@@ -322,9 +322,8 @@ const packageJsonProcess = (
  * @dbAnswers  询问服务端配置的选择值
  */
 const createProjectSync = (answers: ProjectInfo) => {
-  const { framework, description, name, serverConfirm, buildTool } = answers;
-  const templatePath =
-    framework === VUE_TEMPLATE_PATH ? VueVersion.Vue3 : NG_TEMPLATE_PATH;
+  const { description, name, serverConfirm, buildTool } = answers;
+  const templatePath = VueVersion.Vue3;
   // 模板来源目录
   const from = utils.getTemplatePath(templatePath);
   // 复制模板的目标目录
@@ -345,11 +344,6 @@ const createProjectSync = (answers: ProjectInfo) => {
   } catch (e) {
     log.error(e);
     log.error('配置项目信息创建失败');
-  }
-
-  // ng模板不开启mock以及服务
-  if (templatePath === NG_TEMPLATE_PATH) {
-    return;
   }
 
   // 如果不对接服务端，全部接口采用mock
