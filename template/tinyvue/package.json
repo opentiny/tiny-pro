@@ -1,5 +1,5 @@
 {
-  "name": "@opentiny/tiny-pro-vue",
+  "name": "tiny-pro-vue",
   "description": "Tiny Pro for Vue",
   "version": "1.0.0",
   "private": true,
@@ -14,7 +14,7 @@
     "build:rp": "rspack build",
     "report": "cross-env REPORT=true npm run build",
     "lint-staged": "npx lint-staged",
-    "prepare": "husky install",
+    "prepare": "git init && husky install",
     "mock": "tsx ./src/mock/index.ts",
     "dev:fr": "farm",
     "build:fr": "farm build"
