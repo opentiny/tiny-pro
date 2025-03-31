@@ -178,7 +178,7 @@ const getProjectInfo = (): Promise<ProjectInfo> => {
 const createServerSync = (answers: ProjectInfo) => {
   const { name, serverFramework } = answers;
   // 复制服务端相关目录
-  const serverFrom = utils.getTemplatePath(`server/${serverFramework}`);
+  const serverFrom = utils.getTemplatePath(`${serverFramework}`);
   const serverTo = utils.getDistPath(`${name}/${serverFramework}`);
   const config = {
     DATABASE_HOST: answers.dialect && (answers.host ?? 'localhost'),
