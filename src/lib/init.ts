@@ -23,7 +23,6 @@ import { existsSync, readFileSync, rmSync, writeFileSync } from 'fs';
 
 const log = logs('tiny-toolkit-pro');
 const VUE_TEMPLATE_PATH = 'tinyvue';
-const NG_TEMPLATE_PATH = 'tinyng';
 const DEFAULT_PROJECT_NAME = 'tiny-pro';
 
 /**
@@ -53,7 +52,6 @@ const getProjectInfo = (): Promise<ProjectInfo> => {
       message: '请选择您希望使用的客户端技术栈：',
       choices: [
         { name: 'vue', value: VUE_TEMPLATE_PATH },
-        { name: 'angular', value: NG_TEMPLATE_PATH },
       ],
       default: VUE_TEMPLATE_PATH,
       prefix: '*',
@@ -178,7 +176,7 @@ const getProjectInfo = (): Promise<ProjectInfo> => {
 const createServerSync = (answers: ProjectInfo) => {
   const { name, serverFramework } = answers;
   // 复制服务端相关目录
-  const serverFrom = utils.getTemplatePath(`server/${serverFramework}`);
+  const serverFrom = utils.getTemplatePath(`${serverFramework}`);
   const serverTo = utils.getDistPath(`${name}/${serverFramework}`);
   const config = {
     DATABASE_HOST: answers.dialect && (answers.host ?? 'localhost'),
