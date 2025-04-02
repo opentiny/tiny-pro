@@ -69,7 +69,6 @@ npm i && npm start
 在 `tiny-pro/web` 下依次执行以下命令：
 
 - 安装依赖：`npm i`
-- 启动 Mock 服务：`npm run mock`
 - 启动前端项目：`npm start`
 
 更详细的文档请参考 TinyPro 官网：[https://opentiny.design/vue-pro](https://opentiny.design/vue-pro)

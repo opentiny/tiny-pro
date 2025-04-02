@@ -29,7 +29,7 @@
     "rspack",
     "farm"
   ],
-  "repository": "https://github.com/opentiny/tiny-cli",
+  "repository": "https://github.com/opentiny/tiny-pro",
   "homepage": "https://opentiny.design/pro/",
   "scripts": {
     "describe": "npm-scripts-info",
