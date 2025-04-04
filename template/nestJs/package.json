@@ -85,6 +85,9 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "@app/models": "<rootDir>/../libs/models/src/index.ts"
+    }
   }
 }
