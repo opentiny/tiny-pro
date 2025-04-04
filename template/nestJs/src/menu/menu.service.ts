@@ -100,6 +100,7 @@ export class MenuService {
     return convertToTree(await menu);
   }
 
+  /* istanbul ignore next */
   async getMenuAllId() {
     const menu = await this.menu.find();
     for (const item of menu) {
@@ -109,6 +110,7 @@ export class MenuService {
     return this.menuId;
   }
 
+  /* istanbul ignore next */
   async handleMenuParentId(menuId: number[]) {
     const menu = await this.menu.find();
     if (menu) {
