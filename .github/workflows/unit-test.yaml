@@ -1,0 +1,31 @@
+name: BackEnd UnitTest
+
+on:
+  - pull_request
+  - workflow_dispatch
+
+jobs:
+  Backend:
+    runs-on: ubuntu-latest
+    permissions:
+      checks: write
+      pull-requests: write
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkut@v4
+      - name: Setup Node.js
+        uses: pnpm/actions@v4
+        with:
+          version: 9
+          run_install: false
+      - name: Install depend
+        working-directory: template/nestJs
+        run: pnpm i
+      - name: Run Unit Test without coverage
+        run: pnpm test
+      - name: Run Unit Test with coverage
+        uses: ArtiomTr/jest-coverage-report-action@v2
+        with:
+          test-script: pnpm test:cov
+          output: comment, report-markdown

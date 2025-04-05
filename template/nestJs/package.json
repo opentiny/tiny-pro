@@ -82,9 +82,25 @@
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "collectCoverageFrom": [
-      "**/*.(t|j)s"
+      "**/*.(t|j)s",
+      "!src/employees/*.(t|j)s"
+    ],
+    "coveragePathIgnorePatterns": [
+      ".module.ts",
+      ".controller.ts",
+      ".dto.ts",
+      "libs",
+      ".decorator.ts",
+      "reject.guard.ts",
+      "mock",
+      "menu/init",
+      "employees",
+      ".entity.ts"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "@app/models": "<rootDir>/../libs/models/src/index.ts"
+    }
   }
 }
