@@ -13,7 +13,7 @@ jobs:
       contents: write
     steps:
       - name: Checkout
-        uses: actions/checkut@v4
+        uses: actions/checkout@v4
       - name: Setup Node.js
         uses: pnpm/actions@v4
         with:
