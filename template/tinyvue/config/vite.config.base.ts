@@ -3,12 +3,14 @@ import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import vueJsx from '@vitejs/plugin-vue-jsx';
 import svgLoader from 'vite-svg-loader';
+import eslint from 'vite-plugin-eslint';
 
 const config = {
   plugins: [
     vue(),
     vueJsx(),
     svgLoader({ svgoConfig: {} }),
+    eslint({ cache: false }), // 禁用缓存‌
   ],
   build: {
     outDir: resolve(__dirname, '../dist'),
@@ -39,19 +41,19 @@ const config = {
   },
   define: {
     'process.env': {},
-    BUILD_TOOLS: "'VITE'"
+    'BUILD_TOOLS': "'VITE'",
   },
   css: {
     preprocessorOptions: {
       less: {
         modifyVars: {
           hack: `true; @import (reference) "${resolve(
-            'src/assets/style/breakpoint.less'
+            'src/assets/style/breakpoint.less',
           )}";`,
         },
         javascriptEnabled: true,
       },
     },
   },
-}
+};
 export default defineConfig(config);

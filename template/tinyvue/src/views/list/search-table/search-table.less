@@ -1,88 +1,27 @@
-.container-list {
+.search-container-list {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: calc(100% - 60px);
   overflow-x: hidden;
   overflow-y: auto;
 }
 
-.line {
-  height: 1px;
-  color: rgb(213, 213, 213);
-  background-color: rgb(213, 213, 213);
-  border: 0;
-}
-
-.contain {
+.search-table-container {
   flex: 1 1 auto;
   margin: 8px 10px;
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 0 8px 8px rgba(169, 174, 184, 0.05);
-
-  .contain-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 30px 30px 0 30px;
-
-    hr {
-      .line();
-
-      width: 86%;
-      margin: 0 20px;
-    }
-
-    span {
-      color: #1a1818;
-      font-size: 16px;
-    }
-  }
-
-  .contain-box {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    min-width: 52px;
-  }
-
-  .contain-img {
-    position: relative;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-
-    img {
-      height: fit-content;
-    }
-
-    img:hover {
-      background: whitesmoke;
-    }
-  }
-
-  .contain-text {
-    padding-left: 10px;
-    color: #4e5969;
-    font-size: 14px;
-    cursor: pointer;
-  }
 }
 
-.bottom-line {
-  padding-bottom: 24px;
+.search-box-container {
+  width: 100%;
+  padding: 0 8px;
 
-  hr {
-    .line();
+  :deep(.tiny-input) {
+    width: 100%;
 
-    width: 96%;
-    margin: 0 auto;
+    &__inner {
+      height: 30px;
+    }
   }
-}
-
-.filter-form {
-  margin-top: 30px;
 }
 
 .col {
@@ -91,7 +30,7 @@
 }
 
 :deep(.tiny-pager) {
-  float: right;
+  padding: 10px;
 }
 
 :deep(.tiny-grid-button__wrapper) {
@@ -117,6 +56,8 @@
   display: flex;
   justify-content: space-between;
   width: 100%;
+  padding: 10px 12px;
+  background-color: #f5f5f5;
 
   .screen {
     display: flex;
@@ -161,18 +102,16 @@
 }
 
 .tiny-fullscreen {
+  height: calc(100vh - 230px);
+  overflow: hidden;
   background: #fff;
-}
 
-.tiny-fullscreen-wrapper {
-  min-height: 710px;
-  padding: 0 30px;
-}
+  .tiny-fullscreen-scroll {
+    height: 100%;
 
-.tiny-fullscreen-scroll {
-  overflow-y: auto;
-}
+    .tiny-fullscreen-wrapper {
+      height: 100%;
 
-.search-btn {
-  display: flex;
+    }
+  }
 }
