@@ -13,9 +13,9 @@ jobs:
       contents: write
     steps:
       - name: Checkout
-        uses: actions/checkut@v4
+        uses: actions/checkout@v4
       - name: Setup Node.js
-        uses: pnpm/actions@v4
+        uses: pnpm/action-setup@v4
         with:
           version: 9
           run_install: false
