@@ -276,7 +276,6 @@
   }
 
   .layout :deep(.tiny-container .tiny-container__main) {
-    color: #ccc;
     background-color: #f5f6f7;
   }
 
@@ -311,8 +310,8 @@
   }
 
   :deep(
-      .tiny-container__main > .tiny-layout > .tiny-tabs > .tiny-tabs__content
-    ) {
+    .tiny-container__main > .tiny-layout > .tiny-tabs > .tiny-tabs__content
+  ) {
     display: none;
   }
 
