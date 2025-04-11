@@ -14,7 +14,6 @@
     "build:rp": "rspack build",
     "report": "cross-env REPORT=true npm run build",
     "lint-staged": "npx lint-staged",
-    "prepare": "husky install",
     "mock": "tsx ./src/mock/index.ts",
     "dev:fr": "farm",
     "build:fr": "farm build"
