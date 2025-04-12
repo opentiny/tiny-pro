@@ -1,10 +1,10 @@
 <template>
   <div class="layout">
     <div>
-      <div class="shadow-[0_4px_6px_#0003] relative z-[999]">
+      <div relative class="shadow-[0_4px_6px_#0003] z-[999]">
         <NavBar v-if="layoutMode[myPattern].navbar"/>
       </div>
-      <div class="flex">
+      <div flex>
         <Suspense>
           <Menu v-if="reloadKey !== 'menu' && layoutMode[myPattern].menu" class="shadow-[0_4px_12px_#0000001a] z-[100]" />
         </Suspense>
