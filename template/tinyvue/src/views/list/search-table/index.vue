@@ -1,6 +1,6 @@
 <template>
   <div class="search-container-list">
-    <Breadcrumb :items="['menu.list.searchTable']" />
+    <Breadcrumb :items="['menu.list', 'menu.list.searchTable']" />
 
     <div class="search-table-container">
       <tiny-fullscreen
