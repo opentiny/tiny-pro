@@ -50,9 +50,7 @@ const getProjectInfo = (): Promise<ProjectInfo> => {
       type: 'list',
       name: 'framework',
       message: '请选择您希望使用的客户端技术栈：',
-      choices: [
-        { name: 'vue', value: VUE_TEMPLATE_PATH },
-      ],
+      choices: [{ name: 'vue', value: VUE_TEMPLATE_PATH }],
       default: VUE_TEMPLATE_PATH,
       prefix: '*',
     },
