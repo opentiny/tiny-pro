@@ -14,18 +14,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup Node.js
-        uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
         with:
-          version: 9
+          version: 10
           run_install: false
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
       - name: Install depend
-        working-directory: template/nestJs
         run: pnpm i
       - name: Run Unit Test without coverage
         run: pnpm test
-      - name: Run Unit Test with coverage
-        uses: ArtiomTr/jest-coverage-report-action@v2
-        with:
-          test-script: pnpm test:cov
-          output: comment, report-markdown
