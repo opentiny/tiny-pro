@@ -12,6 +12,7 @@ import '@/assets/style/global.less';
 import config from '../hwc-exports.json';
 import chinaMap from './assets/china.json';
 import '@opentiny/vue-search-box/index.css';
+import 'virtual:uno.css';
 
 registerMap('china', chinaMap as any);
 const app = createApp(App);

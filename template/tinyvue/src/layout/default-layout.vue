@@ -1,47 +1,33 @@
 <template>
   <div class="layout">
-    <tiny-container :aside-width="250" :pattern="myPattern">
-      <template #header>
-        <tiny-layout>
-          <div class="layout-navbar">
-            <NavBar />
-          </div>
-        </tiny-layout>
-      </template>
-      <template #aside>
-        <tiny-layout class="layout-sider">
-          <div class="menu-wrapper">
-            <Suspense>
-              <Menu v-if="reloadKey !== 'menu'" />
-            </Suspense>
-          </div>
-        </tiny-layout>
-      </template>
-      <tiny-layout class="layout-content">
-        <Tabs
-          :key="tabsRefreshKey"
-          v-model="currentTabName"
-          with-close
-          @click="onClick"
-          @close="onClose"
-        >
-          <tab-item
-            v-for="(history, idx) of tabsHistory"
-            :key="idx"
-            :title="t(history.name)"
-            :name="history.link"
-          ></tab-item>
-        </Tabs>
-        <PageLayout />
-      </tiny-layout>
-      <template #footer>
-        <tiny-layout>
-          <div class="layout-footer">
-            <Footer />
-          </div>
-        </tiny-layout>
-      </template>
-    </tiny-container>
+    <div>
+      <div relative class="shadow-[0_4px_6px_#0003] z-[999]">
+        <NavBar v-if="layoutMode[myPattern].navbar"/>
+      </div>
+      <div flex>
+        <Suspense>
+          <Menu v-if="reloadKey !== 'menu' && layoutMode[myPattern].menu" class="shadow-[0_4px_12px_#0000001a] z-[100]" />
+        </Suspense>
+        <div class="text-[#ccc] bg-[#f5f6f7] pl-[10px] pr-[10px] flex-1 h-[calc(100vh-60px)]" :style="{ width: isMenuCollapsed ? '100%' : 'calc(100% - 220px)' }">
+          <Tabs
+            :key="tabsRefreshKey"
+            v-model="currentTabName"
+            with-close
+            @click="onClick"
+            @close="onClose"
+          >
+            <tab-item
+              v-for="(history, idx) of tabsHistory"
+              :key="idx"
+              :title="t(history.name)"
+              :name="history.link"
+            ></tab-item>
+          </Tabs>
+          <PageLayout class="!h-[calc(100%-120px)]" />
+          <Footer v-if="layoutMode[myPattern].footer" class="h-[60px]" />
+        </div>
+      </div>
+    </div>
     <div class="theme-box" @click="themeVisible">
       <img src="@/assets/images/theme.png" />
     </div>
@@ -72,11 +58,9 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, watch, onMounted, computed, nextTick, provide } from 'vue';
+  import { ref, watch, computed, nextTick, provide } from 'vue';
   import { useI18n } from 'vue-i18n';
   import {
-    Container as TinyContainer,
-    Layout as TinyLayout,
     Modal as tinyModal,
     Tabs,
     TabItem,
@@ -96,13 +80,15 @@
   // 动态切换
   const router = useRouter();
   const appStore = useAppStore();
-  const changefooter = ref('#fff');
+  const footerColor = ref('#fff');
 
   const { t } = useI18n();
   const tabStore = useTabStore();
 
   const tabsHistory = computed(() => tabStore.data);
   const currentTabName = ref();
+
+  const { isMenuCollapsed } = appStore;
 
   const reloadKey = ref('');
   const reloadMenu = () => {
@@ -203,6 +189,39 @@
   // 是否显示切换框架结构
   const myPattern = ref('legend');
 
+  const layoutMode = {
+    // 传奇布局
+    legend: {
+      navbar: true,
+      menu: true,
+      footer: true,
+    },
+    // 简约布局
+    simple: {
+      navbar: false,
+      menu: true,
+      footer: false,
+    },
+    // 时尚布局
+    fashion: {
+      navbar: true,
+      menu: true,
+      footer: false,
+    },
+    // 经典布局
+    classic: {
+      navbar: true,
+      menu: false,
+      footer: true,
+    },
+    // 默认布局
+    default: {
+      navbar: true,
+      menu: true,
+      footer: false,
+    },
+  }
+
   // 主题配置
   const disTheme = ref(false);
   const theme = new TinyThemeTool();
@@ -227,9 +246,9 @@
 
   watch(appStore.$state, (newValue, oldValue) => {
     if (newValue.theme === 'dark') {
-      changefooter.value = '#262323;';
+      footerColor.value = '#262323;';
     } else {
-      changefooter.value = '#fff;';
+      footerColor.value = '#fff;';
     }
   });
   // 初始化默认主题
@@ -241,24 +260,6 @@
     height: 100%;
   }
 
-  .layout-navbar {
-    position: fixed;
-    left: 0;
-    z-index: 999;
-    width: 100%;
-    height: 60px;
-    background-color: #fff;
-    box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.2);
-  }
-
-  .menu-wrapper {
-    width: inherit;
-    height: 92vh;
-    margin-top: v-bind(top);
-    overflow-x: hidden;
-    overflow-y: auto;
-  }
-
   .global-setting {
     position: fixed;
     top: 280px;
@@ -266,30 +267,6 @@
     z-index: 99;
     width: 30px;
     height: 30px;
-  }
-
-  .layout :deep(.tiny-container .tiny-container__aside) {
-    z-index: 100;
-    background: #fff;
-    border-left: 1px solid #ccc;
-    box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.1);
-  }
-
-  .layout :deep(.tiny-container .tiny-container__main) {
-    background-color: #f5f6f7;
-  }
-
-  .layout :deep(.layout-content) {
-    height: 100%;
-    padding: 0 10px;
-    overflow: hidden;
-  }
-
-  .layout :deep(.tiny-container .tiny-container__footer) {
-    display: flex;
-    justify-content: center;
-    padding-top: 15px;
-    background-color: #f5f6f7;
   }
 
   // 组件无法固定非message的modal类型距离顶部距离
@@ -317,6 +294,11 @@
 
   :deep(.tiny-tabs--top) {
     padding: 0 16px;
+  }
+
+  :deep(.tiny-tree-menu .tiny-tree) {
+    height: 100%;
+    overflow: auto;
   }
 
   .theme-box {

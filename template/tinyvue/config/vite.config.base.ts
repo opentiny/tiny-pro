@@ -4,6 +4,7 @@ import vue from '@vitejs/plugin-vue';
 import vueJsx from '@vitejs/plugin-vue-jsx';
 import svgLoader from 'vite-svg-loader';
 import eslint from 'vite-plugin-eslint';
+import UnoCSS from 'unocss/vite';
 
 const config = {
   plugins: [
@@ -11,6 +12,7 @@ const config = {
     vueJsx(),
     svgLoader({ svgoConfig: {} }),
     eslint({ cache: false }), // 禁用缓存‌
+    UnoCSS(),
   ],
   build: {
     outDir: resolve(__dirname, '../dist'),

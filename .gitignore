@@ -10,3 +10,4 @@ coverage
 dist
 yarn.lock
 .env
+.history

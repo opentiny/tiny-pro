@@ -5,11 +5,14 @@
       :data="MenuData"
       :show-filter="false"
       node-key="id"
-      wrap
+
       :default-expanded-keys="expandeArr"
       only-check-children
       check-strictly
+      menu-collapsible
       @current-change="currentChange"
+      @collapse-change="collapseChange"
+      class="h-[calc(100vh-60px)]"
     >
       <template #default="slotScope">
         <template v-for="(item, index) in routerTitle" :key="index">
@@ -30,7 +33,7 @@
   import router from '@/router';
   import { ITreeNodeData } from '@/router/guard/menu';
   import * as icons from '@opentiny/vue-icon';
-  import { useTabStore } from '@/store';
+  import { useTabStore, useAppStore } from '@/store';
   import { useDeepClone } from '@/hooks/useDeepClone';
 
   const menuStore = useMenuStore();
@@ -39,6 +42,7 @@
   type SideMenuData = (ITreeNodeData & { meta: { url: string } })[];
 
   let routerTitle = [] as any;
+  const appStore = useAppStore();
 
   const filtter = (treeNodeDatas: ITreeNodeData[]) => {
     const menus: SideMenuData = [];
@@ -77,6 +81,10 @@
     }
     router.replace({ name: data.label });
   };
+
+  const collapseChange = (value) => {
+    appStore.isMenuCollapsed = value
+  }
 
   const findId = (name: string, path: string) => {
     const dfs = (item, url: string[]) => {
