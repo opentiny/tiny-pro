@@ -20,7 +20,6 @@ jobs:
           version: 9
           run_install: false
       - name: Install depend
-        working-directory: template/nestJs
         run: pnpm i
       - name: Run Unit Test without coverage
         run: pnpm test
