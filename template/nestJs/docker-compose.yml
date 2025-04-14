@@ -6,7 +6,7 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: ospp-nest
+      MYSQL_DATABASE: demo_tiny_pro
     ports:
       - "3306:3306"
   redis:
