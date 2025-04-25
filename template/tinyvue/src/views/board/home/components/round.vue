@@ -4,7 +4,7 @@
       <div>
         <img src="@/assets/images/map-background3.png" class="image" />
         <h3>{{ $t('home.round.title') }}</h3>
-        <div id="circled" ref="echartsDom"></div>
+        <tiny-chart-ring id="circled" ref="ringRef" height="100%" :options="options" :extend="chartExtend"></tiny-chart-ring>
       </div>
       <div class="round-from">
         <RoundTable></RoundTable>
@@ -16,22 +16,35 @@
 <script lang="ts" setup>
   import { onMounted, watch, inject, ref, nextTick } from 'vue';
   import { useI18n } from 'vue-i18n';
+  import { TinyHuichartsRing as TinyChartRing } from '@opentiny/vue-huicharts'
   import useLocale from '@/hooks/locale';
   import RoundTable from './roundtable.vue';
 
   const { t } = useI18n();
   const { currentLocale } = useLocale();
-  let echarts = inject<any>('echarts');
-  const echartsDom = ref();
-
-  let option = {
+  const ringRef = ref();
+  const options = ref({
+    data: [
+      { value: 300, name: '5G' },
+      { value: 1048, name: '4G' },
+      { value: 735, name: 'unknow' },
+      { value: 580, name: '3G' },
+    ]
+  })
+  const chartExtend = ref({
+    color: ['#5470c6', '#91cc74', '#fac858', '#ee6666'],
     tooltip: {
       trigger: 'item',
     },
     legend: {
       orient: 'vertical',
-      y: 'center',
-      x: 'right',
+      left: 'right',
+      top: 'center',
+      icon: '',
+      align: 'right',
+      itemWidth: 25,
+      itemHeight: 14,
+      itemGap: 10,
     },
     series: [
       {
@@ -58,33 +71,22 @@
         },
         labelLine: {
           show: false,
-        },
-        data: [
-          { value: 300, name: '5G' },
-          { value: 1048, name: '4G' },
-          { value: 735, name: 'unknow' },
-          { value: 580, name: '3G' },
-        ],
+        }
       },
     ],
-  };
+  })
 
   onMounted(() => {
-    const chartDom = echartsDom.value;
-    const myChart = echarts.init(chartDom as any);
-    option && myChart.setOption(option);
     window.addEventListener('resize', () => {
-      myChart.resize();
+      ringRef.value.resize();
     });
     nextTick(() => {
-      myChart.resize();
+      ringRef.value.resize();
     });
   });
 
   watch(currentLocale, (newValue, oldValue) => {
-    const chartDom = echartsDom.value;
-    const myChart = echarts.init(chartDom as any);
-    myChart.setOption(option);
+    ringRef.value.resize();
   });
 </script>
 

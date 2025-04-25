@@ -11,6 +11,9 @@ importers:
       '@opentiny/cli-devkit':
         specifier: ^1.0.1
         version: 1.1.3
+      '@opentiny/vue-huicharts':
+        specifier: ^3.22.0
+        version: 3.22.0(echarts@5.4.1)
       chalk:
         specifier: ^4.1.2
         version: 4.1.2
@@ -275,6 +278,15 @@ packages:
       tsutils: '>=2.29.0'
       typescript: '>= 3.3.0 || >= 3.6.0-dev || >= 3.7.0-dev'
 
+  '@floating-ui/core@1.6.9':
+    resolution: {integrity: sha512-uMXCuQ3BItDUbAMhIXw7UPXRfAlOAvZzdK9BWpE60MCn+Svt3aLn9jsPTi/WNGlRUu2uI0v5S7JiIUsbsvh3fw==}
+
+  '@floating-ui/dom@1.6.13':
+    resolution: {integrity: sha512-umqzocjDgNRGTuO7Q8CU32dkHkECqI8ZdMZ5Swb6QAM0t5rnlrN3lGo1hdpscRd3WS8T6DKYK4ephgIH9iRh3w==}
+
+  '@floating-ui/utils@0.2.9':
+    resolution: {integrity: sha512-MDWhGtE+eHw5JW7lq4qhc5yRLS11ERl1c7Z6Xd0a58DozHES6EnNNwUWbMiG4J9Cgj053Bhk8zvlhFYKVhULwg==}
+
   '@gar/promisify@1.1.3':
     resolution: {integrity: sha512-k2Ty1JcVojjJFwrg/ThKi2ujJ7XNLYaFGNB/bWT9wGR+oSMJHMa5w+CUq6p/pVrKeNNgA7pCqEcjSnHVoqJQFw==}
 
@@ -398,6 +410,102 @@ packages:
 
   '@opentiny/cli-devkit@1.1.3':
     resolution: {integrity: sha512-9B9ohUDGDzdU4XDNYBcmmpme3kX6RnhiT/jOD9qnsjReyI4rm/d9uNDZ4hAeySSAFUPtEhswUommXUfr4HZknw==}
+
+  '@opentiny/huicharts@1.0.1':
+    resolution: {integrity: sha512-KsVNZwCstMJec2vM/uMff9jj/nNHXCchiwGGU4+MGP1nRwg7Hkj8pjgJQh/tJR6+AEKPY/h+TewRM3S6KBtn5g==}
+
+  '@opentiny/utils@3.22.0':
+    resolution: {integrity: sha512-iQCozIrpTXIfipe1o1avAswQ8NENfDdYennSUsdkpBVIZftSe5ZVVdPBXNSDcoeA+chUQryk2WDapudVaQA8sg==}
+
+  '@opentiny/vue-common@3.22.0':
+    resolution: {integrity: sha512-ay1fxJAIk8jRMT6Fsb8VJmX3EPWRcizTELA1rjyiJnOH+DJ0mdNmPWLo70RirPulByaj35voa2HSkcJxbt8Lkg==}
+
+  '@opentiny/vue-hooks@3.22.0':
+    resolution: {integrity: sha512-DTBsana3pJnMCf2WPCmUqpXpcOez64a9aIf9m35XM+a4+yXIQkZoZYOk+B+UdchnA7KtW+OKOrpL0/7DD4Up0Q==}
+
+  '@opentiny/vue-huicharts-amap@3.22.0':
+    resolution: {integrity: sha512-7N4g1oIaKhEIMjbiagLRh+q+Q9zW6R+a4CWN739mZGEOFemlzs8uPx+E7JWfJXYRzdev5cmb9aRf4h+B2n0zsA==}
+
+  '@opentiny/vue-huicharts-bar@3.22.0':
+    resolution: {integrity: sha512-yLR2uJJrJx6pcyB5DB9yvLBuPTD044JHDtPdTCroDs37qceIn6c3C1sI5LziQ6iS8fdp+B90h2eBGkER8ksK6Q==}
+
+  '@opentiny/vue-huicharts-bmap@3.22.0':
+    resolution: {integrity: sha512-bFkZ7d7n5dzj/z2AlCF/dUtrJFVW78TZT2OTqrVX1Lq3v1AyuzarV/o0sTs57Xwx3JRubnMdbJYLS9jyzw3GPQ==}
+
+  '@opentiny/vue-huicharts-boxplot@3.22.0':
+    resolution: {integrity: sha512-J6u7urE+oTscxXusRNFWJWyTxBtWG1qxezDSpTmn52yNifJdXoVlUPGWDf6TbJdNT7AZU4mHPp2Z6mo0J8N9JA==}
+
+  '@opentiny/vue-huicharts-candle@3.22.0':
+    resolution: {integrity: sha512-EUmENBOjKuP4UpUZKSX85KWA2CeLQhgWeKXV9zHovUYWzDY93ozF99Ark17ExqnWuxYAvE0X1mBSmUYfJIIB/w==}
+
+  '@opentiny/vue-huicharts-core@3.22.0':
+    resolution: {integrity: sha512-XZJQSfEeWktqcPLH1kFhjYpKX5fgDLjDHurcLPhRDjW2oDTElvfNa+MlXlutT6GT/u5ple9XzWu0Lm3hujdgJA==}
+
+  '@opentiny/vue-huicharts-funnel@3.22.0':
+    resolution: {integrity: sha512-6LPXX37vJ2Y0FmNyONVsymsW+E7FF2WU8LODtyNyloHSs2FWAr6xYPRLnyodAQTQ1r0oE0xWanpPKvUi2/hA+g==}
+
+  '@opentiny/vue-huicharts-gauge@3.22.0':
+    resolution: {integrity: sha512-VwT6sDelEHRl7nEl7eKyUDwLjsScbfnlYMn8tnsQjfy5uxOPL1ZITzVJuGyytU1TylQXL+oWF2T8ameosCK/Ng==}
+
+  '@opentiny/vue-huicharts-graph@3.22.0':
+    resolution: {integrity: sha512-BAI0iydq6TKpE24E7K/QId8VI3N0dehkJ8wXJUnA5kkNf0ZuAGb8qdrBKoSNGFUfhO+RS9ZNsKwnl9WsZ6pxrw==}
+
+  '@opentiny/vue-huicharts-heatmap@3.22.0':
+    resolution: {integrity: sha512-e07ZknWNvQdsbiXKc3SEU5twHZ5+x++NZCjrjFgLdSdEJJ6LfwJVJqweDxbe97bIoOa+yvbSj6/GalPsJD2N5A==}
+
+  '@opentiny/vue-huicharts-histogram@3.22.0':
+    resolution: {integrity: sha512-2jC0A5FfdGmzMIHvlr4khTkLr/RgJlMwMSNzvZHx0GsGn5BWVXVIaMsqCDoA/HR2H9nz99TQ+PjQo2ynBuUszA==}
+
+  '@opentiny/vue-huicharts-line@3.22.0':
+    resolution: {integrity: sha512-m9mo7CzwhlSTxlyoitCozyZbiORnIOU2Skues5KGnYF/iw57OV/w+kRdPAdkVVS/bj8DwadNPr3hYx/Iq40srA==}
+
+  '@opentiny/vue-huicharts-liquidfill@3.22.0':
+    resolution: {integrity: sha512-4Uq8T8epzG1+GBln0Ol11stnyoB4qngyJNZS/BuDz0JcVucH9OGZ/4Mm5l41sWROvhXyO4BQe8Z8t9qWGeOevg==}
+
+  '@opentiny/vue-huicharts-map@3.22.0':
+    resolution: {integrity: sha512-uGnt1KFceLLstPSQEjbTgy/kxSRnPBBZ8hej3MweZbEdbVR8HxfQhvvlUpN9GZyesxnqOv/mD7EzfjTLc0QJaQ==}
+
+  '@opentiny/vue-huicharts-pie@3.22.0':
+    resolution: {integrity: sha512-viAWcUfRnOU4QvKCHon3nuEHz5bKiDf35PwreIjcvXyqOfRoiDWGL8GY+6qeb3UwjzKTEP9ClOArbJt49rFceQ==}
+
+  '@opentiny/vue-huicharts-process@3.22.0':
+    resolution: {integrity: sha512-rZV7/C+fPVZtRvnO0GjcpBIw5iVzzreZdL8T1uem9D7P576L9rgkw9QMXct7z/G12POaGpHjziBZH2ySWIK8QQ==}
+
+  '@opentiny/vue-huicharts-radar@3.22.0':
+    resolution: {integrity: sha512-gwgPLzIlPxNDkc7uEbiqkRW1qZdrNv+N4YcmD6NrgEi760hpMHpUa1E5NZAnAIUQsFRc0BBIj4dAVGBf/STlPw==}
+
+  '@opentiny/vue-huicharts-ring@3.22.0':
+    resolution: {integrity: sha512-IJS2wOPOlPmUm5ZNVDG21OAMssijLOmQZYBga+xlNWtGCR2/CwTDF5NaFQR87X3PRlPmkckmWAcmP/PxowqdXA==}
+
+  '@opentiny/vue-huicharts-sankey@3.22.0':
+    resolution: {integrity: sha512-acn3SK7z6SrxMnMrr9TCjGhfCPB1OGKpJ0v7HZDa/+KV0aP60zdvSDRLNZqjvqmouapPVliCFKjRW13y1LEEPQ==}
+
+  '@opentiny/vue-huicharts-scatter@3.22.0':
+    resolution: {integrity: sha512-2Sn1rdGIe//MGceYysJwRTxzWgP1hA0ihabTlEuSP2saktYBd/Df6o+FWIlSQHp+LVJuKBPuCv4mzxI8cHWmGg==}
+
+  '@opentiny/vue-huicharts-sunburst@3.22.0':
+    resolution: {integrity: sha512-OolJZeQ2uB8kpFdQLHLBZOggwxOp0jPKAaCsmK2z6mC3sHLlTNnwXohSh9UDvClugkjM2tsmYzR0uk7Lnpb0WA==}
+
+  '@opentiny/vue-huicharts-tree@3.22.0':
+    resolution: {integrity: sha512-JbAu3CVxWUxni1OiIPVM5lu5JTK0hmmG0xJtkVzL59T8uVjd58K2bpr9tFVHSTiYajwUvIkHwcWtymnYjj111Q==}
+
+  '@opentiny/vue-huicharts-waterfall@3.22.0':
+    resolution: {integrity: sha512-SUt/vOIyuXhPQPnPvvUb52qHC34jJDHdeme3vMWHDocncqIaNgnd6LwW7yGAHOhiQ+zVsq4yIYIy/LTIfI6Zzg==}
+
+  '@opentiny/vue-huicharts-wordcloud@3.22.0':
+    resolution: {integrity: sha512-2Klrr/CJdQBvf5pVuhoGXBMvAiBlIMC86D6AXFJXiYK68RcE5beidS6cnNtl2AlqFYzb+45iIusmJR9YT8EISQ==}
+
+  '@opentiny/vue-huicharts@3.22.0':
+    resolution: {integrity: sha512-I637k99/xZydjxHdf8zRmqQNWMG5BrDEMT2FkN88HCDr4AX2PcJz5afB/QaDQ04UaTB1sXi3thCfTVMWPiD97w==}
+
+  '@opentiny/vue-locale@3.22.0':
+    resolution: {integrity: sha512-opcVULSn7/klAmNpCaASkcJOfC5ty96qSIyED9AdjFj8EQvHLOiXYDTidrT2YIzlvnLC5ceFwVQcm1yjxuDL9Q==}
+
+  '@opentiny/vue-renderless@3.22.0':
+    resolution: {integrity: sha512-Hxho9TDbzgXzGCuejOs5WUPWwkbh4Led7aDGQkUxEULU+wJWEVf52gQXA9UVfdRYovxQXusyih23vhG0hhTDrQ==}
+
+  '@opentiny/vue-theme@3.22.1':
+    resolution: {integrity: sha512-3yvuU5mc7dVX408hLK2sjEx7sSdEblcJyPtdbOeQ8ovaAq9fW6GZA3sUNRvq9SeanCw4vvZX5AkTB22sARKTNQ==}
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -1009,6 +1117,10 @@ packages:
   color@3.2.1:
     resolution: {integrity: sha512-aBl7dZI9ENN6fUGC7mWpMTPNHmWUSNan9tuWN6ahh5ZLNk9baLJOnSMlrQkHcrfFgz2/RigjUVAjdx36VcemKA==}
 
+  color@4.2.3:
+    resolution: {integrity: sha512-1rXeuUUiGGrykh+CeBdu5Ie7OJwinCgQY0bc7GCRxy5xVHy+moaqkpL/jqQq0MtQOeYcrqEz4abc5f0KtU7W4A==}
+    engines: {node: '>=12.5.0'}
+
   colorspace@1.1.4:
     resolution: {integrity: sha512-BgvKJiuVu1igBUF2kEjRCZXol6wiiGbY5ipL/oVPwm0BL9sIpMIzM8IK7vwuxIIzOXMV3Ey5w+vxhm0rR/TN8w==}
 
@@ -1092,6 +1204,9 @@ packages:
     resolution: {integrity: sha512-/Tb/JcjK111nNScGob5MNtsntNM1aCNUDipB/TkwZFhyDrrE47SOx/18wF2bbjgc3ZzCSKW1T5nt5EbFoAz/Vg==}
     engines: {node: '>=4'}
     hasBin: true
+
+  cssfilter@0.0.10:
+    resolution: {integrity: sha512-FAaLDaplstoRsDR8XGYH51znUN0UY7nMc6Z9/fvE8EXGwvJE9hu7W2vHwx1+bd6gCYnln9nLbzxFTrcO9YQDZw==}
 
   currently-unhandled@0.4.1:
     resolution: {integrity: sha512-/fITjgjGU50vjQ4FH6eUoYu+iUoUKIXws2hL15JJpIR+BbTxaXQsMuuyjtNh2WqsSBS5nsaZHFsFecyw5CCAng==}
@@ -1274,6 +1389,19 @@ packages:
 
   eastasianwidth@0.2.0:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
+
+  echarts-liquidfill@3.1.0:
+    resolution: {integrity: sha512-5Dlqs/jTsdTUAsd+K5LPLLTgrbbNORUSBQyk8PSy1Mg2zgHDWm83FmvA4s0ooNepCJojFYRITTQ4GU1UUSKYLw==}
+    peerDependencies:
+      echarts: ^5.0.1
+
+  echarts-wordcloud@2.0.0:
+    resolution: {integrity: sha512-K7l6pTklqdW7ZWzT/1CS0KhBSINr/cd7c5N1fVMzZMwLQHEwT7x+nivK7g5hkVh7WNcAv4Dn6/ZS5zMKRozC1g==}
+    peerDependencies:
+      echarts: ^5.0.1
+
+  echarts@5.4.1:
+    resolution: {integrity: sha512-9ltS3M2JB0w2EhcYjCdmtrJ+6haZcW6acBolMGIuf01Hql1yrIV01L1aRj7jsaaIULJslEP9Z3vKlEmnJaWJVQ==}
 
   ejs@2.7.4:
     resolution: {integrity: sha512-7vmuyh5+kuUyJKePhQfRQBhXV5Ce+RnaeeQArKu1EAMpL3WbgMt5WG6uQZpEVvYSSsxMXRKOewtDk9RaTKXRlA==}
@@ -3894,6 +4022,9 @@ packages:
     resolution: {integrity: sha512-e900nM8RRtGhlV36KGEU9k65K3mPb1WV70OdjfxlG2EAuM1noi/E/BaW/uMhL7bPEssK8QV57vN3esixjUvcXQ==}
     engines: {node: '>=0.10.0'}
 
+  tailwind-merge@1.14.0:
+    resolution: {integrity: sha512-3mFKyCo/MBcgyOTlrY8T7odzZFx+w+qKSMAmdFzRvqBfLlSigU6TZnlFHK0lkMwj9Bj8OYU+9yW9lmGuS0QEnQ==}
+
   tar@6.2.1:
     resolution: {integrity: sha512-DZ4yORTwrbTj/7MZYq2w+/ZFdI6OZ/f9SFHR+71gIVUZhOQPHzVCLpvRnPgyaMpfWxxk/4ONva3GQSyNIKRv6A==}
     engines: {node: '>=10'}
@@ -3996,6 +4127,9 @@ packages:
 
   tslib@1.9.0:
     resolution: {integrity: sha512-f/qGG2tUkrISBlQZEjEqoZ3B2+npJjIf04H1wuAv9iA8i04Icp+61KRXxFdha22670NJopsZCIjhC3SnjPRKrQ==}
+
+  tslib@2.3.0:
+    resolution: {integrity: sha512-N82ooyxVNm6h1riLCoyS9e3fuJ3AMG2zIZs2Gd1ATcSFjSA23Q0fzjjZeh0jbJvWVDZ0cJT8yaNNaaXHzueNjg==}
 
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
@@ -4368,6 +4502,11 @@ packages:
     resolution: {integrity: sha512-KcVhPaOu2ZurYNHSRTf1+ZHORkTZGCQ+u0JHN17QixRISJq4pXOnjt/lQcehvtHL5QAKhSzKgyjrcNnPdkPBHA==}
     engines: {node: '>=4'}
 
+  xss@1.0.14:
+    resolution: {integrity: sha512-og7TEJhXvn1a7kzZGQ7ETjdQVS2UfZyTlsEdDOqvQF7GoxNfY+0YLCzBy1kPdsDDx4QuNAonQPddpsn6Xl/7sw==}
+    engines: {node: '>= 0.10.0'}
+    hasBin: true
+
   xtend@4.0.2:
     resolution: {integrity: sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==}
     engines: {node: '>=0.4'}
@@ -4410,6 +4549,9 @@ packages:
     resolution: {integrity: sha512-2OQsPNEmBCvXuFlIni/a+Rn+R2pHW9INm0BxXJ4hVDA8TirqMj+J/Rp9ItLatT/5pZqWwefVrTQcHpixsxnVlA==}
     engines: {node: '>= 4.0.0'}
 
+  zrender@5.4.1:
+    resolution: {integrity: sha512-M4Z05BHWtajY2241EmMPHglDQAJ1UyHQcYsxDNzD9XLSkPDqMq4bB28v9Pb4mvHnVQ0GxyTklZ/69xCFP6RXBA==}
+
 snapshots:
 
   '@ampproject/remapping@2.3.0':
@@ -4419,12 +4561,12 @@ snapshots:
 
   '@ava/babel-plugin-throws-helper@3.0.0': {}
 
-  '@ava/babel-preset-stage-4@3.0.0(@babel/core@7.26.10)(supports-color@7.2.0)':
+  '@ava/babel-preset-stage-4@3.0.0(@babel/core@7.26.10(supports-color@7.2.0))(supports-color@7.2.0)':
     dependencies:
-      '@babel/plugin-proposal-async-generator-functions': 7.20.7(@babel/core@7.26.10)(supports-color@7.2.0)
-      '@babel/plugin-proposal-optional-catch-binding': 7.18.6(@babel/core@7.26.10)
-      '@babel/plugin-transform-dotall-regex': 7.25.9(@babel/core@7.26.10)
-      '@babel/plugin-transform-modules-commonjs': 7.26.3(@babel/core@7.26.10)(supports-color@7.2.0)
+      '@babel/plugin-proposal-async-generator-functions': 7.20.7(@babel/core@7.26.10(supports-color@7.2.0))(supports-color@7.2.0)
+      '@babel/plugin-proposal-optional-catch-binding': 7.18.6(@babel/core@7.26.10(supports-color@7.2.0))
+      '@babel/plugin-transform-dotall-regex': 7.25.9(@babel/core@7.26.10(supports-color@7.2.0))
+      '@babel/plugin-transform-modules-commonjs': 7.26.3(@babel/core@7.26.10(supports-color@7.2.0))(supports-color@7.2.0)
     transitivePeerDependencies:
       - '@babel/core'
       - supports-color
@@ -4482,7 +4624,7 @@ snapshots:
       lru-cache: 5.1.1
       semver: 6.3.1
 
-  '@babel/helper-create-regexp-features-plugin@7.27.0(@babel/core@7.26.10)':
+  '@babel/helper-create-regexp-features-plugin@7.27.0(@babel/core@7.26.10(supports-color@7.2.0))':
     dependencies:
       '@babel/core': 7.26.10(supports-color@7.2.0)
       '@babel/helper-annotate-as-pure': 7.25.9
@@ -4511,7 +4653,7 @@ snapshots:
 
   '@babel/helper-plugin-utils@7.26.5': {}
 
-  '@babel/helper-remap-async-to-generator@7.25.9(@babel/core@7.26.10)(supports-color@7.2.0)':
+  '@babel/helper-remap-async-to-generator@7.25.9(@babel/core@7.26.10(supports-color@7.2.0))(supports-color@7.2.0)':
     dependencies:
       '@babel/core': 7.26.10(supports-color@7.2.0)
       '@babel/helper-annotate-as-pure': 7.25.9
@@ -4543,44 +4685,44 @@ snapshots:
     dependencies:
       '@babel/types': 7.27.0
 
-  '@babel/plugin-proposal-async-generator-functions@7.20.7(@babel/core@7.26.10)(supports-color@7.2.0)':
+  '@babel/plugin-proposal-async-generator-functions@7.20.7(@babel/core@7.26.10(supports-color@7.2.0))(supports-color@7.2.0)':
     dependencies:
       '@babel/core': 7.26.10(supports-color@7.2.0)
       '@babel/helper-environment-visitor': 7.24.7
       '@babel/helper-plugin-utils': 7.26.5
-      '@babel/helper-remap-async-to-generator': 7.25.9(@babel/core@7.26.10)(supports-color@7.2.0)
-      '@babel/plugin-syntax-async-generators': 7.8.4(@babel/core@7.26.10)
+      '@babel/helper-remap-async-to-generator': 7.25.9(@babel/core@7.26.10(supports-color@7.2.0))(supports-color@7.2.0)
+      '@babel/plugin-syntax-async-generators': 7.8.4(@babel/core@7.26.10(supports-color@7.2.0))
     transitivePeerDependencies:
       - supports-color
 
-  '@babel/plugin-proposal-optional-catch-binding@7.18.6(@babel/core@7.26.10)':
+  '@babel/plugin-proposal-optional-catch-binding@7.18.6(@babel/core@7.26.10(supports-color@7.2.0))':
     dependencies:
       '@babel/core': 7.26.10(supports-color@7.2.0)
       '@babel/helper-plugin-utils': 7.26.5
-      '@babel/plugin-syntax-optional-catch-binding': 7.8.3(@babel/core@7.26.10)
+      '@babel/plugin-syntax-optional-catch-binding': 7.8.3(@babel/core@7.26.10(supports-color@7.2.0))
 
-  '@babel/plugin-syntax-async-generators@7.8.4(@babel/core@7.26.10)':
-    dependencies:
-      '@babel/core': 7.26.10(supports-color@7.2.0)
-      '@babel/helper-plugin-utils': 7.26.5
-
-  '@babel/plugin-syntax-object-rest-spread@7.8.3(@babel/core@7.26.10)':
+  '@babel/plugin-syntax-async-generators@7.8.4(@babel/core@7.26.10(supports-color@7.2.0))':
     dependencies:
       '@babel/core': 7.26.10(supports-color@7.2.0)
       '@babel/helper-plugin-utils': 7.26.5
 
-  '@babel/plugin-syntax-optional-catch-binding@7.8.3(@babel/core@7.26.10)':
+  '@babel/plugin-syntax-object-rest-spread@7.8.3(@babel/core@7.26.10(supports-color@7.2.0))':
     dependencies:
       '@babel/core': 7.26.10(supports-color@7.2.0)
       '@babel/helper-plugin-utils': 7.26.5
 
-  '@babel/plugin-transform-dotall-regex@7.25.9(@babel/core@7.26.10)':
+  '@babel/plugin-syntax-optional-catch-binding@7.8.3(@babel/core@7.26.10(supports-color@7.2.0))':
     dependencies:
       '@babel/core': 7.26.10(supports-color@7.2.0)
-      '@babel/helper-create-regexp-features-plugin': 7.27.0(@babel/core@7.26.10)
       '@babel/helper-plugin-utils': 7.26.5
 
-  '@babel/plugin-transform-modules-commonjs@7.26.3(@babel/core@7.26.10)(supports-color@7.2.0)':
+  '@babel/plugin-transform-dotall-regex@7.25.9(@babel/core@7.26.10(supports-color@7.2.0))':
+    dependencies:
+      '@babel/core': 7.26.10(supports-color@7.2.0)
+      '@babel/helper-create-regexp-features-plugin': 7.27.0(@babel/core@7.26.10(supports-color@7.2.0))
+      '@babel/helper-plugin-utils': 7.26.5
+
+  '@babel/plugin-transform-modules-commonjs@7.26.3(@babel/core@7.26.10(supports-color@7.2.0))(supports-color@7.2.0)':
     dependencies:
       '@babel/core': 7.26.10(supports-color@7.2.0)
       '@babel/helper-module-transforms': 7.26.0(@babel/core@7.26.10)(supports-color@7.2.0)
@@ -4647,6 +4789,17 @@ snapshots:
       tslib: 1.14.1
       tsutils: 3.21.0(typescript@3.9.10)
       typescript: 3.9.10
+
+  '@floating-ui/core@1.6.9':
+    dependencies:
+      '@floating-ui/utils': 0.2.9
+
+  '@floating-ui/dom@1.6.13':
+    dependencies:
+      '@floating-ui/core': 1.6.9
+      '@floating-ui/utils': 0.2.9
+
+  '@floating-ui/utils@0.2.9': {}
 
   '@gar/promisify@1.1.3': {}
 
@@ -4872,6 +5025,206 @@ snapshots:
     transitivePeerDependencies:
       - bluebird
       - supports-color
+
+  '@opentiny/huicharts@1.0.1': {}
+
+  '@opentiny/utils@3.22.0':
+    dependencies:
+      xss: 1.0.14
+
+  '@opentiny/vue-common@3.22.0':
+    dependencies:
+      '@opentiny/utils': 3.22.0
+      '@opentiny/vue-hooks': 3.22.0
+      '@opentiny/vue-locale': 3.22.0
+      '@opentiny/vue-renderless': 3.22.0
+      '@opentiny/vue-theme': 3.22.1
+      tailwind-merge: 1.14.0
+
+  '@opentiny/vue-hooks@3.22.0':
+    dependencies:
+      '@floating-ui/dom': 1.6.13
+      '@opentiny/utils': 3.22.0
+
+  '@opentiny/vue-huicharts-amap@3.22.0':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+
+  '@opentiny/vue-huicharts-bar@3.22.0':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+
+  '@opentiny/vue-huicharts-bmap@3.22.0':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+
+  '@opentiny/vue-huicharts-boxplot@3.22.0':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+
+  '@opentiny/vue-huicharts-candle@3.22.0':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+      '@opentiny/vue-locale': 3.22.0
+
+  '@opentiny/vue-huicharts-core@3.22.0':
+    dependencies:
+      '@opentiny/huicharts': 1.0.1
+      '@opentiny/utils': 3.22.0
+      '@opentiny/vue-theme': 3.22.1
+      echarts: 5.4.1
+
+  '@opentiny/vue-huicharts-funnel@3.22.0':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+
+  '@opentiny/vue-huicharts-gauge@3.22.0':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+
+  '@opentiny/vue-huicharts-graph@3.22.0':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+
+  '@opentiny/vue-huicharts-heatmap@3.22.0':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+
+  '@opentiny/vue-huicharts-histogram@3.22.0':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+
+  '@opentiny/vue-huicharts-line@3.22.0':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+
+  '@opentiny/vue-huicharts-liquidfill@3.22.0(echarts@5.4.1)':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+      echarts-liquidfill: 3.1.0(echarts@5.4.1)
+    transitivePeerDependencies:
+      - echarts
+
+  '@opentiny/vue-huicharts-map@3.22.0':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+
+  '@opentiny/vue-huicharts-pie@3.22.0':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+      '@opentiny/vue-locale': 3.22.0
+
+  '@opentiny/vue-huicharts-process@3.22.0':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+
+  '@opentiny/vue-huicharts-radar@3.22.0':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+
+  '@opentiny/vue-huicharts-ring@3.22.0':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+      '@opentiny/vue-locale': 3.22.0
+
+  '@opentiny/vue-huicharts-sankey@3.22.0':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+
+  '@opentiny/vue-huicharts-scatter@3.22.0':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+
+  '@opentiny/vue-huicharts-sunburst@3.22.0':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+
+  '@opentiny/vue-huicharts-tree@3.22.0':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+
+  '@opentiny/vue-huicharts-waterfall@3.22.0':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+      '@opentiny/vue-locale': 3.22.0
+
+  '@opentiny/vue-huicharts-wordcloud@3.22.0(echarts@5.4.1)':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+      echarts-wordcloud: 2.0.0(echarts@5.4.1)
+    transitivePeerDependencies:
+      - echarts
+
+  '@opentiny/vue-huicharts@3.22.0(echarts@5.4.1)':
+    dependencies:
+      '@opentiny/huicharts': 1.0.1
+      '@opentiny/utils': 3.22.0
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-amap': 3.22.0
+      '@opentiny/vue-huicharts-bar': 3.22.0
+      '@opentiny/vue-huicharts-bmap': 3.22.0
+      '@opentiny/vue-huicharts-boxplot': 3.22.0
+      '@opentiny/vue-huicharts-candle': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+      '@opentiny/vue-huicharts-funnel': 3.22.0
+      '@opentiny/vue-huicharts-gauge': 3.22.0
+      '@opentiny/vue-huicharts-graph': 3.22.0
+      '@opentiny/vue-huicharts-heatmap': 3.22.0
+      '@opentiny/vue-huicharts-histogram': 3.22.0
+      '@opentiny/vue-huicharts-line': 3.22.0
+      '@opentiny/vue-huicharts-liquidfill': 3.22.0(echarts@5.4.1)
+      '@opentiny/vue-huicharts-map': 3.22.0
+      '@opentiny/vue-huicharts-pie': 3.22.0
+      '@opentiny/vue-huicharts-process': 3.22.0
+      '@opentiny/vue-huicharts-radar': 3.22.0
+      '@opentiny/vue-huicharts-ring': 3.22.0
+      '@opentiny/vue-huicharts-sankey': 3.22.0
+      '@opentiny/vue-huicharts-scatter': 3.22.0
+      '@opentiny/vue-huicharts-sunburst': 3.22.0
+      '@opentiny/vue-huicharts-tree': 3.22.0
+      '@opentiny/vue-huicharts-waterfall': 3.22.0
+      '@opentiny/vue-huicharts-wordcloud': 3.22.0(echarts@5.4.1)
+      '@opentiny/vue-locale': 3.22.0
+      '@opentiny/vue-theme': 3.22.1
+    transitivePeerDependencies:
+      - echarts
+
+  '@opentiny/vue-locale@3.22.0':
+    dependencies:
+      '@opentiny/utils': 3.22.0
+      '@opentiny/vue-renderless': 3.22.0
+      '@opentiny/vue-theme': 3.22.1
+
+  '@opentiny/vue-renderless@3.22.0':
+    dependencies:
+      '@opentiny/utils': 3.22.0
+      '@opentiny/vue-hooks': 3.22.0
+      color: 4.2.3
+
+  '@opentiny/vue-theme@3.22.1': {}
 
   '@pkgjs/parseargs@0.11.0':
     optional: true
@@ -5125,13 +5478,13 @@ snapshots:
 
   ava@2.2.0:
     dependencies:
-      '@ava/babel-preset-stage-4': 3.0.0(@babel/core@7.26.10)(supports-color@7.2.0)
+      '@ava/babel-preset-stage-4': 3.0.0(@babel/core@7.26.10(supports-color@7.2.0))(supports-color@7.2.0)
       '@ava/babel-preset-transform-test-files': 5.0.0
       '@babel/core': 7.26.10(supports-color@7.2.0)
       '@babel/generator': 7.27.0
-      '@babel/plugin-syntax-async-generators': 7.8.4(@babel/core@7.26.10)
-      '@babel/plugin-syntax-object-rest-spread': 7.8.3(@babel/core@7.26.10)
-      '@babel/plugin-syntax-optional-catch-binding': 7.8.3(@babel/core@7.26.10)
+      '@babel/plugin-syntax-async-generators': 7.8.4(@babel/core@7.26.10(supports-color@7.2.0))
+      '@babel/plugin-syntax-object-rest-spread': 7.8.3(@babel/core@7.26.10(supports-color@7.2.0))
+      '@babel/plugin-syntax-optional-catch-binding': 7.8.3(@babel/core@7.26.10(supports-color@7.2.0))
       '@concordance/react': 2.0.0
       ansi-escapes: 4.3.2
       ansi-styles: 4.3.0
@@ -5613,6 +5966,11 @@ snapshots:
       color-convert: 1.9.3
       color-string: 1.9.1
 
+  color@4.2.3:
+    dependencies:
+      color-convert: 2.0.1
+      color-string: 1.9.1
+
   colorspace@1.1.4:
     dependencies:
       color: 3.2.1
@@ -5705,6 +6063,8 @@ snapshots:
   crypto-random-string@1.0.0: {}
 
   cssesc@3.0.0: {}
+
+  cssfilter@0.0.10: {}
 
   currently-unhandled@0.4.1:
     dependencies:
@@ -5890,6 +6250,19 @@ snapshots:
   duplexer3@0.1.5: {}
 
   eastasianwidth@0.2.0: {}
+
+  echarts-liquidfill@3.1.0(echarts@5.4.1):
+    dependencies:
+      echarts: 5.4.1
+
+  echarts-wordcloud@2.0.0(echarts@5.4.1):
+    dependencies:
+      echarts: 5.4.1
+
+  echarts@5.4.1:
+    dependencies:
+      tslib: 2.3.0
+      zrender: 5.4.1
 
   ejs@2.7.4: {}
 
@@ -8871,6 +9244,8 @@ snapshots:
 
   symbol-observable@1.2.0: {}
 
+  tailwind-merge@1.14.0: {}
+
   tar@6.2.1:
     dependencies:
       chownr: 2.0.0
@@ -8978,6 +9353,8 @@ snapshots:
   tslib@1.14.1: {}
 
   tslib@1.9.0: {}
+
+  tslib@2.3.0: {}
 
   tslib@2.8.1: {}
 
@@ -9434,6 +9811,11 @@ snapshots:
       user-home: 2.0.0
       xdg-basedir: 2.0.0
 
+  xss@1.0.14:
+    dependencies:
+      commander: 2.20.3
+      cssfilter: 0.0.10
+
   xtend@4.0.2: {}
 
   y18n@4.0.3: {}
@@ -9488,3 +9870,7 @@ snapshots:
       yargs-parser: 18.1.3
 
   ylru@1.4.0: {}
+
+  zrender@5.4.1:
+    dependencies:
+      tslib: 2.3.0

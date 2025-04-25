@@ -3,7 +3,7 @@
     <div class="falls">
       <img src="@/assets/images/map-background2.png" class="image" />
       <h3>{{ $t('home.falls.line') }}</h3>
-      <div id="flow" ref="echartsDom"></div>
+      <tiny-chart-waterfall id="flow" ref="waterFallRef" height="100%" :options="options" :extend="chartExtend" ></tiny-chart-waterfall>
     </div>
   </div>
 </template>
@@ -11,12 +11,11 @@
 <script lang="ts" setup>
   import { onMounted, watch, inject, ref, nextTick } from 'vue';
   import { useI18n } from 'vue-i18n';
+  import { TinyHuichartsWaterfall as TinyChartWaterfall } from '@opentiny/vue-huicharts'
   import useLocale from '@/hooks/locale';
 
   const { t } = useI18n();
   const { currentLocale } = useLocale();
-  let echarts = inject<any>('echarts');
-  const echartsDom = ref();
 
   const list = [
     {
@@ -68,26 +67,9 @@
       value: 'SSL',
     },
   ];
-
-  let option = {
-    tooltip: {
-      trigger: 'axis',
-      axisPointer: {
-        type: 'shadow',
-      },
-      formatter(params: any) {
-        let tar;
-        if (params[1].value !== '-') {
-          // eslint-disable-next-line prefer-destructuring
-          tar = params[1];
-        } else {
-          // eslint-disable-next-line prefer-destructuring
-          tar = params[0];
-        }
-        // eslint-disable-next-line prefer-template
-        return tar.name + '<br/>' + tar.seriesName + ' : ' + tar.value;
-      },
-    },
+  const waterFallRef = ref();
+  const options = ref({
+    data: [],
     grid: {
       left: '3%',
       right: '4%',
@@ -108,6 +90,42 @@
           );
         },
         margin: 20,
+      },
+      axisLine: {
+        show: true,
+        lineStyle: {
+          color: '#333',
+        },
+      },
+      axisTick: {
+        show: true,
+        inside: false,
+        lineStyle: {
+          color: '#333',
+        },
+      },
+      splitLine: {
+        show: false,
+      }
+    }
+  })
+  const chartExtend = ref({
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+        type: 'shadow',
+      },
+      formatter(params: any) {
+        let tar;
+        if (params[1].value !== '-') {
+          // eslint-disable-next-line prefer-destructuring
+          tar = params[1];
+        } else {
+          // eslint-disable-next-line prefer-destructuring
+          tar = params[0];
+        }
+        // eslint-disable-next-line prefer-template
+        return tar.name + '<br/>' + tar.seriesName + ' : ' + tar.value;
       },
     },
     series: [
@@ -167,24 +185,19 @@
         data: ['-', 99, '-', '-', '-', '-', '-', '-', '-', '-', 32],
       },
     ],
-  };
+  });
 
   onMounted(() => {
-    const chartDom = echartsDom.value;
-    const myChart = echarts.init(chartDom as any);
-    option && myChart.setOption(option);
     window.addEventListener('resize', () => {
-      myChart.resize();
+      waterFallRef.value.resize();
     });
     nextTick(() => {
-      myChart.resize();
+      waterFallRef.value.resize();
     });
   });
 
   watch(currentLocale, (newValue, oldValue) => {
-    const chartDom = echartsDom.value;
-    const myChart = echarts.init(chartDom as any);
-    myChart.setOption(option);
+    waterFallRef.value.resize();
   });
 </script>
 

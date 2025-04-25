@@ -6,7 +6,7 @@
           <img src="@/assets/images/map-background3.png" class="image" />
           <h3>{{ $t('home.region.title') }}</h3>
         </div>
-        <div id="earth" ref="echartsDom"></div>
+        <tiny-chart-map  id="earth" ref="mapChartsRef" :options="options"></tiny-chart-map>
       </div>
       <div class="region-from">
         <RegionTable></RegionTable>
@@ -17,6 +17,7 @@
 
 <script lang="ts" setup>
   import { onMounted, inject, ref, nextTick } from 'vue';
+  import { TinyHuichartsMap as TinyChartMap } from '@opentiny/vue-huicharts'
   import RegionTable from './regiontable.vue';
 
   const data = [
@@ -56,9 +57,12 @@
     { name: '澳门特别行政区', value: 34594 },
   ];
 
-  let echarts = inject<any>('echarts');
-  const echartsDom = ref();
-  let options = {
+  const mapChartsRef = ref();
+
+  const options = ref({
+    legend: {
+      show: false,
+    },
     tooltip: {
       trigger: 'item',
     },
@@ -104,20 +108,22 @@
             },
           },
         },
+        selectedMode: false,
+        markPoint: {
+          symbol: 'none',
+          symbolSize: 0,
+        },
         data,
       },
     ],
-  };
+  })
 
   onMounted(() => {
-    const chartDom = echartsDom.value;
-    const myChart = echarts.init(chartDom as any);
-    options && myChart.setOption(options);
     window.addEventListener('resize', () => {
-      myChart.resize();
+      mapChartsRef.value.resize();
     });
     nextTick(() => {
-      myChart.resize();
+      mapChartsRef.value.resize();
     });
   });
 </script>
