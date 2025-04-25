@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, inject, ref, nextTick } from 'vue';
+  import { onMounted, ref, nextTick } from 'vue';
   import { TinyHuichartsMap as TinyChartMap } from '@opentiny/vue-huicharts'
   import RegionTable from './regiontable.vue';
 

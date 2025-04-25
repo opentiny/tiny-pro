@@ -9,7 +9,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, watch, inject, ref, nextTick } from 'vue';
+  import { onMounted, watch, ref, nextTick } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { TinyHuichartsWaterfall as TinyChartWaterfall } from '@opentiny/vue-huicharts'
   import useLocale from '@/hooks/locale';

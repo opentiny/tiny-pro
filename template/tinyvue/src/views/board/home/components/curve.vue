@@ -9,7 +9,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, watch, inject, ref, nextTick } from 'vue';
+  import { onMounted, watch, ref, nextTick } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { TinyHuichartsHistogram as TinyChartHistogram } from '@opentiny/vue-huicharts'
   import useLocale from '@/hooks/locale';
@@ -108,7 +108,7 @@
           },
         },
         data: [
-          22, 4.91, 7.0, 23.2, 25.6, 16.7, 15.6, 22.2, 12.6, 22.0, 6.4, 33.3, 22,
+          22, 4.9, 7.0, 23.2, 25.6, 16.7, 15.6, 22.2, 12.6, 22.0, 6.4, 33.3, 22,
           4.9, 7.0, 23.2, 25.6, 16.7, 15.6, 22.2, 12.6, 22.0, 6.4, 33.3, 22,
           4.9, 7.0, 23.2, 25.6, 16.7, 15.6, 22.2, 12.6, 22.0, 6.4, 33.3,
         ],
