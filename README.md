@@ -1,4 +1,7 @@
 # TinyPro
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 TinyCLI 是一个跨平台的前端工程化 CLI 工具，为开发者提供一系列开发套件及工程插件，覆盖前端开发的整个链路，保证团队开发过程的一致性和可复制性。
 
@@ -76,3 +79,25 @@ npm i && npm start
 ## 维护者
 
 添加官方小助手微信：opentiny-official，加入我们的技术交流群。
+
+## Contributors ✨
+
+Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/hu-qi"><img src="https://avatars.githubusercontent.com/u/17986122?v=4?s=100" width="100px;" alt="huqi"/><br /><sub><b>huqi</b></sub></a><br /><a href="https://github.com/opentiny/tiny-pro/commits?author=hu-qi" title="Code">💻</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
