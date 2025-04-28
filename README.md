@@ -90,10 +90,10 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <table>
   <tbody>
     <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/hu-qi"><img src="https://avatars.githubusercontent.com/u/17986122?v=4?s=100" width="100px;" alt="huqi"/><br /><sub><b>huqi</b></sub></a><br /><a href="https://github.com/opentiny/tiny-pro/commits?author=hu-qi" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://kagol.github.io/blogs"><img src="https://avatars.githubusercontent.com/u/9566362?v=4?s=100" width="100px;" alt="Kagol"/><br /><sub><b>Kagol</b></sub></a><br /><a href="https://github.com/opentiny/tiny-pro/commits?author=kagol" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/GaoNeng-wWw"><img src="https://avatars.githubusercontent.com/u/31283122?v=4?s=100" width="100px;" alt="GaoNeng"/><br /><sub><b>GaoNeng</b></sub></a><br /><a href="https://github.com/opentiny/tiny-pro/commits?author=GaoNeng-wWw" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/discreted66"><img src="https://avatars.githubusercontent.com/u/190872652?v=4?s=100" width="100px;" alt="liukun"/><br /><sub><b>liukun</b></sub></a><br /><a href="https://github.com/opentiny/tiny-pro/commits?author=discreted66" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/hu-qi"><img src="https://avatars.githubusercontent.com/u/17986122?v=4?s=100" width="100px;" alt="huqi"/><br /><sub><b>huqi</b></sub></a><br /><a href="https://github.com/opentiny/tiny-pro/commits?author=hu-qi" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

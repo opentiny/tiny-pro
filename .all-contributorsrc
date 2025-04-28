@@ -8,15 +8,6 @@
   "commitConvention": "angular",
   "contributors": [
     {
-      "login": "hu-qi",
-      "name": "huqi",
-      "avatar_url": "https://avatars.githubusercontent.com/u/17986122?v=4",
-      "profile": "https://github.com/hu-qi",
-      "contributions": [
-        "code"
-      ]
-    },
-    {
       "login": "kagol",
       "name": "Kagol",
       "avatar_url": "https://avatars.githubusercontent.com/u/9566362?v=4",
@@ -42,9 +33,18 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "hu-qi",
+      "name": "huqi",
+      "avatar_url": "https://avatars.githubusercontent.com/u/17986122?v=4",
+      "profile": "https://github.com/hu-qi",
+      "contributions": [
+        "code"
+      ]
     }
   ],
-  "contributorsPerLine": 7,
+  "contributorsPerLine": 8,
   "skipCi": true,
   "repoType": "github",
   "repoHost": "https://github.com",
