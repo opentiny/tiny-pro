@@ -9,12 +9,6 @@ declare module '*.vue' {
   export default component;
 }
 
-declare module 'vue/types/vue' {
-  interface Vue {
-    $echarts: any;
-  }
-}
-
 interface ImportMetaEnv {
   readonly VITE_API_BASE_URL: string;
 }
