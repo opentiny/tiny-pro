@@ -9,3 +9,5 @@ coverage
 *.log
 dist
 yarn.lock
+.env
+.history

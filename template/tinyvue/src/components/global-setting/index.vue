@@ -81,12 +81,7 @@
   };
 
   const copySettings = () => {
-    const text = JSON.stringify(`const tinyTestTheme = {
-  id: 'tiny-test-theme', // 主题的唯一id，每个主题必须唯一
-  name: 'testTheme', // 主题的英文名称
-  cnName: '测试主题', // 主题的中文名称
-  data: { 'ti-base-color': '#f2f2f3' } //  主题数据
-}`);
+    const text = JSON.stringify(appStore.get(), null, 2);
     copy(text);
     Modal.message({
       message: t('setting.copy'),

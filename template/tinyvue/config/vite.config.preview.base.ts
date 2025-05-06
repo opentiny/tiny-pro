@@ -3,12 +3,14 @@ import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import vueJsx from '@vitejs/plugin-vue-jsx';
 import svgLoader from 'vite-svg-loader';
+import eslint from 'vite-plugin-eslint';
 
 export default defineConfig({
   plugins: [
     vue(),
     vueJsx(),
     svgLoader({ svgoConfig: {} }),
+    eslint({ cache: false }), // 禁用缓存‌
   ],
   build: {
     outDir: resolve(__dirname, '../dist/vue-pro/pages'),
@@ -45,7 +47,7 @@ export default defineConfig({
       less: {
         modifyVars: {
           hack: `true; @import (reference) "${resolve(
-            'src/assets/style/breakpoint.less'
+            'src/assets/style/breakpoint.less',
           )}";`,
         },
         javascriptEnabled: true,

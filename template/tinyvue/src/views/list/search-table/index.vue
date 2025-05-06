@@ -1,145 +1,8 @@
 <template>
-  <div class="container-list">
+  <div class="search-container-list">
     <Breadcrumb :items="['menu.list', 'menu.list.searchTable']" />
-    <div class="contain">
-      <div class="contain-head">
-        <span>{{ $t('searchTable.form.create') }}</span>
-        <hr />
-        <div class="contain-img" @click="setCollapse = !setCollapse">
-          <img
-            v-if="setCollapse"
-            src="@/assets/images/collapse.png"
-            alt="collapse"
-          />
-          <img
-            v-else
-            src="@/assets/images/expand.png"
-            alt="expand"
-          />
-          <div class="contain-text">
-            {{
-              setCollapse
-                ? $t('searchTable.form.collapse')
-                : $t('searchTable.form.extend')
-            }}
-          </div>
-        </div>
-      </div>
-      <tiny-form
-        :model="filterOptions"
-        label-position="right"
-        label-width="100px"
-        class="filter-form"
-      >
-        <transition-fade-slide-group>
-          <tiny-row :flex="true" justify="center" class="col">
-            <transition-fade-slide-group>
-              <tiny-col :span="4" label-width="100px">
-                <tiny-form-item :label="$t('searchTable.columns.name')">
-                  <tiny-input
-                    v-model="filterOptions.name"
-                    :placeholder="$t('searchTable.form.input')"
-                  ></tiny-input>
-                </tiny-form-item>
-              </tiny-col>
-              <tiny-col :span="4" label-width="100px">
-                <tiny-form-item
-                  :label="$t('searchTable.columns.department')"
-                  prop="id"
-                >
-                  <tiny-input
-                    v-model="filterOptions.department"
-                    :placeholder="$t('searchTable.form.input')"
-                  ></tiny-input>
-                </tiny-form-item>
-              </tiny-col>
-              <tiny-col :span="4" label-width="100px">
-                <tiny-form-item :label="$t('searchTable.columns.role')">
-                  <tiny-input
-                    v-model="filterOptions.roles"
-                    :placeholder="$t('searchTable.form.input')"
-                  ></tiny-input>
-                </tiny-form-item>
-              </tiny-col>
-            </transition-fade-slide-group>
-          </tiny-row>
 
-          <tiny-row
-            v-if="setCollapse"
-            :flex="true"
-            justify="center"
-            class="col"
-          >
-            <transition-fade-slide-group>
-              <tiny-col :span="4">
-                <tiny-form-item :label="$t('searchTable.columns.workname')">
-                  <tiny-input
-                    v-model="filterOptions.workbenchName"
-                    :placeholder="$t('searchTable.form.input')"
-                  ></tiny-input>
-                </tiny-form-item>
-              </tiny-col>
-              <tiny-col :span="4" label-width="100px">
-                <tiny-form-item
-                  :label="$t('searchTable.columns.enablement')"
-                  prop="id"
-                >
-                  <tiny-input
-                    v-model="filterOptions.project"
-                    :placeholder="$t('searchTable.form.input')"
-                  ></tiny-input>
-                </tiny-form-item>
-              </tiny-col>
-              <tiny-col :span="4" label-width="100px">
-                <tiny-form-item :label="$t('searchTable.columns.type')">
-                  <tiny-input
-                    v-model="filterOptions.type"
-                    :placeholder="$t('searchTable.form.input')"
-                  ></tiny-input>
-                </tiny-form-item>
-              </tiny-col>
-            </transition-fade-slide-group>
-          </tiny-row>
-
-          <tiny-row :flex="true" justify="end" class="col">
-            <transition-fade-slide-group>
-              <tiny-col v-if="setCollapse" :span="4" label-width="100px">
-                <tiny-form-item :label="$t('searchTable.columns.study')">
-                  <tiny-input
-                    v-model="filterOptions.address"
-                    :placeholder="$t('searchTable.form.input')"
-                  ></tiny-input>
-                </tiny-form-item>
-              </tiny-col>
-              <tiny-col v-if="setCollapse" :span="4">
-                <tiny-form-item :label="$t('searchTable.form.status')">
-                  <tiny-select
-                    v-model="filterOptions.status"
-                    :options="statusOptions"
-                  ></tiny-select>
-                </tiny-form-item>
-              </tiny-col>
-              <tiny-col :span="4">
-                <tiny-form-item>
-                  <div class="search-btn">
-                    <transition-fade-slide-group>
-                      <tiny-button type="primary" @click="reloadGrid">
-                        {{ $t('searchTable.form.search') }}
-                      </tiny-button>
-                      <tiny-button @click="handleFormReset">
-                        {{ $t('searchTable.form.reset') }}
-                      </tiny-button>
-                    </transition-fade-slide-group>
-                  </div>
-                </tiny-form-item>
-              </tiny-col>
-            </transition-fade-slide-group>
-          </tiny-row>
-        </transition-fade-slide-group>
-      </tiny-form>
-      <div class="bottom-line">
-        <hr />
-      </div>
+    <div class="search-table-container">
       <tiny-fullscreen
         :teleport="true"
         :page-only="true"
@@ -149,49 +12,50 @@
       >
         <div class="tiny-fullscreen-scroll">
           <div class="tiny-fullscreen-wrapper">
+            <div class="btn">
+              <transition-fade-down-group>
+                <tiny-button @click="toCsvEvent">
+                  {{ $t('searchTable.operation.import') }}
+                </tiny-button>
+                <div class="search-box-container">
+                  <tiny-search-box
+                    v-model="tags"
+                    :items="items"
+                    :empty-placeholder="$t('searchTable.form.placeholder')"
+                    @change="reloadGrid"
+                  ></tiny-search-box>
+                </div>
+                <div class="screen" @click="toggle">
+                  <img
+                    v-if="!fullscreen"
+                    src="@/assets/images/screen-out.png"
+                    class="screen-image"
+                  />
+                  <img
+                    v-if="fullscreen"
+                    src="@/assets/images/screen-in.png"
+                    class="screen-image"
+                  />
+                  <span>
+                    {{
+                      fullscreen
+                        ? $t('searchTable.collapse.restores')
+                        : $t('searchTable.collapse.full')
+                    }}
+                  </span>
+                </div>
+              </transition-fade-down-group>
+            </div>
             <tiny-grid
               ref="taskGrid"
               :fetch-data="fetchDataOption"
               :pager="pagerConfig"
               :loading="loading"
               size="medium"
+              :height="fullscreen ? 820 : 600"
               :auto-resize="true"
             >
-              <template #toolbar>
-                <tiny-grid-toolbar>
-                  <template #buttons>
-                    <div class="btn">
-                      <transition-fade-down-group>
-                        <tiny-button @click="toCsvEvent">
-                          {{ $t('searchTable.operation.import') }}
-                        </tiny-button>
-                        <div class="screen">
-                          <img
-                            v-if="!fullscreen"
-                            src="@/assets/images/screen-out.png"
-                            class="screen-image"
-                            @click="toggle"
-                          />
-                          <img
-                            v-if="fullscreen"
-                            src="@/assets/images/screen-in.png"
-                            class="screen-image"
-                            @click="toggle"
-                          />
-                          <span @click="toggle">
-                            {{
-                              fullscreen
-                                ? $t('searchTable.collapse.restores')
-                                : $t('searchTable.collapse.full')
-                            }}
-                          </span>
-                        </div>
-                      </transition-fade-down-group>
-                    </div>
-                  </template>
-                </tiny-grid-toolbar>
-              </template>
-
+              <tiny-grid-column type="selection" width="60"></tiny-grid-column>
               <tiny-grid-column
                 field="name"
                 :title="$t('searchTable.columns.name')"
@@ -302,11 +166,13 @@
     Fullscreen as TinyFullscreen,
     Modal,
   } from '@opentiny/vue';
+  import TinySearchBox from '@opentiny/vue-search-box';
   import {
     queryEmployeeList,
     deleteEmployee,
     QueryTaskParmas,
   } from '@/api/list';
+  import { t } from '@opentiny/vue-locale';
   import TransitionFadeSlideGroup from '@/components/transition/transition-fade-slide-group.vue';
 
   // 初始化请求数据
@@ -322,7 +188,58 @@
     type: string;
     address: string;
   }
+  const tags = ref([]);
 
+  // 搜索配置
+  const items = [
+    {
+      label: t('searchTable.columns.name'),
+      field: 'name',
+    },
+    {
+      label: t('searchTable.columns.department'),
+      field: 'department',
+    },
+    {
+      label: t('searchTable.columns.role'),
+      field: 'roles',
+    },
+    {
+      label: t('searchTable.columns.workname'),
+      field: 'workbenchName',
+    },
+    {
+      label: t('searchTable.columns.enablement'),
+      field: 'project',
+    },
+    {
+      label: t('searchTable.columns.type'),
+      field: 'type',
+    },
+    {
+      label: t('searchTable.columns.study'),
+      field: 'address',
+    },
+    {
+      label: t('searchTable.form.status'),
+      field: 'status',
+      replace: true,
+      options: [
+        {
+          id: '0',
+          label: 'offline',
+        },
+        {
+          id: '1',
+          label: 'online',
+        },
+        {
+          id: '2',
+          label: 'doing',
+        },
+      ],
+    },
+  ];
   // 加载效果
   const state = reactive<{
     loading: boolean;
@@ -370,9 +287,15 @@
       status: '',
     },
   ) {
-    const { ...rest } = filterOptions.value;
+    let searchInfo = {};
+    if (filterOptions.value?.length) {
+      filterOptions.value.forEach((item) => {
+        searchInfo[item.field] = item.value;
+      });
+    }
+
     const queryParmas = {
-      searchInfo: rest,
+      searchInfo,
       ...params,
     };
 
@@ -413,24 +336,9 @@
   }
 
   // form的button
-  function reloadGrid() {
+  function reloadGrid(filters) {
+    filterOptions.value = filters;
     taskGrid?.value.handleFetch('reload');
-    fetchData();
-  }
-
-  function handleFormReset() {
-    state.filterOptions = {} as FilterOptions;
-    reloadGrid();
-  }
-
-  const setCollapse = ref(true);
-
-  function collapse() {
-    setCollapse.value = false;
-  }
-
-  function extend() {
-    setCollapse.value = true;
   }
 
   // 导出

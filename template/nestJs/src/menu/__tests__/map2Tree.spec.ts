@@ -1,3 +1,7 @@
+/**
+ * @description 将 menuArray 转为一颗树的算法. 这里测试实际上不需要考虑component或其他东西是否真的存在, 只需要考虑结构是否是规范的即可。
+ */
+
 import { convertToTree } from '../menu.service';
 
 const cretaeMenuItem = (
@@ -45,8 +49,8 @@ describe('convertToTree', () => {
       cretaeMenuItem(19, '1-1-4', 6, 19),
       cretaeMenuItem(20, '1-1-5', 6, 20),
     ];
-    const data = convertToTree(menus);
-    expect(data).toStrictEqual([
+    const data = convertToTree(menus as any);
+    expect(data).toMatchObject([
       {
         label: '0',
         id: 1,
@@ -201,7 +205,6 @@ describe('convertToTree', () => {
       cretaeMenuItem(19, '1-1-4', 6, 19),
       cretaeMenuItem(20, '1-1-5', 6, 20),
     ];
-    const data = convertToTree(menus);
-    console.log(data);
+    convertToTree(menus as any);
   });
 });

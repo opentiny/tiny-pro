@@ -1,0 +1,30 @@
+name: BackEnd UnitTest
+
+on:
+  - pull_request
+  - workflow_dispatch
+
+jobs:
+  Backend:
+    runs-on: ubuntu-latest
+    permissions:
+      checks: write
+      pull-requests: write
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: 10
+          run_install: false
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - name: Install depend
+        run: pnpm i
+      - name: Run Unit Test without coverage
+        run: pnpm test
