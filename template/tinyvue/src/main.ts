@@ -1,5 +1,4 @@
 import { createApp } from 'vue';
-import { registerMap } from 'echarts';
 import { HwcClient } from '@opentiny/hwc-client';
 import globalComponents from '@/components';
 import router from './router';
@@ -10,11 +9,9 @@ import App from './App.vue';
 import '@/api/interceptor';
 import '@/assets/style/global.less';
 import config from '../hwc-exports.json';
-import chinaMap from './assets/china.json';
 import '@opentiny/vue-search-box/index.css';
 import 'virtual:uno.css';
 
-registerMap('china', chinaMap as any);
 const app = createApp(App);
 
 // 增加华为云相关配置
