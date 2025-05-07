@@ -11,6 +11,7 @@ import '@/assets/style/global.less';
 import config from '../hwc-exports.json';
 import '@opentiny/vue-search-box/index.css';
 import 'virtual:uno.css';
+import "@opentiny/icons/style/all.css";
 
 const app = createApp(App);
 

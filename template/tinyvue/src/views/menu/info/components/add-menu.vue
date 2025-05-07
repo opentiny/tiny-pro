@@ -29,9 +29,15 @@
         :placeholder="$t('baseForm.form.label.placeholder')"
         filterable
         no-match-text="No Match"
-        :options="iconDatas"
-        optimization
       >
+        <tiny-option
+            v-for="item in iconDatas"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          >
+          <i :class="`ci-${item.value}`"></i>&nbsp;{{ item.label }}
+        </tiny-option>
       </tiny-select>
     </tiny-form-item>
     <tiny-form-item :label="$t('menuInfo.table.component')" prop="component">
@@ -63,8 +69,9 @@
     FormItem as TinyFormItem,
     Input as TinyInput,
     Select as TinySelect,
+    Option as TinyOption,
   } from '@opentiny/vue';
-  import * as icons from '@opentiny/vue-icon';
+  import { icons} from '@opentiny/icons/json/icons.json';
   import { reactive, ref, toRefs, computed, unref } from 'vue';
 
   const props = defineProps<{
