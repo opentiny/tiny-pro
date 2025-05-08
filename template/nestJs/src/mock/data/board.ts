@@ -38,16 +38,28 @@ const initData1 = mock({
 const initData2 = mock({
   options: [
     {
-      value: '1',
-      label: 'work.mock.network',
+      value: 'work.mock.collectValue1',
+      description: 'work.mock.collectDescription1',
+      label1: 'work.mock.collectHotLabel1',
+      label2: 'work.mock.collectLabel2',
     },
     {
-      value: '2',
-      label: 'work.mock.centralized',
+      value: 'work.mock.collectValue2',
+      description: 'work.mock.collectDescription2',
+      label1: 'work.mock.collectHotLabel1',
+      label2: 'work.mock.collectLabel3',
     },
     {
-      value: '3',
-      label: 'work.mock.hardware',
+      value: 'work.mock.collectValue3',
+      description: 'work.mock.collectDescription3',
+      label1: 'work.mock.collectHotLabel1',
+      label2: 'work.mock.collectLabel4',
+    },
+    {
+      value: 'work.mock.collectValue4',
+      description: 'work.mock.collectDescription4',
+      label1: 'work.mock.collectHotLabel1',
+      label2: 'work.mock.collectLabel5',
     },
   ],
 });
