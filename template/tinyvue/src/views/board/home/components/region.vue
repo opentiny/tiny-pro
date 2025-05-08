@@ -6,7 +6,7 @@
           <img src="@/assets/images/map-background3.png" class="image" />
           <h3>{{ $t('home.region.title') }}</h3>
         </div>
-        <div id="earth" ref="echartsDom"></div>
+        <tiny-chart-map v-if="chartSettings.mapOrigin" id="earth" ref="mapChartsRef" :settings="chartSettings" :data="chartData" :visual-map="visualMap" :legend-visible="legendVisible"></tiny-chart-map>
       </div>
       <div class="region-from">
         <RegionTable></RegionTable>
@@ -16,7 +16,9 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, inject, ref, nextTick } from 'vue';
+  import { onMounted, ref, nextTick } from 'vue';
+  import { TinyHuichartsMap as TinyChartMap } from '@opentiny/vue-huicharts'
+  import chinaData from '@/assets/china.json'
   import RegionTable from './regiontable.vue';
 
   const data = [
@@ -56,68 +58,64 @@
     { name: '澳门特别行政区', value: 34594 },
   ];
 
-  let echarts = inject<any>('echarts');
-  const echartsDom = ref();
-  let options = {
-    tooltip: {
-      trigger: 'item',
-    },
-    visualMap: {
-      show: true,
-      top: '-5px',
-      x: 'left',
-      y: 'bottom',
-      realtime: false,
-      splitList: [
-        { start: 5000, end: 500000 },
-        { start: 4000, end: 5000 },
-        { start: 3000, end: 4000 },
-        { start: 2000, end: 3000 },
-        { start: 1000, end: 2000 },
-        { start: 0, end: 1000 },
-      ],
-      color: ['#9feaa5', '#5475f5', '#85daef', '#74e2ca', '#e6ac53', '#9fb5ea'],
-    },
-
-    series: [
-      {
-        name: 'china',
-        type: 'map',
-        mapType: 'china',
-        roam: false,
-        zoom: 1.2,
-        top: '30px',
-        itemStyle: {
-          normal: {
-            borderColor: 'skyblue',
-            borderWidth: 1,
-            shadowColor: '#ccc',
-            shadowBlur: 30,
-            opacity: 1,
-          },
-        },
-        label: {
-          normal: {
-            show: true,
-            textStyle: {
-              fontSize: 5,
-            },
-          },
-        },
-        data,
+  const mapChartsRef = ref();
+  const chartData = ref({
+    columns: ['name', 'value'],
+    rows: data
+  })
+  const chartSettings = ref({
+    position: 'china',
+    mapOrigin: chinaData, // 用户自己的地图数据
+    roam: false,
+    zoom: 1.2,
+    top: '30px',
+    itemStyle: {
+      normal: {
+        borderColor: 'skyblue',
+        borderWidth: 1,
+        shadowColor: '#ccc',
+        shadowBlur: 30,
+        opacity: 1,
       },
+    },
+    label: {
+      normal: {
+        show: true,
+        textStyle: {
+          fontSize: 5,
+        },
+      },
+    },
+    selectedMode: false,
+    markPoint: {
+      symbol: 'none',
+      symbolSize: 0,
+    },
+  })
+  const legendVisible = ref(false)
+  const visualMap = ref({
+    show: true,
+    top: '-5px',
+    x: 'left',
+    y: 'bottom',
+    realtime: false,
+    splitList: [
+      { start: 5000, end: 500000 },
+      { start: 4000, end: 5000 },
+      { start: 3000, end: 4000 },
+      { start: 2000, end: 3000 },
+      { start: 1000, end: 2000 },
+      { start: 0, end: 1000 },
     ],
-  };
+    color: ['#9feaa5', '#5475f5', '#85daef', '#74e2ca', '#e6ac53', '#9fb5ea'],
+  })
 
   onMounted(() => {
-    const chartDom = echartsDom.value;
-    const myChart = echarts.init(chartDom as any);
-    options && myChart.setOption(options);
     window.addEventListener('resize', () => {
-      myChart.resize();
+      mapChartsRef.value.resize();
     });
     nextTick(() => {
-      myChart.resize();
+      mapChartsRef.value.resize();
     });
   });
 </script>

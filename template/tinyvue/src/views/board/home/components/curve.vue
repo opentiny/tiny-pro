@@ -3,36 +3,21 @@
     <div class="curve">
       <img src="@/assets/images/map-background3.png" class="image" />
       <h3>{{ $t('home.curve.trend') }}</h3>
-      <div id="line" ref="echartsDom"></div>
+      <tiny-chart-histogram ref="chartRef" height="100%" :data-zoom="dataZoom" :options="options" :extend="chartExtend"></tiny-chart-histogram>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, watch, inject, ref, nextTick } from 'vue';
+  import { onMounted, watch, ref, nextTick } from 'vue';
   import { useI18n } from 'vue-i18n';
+  import { TinyHuichartsHistogram as TinyChartHistogram } from '@opentiny/vue-huicharts'
   import useLocale from '@/hooks/locale';
 
   const { t } = useI18n();
   const { currentLocale } = useLocale();
-  let echarts = inject<any>('echarts');
-  const echartsDom = ref();
-
-  let option = {
-    tooltip: {
-      trigger: 'axis',
-      axisPointer: {
-        type: 'cross',
-        crossStyle: {
-          color: '#999',
-        },
-      },
-    },
-    legend: {
-      data: [t('home.main.down'), t('home.curve.play'), t('home.curve.page')],
-      top: '10',
-    },
-    dataZoom: [
+  const chartRef = ref()
+  const dataZoom = ref([
       {
         type: 'inside',
         start: 10,
@@ -40,7 +25,15 @@
       {
         type: 'slider',
       },
-    ],
+    ])
+  const options = ref({
+    grid: {
+      left: '8%',
+      right: '8%',
+    },
+    data: new Array(20).fill({
+      "time": "16:00"
+    }),
     xAxis: [
       {
         type: 'category',
@@ -78,7 +71,28 @@
           formatter: '{value}',
         },
       },
-    ],
+    ]
+  })
+  const chartExtend = ref({
+    legend: {
+      data: [t('home.main.down'), t('home.curve.play'), t('home.curve.page')],
+      top: '10',
+      icon: '',
+      itemHeight: 16,
+      itemWidth: 26,
+    },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+        type: 'cross',
+        crossStyle: {
+          color: '#999',
+        },
+        label: {
+          backgroundColor : '#666',
+        },
+      },
+    },
     series: [
       {
         name: t('home.main.down'),
@@ -185,39 +199,34 @@
         ],
       },
     ],
-  };
+  })
 
   onMounted(() => {
-    const chartDom = echartsDom.value;
-    const myChart = echarts.init(chartDom as any);
-    option && myChart.setOption(option);
     window.addEventListener('resize', () => {
-      myChart.resize();
+      chartRef.value.resize();
     });
     nextTick(() => {
-      myChart.resize();
+      chartRef.value.resize();
     });
   });
 
   watch(currentLocale, (newValue, oldValue) => {
-    const chartDom = echartsDom.value;
-    const myChart = echarts.init(chartDom as any);
     if (newValue === 'zhCN') {
-      option.legend.data = ['采样PV', '首屏可见', '页面Onload'];
-      option.series[0].name = '采样PV';
-      option.series[1].name = '首屏可见';
-      option.series[2].name = '页面Onload';
+      chartExtend.value.legend.data = ['采样PV', '首屏可见', '页面Onload'];
+      chartExtend.value.series[0].name = '采样PV';
+      chartExtend.value.series[1].name = '首屏可见';
+      chartExtend.value.series[2].name = '页面Onload';
     } else {
-      option.legend.data = [
+      chartExtend.value.legend.data = [
         'Sampling PV',
         'Visible on the first screen',
         'Page Onload',
       ];
-      option.series[0].name = 'Sampling PV';
-      option.series[1].name = 'Visible on the first screen';
-      option.series[2].name = 'Page Onload';
+      chartExtend.value.series[0].name = 'Sampling PV';
+      chartExtend.value.series[1].name = 'Visible on the first screen';
+      chartExtend.value.series[2].name = 'Page Onload';
     }
-    myChart.setOption(option);
+    chartRef.value.resize();
   });
 </script>
 
@@ -233,11 +242,6 @@
   .curve {
     width: 100%;
     height: 491px;
-  }
-
-  #line {
-    width: 100%;
-    height: inherit;
   }
 
   .image {

@@ -1,0 +1,71 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "commitType": "docs",
+  "commitConvention": "angular",
+  "contributors": [
+    {
+      "login": "kagol",
+      "name": "Kagol",
+      "avatar_url": "https://avatars.githubusercontent.com/u/9566362?v=4",
+      "profile": "https://kagol.github.io/blogs",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "GaoNeng-wWw",
+      "name": "GaoNeng",
+      "avatar_url": "https://avatars.githubusercontent.com/u/31283122?v=4",
+      "profile": "https://github.com/GaoNeng-wWw",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "discreted66",
+      "name": "liukun",
+      "avatar_url": "https://avatars.githubusercontent.com/u/190872652?v=4",
+      "profile": "https://github.com/discreted66",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "hu-qi",
+      "name": "huqi",
+      "avatar_url": "https://avatars.githubusercontent.com/u/17986122?v=4",
+      "profile": "https://github.com/hu-qi",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "Muyu-art",
+      "name": "CatWithFish",
+      "avatar_url": "https://avatars.githubusercontent.com/u/72800755?v=4",
+      "profile": "https://github.com/Muyu-art",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "zzcr",
+      "name": "ajaxzheng",
+      "avatar_url": "https://avatars.githubusercontent.com/u/18521562?v=4",
+      "profile": "https://github.com/zzcr",
+      "contributions": [
+        "code"
+      ]
+    }
+  ],
+  "contributorsPerLine": 8,
+  "skipCi": true,
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "projectName": "tiny-pro",
+  "projectOwner": "opentiny"
+}

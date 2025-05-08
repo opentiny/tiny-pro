@@ -253,6 +253,9 @@ importers:
       '@opentiny/vue':
         specifier: ^3.21.0
         version: 3.22.1
+      '@opentiny/vue-huicharts':
+        specifier: ^3.22.0
+        version: 3.22.0(echarts@5.6.0)
       '@opentiny/vue-icon':
         specifier: ^3.21.0
         version: 3.22.0
@@ -280,9 +283,6 @@ importers:
       axios:
         specifier: ^1.8.0
         version: 1.8.4
-      echarts:
-        specifier: ^5.4.3
-        version: 5.6.0
       fp-ts:
         specifier: ^2.16.1
         version: 2.16.9
@@ -357,11 +357,11 @@ importers:
         specifier: ^5.62.0
         version: 5.62.0(eslint@7.32.0)(typescript@4.9.5)
       '@vitejs/plugin-vue':
-        specifier: ^4.6.2
-        version: 4.6.2(vite@6.2.6(@types/node@22.14.1)(jiti@2.4.2)(less@4.3.0)(sugarss@2.0.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1))(vue@3.5.13(typescript@4.9.5))
+        specifier: ^5.2.3
+        version: 5.2.3(vite@6.2.6(@types/node@22.14.1)(jiti@2.4.2)(less@4.3.0)(sugarss@2.0.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1))(vue@3.5.13(typescript@4.9.5))
       '@vitejs/plugin-vue-jsx':
-        specifier: ^3.1.0
-        version: 3.1.0(vite@6.2.6(@types/node@22.14.1)(jiti@2.4.2)(less@4.3.0)(sugarss@2.0.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1))(vue@3.5.13(typescript@4.9.5))
+        specifier: ^4.1.2
+        version: 4.1.2(vite@6.2.6(@types/node@22.14.1)(jiti@2.4.2)(less@4.3.0)(sugarss@2.0.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1))(vue@3.5.13(typescript@4.9.5))
       '@vue/babel-helper-vue-jsx-merge-props':
         specifier: ^1.4.0
         version: 1.4.0
@@ -2053,6 +2053,9 @@ packages:
   '@opentiny/fluent-editor@3.25.4':
     resolution: {integrity: sha512-jdXXsBq2AIy9e8L8RkNXVo0ittDhfG7ELVs4lGUmnewIvdNOs64axttj2GGfW9Lup95oeMqdoOW0kf09GAx0Vw==}
 
+  '@opentiny/huicharts@1.0.1':
+    resolution: {integrity: sha512-KsVNZwCstMJec2vM/uMff9jj/nNHXCchiwGGU4+MGP1nRwg7Hkj8pjgJQh/tJR6+AEKPY/h+TewRM3S6KBtn5g==}
+
   '@opentiny/hwc-client@0.0.14':
     resolution: {integrity: sha512-n4oJlgOGIsW3Ungy2kPp+5Re2HoUAWmFUS+33yMs5SF8hhTG9drxzV8zjK2gqYjcyWnVi9CW1dAnXLE1IVeluQ==}
 
@@ -2331,6 +2334,81 @@ packages:
 
   '@opentiny/vue-hrapprover@3.22.0':
     resolution: {integrity: sha512-TpOKq6lE7wnPhRIZW+13jhUjraQzu9g0DW/qc5NzuAZ9Zf5EMVFJXTbTRZZXXmFp5GPt7uBtlmn4ldW4c8U4Jw==}
+
+  '@opentiny/vue-huicharts-amap@3.22.0':
+    resolution: {integrity: sha512-7N4g1oIaKhEIMjbiagLRh+q+Q9zW6R+a4CWN739mZGEOFemlzs8uPx+E7JWfJXYRzdev5cmb9aRf4h+B2n0zsA==}
+
+  '@opentiny/vue-huicharts-bar@3.22.0':
+    resolution: {integrity: sha512-yLR2uJJrJx6pcyB5DB9yvLBuPTD044JHDtPdTCroDs37qceIn6c3C1sI5LziQ6iS8fdp+B90h2eBGkER8ksK6Q==}
+
+  '@opentiny/vue-huicharts-bmap@3.22.0':
+    resolution: {integrity: sha512-bFkZ7d7n5dzj/z2AlCF/dUtrJFVW78TZT2OTqrVX1Lq3v1AyuzarV/o0sTs57Xwx3JRubnMdbJYLS9jyzw3GPQ==}
+
+  '@opentiny/vue-huicharts-boxplot@3.22.0':
+    resolution: {integrity: sha512-J6u7urE+oTscxXusRNFWJWyTxBtWG1qxezDSpTmn52yNifJdXoVlUPGWDf6TbJdNT7AZU4mHPp2Z6mo0J8N9JA==}
+
+  '@opentiny/vue-huicharts-candle@3.22.0':
+    resolution: {integrity: sha512-EUmENBOjKuP4UpUZKSX85KWA2CeLQhgWeKXV9zHovUYWzDY93ozF99Ark17ExqnWuxYAvE0X1mBSmUYfJIIB/w==}
+
+  '@opentiny/vue-huicharts-core@3.22.0':
+    resolution: {integrity: sha512-XZJQSfEeWktqcPLH1kFhjYpKX5fgDLjDHurcLPhRDjW2oDTElvfNa+MlXlutT6GT/u5ple9XzWu0Lm3hujdgJA==}
+
+  '@opentiny/vue-huicharts-funnel@3.22.0':
+    resolution: {integrity: sha512-6LPXX37vJ2Y0FmNyONVsymsW+E7FF2WU8LODtyNyloHSs2FWAr6xYPRLnyodAQTQ1r0oE0xWanpPKvUi2/hA+g==}
+
+  '@opentiny/vue-huicharts-gauge@3.22.0':
+    resolution: {integrity: sha512-VwT6sDelEHRl7nEl7eKyUDwLjsScbfnlYMn8tnsQjfy5uxOPL1ZITzVJuGyytU1TylQXL+oWF2T8ameosCK/Ng==}
+
+  '@opentiny/vue-huicharts-graph@3.22.0':
+    resolution: {integrity: sha512-BAI0iydq6TKpE24E7K/QId8VI3N0dehkJ8wXJUnA5kkNf0ZuAGb8qdrBKoSNGFUfhO+RS9ZNsKwnl9WsZ6pxrw==}
+
+  '@opentiny/vue-huicharts-heatmap@3.22.0':
+    resolution: {integrity: sha512-e07ZknWNvQdsbiXKc3SEU5twHZ5+x++NZCjrjFgLdSdEJJ6LfwJVJqweDxbe97bIoOa+yvbSj6/GalPsJD2N5A==}
+
+  '@opentiny/vue-huicharts-histogram@3.22.0':
+    resolution: {integrity: sha512-2jC0A5FfdGmzMIHvlr4khTkLr/RgJlMwMSNzvZHx0GsGn5BWVXVIaMsqCDoA/HR2H9nz99TQ+PjQo2ynBuUszA==}
+
+  '@opentiny/vue-huicharts-line@3.22.0':
+    resolution: {integrity: sha512-m9mo7CzwhlSTxlyoitCozyZbiORnIOU2Skues5KGnYF/iw57OV/w+kRdPAdkVVS/bj8DwadNPr3hYx/Iq40srA==}
+
+  '@opentiny/vue-huicharts-liquidfill@3.22.0':
+    resolution: {integrity: sha512-4Uq8T8epzG1+GBln0Ol11stnyoB4qngyJNZS/BuDz0JcVucH9OGZ/4Mm5l41sWROvhXyO4BQe8Z8t9qWGeOevg==}
+
+  '@opentiny/vue-huicharts-map@3.22.0':
+    resolution: {integrity: sha512-uGnt1KFceLLstPSQEjbTgy/kxSRnPBBZ8hej3MweZbEdbVR8HxfQhvvlUpN9GZyesxnqOv/mD7EzfjTLc0QJaQ==}
+
+  '@opentiny/vue-huicharts-pie@3.22.0':
+    resolution: {integrity: sha512-viAWcUfRnOU4QvKCHon3nuEHz5bKiDf35PwreIjcvXyqOfRoiDWGL8GY+6qeb3UwjzKTEP9ClOArbJt49rFceQ==}
+
+  '@opentiny/vue-huicharts-process@3.22.0':
+    resolution: {integrity: sha512-rZV7/C+fPVZtRvnO0GjcpBIw5iVzzreZdL8T1uem9D7P576L9rgkw9QMXct7z/G12POaGpHjziBZH2ySWIK8QQ==}
+
+  '@opentiny/vue-huicharts-radar@3.22.0':
+    resolution: {integrity: sha512-gwgPLzIlPxNDkc7uEbiqkRW1qZdrNv+N4YcmD6NrgEi760hpMHpUa1E5NZAnAIUQsFRc0BBIj4dAVGBf/STlPw==}
+
+  '@opentiny/vue-huicharts-ring@3.22.0':
+    resolution: {integrity: sha512-IJS2wOPOlPmUm5ZNVDG21OAMssijLOmQZYBga+xlNWtGCR2/CwTDF5NaFQR87X3PRlPmkckmWAcmP/PxowqdXA==}
+
+  '@opentiny/vue-huicharts-sankey@3.22.0':
+    resolution: {integrity: sha512-acn3SK7z6SrxMnMrr9TCjGhfCPB1OGKpJ0v7HZDa/+KV0aP60zdvSDRLNZqjvqmouapPVliCFKjRW13y1LEEPQ==}
+
+  '@opentiny/vue-huicharts-scatter@3.22.0':
+    resolution: {integrity: sha512-2Sn1rdGIe//MGceYysJwRTxzWgP1hA0ihabTlEuSP2saktYBd/Df6o+FWIlSQHp+LVJuKBPuCv4mzxI8cHWmGg==}
+
+  '@opentiny/vue-huicharts-sunburst@3.22.0':
+    resolution: {integrity: sha512-OolJZeQ2uB8kpFdQLHLBZOggwxOp0jPKAaCsmK2z6mC3sHLlTNnwXohSh9UDvClugkjM2tsmYzR0uk7Lnpb0WA==}
+
+  '@opentiny/vue-huicharts-tree@3.22.0':
+    resolution: {integrity: sha512-JbAu3CVxWUxni1OiIPVM5lu5JTK0hmmG0xJtkVzL59T8uVjd58K2bpr9tFVHSTiYajwUvIkHwcWtymnYjj111Q==}
+
+  '@opentiny/vue-huicharts-waterfall@3.22.0':
+    resolution: {integrity: sha512-SUt/vOIyuXhPQPnPvvUb52qHC34jJDHdeme3vMWHDocncqIaNgnd6LwW7yGAHOhiQ+zVsq4yIYIy/LTIfI6Zzg==}
+
+  '@opentiny/vue-huicharts-wordcloud@3.22.0':
+    resolution: {integrity: sha512-2Klrr/CJdQBvf5pVuhoGXBMvAiBlIMC86D6AXFJXiYK68RcE5beidS6cnNtl2AlqFYzb+45iIusmJR9YT8EISQ==}
+
+  '@opentiny/vue-huicharts@3.22.0':
+    resolution: {integrity: sha512-I637k99/xZydjxHdf8zRmqQNWMG5BrDEMT2FkN88HCDr4AX2PcJz5afB/QaDQ04UaTB1sXi3thCfTVMWPiD97w==}
 
   '@opentiny/vue-icon@3.22.0':
     resolution: {integrity: sha512-PHaCNr8jTukJHIG1pFBnH2q5Kqri43cYDUC1ea/6TvQATQZoBuM1CwzA7dO0I4bim/iRyruo47lIoZTPq9G5Vg==}
@@ -3448,18 +3526,18 @@ packages:
     peerDependencies:
       vite: ^2.9.0 || ^3.0.0-0 || ^4.0.0 || ^5.0.0-0 || ^6.0.0-0
 
-  '@vitejs/plugin-vue-jsx@3.1.0':
-    resolution: {integrity: sha512-w9M6F3LSEU5kszVb9An2/MmXNxocAnUb3WhRr8bHlimhDrXNt6n6D2nJQR3UXpGlZHh/EsgouOHCsM8V3Ln+WA==}
-    engines: {node: ^14.18.0 || >=16.0.0}
+  '@vitejs/plugin-vue-jsx@4.1.2':
+    resolution: {integrity: sha512-4Rk0GdE0QCdsIkuMmWeg11gmM4x8UmTnZR/LWPm7QJ7+BsK4tq08udrN0isrrWqz5heFy9HLV/7bOLgFS8hUjA==}
+    engines: {node: ^18.0.0 || >=20.0.0}
     peerDependencies:
-      vite: ^4.0.0 || ^5.0.0
+      vite: ^5.0.0 || ^6.0.0
       vue: ^3.0.0
 
-  '@vitejs/plugin-vue@4.6.2':
-    resolution: {integrity: sha512-kqf7SGFoG+80aZG6Pf+gsZIVvGSCKE98JbiWqcCV9cThtg91Jav0yvYFC9Zb+jKetNGF6ZKeoaxgZfND21fWKw==}
-    engines: {node: ^14.18.0 || >=16.0.0}
+  '@vitejs/plugin-vue@5.2.3':
+    resolution: {integrity: sha512-IYSLEQj4LgZZuoVpdSUCw3dIynTWQgPlaRP6iAvMle4My0HdYwr5g5wQAfwOeHQBmYwEkqF70nRpSilr6PoUDg==}
+    engines: {node: ^18.0.0 || >=20.0.0}
     peerDependencies:
-      vite: ^4.0.0 || ^5.0.0
+      vite: ^5.0.0 || ^6.0.0
       vue: ^3.2.25
 
   '@volar/language-core@1.11.1':
@@ -5221,6 +5299,16 @@ packages:
   ecdsa-sig-formatter@1.0.11:
     resolution: {integrity: sha512-nagl3RYrbNv6kQkeJIpt6NJZy8twLB/2vtz6yN9Z4vRKHN4/QZJIEbqohALSgwKdnksuY3k5Addp5lg8sVoVcQ==}
 
+  echarts-liquidfill@3.1.0:
+    resolution: {integrity: sha512-5Dlqs/jTsdTUAsd+K5LPLLTgrbbNORUSBQyk8PSy1Mg2zgHDWm83FmvA4s0ooNepCJojFYRITTQ4GU1UUSKYLw==}
+    peerDependencies:
+      echarts: ^5.0.1
+
+  echarts-wordcloud@2.0.0:
+    resolution: {integrity: sha512-K7l6pTklqdW7ZWzT/1CS0KhBSINr/cd7c5N1fVMzZMwLQHEwT7x+nivK7g5hkVh7WNcAv4Dn6/ZS5zMKRozC1g==}
+    peerDependencies:
+      echarts: ^5.0.1
+
   echarts@5.4.1:
     resolution: {integrity: sha512-9ltS3M2JB0w2EhcYjCdmtrJ+6haZcW6acBolMGIuf01Hql1yrIV01L1aRj7jsaaIULJslEP9Z3vKlEmnJaWJVQ==}
 
@@ -5228,7 +5316,7 @@ packages:
     resolution: {integrity: sha512-oTbVTsXfKuEhxftHqL5xprgLoc0k7uScAwtryCgWF6hPYFLRwOUHiFmHGCBKP5NPFNkDVopOieyUqYGH8Fa3kA==}
 
   ee-first@1.1.1:
-    resolution: {integrity: sha1-WQxhFWsK4vTwJVcyoViyZrxWsh0=}
+    resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
 
   ejs@2.7.4:
     resolution: {integrity: sha512-7vmuyh5+kuUyJKePhQfRQBhXV5Ce+RnaeeQArKu1EAMpL3WbgMt5WG6uQZpEVvYSSsxMXRKOewtDk9RaTKXRlA==}
@@ -6078,6 +6166,7 @@ packages:
 
   formidable@2.1.2:
     resolution: {integrity: sha512-CM3GuJ57US06mlpQ47YcunuUZ9jpm8Vx+P2CGt2j7HpgkKZO/DJYQ0Bobim8G6PFQmK5lOqOOdUXboU+h73A4g==}
+    deprecated: 'ACTION REQUIRED: SWITCH TO v3 - v1 and v2 are VULNERABLE! v1 is DEPRECATED FOR OVER 2 YEARS! Use formidable@latest or try formidable-mini for fresh projects'
 
   formstream@1.5.1:
     resolution: {integrity: sha512-q7ORzFqotpwn3Y/GBK2lK7PjtZZwJHz9QE9Phv8zb5IrL9ftGLyi2zjGURON3voK8TaZ+mqJKERYN4lrHYTkUQ==}
@@ -7390,7 +7479,7 @@ packages:
     hasBin: true
 
   json-buffer@3.0.0:
-    resolution: {integrity: sha1-Wx85evx11ne96Lz8Dkfh+aPZqJg=}
+    resolution: {integrity: sha512-CuUqjv0FUZIdXkHPI8MezCnFCdaTAacej1TZYulLoAg1h/PhwkdXFN4V/gzY4g+fMBCOV2xF+rp7t2XD2ns/NQ==}
 
   json-buffer@3.0.1:
     resolution: {integrity: sha512-4bV5BfR2mqfQTJm+V5tPPdf+ZpuhiIvTuAB5g8kcrXOZpTT/QwwVRWBywX1ozr6lEuPdbHxwaJlm9G6mI2sfSQ==}
@@ -8260,6 +8349,7 @@ packages:
   node-domexception@1.0.0:
     resolution: {integrity: sha512-/jKZoMpw0F8GRwl4/eLROPA3cfcXtLApP0QzLmUT/HuPCZWyB7IY9ZrMeKw2O/nFIqPQB3PVM9aYm0F312AXDQ==}
     engines: {node: '>=10.5.0'}
+    deprecated: Use your platform's native DOMException instead
 
   node-emoji@1.11.0:
     resolution: {integrity: sha512-wo2DpQkQp7Sjm2A0cq+sN7EHKO6Sl0ctXeBdFZrL9T9+UywORbufTcTZxom8YqpLQt/FqNMUkOpkZrJVYSKD3A==}
@@ -9570,7 +9660,7 @@ packages:
   right-pad@1.0.1:
     resolution: {integrity: sha512-bYBjgxmkvTAfgIYy328fmkwhp39v8lwVgWhhrzxPV3yHtcSqyYKe9/XOhvW48UFjATg3VuJbpsp5822ACNvkmw==}
     engines: {node: '>= 0.10'}
-    deprecated: Please use String.prototype.padEnd() over this package.
+    deprecated: Use String.prototype.padEnd() instead
 
   rimraf@2.6.3:
     resolution: {integrity: sha512-mwqeW5XsA2qAejG46gYdENaxXjx9onRNCfn7L0duuP4hCuTIi/QO7PDK07KJfp1d+izWPrzEJDcSqBa0OZQriA==}
@@ -11117,7 +11207,7 @@ packages:
     resolution: {integrity: sha512-Z0DbgELS9/L/75wZbro8xAnT50pBVFQZ+hUEueGDU5FN51YSCYM+jdxsfCiHjwNP/4LCDD0i/graKpeBnOXKRA==}
 
   utils-merge@1.0.1:
-    resolution: {integrity: sha1-n5VxD1CiZ5R7LMwSR0HBAoQn5xM=}
+    resolution: {integrity: sha512-pMZTvIkT1d+TFGvDOqodOclx0QWkkgi6Tdoa8gC8ffGAAqz9pzPTZWAybbsHHoED/ztMtkv/VoYTYyShUn81hA==}
     engines: {node: '>= 0.4.0'}
 
   uuid@11.1.0:
@@ -11832,10 +11922,10 @@ snapshots:
       '@babel/helpers': 7.27.0
       '@babel/parser': 7.27.0
       '@babel/template': 7.27.0
-      '@babel/traverse': 7.27.0
+      '@babel/traverse': 7.27.0(supports-color@7.2.0)
       '@babel/types': 7.27.0
       convert-source-map: 2.0.0
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
       gensync: 1.0.0-beta.2
       json5: 2.2.3
       semver: 6.3.1
@@ -11890,7 +11980,7 @@ snapshots:
       '@babel/helper-optimise-call-expression': 7.25.9
       '@babel/helper-replace-supers': 7.26.5(@babel/core@7.26.10)
       '@babel/helper-skip-transparent-expression-wrappers': 7.25.9
-      '@babel/traverse': 7.27.0
+      '@babel/traverse': 7.27.0(supports-color@7.2.0)
       semver: 6.3.1
     transitivePeerDependencies:
       - supports-color
@@ -11907,7 +11997,7 @@ snapshots:
       '@babel/core': 7.26.10
       '@babel/helper-compilation-targets': 7.27.0
       '@babel/helper-plugin-utils': 7.26.5
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
       lodash.debounce: 4.0.8
       resolve: 1.22.10
     transitivePeerDependencies:
@@ -11919,14 +12009,7 @@ snapshots:
 
   '@babel/helper-member-expression-to-functions@7.25.9':
     dependencies:
-      '@babel/traverse': 7.27.0
-      '@babel/types': 7.27.0
-    transitivePeerDependencies:
-      - supports-color
-
-  '@babel/helper-module-imports@7.25.9':
-    dependencies:
-      '@babel/traverse': 7.27.0
+      '@babel/traverse': 7.27.0(supports-color@7.2.0)
       '@babel/types': 7.27.0
     transitivePeerDependencies:
       - supports-color
@@ -11941,9 +12024,9 @@ snapshots:
   '@babel/helper-module-transforms@7.26.0(@babel/core@7.26.10)':
     dependencies:
       '@babel/core': 7.26.10
-      '@babel/helper-module-imports': 7.25.9
+      '@babel/helper-module-imports': 7.25.9(supports-color@7.2.0)
       '@babel/helper-validator-identifier': 7.25.9
-      '@babel/traverse': 7.27.0
+      '@babel/traverse': 7.27.0(supports-color@7.2.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -11966,8 +12049,8 @@ snapshots:
     dependencies:
       '@babel/core': 7.26.10
       '@babel/helper-annotate-as-pure': 7.25.9
-      '@babel/helper-wrap-function': 7.25.9
-      '@babel/traverse': 7.27.0
+      '@babel/helper-wrap-function': 7.25.9(supports-color@7.2.0)
+      '@babel/traverse': 7.27.0(supports-color@7.2.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -11985,13 +12068,13 @@ snapshots:
       '@babel/core': 7.26.10
       '@babel/helper-member-expression-to-functions': 7.25.9
       '@babel/helper-optimise-call-expression': 7.25.9
-      '@babel/traverse': 7.27.0
+      '@babel/traverse': 7.27.0(supports-color@7.2.0)
     transitivePeerDependencies:
       - supports-color
 
   '@babel/helper-skip-transparent-expression-wrappers@7.25.9':
     dependencies:
-      '@babel/traverse': 7.27.0
+      '@babel/traverse': 7.27.0(supports-color@7.2.0)
       '@babel/types': 7.27.0
     transitivePeerDependencies:
       - supports-color
@@ -12001,14 +12084,6 @@ snapshots:
   '@babel/helper-validator-identifier@7.25.9': {}
 
   '@babel/helper-validator-option@7.25.9': {}
-
-  '@babel/helper-wrap-function@7.25.9':
-    dependencies:
-      '@babel/template': 7.27.0
-      '@babel/traverse': 7.27.0
-      '@babel/types': 7.27.0
-    transitivePeerDependencies:
-      - supports-color
 
   '@babel/helper-wrap-function@7.25.9(supports-color@7.2.0)':
     dependencies:
@@ -12038,7 +12113,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.26.10
       '@babel/helper-plugin-utils': 7.26.5
-      '@babel/traverse': 7.27.0
+      '@babel/traverse': 7.27.0(supports-color@7.2.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -12065,7 +12140,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.26.10
       '@babel/helper-plugin-utils': 7.26.5
-      '@babel/traverse': 7.27.0
+      '@babel/traverse': 7.27.0(supports-color@7.2.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -12195,14 +12270,14 @@ snapshots:
       '@babel/core': 7.26.10
       '@babel/helper-plugin-utils': 7.26.5
       '@babel/helper-remap-async-to-generator': 7.25.9(@babel/core@7.26.10)
-      '@babel/traverse': 7.27.0
+      '@babel/traverse': 7.27.0(supports-color@7.2.0)
     transitivePeerDependencies:
       - supports-color
 
   '@babel/plugin-transform-async-to-generator@7.25.9(@babel/core@7.26.10)':
     dependencies:
       '@babel/core': 7.26.10
-      '@babel/helper-module-imports': 7.25.9
+      '@babel/helper-module-imports': 7.25.9(supports-color@7.2.0)
       '@babel/helper-plugin-utils': 7.26.5
       '@babel/helper-remap-async-to-generator': 7.25.9(@babel/core@7.26.10)
     transitivePeerDependencies:
@@ -12241,7 +12316,7 @@ snapshots:
       '@babel/helper-compilation-targets': 7.27.0
       '@babel/helper-plugin-utils': 7.26.5
       '@babel/helper-replace-supers': 7.26.5(@babel/core@7.26.10)
-      '@babel/traverse': 7.27.0
+      '@babel/traverse': 7.27.0(supports-color@7.2.0)
       globals: 11.12.0
     transitivePeerDependencies:
       - supports-color
@@ -12302,7 +12377,7 @@ snapshots:
       '@babel/core': 7.26.10
       '@babel/helper-compilation-targets': 7.27.0
       '@babel/helper-plugin-utils': 7.26.5
-      '@babel/traverse': 7.27.0
+      '@babel/traverse': 7.27.0(supports-color@7.2.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -12356,7 +12431,7 @@ snapshots:
       '@babel/helper-module-transforms': 7.26.0(@babel/core@7.26.10)
       '@babel/helper-plugin-utils': 7.26.5
       '@babel/helper-validator-identifier': 7.25.9
-      '@babel/traverse': 7.27.0
+      '@babel/traverse': 7.27.0(supports-color@7.2.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -12625,18 +12700,6 @@ snapshots:
       '@babel/code-frame': 7.26.2
       '@babel/parser': 7.27.0
       '@babel/types': 7.27.0
-
-  '@babel/traverse@7.27.0':
-    dependencies:
-      '@babel/code-frame': 7.26.2
-      '@babel/generator': 7.27.0
-      '@babel/parser': 7.27.0
-      '@babel/template': 7.27.0
-      '@babel/types': 7.27.0
-      debug: 4.4.0(supports-color@8.1.1)
-      globals: 11.12.0
-    transitivePeerDependencies:
-      - supports-color
 
   '@babel/traverse@7.27.0(supports-color@7.2.0)':
     dependencies:
@@ -13013,7 +13076,7 @@ snapshots:
   '@eslint/eslintrc@0.4.3':
     dependencies:
       ajv: 6.12.6
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
       espree: 7.3.1
       globals: 13.24.0
       ignore: 4.0.6
@@ -13027,7 +13090,7 @@ snapshots:
   '@eslint/eslintrc@2.1.4':
     dependencies:
       ajv: 6.12.6
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
       espree: 9.6.1
       globals: 13.24.0
       ignore: 5.3.2
@@ -13179,7 +13242,7 @@ snapshots:
   '@humanwhocodes/config-array@0.11.14':
     dependencies:
       '@humanwhocodes/object-schema': 2.0.3
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
       minimatch: 3.1.2
     transitivePeerDependencies:
       - supports-color
@@ -13187,7 +13250,7 @@ snapshots:
   '@humanwhocodes/config-array@0.5.0':
     dependencies:
       '@humanwhocodes/object-schema': 1.2.1
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
       minimatch: 3.1.2
     transitivePeerDependencies:
       - supports-color
@@ -13205,7 +13268,7 @@ snapshots:
       '@antfu/install-pkg': 1.0.0
       '@antfu/utils': 8.1.1
       '@iconify/types': 2.0.0
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
       globals: 15.15.0
       kolorist: 1.8.0
       local-pkg: 1.1.1
@@ -13814,7 +13877,7 @@ snapshots:
       chalk: 2.4.2
       cross-spawn: 7.0.6
       dargs: 7.0.0
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
       del: 5.1.0
       ejs: 2.7.4
       escodegen: 1.14.3
@@ -13848,6 +13911,8 @@ snapshots:
     dependencies:
       lodash-es: 4.17.21
       quill: 2.0.3
+
+  '@opentiny/huicharts@1.0.1': {}
 
   '@opentiny/hwc-client@0.0.14': {}
 
@@ -14669,6 +14734,172 @@ snapshots:
       '@opentiny/vue-radio': 3.22.0
       '@opentiny/vue-renderless': 3.22.0
       '@opentiny/vue-theme': 3.22.1
+
+  '@opentiny/vue-huicharts-amap@3.22.0':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+
+  '@opentiny/vue-huicharts-bar@3.22.0':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+
+  '@opentiny/vue-huicharts-bmap@3.22.0':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+
+  '@opentiny/vue-huicharts-boxplot@3.22.0':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+
+  '@opentiny/vue-huicharts-candle@3.22.0':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+      '@opentiny/vue-locale': 3.22.0
+
+  '@opentiny/vue-huicharts-core@3.22.0':
+    dependencies:
+      '@opentiny/huicharts': 1.0.1
+      '@opentiny/utils': 3.22.0
+      '@opentiny/vue-theme': 3.22.1
+      echarts: 5.4.1
+
+  '@opentiny/vue-huicharts-funnel@3.22.0':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+
+  '@opentiny/vue-huicharts-gauge@3.22.0':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+
+  '@opentiny/vue-huicharts-graph@3.22.0':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+
+  '@opentiny/vue-huicharts-heatmap@3.22.0':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+
+  '@opentiny/vue-huicharts-histogram@3.22.0':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+
+  '@opentiny/vue-huicharts-line@3.22.0':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+
+  '@opentiny/vue-huicharts-liquidfill@3.22.0(echarts@5.6.0)':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+      echarts-liquidfill: 3.1.0(echarts@5.6.0)
+    transitivePeerDependencies:
+      - echarts
+
+  '@opentiny/vue-huicharts-map@3.22.0':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+
+  '@opentiny/vue-huicharts-pie@3.22.0':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+      '@opentiny/vue-locale': 3.22.0
+
+  '@opentiny/vue-huicharts-process@3.22.0':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+
+  '@opentiny/vue-huicharts-radar@3.22.0':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+
+  '@opentiny/vue-huicharts-ring@3.22.0':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+      '@opentiny/vue-locale': 3.22.0
+
+  '@opentiny/vue-huicharts-sankey@3.22.0':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+
+  '@opentiny/vue-huicharts-scatter@3.22.0':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+
+  '@opentiny/vue-huicharts-sunburst@3.22.0':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+
+  '@opentiny/vue-huicharts-tree@3.22.0':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+
+  '@opentiny/vue-huicharts-waterfall@3.22.0':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+      '@opentiny/vue-locale': 3.22.0
+
+  '@opentiny/vue-huicharts-wordcloud@3.22.0(echarts@5.6.0)':
+    dependencies:
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+      echarts-wordcloud: 2.0.0(echarts@5.6.0)
+    transitivePeerDependencies:
+      - echarts
+
+  '@opentiny/vue-huicharts@3.22.0(echarts@5.6.0)':
+    dependencies:
+      '@opentiny/huicharts': 1.0.1
+      '@opentiny/utils': 3.22.0
+      '@opentiny/vue-common': 3.22.0
+      '@opentiny/vue-huicharts-amap': 3.22.0
+      '@opentiny/vue-huicharts-bar': 3.22.0
+      '@opentiny/vue-huicharts-bmap': 3.22.0
+      '@opentiny/vue-huicharts-boxplot': 3.22.0
+      '@opentiny/vue-huicharts-candle': 3.22.0
+      '@opentiny/vue-huicharts-core': 3.22.0
+      '@opentiny/vue-huicharts-funnel': 3.22.0
+      '@opentiny/vue-huicharts-gauge': 3.22.0
+      '@opentiny/vue-huicharts-graph': 3.22.0
+      '@opentiny/vue-huicharts-heatmap': 3.22.0
+      '@opentiny/vue-huicharts-histogram': 3.22.0
+      '@opentiny/vue-huicharts-line': 3.22.0
+      '@opentiny/vue-huicharts-liquidfill': 3.22.0(echarts@5.6.0)
+      '@opentiny/vue-huicharts-map': 3.22.0
+      '@opentiny/vue-huicharts-pie': 3.22.0
+      '@opentiny/vue-huicharts-process': 3.22.0
+      '@opentiny/vue-huicharts-radar': 3.22.0
+      '@opentiny/vue-huicharts-ring': 3.22.0
+      '@opentiny/vue-huicharts-sankey': 3.22.0
+      '@opentiny/vue-huicharts-scatter': 3.22.0
+      '@opentiny/vue-huicharts-sunburst': 3.22.0
+      '@opentiny/vue-huicharts-tree': 3.22.0
+      '@opentiny/vue-huicharts-waterfall': 3.22.0
+      '@opentiny/vue-huicharts-wordcloud': 3.22.0(echarts@5.6.0)
+      '@opentiny/vue-locale': 3.22.0
+      '@opentiny/vue-theme': 3.22.1
+    transitivePeerDependencies:
+      - echarts
 
   '@opentiny/vue-icon@3.22.0':
     dependencies:
@@ -16049,18 +16280,18 @@ snapshots:
 
   '@stroncium/procfs@1.2.1': {}
 
-  '@stylelint/postcss-css-in-js@0.37.3(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@7.0.39)':
+  '@stylelint/postcss-css-in-js@0.37.3(postcss-syntax@0.36.2)(postcss@7.0.39)':
     dependencies:
       '@babel/core': 7.26.10
       postcss: 7.0.39
-      postcss-syntax: 0.36.2(postcss-html@0.36.0(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@7.0.39))(postcss-jsx@0.36.4)(postcss-less@3.1.4)(postcss-markdown@0.36.0)(postcss-scss@2.1.1)(postcss@7.0.39)
+      postcss-syntax: 0.36.2(postcss-html@0.36.0(postcss-syntax@0.36.2)(postcss@7.0.39))(postcss-jsx@0.36.4(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@7.0.39))(postcss-less@3.1.4)(postcss-markdown@0.36.0)(postcss-scss@2.1.1)(postcss@7.0.39)
     transitivePeerDependencies:
       - supports-color
 
-  '@stylelint/postcss-markdown@0.36.2(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@7.0.39)':
+  '@stylelint/postcss-markdown@0.36.2(postcss-syntax@0.36.2)(postcss@7.0.39)':
     dependencies:
       postcss: 7.0.39
-      postcss-syntax: 0.36.2(postcss-html@0.36.0(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@7.0.39))(postcss-jsx@0.36.4)(postcss-less@3.1.4)(postcss-markdown@0.36.0)(postcss-scss@2.1.1)(postcss@7.0.39)
+      postcss-syntax: 0.36.2(postcss-html@0.36.0(postcss-syntax@0.36.2)(postcss@7.0.39))(postcss-jsx@0.36.4(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@7.0.39))(postcss-less@3.1.4)(postcss-markdown@0.36.0)(postcss-scss@2.1.1)(postcss@7.0.39)
       remark: 13.0.0
       unist-util-find-all-after: 3.0.2
     transitivePeerDependencies:
@@ -16369,7 +16600,7 @@ snapshots:
       '@typescript-eslint/scope-manager': 5.60.1
       '@typescript-eslint/type-utils': 5.60.1(eslint@8.42.0)(typescript@5.1.6)
       '@typescript-eslint/utils': 5.60.1(eslint@8.42.0)(typescript@5.1.6)
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
       eslint: 8.42.0
       grapheme-splitter: 1.0.4
       ignore: 5.3.2
@@ -16388,7 +16619,7 @@ snapshots:
       '@typescript-eslint/scope-manager': 5.62.0
       '@typescript-eslint/type-utils': 5.62.0(eslint@7.32.0)(typescript@4.9.5)
       '@typescript-eslint/utils': 5.62.0(eslint@7.32.0)(typescript@4.9.5)
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
       eslint: 7.32.0
       graphemer: 1.4.0
       ignore: 5.3.2
@@ -16405,7 +16636,7 @@ snapshots:
       '@typescript-eslint/scope-manager': 5.60.1
       '@typescript-eslint/types': 5.60.1
       '@typescript-eslint/typescript-estree': 5.60.1(typescript@5.1.6)
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
       eslint: 8.42.0
     optionalDependencies:
       typescript: 5.1.6
@@ -16417,7 +16648,7 @@ snapshots:
       '@typescript-eslint/scope-manager': 5.62.0
       '@typescript-eslint/types': 5.62.0
       '@typescript-eslint/typescript-estree': 5.62.0(typescript@4.9.5)
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
       eslint: 7.32.0
     optionalDependencies:
       typescript: 4.9.5
@@ -16438,7 +16669,7 @@ snapshots:
     dependencies:
       '@typescript-eslint/typescript-estree': 5.60.1(typescript@5.1.6)
       '@typescript-eslint/utils': 5.60.1(eslint@8.42.0)(typescript@5.1.6)
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
       eslint: 8.42.0
       tsutils: 3.21.0(typescript@5.1.6)
     optionalDependencies:
@@ -16450,7 +16681,7 @@ snapshots:
     dependencies:
       '@typescript-eslint/typescript-estree': 5.62.0(typescript@4.9.5)
       '@typescript-eslint/utils': 5.62.0(eslint@7.32.0)(typescript@4.9.5)
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
       eslint: 7.32.0
       tsutils: 3.21.0(typescript@4.9.5)
     optionalDependencies:
@@ -16466,7 +16697,7 @@ snapshots:
     dependencies:
       '@typescript-eslint/types': 5.60.1
       '@typescript-eslint/visitor-keys': 5.60.1
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
       globby: 11.1.0
       is-glob: 4.0.3
       semver: 7.7.1
@@ -16480,7 +16711,7 @@ snapshots:
     dependencies:
       '@typescript-eslint/types': 5.62.0
       '@typescript-eslint/visitor-keys': 5.62.0
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
       globby: 11.1.0
       is-glob: 4.0.3
       semver: 7.7.1
@@ -16710,7 +16941,7 @@ snapshots:
     transitivePeerDependencies:
       - vue
 
-  '@vitejs/plugin-vue-jsx@3.1.0(vite@6.2.6(@types/node@22.14.1)(jiti@2.4.2)(less@4.3.0)(sugarss@2.0.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1))(vue@3.5.13(typescript@4.9.5))':
+  '@vitejs/plugin-vue-jsx@4.1.2(vite@6.2.6(@types/node@22.14.1)(jiti@2.4.2)(less@4.3.0)(sugarss@2.0.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1))(vue@3.5.13(typescript@4.9.5))':
     dependencies:
       '@babel/core': 7.26.10
       '@babel/plugin-transform-typescript': 7.27.0(@babel/core@7.26.10)
@@ -16720,7 +16951,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@vitejs/plugin-vue@4.6.2(vite@6.2.6(@types/node@22.14.1)(jiti@2.4.2)(less@4.3.0)(sugarss@2.0.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1))(vue@3.5.13(typescript@4.9.5))':
+  '@vitejs/plugin-vue@5.2.3(vite@6.2.6(@types/node@22.14.1)(jiti@2.4.2)(less@4.3.0)(sugarss@2.0.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1))(vue@3.5.13(typescript@4.9.5))':
     dependencies:
       vite: 6.2.6(@types/node@22.14.1)(jiti@2.4.2)(less@4.3.0)(sugarss@2.0.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1)
       vue: 3.5.13(typescript@4.9.5)
@@ -16744,11 +16975,11 @@ snapshots:
 
   '@vue/babel-plugin-jsx@1.4.0(@babel/core@7.26.10)':
     dependencies:
-      '@babel/helper-module-imports': 7.25.9
+      '@babel/helper-module-imports': 7.25.9(supports-color@7.2.0)
       '@babel/helper-plugin-utils': 7.26.5
       '@babel/plugin-syntax-jsx': 7.25.9(@babel/core@7.26.10)
       '@babel/template': 7.27.0
-      '@babel/traverse': 7.27.0
+      '@babel/traverse': 7.27.0(supports-color@7.2.0)
       '@babel/types': 7.27.0
       '@vue/babel-helper-vue-transform-on': 1.4.0
       '@vue/babel-plugin-resolve-type': 1.4.0(@babel/core@7.26.10)
@@ -16762,7 +16993,7 @@ snapshots:
     dependencies:
       '@babel/code-frame': 7.26.2
       '@babel/core': 7.26.10
-      '@babel/helper-module-imports': 7.25.9
+      '@babel/helper-module-imports': 7.25.9(supports-color@7.2.0)
       '@babel/helper-plugin-utils': 7.26.5
       '@babel/parser': 7.27.0
       '@vue/compiler-sfc': 3.5.13
@@ -16772,7 +17003,7 @@ snapshots:
   '@vue/babel-plugin-transform-vue-jsx@1.4.0(@babel/core@7.26.10)':
     dependencies:
       '@babel/core': 7.26.10
-      '@babel/helper-module-imports': 7.25.9
+      '@babel/helper-module-imports': 7.25.9(supports-color@7.2.0)
       '@babel/plugin-syntax-jsx': 7.25.9(@babel/core@7.26.10)
       '@vue/babel-helper-vue-jsx-merge-props': 1.4.0
       html-tags: 2.0.0
@@ -17076,7 +17307,7 @@ snapshots:
 
   agent-base@6.0.2:
     dependencies:
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -18832,6 +19063,14 @@ snapshots:
     dependencies:
       safe-buffer: 5.2.1
 
+  echarts-liquidfill@3.1.0(echarts@5.6.0):
+    dependencies:
+      echarts: 5.6.0
+
+  echarts-wordcloud@2.0.0(echarts@5.6.0):
+    dependencies:
+      echarts: 5.6.0
+
   echarts@5.4.1:
     dependencies:
       tslib: 2.3.0
@@ -19165,7 +19404,7 @@ snapshots:
 
   eslint-import-resolver-typescript@2.7.1(eslint-plugin-import@2.31.0)(eslint@7.32.0):
     dependencies:
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
       eslint: 7.32.0
       eslint-plugin-import: 2.31.0(@typescript-eslint/parser@5.62.0(eslint@7.32.0)(typescript@4.9.5))(eslint-import-resolver-typescript@2.7.1)(eslint@7.32.0)
       glob: 7.2.3
@@ -19303,7 +19542,7 @@ snapshots:
       ajv: 6.12.6
       chalk: 4.1.2
       cross-spawn: 7.0.6
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
       doctrine: 3.0.0
       enquirer: 2.4.1
       escape-string-regexp: 4.0.0
@@ -19352,7 +19591,7 @@ snapshots:
       ajv: 6.12.6
       chalk: 4.1.2
       cross-spawn: 7.0.6
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
       doctrine: 3.0.0
       escape-string-regexp: 4.0.0
       eslint-scope: 7.2.2
@@ -19936,7 +20175,7 @@ snapshots:
 
   follow-redirects@1.15.9(debug@4.4.0):
     optionalDependencies:
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
 
   for-each@0.3.5:
     dependencies:
@@ -20541,7 +20780,7 @@ snapshots:
     dependencies:
       '@tootallnate/once': 1.1.2
       agent-base: 6.0.2
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -20549,7 +20788,7 @@ snapshots:
     dependencies:
       '@tootallnate/once': 2.0.0
       agent-base: 6.0.2
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -20592,7 +20831,7 @@ snapshots:
   http-proxy-middleware@3.0.5:
     dependencies:
       '@types/http-proxy': 1.17.16
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
       http-proxy: 1.18.1(debug@4.4.0)
       is-glob: 4.0.3
       is-plain-object: 5.0.0
@@ -20611,7 +20850,7 @@ snapshots:
   https-proxy-agent@5.0.1:
     dependencies:
       agent-base: 6.0.2
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -20818,7 +21057,7 @@ snapshots:
     dependencies:
       '@ioredis/commands': 1.2.0
       cluster-key-slot: 1.1.2
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
       denque: 2.1.0
       lodash.defaults: 4.2.0
       lodash.isarguments: 3.1.0
@@ -21196,7 +21435,7 @@ snapshots:
 
   istanbul-lib-source-maps@4.0.1:
     dependencies:
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
       istanbul-lib-coverage: 3.2.2
       source-map: 0.6.1
     transitivePeerDependencies:
@@ -21705,7 +21944,7 @@ snapshots:
 
   koa-send@5.0.1:
     dependencies:
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
       http-errors: 1.8.1
       resolve-path: 1.4.0
     transitivePeerDependencies:
@@ -21725,7 +21964,7 @@ snapshots:
       content-disposition: 0.5.4
       content-type: 1.0.5
       cookies: 0.9.1
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
       delegates: 1.0.0
       depd: 2.0.0
       destroy: 1.2.0
@@ -22298,7 +22537,7 @@ snapshots:
 
   micromark@2.11.4:
     dependencies:
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
       parse-entities: 2.0.0
     transitivePeerDependencies:
       - supports-color
@@ -23453,17 +23692,17 @@ snapshots:
 
   possible-typed-array-names@1.1.0: {}
 
-  postcss-html@0.36.0(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@7.0.39):
+  postcss-html@0.36.0(postcss-syntax@0.36.2)(postcss@7.0.39):
     dependencies:
       htmlparser2: 3.10.1
       postcss: 7.0.39
-      postcss-syntax: 0.36.2(postcss-html@0.36.0(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@7.0.39))(postcss-jsx@0.36.4)(postcss-less@3.1.4)(postcss-markdown@0.36.0)(postcss-scss@2.1.1)(postcss@7.0.39)
+      postcss-syntax: 0.36.2(postcss-html@0.36.0(postcss-syntax@0.36.2)(postcss@7.0.39))(postcss-jsx@0.36.4(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@7.0.39))(postcss-less@3.1.4)(postcss-markdown@0.36.0)(postcss-scss@2.1.1)(postcss@7.0.39)
 
   postcss-jsx@0.36.4(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@7.0.39):
     dependencies:
       '@babel/core': 7.26.10
       postcss: 7.0.39
-      postcss-syntax: 0.36.2(postcss-html@0.36.0(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@7.0.39))(postcss-jsx@0.36.4)(postcss-less@3.1.4)(postcss-markdown@0.36.0)(postcss-scss@2.1.1)(postcss@7.0.39)
+      postcss-syntax: 0.36.2(postcss-html@0.36.0(postcss-syntax@0.36.2)(postcss@7.0.39))(postcss-jsx@0.36.4(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@7.0.39))(postcss-less@3.1.4)(postcss-markdown@0.36.0)(postcss-scss@2.1.1)(postcss@7.0.39)
     transitivePeerDependencies:
       - supports-color
 
@@ -23474,7 +23713,7 @@ snapshots:
   postcss-markdown@0.36.0(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@7.0.39):
     dependencies:
       postcss: 7.0.39
-      postcss-syntax: 0.36.2(postcss-html@0.36.0(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@7.0.39))(postcss-jsx@0.36.4)(postcss-less@3.1.4)(postcss-markdown@0.36.0)(postcss-scss@2.1.1)(postcss@7.0.39)
+      postcss-syntax: 0.36.2(postcss-html@0.36.0(postcss-syntax@0.36.2)(postcss@7.0.39))(postcss-jsx@0.36.4(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@7.0.39))(postcss-less@3.1.4)(postcss-markdown@0.36.0)(postcss-scss@2.1.1)(postcss@7.0.39)
       remark: 10.0.1
       unist-util-find-all-after: 1.0.5
 
@@ -23554,11 +23793,11 @@ snapshots:
       lodash: 4.17.21
       postcss: 7.0.39
 
-  postcss-syntax@0.36.2(postcss-html@0.36.0(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@7.0.39))(postcss-jsx@0.36.4)(postcss-less@3.1.4)(postcss-markdown@0.36.0)(postcss-scss@2.1.1)(postcss@7.0.39):
+  postcss-syntax@0.36.2(postcss-html@0.36.0(postcss-syntax@0.36.2)(postcss@7.0.39))(postcss-jsx@0.36.4(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@7.0.39))(postcss-less@3.1.4)(postcss-markdown@0.36.0)(postcss-scss@2.1.1)(postcss@7.0.39):
     dependencies:
       postcss: 7.0.39
     optionalDependencies:
-      postcss-html: 0.36.0(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@7.0.39)
+      postcss-html: 0.36.0(postcss-syntax@0.36.2)(postcss@7.0.39)
       postcss-jsx: 0.36.4(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@7.0.39)
       postcss-less: 3.1.4
       postcss-markdown: 0.36.0(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@7.0.39)
@@ -24292,7 +24531,7 @@ snapshots:
     dependencies:
       '@types/debug': 4.1.12
       '@types/validator': 13.12.3
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
       dottie: 2.0.6
       inflection: 1.13.4
       lodash: 4.17.21
@@ -24553,7 +24792,7 @@ snapshots:
   socks-proxy-agent@7.0.0:
     dependencies:
       agent-base: 6.0.2
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
       socks: 2.8.4
     transitivePeerDependencies:
       - supports-color
@@ -24627,7 +24866,7 @@ snapshots:
 
   spdy-transport@3.0.0:
     dependencies:
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
       detect-node: 2.1.0
       hpack.js: 2.1.6
       obuf: 1.1.2
@@ -24638,7 +24877,7 @@ snapshots:
 
   spdy@4.0.2:
     dependencies:
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
       handle-thing: 2.0.1
       http-deceiver: 1.2.7
       select-hose: 2.0.0
@@ -24915,13 +25154,13 @@ snapshots:
 
   stylelint@13.13.1:
     dependencies:
-      '@stylelint/postcss-css-in-js': 0.37.3(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@7.0.39)
-      '@stylelint/postcss-markdown': 0.36.2(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@7.0.39)
+      '@stylelint/postcss-css-in-js': 0.37.3(postcss-syntax@0.36.2)(postcss@7.0.39)
+      '@stylelint/postcss-markdown': 0.36.2(postcss-syntax@0.36.2)(postcss@7.0.39)
       autoprefixer: 9.8.8
       balanced-match: 2.0.0
       chalk: 4.1.2
       cosmiconfig: 7.1.0
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
       execall: 2.0.0
       fast-glob: 3.3.3
       fastest-levenshtein: 1.0.16
@@ -24942,7 +25181,7 @@ snapshots:
       micromatch: 4.0.8
       normalize-selector: 0.2.0
       postcss: 7.0.39
-      postcss-html: 0.36.0(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@7.0.39)
+      postcss-html: 0.36.0(postcss-syntax@0.36.2)(postcss@7.0.39)
       postcss-less: 3.1.4
       postcss-media-query-parser: 0.2.3
       postcss-resolve-nested-selector: 0.1.6
@@ -24950,7 +25189,7 @@ snapshots:
       postcss-sass: 0.4.4
       postcss-scss: 2.1.1
       postcss-selector-parser: 6.1.2
-      postcss-syntax: 0.36.2(postcss-html@0.36.0(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@7.0.39))(postcss-jsx@0.36.4)(postcss-less@3.1.4)(postcss-markdown@0.36.0)(postcss-scss@2.1.1)(postcss@7.0.39)
+      postcss-syntax: 0.36.2(postcss-html@0.36.0(postcss-syntax@0.36.2)(postcss@7.0.39))(postcss-jsx@0.36.4(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@7.0.39))(postcss-less@3.1.4)(postcss-markdown@0.36.0)(postcss-scss@2.1.1)(postcss@7.0.39)
       postcss-value-parser: 4.2.0
       resolve-from: 5.0.0
       slash: 3.0.0
@@ -24974,7 +25213,7 @@ snapshots:
       balanced-match: 1.0.2
       chalk: 2.4.2
       cosmiconfig: 5.2.1
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
       execall: 1.0.0
       file-entry-cache: 4.0.0
       get-stdin: 6.0.0
@@ -24995,7 +25234,7 @@ snapshots:
       normalize-selector: 0.2.0
       pify: 4.0.1
       postcss: 7.0.39
-      postcss-html: 0.36.0(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@7.0.39)
+      postcss-html: 0.36.0(postcss-syntax@0.36.2)(postcss@7.0.39)
       postcss-jsx: 0.36.4(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@7.0.39)
       postcss-less: 3.1.4
       postcss-markdown: 0.36.0(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@7.0.39)
@@ -25006,7 +25245,7 @@ snapshots:
       postcss-sass: 0.3.5
       postcss-scss: 2.1.1
       postcss-selector-parser: 3.1.2
-      postcss-syntax: 0.36.2(postcss-html@0.36.0(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@7.0.39))(postcss-jsx@0.36.4)(postcss-less@3.1.4)(postcss-markdown@0.36.0)(postcss-scss@2.1.1)(postcss@7.0.39)
+      postcss-syntax: 0.36.2(postcss-html@0.36.0(postcss-syntax@0.36.2)(postcss@7.0.39))(postcss-jsx@0.36.4(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@7.0.39))(postcss-less@3.1.4)(postcss-markdown@0.36.0)(postcss-scss@2.1.1)(postcss@7.0.39)
       postcss-value-parser: 3.3.1
       resolve-from: 4.0.0
       signal-exit: 3.0.7
@@ -25028,7 +25267,7 @@ snapshots:
     dependencies:
       component-emitter: 1.3.1
       cookiejar: 2.1.4
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
       fast-safe-stringify: 2.1.1
       form-data: 4.0.2
       formidable: 2.1.2
@@ -25477,7 +25716,7 @@ snapshots:
   tuf-js@1.1.7:
     dependencies:
       '@tufjs/models': 1.0.4
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
       make-fetch-happen: 11.1.1
     transitivePeerDependencies:
       - supports-color
@@ -25559,7 +25798,7 @@ snapshots:
       app-root-path: 3.1.0
       buffer: 6.0.3
       dayjs: 1.11.13
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
       dotenv: 16.4.7
       glob: 10.4.5
       reflect-metadata: 0.1.13
@@ -25773,7 +26012,7 @@ snapshots:
       '@antfu/utils': 0.4.0
       '@rollup/pluginutils': 4.2.1
       chokidar: 3.6.0
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
       fast-glob: 3.3.3
       local-pkg: 0.4.3
       magic-string: 0.25.9
@@ -25783,7 +26022,7 @@ snapshots:
       vue: 3.5.13(typescript@4.9.5)
     optionalDependencies:
       '@babel/parser': 7.27.0
-      '@babel/traverse': 7.27.0
+      '@babel/traverse': 7.27.0(supports-color@7.2.0)
     transitivePeerDependencies:
       - esbuild
       - rollup
@@ -25963,7 +26202,7 @@ snapshots:
   vite-plugin-compression@0.5.1(vite@6.2.6(@types/node@22.14.1)(jiti@2.4.2)(less@4.3.0)(sugarss@2.0.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1)):
     dependencies:
       chalk: 4.1.2
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
       fs-extra: 10.1.0
       vite: 6.2.6(@types/node@22.14.1)(jiti@2.4.2)(less@4.3.0)(sugarss@2.0.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1)
     transitivePeerDependencies:
@@ -25999,7 +26238,7 @@ snapshots:
       chalk: 4.1.2
       chokidar: 3.6.0
       connect: 3.7.0
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
       esbuild: 0.14.54
       fast-glob: 3.3.3
       mockjs: 1.1.0
@@ -26045,7 +26284,7 @@ snapshots:
 
   vue-eslint-parser@8.3.0(eslint@7.32.0):
     dependencies:
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
       eslint: 7.32.0
       eslint-scope: 7.2.2
       eslint-visitor-keys: 3.4.3
@@ -26058,7 +26297,7 @@ snapshots:
 
   vue-eslint-parser@9.4.3(eslint@7.32.0):
     dependencies:
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@7.2.0)
       eslint: 7.32.0
       eslint-scope: 7.2.2
       eslint-visitor-keys: 3.4.3
