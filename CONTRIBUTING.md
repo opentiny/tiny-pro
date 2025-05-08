@@ -39,7 +39,7 @@ pnpm start
 cd template/tinyvue
 
 pnpm i
-
+pnpm mock
 pnpm start
 ```
 

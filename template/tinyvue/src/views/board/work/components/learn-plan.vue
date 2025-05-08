@@ -1,81 +1,109 @@
 <template>
   <tiny-layout>
     <tiny-row :flex="true" justify="center">
-      <transition-fade-slide-group>
         <tiny-col>
           <div class="col">
             <div class="title">
-              <img src="@/assets/images/plan-1.png" />
               <span>{{ $t('work.index.plans') }}</span>
             </div>
-            <div>
-              <span class="plan-pass">1890</span>
-              <span class="num">&nbsp;/ {{ $t('work.index.Numbers') }}</span>
+            <div class="col-content">
+              <tiny-progress
+                class="progress"
+                :show-text="false"
+                :stroke-width="4"
+                :percentage="20"
+                color = "#f23030"
+              ></tiny-progress>
+              <span class="plan-pass">1890 <span class="num">&nbsp;/ {{ $t('work.index.Numbers') }}</span> </span>
             </div>
           </div>
         </tiny-col>
         <tiny-col>
           <div class="col">
             <div class="title">
-              <img src="@/assets/images/plan-2.png" />
               <span>{{ $t('work.index.Unfinished') }}</span>
             </div>
-            <div>
-              <span class="plan-pass">23</span>
-              <span class="num">&nbsp;/ {{ $t('work.index.Numbers') }}</span>
+            <div class="col-content">
+              <tiny-progress
+                class="progress"
+                :show-text="false"
+                :stroke-width="4"
+                :percentage="20"
+                color = "#f23030"
+              ></tiny-progress>
+              <span class="plan-pass">23  <span class="num">&nbsp;/ {{ $t('work.index.Numbers') }}</span> </span>
             </div>
           </div>
         </tiny-col>
         <tiny-col>
           <div class="col">
             <div class="title">
-              <img src="@/assets/images/plan-3.png" />
               <span>{{ $t('work.index.beOverdue') }}</span>
             </div>
-            <div>
-              <span class="plan-fail">113</span>
-              <span class="num">&nbsp;/ {{ $t('work.index.Numbers') }}</span>
+            <div class="col-content">
+              <tiny-progress
+                class="progress"
+                :show-text="false"
+                :stroke-width="4"
+                :percentage="20"
+                color = "#f23030"
+              ></tiny-progress>
+              <span class="plan-fail">113 <span class="num">&nbsp;/ {{ $t('work.index.Numbers') }}</span></span>
             </div>
           </div>
         </tiny-col>
         <tiny-col>
           <div class="col">
             <div class="title">
-              <img src="@/assets/images/plan-4.png" />
               <span>{{ $t('work.index.Overdue') }}</span>
             </div>
-            <div>
-              <span class="plan-pass">56</span>
-              <span class="num">&nbsp;/ {{ $t('work.index.Numbers') }}</span>
+            <div class="col-content">
+              <tiny-progress
+                class="progress"
+                :show-text="false"
+                :stroke-width="4"
+                :percentage="20"
+                color = "#f23030"
+              ></tiny-progress>
+              <span class="plan-pass">56 <span class="num">&nbsp;/ {{ $t('work.index.Numbers') }}</span></span>
             </div>
           </div>
         </tiny-col>
-      </transition-fade-slide-group>
     </tiny-row>
   </tiny-layout>
 </template>
 
 <script lang="ts" setup>
-  import transitionFadeSlideGroup from '@/components/transition/transition-fade-slide-group.vue';
   import {
     Layout as TinyLayout,
     Row as TinyRow,
     Col as TinyCol,
+    TinyProgress
   } from '@opentiny/vue';
 </script>
 
 <style scoped lang="less">
   .col {
-    height: 150px;
+    height: 106px;
     text-align: center;
-    background: #fff;
+    background: #f5f5f5;
     border-radius: 10px;
-    box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.05);
+
+    .col-content{
+      margin: 0 24px;
+      display: flex;
+      justify-content: space-between;
+      .progress{
+        width: 50%;
+      }
+      .plan-pass{
+        font-size: 20px;
+        font-weight: 700;
+      }
+    }
+
   }
 
-  .col:hover {
-    box-shadow: 0 3px 10px 0 rgb(64 98 225 / 45%);
-  }
 
   .font {
     font-weight: 600;
@@ -85,22 +113,9 @@
   }
 
   .col > div {
-    padding: 15px 0;
     color: #252b3a;
-    font-weight: normal;
-    font-size: 18px;
-    line-height: 14px;
-    text-align: center;
-
-    .plan-pass {
-      color: #f05d0a;
-      .font();
-    }
-
-    .plan-fail {
-      color: #252b3a;
-      .font();
-    }
+    font-size: 14px;
+    line-height: 24px;
 
     .num {
       color: #adb0b8;
@@ -112,12 +127,9 @@
   .title {
     display: flex;
     align-items: center;
-    justify-content: center;
-
-    img {
-      padding-right: 10px;
-    }
+    padding: 16px  24px 6px;
   }
+  
 
   // responsive
   @media (max-width: @screen-md) {
