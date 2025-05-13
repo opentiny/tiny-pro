@@ -1,212 +1,256 @@
 <template>
-  <div class="container-set">
-    <div class="general-card">
-      <div class="general-contain">
-        <tiny-layout>
-          <tiny-form
-            ref="setFormRef"
-            :model="state.userData"
-            :rules="rules"
-            label-width="80"
-            :label-align="true"
-            label-position="left"
-          >
-            <tiny-row :flex="true" justify="left">
-              <tiny-col :span="5" label-width="100px">
-                <tiny-form-item :label="$t('userSetting.name')" prop="name">
-                  <tiny-input v-model="state.userData.name"></tiny-input>
-                </tiny-form-item>
-              </tiny-col>
-              <tiny-col :span="5" label-width="100px">
-                <tiny-form-item
-                  :label="$t('userSetting.address')"
-                  prop="address"
-                >
-                  <tiny-input v-model="state.userData.address"></tiny-input>
-                </tiny-form-item>
-              </tiny-col>
-            </tiny-row>
-
-            <tiny-row :flex="true" justify="left">
-              <tiny-col :span="5" label-width="100px">
-                <tiny-form-item
-                  :label="$t('userSetting.department')"
-                  prop="department"
-                >
-                  <tiny-input v-model="state.userData.department"></tiny-input>
-                </tiny-form-item>
-              </tiny-col>
-              <tiny-col :span="5" label-width="100px">
-                <tiny-form-item
-                  :label="$t('userSetting.position')"
-                  prop="roleIds"
-                >
-                  <tiny-select
-                    v-model="state.userData.roleIds"
-                    :placeholder="$t('baseForm.form.label.placeholder')"
-                  >
-                    <tiny-option
-                      v-for="item in state.roleData as any"
-                      :key="item.id"
-                      :label="$t(item.name)"
-                      :value="item.id"
-                    ></tiny-option>
-                  </tiny-select>
-                </tiny-form-item>
-              </tiny-col>
-            </tiny-row>
-
-            <tiny-row :flex="true" justify="left">
-              <tiny-col :span="5" label-width="100px">
-                <tiny-form-item
-                  :label="$t('userSetting.type')"
-                  prop="employeeType"
-                >
-                  <tiny-select
-                    v-model="state.userData.employeeType"
-                    :placeholder="$t('baseForm.form.label.placeholder')"
-                  >
-                    <tiny-option
-                      v-for="item in projectData as any"
-                      :key="item.value"
-                      :label="$t(item.label)"
-                      :value="item.label"
-                    ></tiny-option>
-                  </tiny-select>
-                </tiny-form-item>
-              </tiny-col>
-              <tiny-col :span="5" label-width="100px">
-                <tiny-form-item
-                  :label="$t('userSetting.date')"
-                  prop="probationDate"
-                >
-                  <tiny-date-picker
-                    v-model="state.userData.probationDate"
-                    unlink-panels
-                    type="daterange"
-                    range-separator="-"
-                    :start-placeholder="$t('userSetting.first')"
-                    :end-placeholder="$t('userSetting.last')"
-                  ></tiny-date-picker>
-                </tiny-form-item>
-              </tiny-col>
-            </tiny-row>
-
-            <tiny-row :flex="true" justify="left">
-              <tiny-col :span="5" label-width="100px">
-                <tiny-form-item
-                  :label="$t('userSetting.during')"
-                  prop="probationDuration"
-                >
-                  <tiny-input
-                    v-model="state.userData.probationDuration"
-                  ></tiny-input>
-                </tiny-form-item>
-              </tiny-col>
-              <tiny-col :span="5" label-width="100px">
-                <tiny-form-item
-                  :label="$t('userSetting.startTime')"
-                  prop="protocolStart"
-                >
-                  <tiny-date-picker
-                    v-model="state.userData.protocolStart"
-                    @blur="handleBlur"
-                  ></tiny-date-picker>
-                </tiny-form-item>
-              </tiny-col>
-            </tiny-row>
-
-            <tiny-row :flex="true" justify="left">
-              <tiny-col :span="5" label-width="100px">
-                <tiny-form-item
-                  :label="$t('userSetting.endTime')"
-                  prop="protocolEnd"
-                >
-                  <tiny-date-picker
-                    v-model="state.userData.protocolEnd"
-                    @blur="handleBlur"
-                  ></tiny-date-picker>
-                </tiny-form-item>
-              </tiny-col>
-              <tiny-col :span="5" label-width="100px">
-                <tiny-form-item :label="$t('userSetting.status')" prop="status">
-                  <tiny-select
-                    v-model="state.userData.status"
-                    :placeholder="$t('baseForm.form.label.placeholder')"
-                  >
-                    <tiny-option
-                      v-for="item in statusData as any"
-                      :key="item.value"
-                      :label="$t(item.label)"
-                      :value="item.label"
-                    ></tiny-option>
-                  </tiny-select>
-                </tiny-form-item>
-              </tiny-col>
-            </tiny-row>
-          </tiny-form>
-        </tiny-layout>
-
-        <div class="general-btn">
-          <tiny-button
-            v-permission="'user::update'"
-            type="primary"
-            native-type="submit"
-            @click="handleSubmit"
-            >{{ $t('userSetting.save') }}
-          </tiny-button>
-          <tiny-button @click="handleCancel">
-            {{ $t('userSetting.cancel') }}
-          </tiny-button>
-        </div>
-      </div>
-    </div>
-  </div>
+  <ul class="tiny-info-expand">
+    <li>
+      <span class="title">{{ $t('userInfo.table.id') }}：</span>
+      <span class="desc">{{ state.userData.id }}</span>
+    </li>
+    <li>
+      <span class="title">{{ $t('userInfo.table.name') }}：</span><!-- 使用一个ref来控制输入框的显示与隐藏 -->
+      <span 
+        v-if="!state.userData.isEditingName" 
+        @click="detailClick('isEditingName')"
+        class="desc"
+      >
+        {{ $t(`${state.userData.name}`) }}
+      </span>
+      <tiny-input
+        v-else
+        autofocus
+        v-model="state.userData.name"
+        @blur="handleNameUpdate('name', 'isEditingName')"
+        @keyup.enter="handleNameUpdate('name', 'isEditingName')"
+        class="desc"
+      ></tiny-input>
+    </li>
+    <li>
+      <span class="title">{{ $t('userInfo.table.email') }}：</span>
+      <span 
+        v-if="!state.userData.isEditingEmail"
+        @click="detailClick('isEditingEmail')"
+        class="desc"
+      >
+        {{ $t(`${state.userData.email}`) }}
+      </span>
+      <tiny-input
+        v-else
+        autofocus
+        v-model="state.userData.email"
+        @blur="handleNameUpdate('email', 'isEditingEmail')"
+        @keyup.enter="handleNameUpdate('email', 'isEditingEmail')"
+        class="desc"
+      ></tiny-input>
+    </li>
+    <li>
+      <span class="title">{{ $t('userInfo.table.department') }}：</span>
+      <span 
+        v-if="!state.userData.isEditingDepartment" 
+        @click="detailClick('isEditingDepartment')"
+        class="desc"
+      >
+        {{ $t(`${state.userData.department}`) }}
+      </span>
+      <tiny-input
+        v-else
+        autofocus
+        v-model="state.userData.department"
+        @blur="handleNameUpdate('department', 'isEditingDepartment')"
+        @keyup.enter="handleNameUpdate('department', 'isEditingDepartment')"
+        class="desc"
+      ></tiny-input>
+    </li>
+    <li>
+      <span class="title">{{ $t('userInfo.table.employeeType') }}：</span>
+      <span 
+        v-if="!state.userData.isEditingEmployeeType" 
+        @click="detailClick('isEditingEmployeeType')"
+        class="desc">
+        {{ $t(`${state.userData.employeeType}`) }}
+      </span>
+      <tiny-select
+        v-else
+        v-model="state.userData.employeeType"
+        :placeholder="$t('baseForm.form.label.placeholder')"
+        @blur="handleNameUpdate('employeeType', 'isEditingEmployeeType')"
+        @keyup.enter="handleNameUpdate('employeeType', 'isEditingEmployeeType')"
+        class="desc"
+      >
+        <tiny-option
+          v-for="item in projectData"
+          :key="item.value"
+          :label="$t(item.label)"
+          :value="item.label"
+        ></tiny-option>
+      </tiny-select>
+    </li>
+    <li>
+      <span class="title">{{ $t('userInfo.table.job') }}：</span>
+      <span 
+        v-if="!state.userData.isEditingJob"
+        @click="detailClick('isEditingJob')"
+        class="desc">
+        {{ state.userData.role && $t(`${state.userData.role[0].name}`) }}
+      </span>
+      <tiny-select
+        v-else
+        v-model="state.userData.roleIds"
+        :placeholder="$t('baseForm.form.label.placeholder')"
+        @blur="handleNameUpdate('roleIds', 'isEditingJob')"
+        @keyup.enter="handleNameUpdate('roleIds', 'isEditingJob')"
+        class="desc"
+      >
+        <tiny-option
+          v-for="item in state.roleData"
+          :key="item.id"
+          :label="$t(item.name)"
+          :value="item.id"
+        ></tiny-option>
+      </tiny-select>
+    </li>
+    <li>
+      <span class="title">{{ $t('userInfo.table.probationStart') }}：</span>
+      <span
+        v-if="!state.userData.isEditingProbationStart"
+        @click="detailClick('isEditingProbationStart')"
+        class="desc">
+        {{ state.userData.probationStart }}
+      </span>
+      <tiny-date-picker
+        v-else
+        v-model="state.userData.probationStart"
+        format="yyyy-MM-dd"
+        @change="handleNameUpdate('probationStart', 'isEditingProbationStart')"
+      ></tiny-date-picker>
+    </li>
+    <li>
+      <span class="title">{{ $t('userInfo.table.probationEnd') }}：</span>
+      <span
+        v-if="!state.userData.isEditingProbationEnd"
+        @click="detailClick('isEditingProbationEnd')"
+        class="desc">
+        {{ state.userData.probationEnd }}
+      </span>
+      <tiny-date-picker
+        v-else
+        v-model="state.userData.probationEnd"
+        format="yyyy-MM-dd"
+        @change="handleNameUpdate('probationEnd', 'isEditingProbationEnd')"
+      ></tiny-date-picker>
+    </li>
+    <li>
+      <span class="title">{{ $t('userInfo.table.probationDuration') }}：</span>
+      <span 
+        v-if="!state.userData.isEditingProbationDuration"
+        @click="detailClick('isEditingProbationDuration')"
+        class="desc"
+      >
+        {{ $t(`${state.userData.probationDuration}`) }}
+      </span>
+      <tiny-input
+        v-else
+        autofocus
+        v-model="state.userData.probationDuration"
+        @blur="handleNameUpdate('probationDuration', 'isEditingProbationDuration')"
+        @keyup.enter="handleNameUpdate('probationDuration', 'isEditingProbationDuration')"
+        class="desc"
+      ></tiny-input>
+    </li>
+    <li>
+      <span class="title">{{ $t('userInfo.table.address') }}：</span>
+      <span 
+        v-if="!state.userData.isEditingAddress"
+        @click="detailClick('isEditingAddress')"
+        class="desc"
+      >
+        {{ $t(`${state.userData.address}`) }}
+      </span>
+      <tiny-input
+        v-else
+        autofocus
+        v-model="state.userData.address"
+        @blur="handleNameUpdate('address', 'isEditingAddress')"
+        @keyup.enter="handleNameUpdate('address', 'isEditingAddress')"
+        class="desc"
+      ></tiny-input>
+    </li>
+    <li>
+      <span class="title">{{ $t('userInfo.table.status') }}：</span>
+      <span
+        v-if="!state.userData.isEditingStatus"
+        @click="detailClick('isEditingStatus')"
+        class="desc">
+        {{ STATUSDATA[state.userData.status] }}
+      </span>
+      <tiny-select
+        v-else
+        v-model="state.userData.status"
+        :placeholder="$t('baseForm.form.label.placeholder')"
+        @blur="handleNameUpdate('status', 'isEditingStatus')"
+        @keyup.enter="handleNameUpdate('status', 'isEditingStatus')"
+        class="desc"
+      >
+        <tiny-option
+          v-for="(value, key) in STATUSDATA"
+          :key="key"
+          :label="$t(value)"
+          :value="key"
+        ></tiny-option>
+      </tiny-select>
+    </li>
+  </ul>
 </template>
 
 <script lang="ts" setup>
-  import { computed, onMounted, reactive, defineProps } from 'vue';
+  import { onMounted, reactive, defineProps } from 'vue';
   import { useI18n } from 'vue-i18n';
   import {
     Select as TinySelect,
     Option as TinyOption,
-    Layout as TinyLayout,
-    Form as TinyForm,
-    FormItem as TinyFormItem,
-    Row as TinyRow,
-    Col as TinyCol,
     Input as TinyInput,
     DatePicker as TinyDatePicker,
     Modal,
-    Button as TinyButton,
   } from '@opentiny/vue';
   import { getSimpleDate } from '@/utils/time';
   import { getUserInfo, updateUserInfo } from '@/api/user';
   import { getAllRole } from '@/api/role';
   import { useUserStore } from '@/store';
+  import { STATUSDATA } from '../const';
 
   const userStore = useUserStore();
 
   const props = defineProps({
-    email: String,
+    email: String
   });
   const emit = defineEmits<{
     cancel: [];
     confirm: [];
   }>();
   // 初始化请求数据
+  fetchData(props.email);
   onMounted(() => {
-    fetchData(props.email);
     fetchRole();
   });
 
-  // 加载效果
   const state = reactive<{
     userData: any;
+    backupUserData: any;
     roleData: any;
+    editorSwitchList: string[],
   }>({
     userData: {} as any,
+    backupUserData: {} as any,
     roleData: [] as any,
+    editorSwitchList: [
+      'isEditingName',
+      'isEditingEmail',
+      'isEditingDepartment',
+      'isEditingEmployeeType',
+      'isEditingJob',
+      'isEditingProbationDuration',
+      'isEditingAddress',
+      'isEditingStatus',
+      'isEditingProbationStart',
+      'isEditingProbationEnd'
+    ] as string[],
   });
 
   const projectData = [
@@ -224,55 +268,51 @@
     },
   ];
 
-  const statusData = [
-    {
-      value: 1,
-      label: 'Active',
-    },
-    {
-      value: 2,
-      label: 'Disabled',
-    },
-  ];
-
-  // 校验规则
-  const rulesType = {
-    required: true,
-    trigger: 'blur',
-  };
-  const rulesSelect = {
-    required: true,
-    message: '必选',
-    trigger: 'blur',
-  };
-  const rules = computed(() => {
-    return {
-      department: [rulesType],
-      roleIds: [rulesSelect],
-      employeeType: [rulesSelect],
-      probationDate: [rulesSelect],
-      probationDuration: [rulesType],
-      protocolStart: [rulesSelect],
-      protocolEnd: [rulesSelect],
-      name: [rulesType],
-      address: [rulesType],
-      status: [rulesSelect],
-    };
-  });
-
   const { t } = useI18n();
 
-  const handleCancel = () => {
-    emit('cancel');
-  };
-
-  async function handleSubmit() {
-    let data = state.userData;
-    if (data.status === 'Active') {
-      data.status = 1;
-    } else {
-      data.status = 2;
+  const detailClick = (attr) => {
+    if(attr === 'isEditingStatus') {
+      state.userData.status = STATUSDATA[state.userData.status]
     }
+    state.editorSwitchList.forEach((item) => {
+      if (item === attr) {
+        state.userData[item] = true;
+      } else {
+        state.userData[item] = false;
+        const key = item.slice(9).toLocaleLowerCase()
+        !state.userData[key] && (state.userData[key] = state.backupUserData[key])
+      }
+    })
+  }
+
+  async function fetchData(email: string) {
+    if (email !== undefined || null) {
+      const { data } = await getUserInfo(email);
+      if (data.role && data.role.length) {
+        data.roleIds = data.role[0].id;
+        data.roleName = data.role[0].name;
+      }
+      state.userData = data;
+      state.backupUserData = {...data};
+      state.userData.probationDate = [data.probationStart, data.probationEnd];
+    }
+  }
+
+  async function fetchRole() {
+    const { data } = await getAllRole();
+    state.roleData = data;
+  }
+  
+  // 处理提交
+  const handleNameUpdate = async (value, editName) => {
+    state.userData[editName] = false
+    state.userData.probationStart = getSimpleDate(state.userData.probationStart)
+    state.userData.probationEnd = getSimpleDate(state.userData.probationEnd)
+    if(!state.userData[value] || state.userData[value] === state.backupUserData[value]) {
+      return 
+    }
+
+    let data = state.userData;
     let newTemp = {
       email: data.email,
       name: data.name,
@@ -280,8 +320,8 @@
       department: data.department,
       roleIds: [data.roleIds],
       employeeType: data.employeeType,
-      probationStart: getSimpleDate(data.probationDate[0]),
-      probationEnd: getSimpleDate(data.probationDate[1]),
+      probationStart: data.probationStart,
+      probationEnd: data.probationEnd,
       probationDuration: data.probationDuration,
       protocolStart: getSimpleDate(data.protocolStart),
       protocolEnd: getSimpleDate(data.protocolEnd),
@@ -294,11 +334,11 @@
         message: t('baseForm.form.submit.success'),
         status: 'success',
       });
-      if (data.email === userStore.email) {
+      if (state.userData.email === userStore.email) {
         const { data: userInfo = null } = await getUserInfo();
         userStore.setInfo(userInfo);
       }
-      emit('confirm');
+      emit('confirm', value, state.userData[value]);
     } catch (error) {
       if (error.response && error.response.data) {
         const errorMessage = error.response.data.message || '未知错误';
@@ -308,85 +348,39 @@
         });
       }
     }
-  }
-
-  async function fetchData(email: string) {
-    if (email !== undefined || null) {
-      const { data } = await getUserInfo(email);
-      if (data.status === 1) {
-        data.status = statusData[0].label;
-      } else {
-        data.status = statusData[1].label;
-      }
-      if (data.role && data.role.length) {
-        data.roleIds = data.role[0].id;
-        data.roleName = data.role[0].name;
-      }
-      state.userData = data;
-      state.userData.probationDate = [data.probationStart, data.probationEnd];
-    }
-  }
-
-  async function fetchRole() {
-    const { data } = await getAllRole();
-    state.roleData = data;
-  }
+  };
 </script>
 
 <style scoped lang="less">
-  .container-set {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    width: 98%;
-    height: inherit;
-    margin: 0 auto;
+.tiny-info-expand {
+  display: flex;
+  flex-wrap: wrap;
+  list-style-type: none;
+  padding: 0;
 
-    .general-card {
-      height: 100%;
-      padding: 10px;
-      overflow-x: hidden;
-      overflow-y: auto;
-      border-radius: 10px;
+  li {
+    width: calc(16.666% - 10px); // 一行显示6个li，留出间距
+    margin: 5px;
+    line-height: 1.5;
 
-      .general-top {
-        display: flex;
-        justify-content: space-around;
-        min-height: 202px;
-        margin: 0 -12px;
-        overflow: hidden;
-        background-image: url('@/assets/images/step-head.png');
-        background-size: 100% 100%;
-      }
+    span {
+      display: block;
+    }
 
-      .general-contain {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        min-height: 75%;
-        padding: 30px 0 10px 0;
+    .title {
+      color: rgb(128, 128, 128);
+    }
 
-        .tiny-layout {
-          width: 100%;
-          margin-left: 8%;
-        }
-      }
-
-      .general-btn {
-        position: relative;
-        margin: 0 auto;
-
-        button {
-          width: 100px;
-          height: 36px;
-          border-radius: 4px;
-        }
-      }
-
-      .col {
-        padding: 4px 0;
-        color: #fff;
-      }
+    .desc {
+      margin-top: 8px;
+      white-space: normal;
+      word-break: break-word;
     }
   }
+
+  // 给第七个往后的li增加margin-top:16px;
+  li:nth-child(n+7) {
+    margin-top: 16px;
+  }
+}
 </style>

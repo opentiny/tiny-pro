@@ -6,6 +6,7 @@
           v-permission="'user::add'"
           type="primary"
           @click="handleAddUser"
+          round
           >{{ $t('userInfo.modal.title.add') }}
         </tiny-button>
       </div>
@@ -17,67 +18,13 @@
           :auto-resize="true"
           remote-filter
         >
-          <tiny-grid-column type="index" width="60"></tiny-grid-column>
+          <tiny-grid-column type="selection" width="60"></tiny-grid-column>
           <tiny-grid-column type="expand" width="60">
-            <template #default="data">
-              <ul>
-                <li>
-                  <span>{{ $t('userInfo.table.id') }}：</span>
-                  <span>{{ data.row.id }}</span>
-                </li>
-                <li>
-                  <span>{{ $t('userInfo.table.name') }}：</span>
-                  <span>{{ data.row.name }}</span>
-                </li>
-                <li>
-                  <span>{{ $t('userInfo.table.email') }}：</span>
-                  <span>{{ $t(`${data.row.email}`) }}</span>
-                </li>
-                <li>
-                  <span>{{ $t('userInfo.table.department') }}：</span>
-                  <span>{{ $t(`${data.row.department}`) }}</span>
-                </li>
-                <li>
-                  <span>{{ $t('userInfo.table.employeeType') }}：</span>
-                  <span>{{ $t(`${data.row.employeeType}`) }}</span>
-                </li>
-                <li>
-                  <span>{{ $t('userInfo.table.job') }}：</span>
-                  <span>{{ $t(`${data.row.role[0].name}`) }}</span>
-                </li>
-                <li>
-                  <span>{{ $t('userInfo.table.probationStart') }}：</span>
-                  <span>{{ $t(`${data.row.probationStart}`) }}</span>
-                </li>
-                <li>
-                  <span>{{ $t('userInfo.table.probationEnd') }}：</span>
-                  <span>{{ $t(`${data.row.probationEnd}`) }}</span>
-                </li>
-                <li>
-                  <span>{{ $t('userInfo.table.probationDuration') }}：</span>
-                  <span>{{ $t(`${data.row.probationDuration}`) }}</span>
-                </li>
-                <li>
-                  <span>{{ $t('userInfo.table.protocolStart') }}：</span>
-                  <span>{{ $t(`${data.row.protocolStart}`) }}</span></li
-                >
-                <li>
-                  <span>{{ $t('userInfo.table.protocolEnd') }}：</span>
-                  <span>{{ $t(`${data.row.protocolEnd}`) }}</span></li
-                >
-                <li>
-                  <span>{{ $t('userInfo.table.address') }}：</span>
-                  <span>{{ $t(`${data.row.address}`) }}</span></li
-                >
-                <li>
-                  <span>{{ $t('userInfo.table.status') }}：</span>
-                  <span v-if="data.row.status == 1">已启用</span>
-                  <span v-if="data.row.status !== 1">已禁用</span>
-                </li>
-              </ul>
+            <template #default="{ row }">
+              <UserSetting :email="row.email" @confirm="(props, value) => row[props] = value" />
             </template>
           </tiny-grid-column>
-          <tiny-grid-column field="id" :title="$t('userInfo.table.id')">
+          <tiny-grid-column field="id" :title="$t('userInfo.table.id')" show-overflow="tooltip">
             <template #default="data">
               <span>{{ $t(`${data.row.id}`) }}</span>
             </template>
@@ -85,7 +32,8 @@
           <tiny-grid-column
             field="name"
             :filter="inputFilter"
-            :title="$t('userInfo.table.name')"
+            :title="$t('userInfo.table.name')" 
+            show-overflow="tooltip"
           >
             <template #default="data">
               <span>{{ $t(`${data.row.name}`) }}</span>
@@ -94,7 +42,8 @@
           <tiny-grid-column
             field="email"
             :filter="inputFilter"
-            :title="$t('userInfo.table.email')"
+            :title="$t('userInfo.table.email')" 
+            show-overflow="tooltip"
           >
             <template #default="data">
               <span>{{ $t(`${data.row.email}`) }}</span>
@@ -102,7 +51,8 @@
           </tiny-grid-column>
           <tiny-grid-column
             field="department"
-            :title="$t('userInfo.table.department')"
+            :title="$t('userInfo.table.department')" 
+            show-overflow="tooltip"
           >
             <template #default="data">
               <span v-if="data.row.department !== null">{{
@@ -113,6 +63,7 @@
           <tiny-grid-column
             field="employeeType"
             :title="$t('userInfo.table.employeeType')"
+             show-overflow="tooltip"
           >
             <template #default="data">
               <span v-if="data.row.employeeType !== null">{{
@@ -123,7 +74,8 @@
           <tiny-grid-column
             field="role"
             :filter="jobFilter"
-            :title="$t('userInfo.table.job')"
+            :title="$t('userInfo.table.job')" 
+            show-overflow="tooltip"
           >
             <template #default="data">
               <span>{{ $t(`${data.row.role[0]?.name}`) }}</span>
@@ -131,7 +83,8 @@
           </tiny-grid-column>
           <tiny-grid-column
             field="probationStart"
-            :title="$t('userInfo.table.probationStart')"
+            :title="$t('userInfo.table.probationStart')" 
+            show-overflow="tooltip"
           >
             <template #default="data">
               <span v-if="data.row.probationStart !== null">{{
@@ -141,7 +94,8 @@
           </tiny-grid-column>
           <tiny-grid-column
             field="probationEnd"
-            :title="$t('userInfo.table.probationEnd')"
+            :title="$t('userInfo.table.probationEnd')" 
+            show-overflow="tooltip"
           >
             <template #default="data">
               <span v-if="data.row.probationEnd !== null">{{
@@ -151,7 +105,8 @@
           </tiny-grid-column>
           <tiny-grid-column
             field="probationDuration"
-            :title="$t('userInfo.table.probationDuration')"
+            :title="$t('userInfo.table.probationDuration')" 
+            show-overflow="tooltip"
           >
             <template #default="data">
               <span v-if="data.row.probationDuration !== null"
@@ -161,28 +116,9 @@
             </template>
           </tiny-grid-column>
           <tiny-grid-column
-            field="protocolStart"
-            :title="$t('userInfo.table.protocolStart')"
-          >
-            <template #default="data">
-              <span v-if="data.row.protocolStart !== null">{{
-                $t(`${data.row.protocolStart}`)
-              }}</span>
-            </template>
-          </tiny-grid-column>
-          <tiny-grid-column
-            field="protocolEnd"
-            :title="$t('userInfo.table.protocolEnd')"
-          >
-            <template #default="data">
-              <span v-if="data.row.protocolEnd !== null">{{
-                $t(`${data.row.protocolEnd}`)
-              }}</span>
-            </template>
-          </tiny-grid-column>
-          <tiny-grid-column
             field="address"
-            :title="$t('userInfo.table.address')"
+            :title="$t('userInfo.table.address')" 
+            show-overflow="tooltip"
           >
             <template #default="data">
               <span v-if="data.row.address !== null">{{
@@ -190,49 +126,50 @@
               }}</span>
             </template>
           </tiny-grid-column>
-          <tiny-grid-column field="status" :title="$t('userInfo.table.status')">
+          <tiny-grid-column field="status" :title="$t('userInfo.table.status')" show-overflow="tooltip">
             <template #default="data">
-              <div v-if="data.row.status == 1">
+              <div class="tiny-col-status">
                 <img
-                  style="width: 20px"
+                  v-if="data.row.status == 1"
                   src="@/assets/images/success.png"
                   alt="success"
                 />
-              </div>
-              <div v-if="data.row.status !== 1">
                 <img
-                  style="width: 20px"
+                  v-else-if="data.row.status == 2"
                   src="@/assets/images/error.png"
                   alt="error"
                 />
+                <img
+                  v-else-if="data.row.status == 3"
+                  src="@/assets/images/tip2.png"
+                  alt="tip"
+                />
+                <span>{{ STATUSDATA[data.row.status]}}</span>
               </div>
             </template>
           </tiny-grid-column>
           <tiny-grid-column
             :title="$t('userInfo.table.operations')"
-            align="center"
+            align="center" 
+            show-overflow="tooltip"
+            width="178"
           >
             <template #default="data">
               <a
-                v-permission="'user::update'"
-                class="operation-update"
-                @click="handleUpdate(data.row.email)"
+                v-permission="'user::password::force-update'"
+                class="operation-pwd-update"
+                @click="handlePwdUpdate(data.row.email)"
               >
-                {{ $t('userInfo.table.operations.update') }}
+                <IconCommission class="operation-icon"></IconCommission>
+                {{ $t('userInfo.table.operations.pwdUpdate') }}
               </a>
               <a
                 v-permission="'user::remove'"
                 class="operation-delete"
                 @click="handleDelete(data.row.email)"
               >
+                <IconDel class="operation-icon"></IconDel>
                 {{ $t('userInfo.table.operations.delete') }}
-              </a>
-              <a
-                v-permission="'user::password::force-update'"
-                class="operation-pwd-update"
-                @click="handlePwdUpdate(data.row.email)"
-              >
-                {{ $t('userInfo.table.operations.pwdUpdate') }}
               </a>
             </template>
           </tiny-grid-column>
@@ -250,22 +187,6 @@
       :title="$t('userInfo.modal.title.add')"
     >
       <UserAdd @confirm="onAddConfirm"></UserAdd>
-    </tiny-modal>
-  </div>
-  <div v-if="state.isUserUpdate">
-    <tiny-modal
-      v-model="state.isUserUpdate"
-      :lock-scroll="true"
-      mask-closable="true"
-      height="auto"
-      width="800"
-      :title="$t('userInfo.modal.title.update')"
-    >
-      <UserSetting
-        :email="state.email"
-        @cancel="onUpdateCancel"
-        @confirm="onUserUpdateConfirm"
-      ></UserSetting>
     </tiny-modal>
   </div>
   <div v-if="state.isPwdUpdate">
@@ -344,6 +265,7 @@
   import { useI18n } from 'vue-i18n';
   import {
     Loading,
+    Modal,
     GridColumn as TinyGridColumn,
     Grid as TinyGrid,
     Pager as TinyPager,
@@ -355,6 +277,7 @@
     Col as TinyCol,
     Input as TinyInput,
   } from '@opentiny/vue';
+  import { iconCommission, iconDel } from '@opentiny/vue-icon';
   import { useUserStore } from '@/store';
   import { getAllUser, deleteUser, updatePwdAdmin } from '@/api/user';
   import { useRouter } from 'vue-router';
@@ -362,7 +285,10 @@
   import { FilterType } from '@/types/global';
   import UserAdd from '../../useradd/index.vue';
   import UserSetting from '../../setting/index.vue';
+  import { STATUSDATA } from '../../const'
 
+  const IconCommission = iconCommission();
+  const IconDel = iconDel();
   const { t } = useI18n();
   const router = useRouter();
   const grid = ref();
@@ -373,7 +299,6 @@
     pageData: any;
     isPwdUpdate: boolean;
     isUserAdd: boolean;
-    isUserUpdate: boolean;
     pwdData: any;
     email: string;
   }>({
@@ -382,7 +307,6 @@
     pageData: [] as any,
     isPwdUpdate: false,
     isUserAdd: false,
-    isUserUpdate: false,
     pwdData: {} as any,
     email: '',
   });
@@ -412,7 +336,7 @@
       pageSize: 10,
       pageSizes: [5, 10, 15, 20],
       total: 10,
-      layout: 'total, prev, pager, next, jumper, sizes',
+      layout: 'total, sizes, prev, pager, next, jumper',
     },
   });
 
@@ -469,14 +393,7 @@
     filter: true,
   });
 
-  const onUpdateCancel = () => {
-    state.isUserUpdate = false;
-  };
-  const onUserUpdateConfirm = async () => {
-    grid.value.handleFetch().then(() => {
-      state.isUserUpdate = false;
-    });
-  };
+
   const onAddConfirm = async () => {
     grid.value.handleFetch().then(() => {
       state.isUserAdd = false;
@@ -501,11 +418,6 @@
           });
         }
       });
-  };
-
-  const handleUpdate = (email: string) => {
-    state.isUserUpdate = true;
-    state.email = email;
   };
 
   const handlePwdUpdate = (email: string) => {
@@ -573,18 +485,33 @@
   }
 
   .operation {
-    &-delete {
-      padding-right: 5px;
-      color: red;
-    }
-
-    &-update {
-      padding-right: 5px;
+    &-pwd-update {
+      padding-right: 16px;
       color: #1890ff;
     }
 
-    &-pwd-update {
-      color: orange;
+    &-delete {
+      color: #1890ff;
+    }
+
+    &-icon {
+      margin-right: 3px;
+      font-size: 16px;
+      fill: currentColor;
     }
   }
+
+ .tiny-col-status {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    line-height: 22px;
+    
+    img {
+      width: 14px;
+      height: 14px;
+      margin-right: 9px;
+    }
+  }  
+ 
 </style>
