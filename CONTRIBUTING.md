@@ -39,6 +39,7 @@ pnpm start
 cd template/tinyvue
 
 pnpm i
+
 pnpm start
 ```
 
