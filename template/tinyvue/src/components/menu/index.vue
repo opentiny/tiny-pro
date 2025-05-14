@@ -57,7 +57,7 @@
         try {
           temp.customIcon = icons[treeNodeData.customIcon]();
         } catch (error) {
-          temp.customIcon = h('i', { class: `ci-${treeNodeData.customIcon} .tiny-svg `, style: { marginRight:  'var(--tv-TreeMenu-prefix-icon-margin-right)' } });
+          temp.customIcon = h('i', { class: `ci-${treeNodeData.customIcon} tiny-svg `, style: { marginRight:  'var(--tv-TreeMenu-prefix-icon-margin-right)' } });
         }
       }
       routerTitle.push(temp);
