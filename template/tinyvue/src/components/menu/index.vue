@@ -27,7 +27,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, onMounted, watch, computed, unref } from 'vue';
+  import { ref, onMounted, watch, computed, unref, h } from 'vue';
   import { TreeMenu as tinyTreeMenu } from '@opentiny/vue';
   import { useMenuStore } from '@/store/modules/router';
   import router from '@/router';
@@ -54,7 +54,11 @@
       temp.label = treeNodeData.label;
       temp.locale = treeNodeData.locale;
       if (treeNodeData.customIcon) {
-        temp.customIcon = icons[treeNodeData.customIcon]();
+        try {
+          temp.customIcon = icons[treeNodeData.customIcon]();
+        } catch (error) {
+          temp.customIcon = h('i', { class: `ci-${treeNodeData.customIcon} .tiny-svg `, style: { marginRight:  'var(--tv-TreeMenu-prefix-icon-margin-right)' } });
+        }
       }
       routerTitle.push(temp);
       menus.push({

@@ -29,16 +29,9 @@
         :placeholder="$t('baseForm.form.label.placeholder')"
         filterable
         no-match-text="No Match"
-      >
-        <tiny-option
-            v-for="item in iconDatas"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          >
-          <i :class="`ci-${item.value}`"></i>&nbsp;{{ item.label }}
-        </tiny-option>
-      </tiny-select>
+        :options="iconDatas"
+        optimization
+      ></tiny-select>
     </tiny-form-item>
     <tiny-form-item :label="$t('menuInfo.table.component')" prop="component">
       <tiny-input v-model="menuInfo.component"></tiny-input>
@@ -71,8 +64,8 @@
     Select as TinySelect,
     Option as TinyOption,
   } from '@opentiny/vue';
-  import { icons} from '@opentiny/icons/json/icons.json';
-  import { reactive, ref, toRefs, computed, unref } from 'vue';
+  import { icons } from '@opentiny/icons/json/icons.json';
+  import { reactive, ref, toRefs, computed, unref, h } from 'vue';
 
   const props = defineProps<{
     menus: ITreeNodeData[];
@@ -136,6 +129,7 @@
     return {
       label: key,
       value: key,
+      icon: h('i', { class: `ci-${key}`, style: { fontSize: '18px',  marginRight: '6px' } }),
     };
   });
 
