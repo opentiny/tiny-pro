@@ -250,6 +250,9 @@ importers:
       '@opentiny/hwc-client':
         specifier: ^0.0.14
         version: 0.0.14
+      '@opentiny/icons':
+        specifier: ^0.1.3
+        version: 0.1.3
       '@opentiny/vue':
         specifier: ^3.21.0
         version: 3.22.1
@@ -2058,6 +2061,9 @@ packages:
 
   '@opentiny/hwc-client@0.0.14':
     resolution: {integrity: sha512-n4oJlgOGIsW3Ungy2kPp+5Re2HoUAWmFUS+33yMs5SF8hhTG9drxzV8zjK2gqYjcyWnVi9CW1dAnXLE1IVeluQ==}
+
+  '@opentiny/icons@0.1.3':
+    resolution: {integrity: sha512-DnbmggX1977E1ZvnHcnWIe3NtT1b099bF3eqgsdGZCAGOTnsORTfPcgLKsKiY2H6VljOoZK02E4ZzzmBNtZjeQ==}
 
   '@opentiny/utils@3.22.0':
     resolution: {integrity: sha512-iQCozIrpTXIfipe1o1avAswQ8NENfDdYennSUsdkpBVIZftSe5ZVVdPBXNSDcoeA+chUQryk2WDapudVaQA8sg==}
@@ -13915,6 +13921,8 @@ snapshots:
   '@opentiny/huicharts@1.0.1': {}
 
   '@opentiny/hwc-client@0.0.14': {}
+
+  '@opentiny/icons@0.1.3': {}
 
   '@opentiny/utils@3.22.0':
     dependencies:
