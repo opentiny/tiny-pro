@@ -56,5 +56,7 @@
   .contain {
     display: flex;
     justify-content: start;
+    padding-left: 14px;
+    padding-bottom: 24px;
   }
 </style>

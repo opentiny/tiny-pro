@@ -12,6 +12,7 @@ export class DbService implements TypeOrmOptionsFactory {
       host: process.env.DATABASE_HOST,
       port: parseInt(process.env.DATABASE_PORT),
       username: process.env.DATABASE_USERNAME,
+      dropSchema: false, // 为true时启动时删除表结构
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
       synchronize: process.env.DATABASE_SYNCHRONIZE === 'true',

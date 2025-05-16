@@ -1,56 +1,49 @@
 <template>
-  <div>
-    <tiny-layout>
-      <tiny-row :flex="true" justify="left" class="margin-bottom">
-        <tiny-col :span="2">
-          <div class="col">
-            {{ $t('menu.plan.department') }}
-            <span>:</span>
-            {{ $t('menu.plan.resource') }}
-          </div>
-        </tiny-col>
-        <tiny-col :span="2">
-          <div class="col">
-            {{ $t('menu.plan.job') }}
-            <span>:</span>
-            All
-          </div>
-        </tiny-col>
-      </tiny-row>
-      <tiny-row :flex="true" justify="left" class="margin-bottom">
-        <tiny-col :span="2">
-          <div class="col">
-            {{ $t('menu.plan.person') }}
-            <span>:</span>
-            All
-          </div>
-        </tiny-col>
-        <tiny-col :span="2">
-          <div class="col">
-            {{ $t('menu.plan.attribute') }}
-            <span>:</span>IT
-          </div>
-        </tiny-col>
-      </tiny-row>
-    </tiny-layout>
+  <div class="plan-detail">
+    <div class="detail-header">{{ $t('baseForm.form.label.people') }}</div>
+    <tiny-row :flex="true" class="detail-row" noSpace>
+      <tiny-col :span="3">
+        <div class="title pad-title">
+          {{ $t('baseForm.form.project') }}
+        </div>
+        <div class="content pad-title">
+          {{ $t('work.mock.centralized') }}
+        </div>
+      </tiny-col>
+      <tiny-col :span="3">
+        <div class="title pad-title">
+          {{ $t('menu.plan.department') }}
+        </div>
+        <div class="content">
+          {{ $t('menu.plan.resource') }}
+        </div>
+      </tiny-col>
+      <tiny-col :span="3">
+        <div class="title pad-title">
+          {{ $t('menu.plan.job') }}
+        </div>
+        <div class="content pad-title"> IT </div>
+      </tiny-col>
+      <tiny-col :span="3">
+        <div class="title pad-title">
+          {{ $t('menu.plan.person') }}
+        </div>
+        <div class="content pad-title"> All </div>
+      </tiny-col>
+    </tiny-row>
+    <tiny-row :flex="true" class="detail-row mart_8" noSpace>
+      <tiny-col :span="3">
+        <div class="title pad-title">
+          {{ $t('menu.plan.attribute') }}
+        </div>
+        <div class="content pad-title"> IT </div>
+      </tiny-col>
+    </tiny-row>
   </div>
 </template>
 
 <script lang="ts" setup>
-  import {
-    Layout as TinyLayout,
-    Row as TinyRow,
-    Col as TinyCol,
-  } from '@opentiny/vue';
+  import { Row as TinyRow, Col as TinyCol } from '@opentiny/vue';
 </script>
 
-<style scoped lang="less">
-  .margin-bottom {
-    margin-top: 20px;
-    margin-bottom: 30px;
-  }
-
-  .col > span {
-    padding: 0 10px;
-  }
-</style>
+<style scoped lang="less"></style>

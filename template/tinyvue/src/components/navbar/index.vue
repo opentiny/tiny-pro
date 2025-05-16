@@ -87,7 +87,7 @@
             :label-align="true"
             label-position="left"
           >
-            <tiny-row :flex="true" justify="left">
+            <tiny-row :flex="true">
               <tiny-col :span="10" label-width="100px">
                 <tiny-form-item :label="$t('userInfo.table.email')">
                   <label>{{ userStore.userInfo.email }}</label>
@@ -95,7 +95,7 @@
               </tiny-col>
             </tiny-row>
 
-            <tiny-row :flex="true" justify="left">
+            <tiny-row :flex="true">
               <tiny-col :span="10" label-width="100px">
                 <tiny-form-item
                   :label="$t('userInfo.modal.input.oldPassword')"
@@ -110,7 +110,7 @@
               </tiny-col>
             </tiny-row>
 
-            <tiny-row :flex="true" justify="left">
+            <tiny-row :flex="true">
               <tiny-col :span="10" label-width="100px">
                 <tiny-form-item
                   :label="$t('userInfo.modal.input.newPassword')"
@@ -125,7 +125,7 @@
               </tiny-col>
             </tiny-row>
 
-            <tiny-row :flex="true" justify="left">
+            <tiny-row :flex="true">
               <tiny-col :span="10" label-width="100px">
                 <tiny-form-item
                   :label="$t('userInfo.modal.input.confirmNewPassword')"
