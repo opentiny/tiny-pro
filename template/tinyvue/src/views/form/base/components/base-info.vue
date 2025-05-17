@@ -1,14 +1,14 @@
 <template>
   <tiny-layout>
     <tiny-form
-      ref="coachFormRef"
+      ref="baseFormRef"
       :model="state.filterOptions"
       :rules="rules"
-      label-width="150px"
       :label-align="true"
       label-position="top"
       class="form-base-info"
     >
+      <div class="form-header">{{ $t('stepForm.collapse.base') }}</div>
       <tiny-row :flex="true">
         <transition-fade-down-group>
           <tiny-col :span="4">
@@ -159,22 +159,26 @@
 
   // 初始化请求数据
   const { t } = useI18n();
-  const coachFormRef = ref();
+  const baseFormRef = ref();
   const disabled = ref(false);
 
   const handleBlur = () => {
-    const start = new Date(
-      JSON.parse(JSON.stringify(state.filterOptions.startTime)),
-    ).getTime();
-    const end = new Date(
-      JSON.parse(JSON.stringify(state.filterOptions.endTime)),
-    ).getTime();
+    const start = state.filterOptions.startTime
+      ? new Date(
+          JSON.parse(JSON.stringify(state.filterOptions.startTime)),
+        )?.getTime()
+      : '';
+    const end = state.filterOptions.endTime
+      ? new Date(
+          JSON.parse(JSON.stringify(state.filterOptions.endTime)),
+        ).getTime()
+      : '';
     if (end < start) {
-      state.filterOptions.endTime = '';
       Modal.message({
         message: t('userInfo.time.message'),
         status: 'error',
       });
+      state.filterOptions.endTime = '';
     }
   };
 
@@ -200,31 +204,27 @@
     };
   });
 
-  const coachValid = () => {
-    let coachValidate = false;
-    coachFormRef.value.validate((valid: boolean) => {
+  const baseValid = () => {
+    let baseValidate = false;
+    baseFormRef.value.validate((valid: boolean) => {
       if (valid) {
         disabled.value = true;
       }
-      coachValidate = valid;
+      baseValidate = valid;
     });
 
-    return coachValidate;
+    return baseValidate;
   };
 
-  const coachReset = () => {
+  const baseReset = () => {
     disabled.value = false;
     state.filterOptions = {} as FilterOptions;
   };
 
   defineExpose({
-    coachValid,
-    coachReset,
+    baseValid,
+    baseReset,
   });
 </script>
 
-<style scoped lang="less">
-  :deep(.tiny-row) {
-    margin-bottom: 15px;
-  }
-</style>
+<style scoped lang="less"></style>

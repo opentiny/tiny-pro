@@ -1,13 +1,11 @@
 <template>
-  <div class="container-step">
-    <Breadcrumb :items="['menu.form', 'menu.form.step']" />
-    <div class="general-card">
+  <div class="container-form">
+    <div class="container-header">{{ $t('menu.form.step') }}</div>
+
+    <div class="base-body">
       <transition-fade-slide-group>
-        <div class="general-top">
-          <headtop></headtop>
-        </div>
-        <div class="general-contain">
-          <div>{{ $t('stepForm.coaching.process') }}</div>
+        <div class="form-card">
+          <div class="form-header">{{ $t('stepForm.coaching.process') }}</div>
           <div>
             <tiny-time-line
               :data="[
@@ -18,29 +16,46 @@
                 { name: t('stepForm.overall.end') },
               ]"
               :active="normalActive"
+              space="200"
               type="normal"
+              :class="`${loacle}-line`"
             ></tiny-time-line>
           </div>
         </div>
-        <div class="general-foot">
+
+        <div class="form-card mart_16 form-scroll">
           <collapsefrom ref="collapseRef"></collapsefrom>
-          <div class="general-btn">
-            <tiny-button
-              v-if="normalActive !== 4"
-              type="primary"
-              native-type="submit"
-              @click="handleSubmit"
-              >{{ $t('stepForm.button.submit') }}</tiny-button
-            >
-            <tiny-button v-if="normalActive !== 4" @click="handleFormReset">{{
-              $t('stepForm.button.cancel')
-            }}</tiny-button>
-            <tiny-button v-if="normalActive === 4" @click="handleFormRestore">{{
-              $t('stepForm.button.restore')
-            }}</tiny-button>
-          </div>
+        </div>
+        <div class="base-footer mart_16">
+          <tiny-button v-if="normalActive !== 4" @click="handleFormReset">{{
+            $t('stepForm.button.cancel')
+          }}</tiny-button>
+          <tiny-button
+            v-if="normalActive !== 4"
+            type="primary"
+            native-type="submit"
+            @click="handleSubmit"
+            >{{ $t('stepForm.button.next') }}</tiny-button
+          >
+          <tiny-button v-if="normalActive === 4" @click="handleFormRestore">{{
+            $t('stepForm.button.restore')
+          }}</tiny-button>
         </div>
       </transition-fade-slide-group>
+      <!-- <div class="form-card mart_16">
+        <detail-info></detail-info>
+      </div>
+      <div class="base-footer mart_16">
+        <tiny-button
+          type="primary"
+          native-type="submit"
+          @click="handleSubmit"
+          >{{ $t('baseForm.form.submit') }}</tiny-button
+        >
+        <tiny-button @click="handleFormReset">
+          {{ $t('baseForm.form.cancel') }}
+        </tiny-button>
+      </div> -->
     </div>
   </div>
 </template>
@@ -55,13 +70,13 @@
   import { useAppStore } from '@/store';
   import transitionFadeSlideGroup from '@/components/transition/transition-fade-slide-group.vue';
   import collapsefrom from './components/collapse-from.vue';
-  import headtop from './components/head.vue';
+  import CoacheFrom from './components/coach-from.vue';
 
   const { t } = useI18n();
   const appStore = useAppStore();
   const collapseRef = ref();
   const normalActive = computed(() => appStore.step);
-
+  const loacle = computed(() => localStorage.getItem('tiny-locale'));
   // btn操作
   function handleFormReset() {
     collapseRef.value.collapseReset();
@@ -77,71 +92,22 @@
 </script>
 
 <style scoped lang="less">
-  .container-step {
-    display: flex;
-    flex-direction: column;
-    align-content: center;
-    justify-content: center;
-    width: 100%;
-    height: calc(100% - 48px);
-    margin: 0 auto;
-    overflow: auto;
-    word-break: break-all;
+  .form-card {
+    padding: 24px 14px;
+  }
 
-    .general-card {
-      display: flex;
-      flex-direction: column;
-      align-content: center;
-      justify-content: flex-start;
-      margin: 0 10px;
-      overflow-x: hidden;
-      overflow-y: auto;
-
-      .general-top {
-        display: flex;
-        justify-content: space-around;
-        margin: 10px -10px;
-        background-image: url('@/assets/images/step-head.png');
-        background-size: cover;
-      }
-
-      .general-contain {
-        height: 180px;
-        margin-bottom: 20px;
-        color: #252b3a;
-        font-weight: 600;
-        font-size: 15px;
-        background-color: #fff;
-        border-radius: 8px;
-
-        div:first-child {
-          margin: 25px 55px;
-          font-size: 15px;
-        }
-
-        :deep(.tiny-steps-normal) {
-          width: 1200px;
-          margin-left: -80px;
-        }
-      }
-
-      .general-foot {
-        background-color: #fff;
-        border-radius: 8px;
-      }
-    }
-
-    .general-btn {
-      display: flex;
-      justify-content: start;
-      min-width: 180px;
-      margin-left: 210px;
-      padding-bottom: 20px;
+  :deep(.enUS-line) {
+    .tiny-steps-normal.text-bottom {
+      margin-left: -45px;
     }
   }
-  @media (max-width: @screen-xs) {
-    .general-top {
-      height: 250px !important;
+  :deep(.zhCN-line) {
+    .tiny-steps-normal.text-bottom {
+      margin-left: -58px;
     }
+  }
+  .form-scroll {
+    height: calc(100% - 275px);
+    overflow: auto;
   }
 </style>

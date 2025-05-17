@@ -100,7 +100,7 @@
     "tslint-config-airbnb": "^5.11.1",
     "tslint-config-prettier": "^1.18.0",
     "tslint-immutable": "^6.0.1",
-    "typescript": "^3.5.3"
+    "typescript": "^5.1.6"
   },
   "ava": {
     "failFast": true,

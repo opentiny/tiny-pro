@@ -1,4 +1,5 @@
 import { createI18n, I18n } from 'vue-i18n';
+import { zhCN, enUS } from '@opentiny/vue-search-box';
 import locale from '@opentiny/vue-locale'; // tiny-vue的国际化
 import en from './en-US';
 import cn from './zh-CN';
@@ -29,7 +30,7 @@ export default (i18n: any) =>
     i18n,
     createI18n: i18nmode,
     messages: {
-      enUS: en,
-      zhCN: cn,
+      enUS: { ...en, ...enUS },
+      zhCN: { ...cn, ...zhCN },
     },
   });

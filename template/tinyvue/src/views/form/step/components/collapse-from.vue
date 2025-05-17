@@ -1,8 +1,8 @@
 <template>
-  <div id="container">
+  <div class="container-form">
     <transition-fade-down-group>
       <div>
-        <h3>{{ $t('stepForm.collapse.base') }}</h3>
+        <div class="form-header">{{ $t('stepForm.collapse.base') }}</div>
         <coachfrom
           ref="coachFormRef"
           :project-data="projectData"
@@ -11,7 +11,9 @@
       </div>
       <div v-if="directorVis">
         <transition-slide-group>
-          <h3>{{ $t('stepForm.collapse.supervisor') }}</h3>
+          <div class="form-header">{{
+            $t('stepForm.collapse.supervisor')
+          }}</div>
           <directorfrom
             ref="directorRef"
             :project-data="projectData"
@@ -21,13 +23,13 @@
       </div>
       <div v-if="targetVis" class="targetStyle">
         <transition-slide-group>
-          <h3>{{ $t('stepForm.collapse.goals') }}</h3>
+          <div class="form-header">{{ $t('stepForm.collapse.goals') }}</div>
           <targetfrom ref="targetRef" :project-data="projectData"></targetfrom>
         </transition-slide-group>
       </div>
       <div v-if="summationVis">
         <transition-slide-group>
-          <h3>{{ $t('stepForm.collapse.summary') }}</h3>
+          <div class="form-header">{{ $t('stepForm.collapse.summary') }}</div>
           <summationfrom
             ref="summationRef"
             :project-data="projectData"
@@ -103,12 +105,14 @@
   // watch控制显隐
   watch(
     appStore.$state,
-    (newValue, oldValue) => {
-      if (newValue.step === 1) {
+    (newValue) => {
+      if (newValue.step >= 1) {
         directorVis.value = true;
-      } else if (newValue.step === 2) {
+      }
+      if (newValue.step >= 2) {
         targetVis.value = true;
-      } else if (newValue.step === 3) {
+      }
+      if (newValue.step >= 3) {
         summationVis.value = true;
       }
     },
@@ -180,23 +184,4 @@
   });
 </script>
 
-<style scoped lang="less">
-  #container {
-    padding: 10px 50px;
-
-    div {
-      padding-top: 20px;
-    }
-
-    .targetStyle {
-      margin-bottom: 10px;
-    }
-  }
-
-  h3 {
-    color: #252b3a;
-    font-weight: 700;
-    font-size: 15px;
-    text-align: left;
-  }
-</style>
+<style scoped lang="less"></style>

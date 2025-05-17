@@ -6,9 +6,10 @@
       :rules="rules"
       label-width="150px"
       :label-align="true"
-      label-position="left"
+      label-position="top"
+      class="form-base-info"
     >
-      <tiny-row :flex="true" justify="left">
+      <tiny-row :flex="true">
         <tiny-col :span="4" label-width="100px">
           <tiny-form-item
             :label="$t('stepForm.dire.supervisor')"
@@ -21,7 +22,7 @@
               multiple
             >
               <tiny-option
-                v-for="item in (projectData?.director as any)"
+                v-for="item in projectData?.director as any"
                 :key="item"
                 :label="$t(item)"
                 :value="item"
@@ -37,9 +38,6 @@
             ></tiny-input>
           </tiny-form-item>
         </tiny-col>
-      </tiny-row>
-
-      <tiny-row :flex="true" justify="left">
         <tiny-col :span="4" label-width="100px">
           <tiny-form-item
             :label="$t('stepForm.dire.startTime')"
@@ -51,6 +49,8 @@
             ></tiny-date-picker>
           </tiny-form-item>
         </tiny-col>
+      </tiny-row>
+      <tiny-row :flex="true">
         <tiny-col :span="4" label-width="100px">
           <tiny-form-item :label="$t('stepForm.dire.endTime')" prop="endTime">
             <tiny-date-picker
@@ -135,10 +135,10 @@
 
   const handleBlur = () => {
     const start = new Date(
-      JSON.parse(JSON.stringify(state.filterOptions.startTime))
+      JSON.parse(JSON.stringify(state.filterOptions.startTime)),
     ).getTime();
     const end = new Date(
-      JSON.parse(JSON.stringify(state.filterOptions.endTime))
+      JSON.parse(JSON.stringify(state.filterOptions.endTime)),
     ).getTime();
     if (end < start) {
       state.filterOptions.endTime = '';

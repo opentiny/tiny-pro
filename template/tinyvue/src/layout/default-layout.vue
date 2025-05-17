@@ -9,21 +9,7 @@
           <Menu v-if="reloadKey !== 'menu' && layoutMode[myPattern].menu" class="shadow-[0_4px_12px_#0000001a] z-[100]" />
         </Suspense>
         <div class="text-[#ccc] bg-[#f5f6f7] pl-[10px] pr-[10px] flex-1 h-[calc(100vh-60px)]" :style="{ width: isMenuCollapsed ? '100%' : 'calc(100% - 220px)' }">
-          <Tabs
-            :key="tabsRefreshKey"
-            v-model="currentTabName"
-            with-close
-            @click="onClick"
-            @close="onClose"
-          >
-            <tab-item
-              v-for="(history, idx) of tabsHistory"
-              :key="idx"
-              :title="t(history.name)"
-              :name="history.link"
-            ></tab-item>
-          </Tabs>
-          <PageLayout class="!h-[calc(100%-120px)]" />
+          <PageLayout class="!h-[calc(100%-70px)]" />
           <Footer v-if="layoutMode[myPattern].footer" class="h-[60px]" />
         </div>
       </div>
