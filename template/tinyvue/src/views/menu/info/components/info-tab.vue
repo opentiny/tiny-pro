@@ -95,7 +95,7 @@
   const onClose = () => {
     activeNode.value = DEFAULT_NODE;
   };
-  const onUpdate = ({ data }: Node) => {
+  const onUpdate = ( data : Node) => {
     updateModal.value = true;
     activeNode.value = data;
     readonly.value = false;
@@ -257,6 +257,7 @@
       <menu-tree
         v-loading="treeLoading"
         :data="i18nMenuData"
+        :locale-data="localeData"
         @update="onUpdate"
         @check="onCheck"
         @delete="onDelete"

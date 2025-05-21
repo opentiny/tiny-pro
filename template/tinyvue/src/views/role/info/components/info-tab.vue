@@ -25,7 +25,6 @@
   import roleTable from './role-table.vue';
   import menuDrawer from './menu-drawer.vue';
   import addRole, { RoleAddData } from './add-role.vue';
-  import UpdateRole, { UpdateRoleData } from './update-role.vue';
 
   const { t } = useI18n();
   const tableData = ref<any[]>([]);
@@ -37,11 +36,6 @@
     onOpen: onAdd,
     onClose: onAddHide,
   } = useDisclosure();
-  const {
-    open: updateRoleVisible,
-    onOpen: showUpdateRole,
-    onClose: hideUpdateRole,
-  } = useDisclosure();
   const { loading, setLoading } = useLoading();
   const i18MenuDatas = computed(() => useI18nMenu(menus.value, t));
   const selectedId = ref<number[]>([]);
@@ -51,7 +45,6 @@
   const roleId = ref(-1);
   const permissions = ref<Permission[]>([]);
   const vLoading = TinyLoading.directive;
-  const activeRole = ref<UpdateRoleData | null>(null);
 
   const { reloadMenu } = inject<{ reloadMenu: () => void }>('RELOAD');
 
@@ -79,7 +72,7 @@
         95, 100,
       ],
       total: 0,
-      layout: 'total, prev, pager, next, jumper, sizes',
+      layout: 'sizes, total, prev, pager, next, jumper',
     },
   });
   const roleTableRef = ref();
@@ -106,6 +99,12 @@
         getAllRoleDetail(page.currentPage, page.pageSize, str).then(
           ({ data }) => {
             tableData.value = data.roleInfo.items;
+            data.roleInfo.items.forEach((item,index) => {
+                tableData.value[index].permissionIds = [];
+                item.permission.forEach((item1) => {
+                  tableData.value[index].permissionIds.push(item1.id) 
+                });
+            });
             resolve({
               result: data.roleInfo.items,
               page: {
@@ -204,15 +203,7 @@
         onAddHide();
       });
   };
-  const onRoleUpdate = (row: Role) => {
-    activeRole.value = {
-      id: row.id,
-      name: row.name,
-      permissionIds: row.permission.map((permission) => permission.id),
-    };
-    showUpdateRole();
-  };
-  const onRoleUpdateSuccess = (role: UpdateRoleData) => {
+  const onRoleUpdateSuccess = () => {
     roleTableRef.value.reload();
   };
   const onRoleDelete = (id: number) => {
@@ -225,7 +216,7 @@
     <div class="tiny-fullscreen-scroll">
       <div class="tiny-full-screen-wrapper">
         <div class="role-add-btn">
-          <tiny-button v-permission="'role::add'" type="primary" @click="onAdd">
+          <tiny-button v-permission="'role::add'" type="primary" round @click="onAdd">
             {{ $t('roleInfo.modal.title.add') }}
           </tiny-button>
         </div>
@@ -235,9 +226,10 @@
             :table-data="tableData"
             :fetch-option="fetchOption"
             :pager-config="pagerConfig"
+            :permissions="permissions"
             :filter="allFilter"
             @menu-update="onMenuUpdate"
-            @role-update="onRoleUpdate"
+            @update-role-close="onRoleUpdateSuccess"
             @role-delete="onRoleDelete"
           />
         </div>
@@ -258,13 +250,6 @@
       @hide="onAddHide"
       @confirm="onAddRole"
       @cancel="onAddHide"
-    />
-    <update-role
-      :visible="updateRoleVisible"
-      :permissions="permissions"
-      :data="activeRole"
-      @close="hideUpdateRole"
-      @confirm="onRoleUpdateSuccess"
     />
   </div>
 </template>
