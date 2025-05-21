@@ -72,7 +72,7 @@ const state = reactive<{
 });
 
 async function fetchData(email: string) {
-  if (email !== undefined || null) {
+  if (email) {
     const { data } = await getUserInfo(email);
     if (data.role && data.role.length) {
       data.roleIds = data.role[0].id;
