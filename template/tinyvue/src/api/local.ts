@@ -60,6 +60,11 @@ export const createLocalItem = (data: CreateLocal) => {
 export const deleteLocale = (id: number) => {
   return axios.delete<DeleteLocaleRet>(`/api/i18/${id}`);
 };
+
 export const patchLocal = (id: number, data: Partial<CreateLocal>) => {
   return axios.patch(`/api/i18/${id}`, data);
 };
+
+export const batchDeleteLocal = (ids: string[]) => {
+  return axios.post('/api/i18/batch', ids)
+}
