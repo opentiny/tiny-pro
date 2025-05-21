@@ -727,7 +727,7 @@
 
 <style scoped lang="less">
   .user-header-btn {
-    margin: 10px 0 10px 10px;
+    margin: 10px 0 24px 10px;
 
     .tiny-button {
       margin: 0 8px 0 0;
