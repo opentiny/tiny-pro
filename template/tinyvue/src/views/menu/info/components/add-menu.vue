@@ -31,8 +31,7 @@
         no-match-text="No Match"
         :options="iconDatas"
         optimization
-      >
-      </tiny-select>
+      ></tiny-select>
     </tiny-form-item>
     <tiny-form-item :label="$t('menuInfo.table.component')" prop="component">
       <tiny-input v-model="menuInfo.component"></tiny-input>
@@ -63,9 +62,10 @@
     FormItem as TinyFormItem,
     Input as TinyInput,
     Select as TinySelect,
+    Option as TinyOption,
   } from '@opentiny/vue';
-  import * as icons from '@opentiny/vue-icon';
-  import { reactive, ref, toRefs, computed, unref } from 'vue';
+  import { icons } from '@opentiny/icons/json/icons.json';
+  import { reactive, ref, toRefs, computed, unref, h } from 'vue';
 
   const props = defineProps<{
     menus: ITreeNodeData[];
@@ -129,6 +129,7 @@
     return {
       label: key,
       value: key,
+      icon: h('i', { class: `ci-${key}`, style: { fontSize: '18px',  marginRight: '6px' } }),
     };
   });
 
