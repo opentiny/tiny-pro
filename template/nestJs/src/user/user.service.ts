@@ -344,4 +344,18 @@ export class UserService {
     }
     return newProfile;
   }
+
+  async batchDeleteUser(emails: string[]) {
+   const results = []
+   for (const email of emails) {
+    try {
+      const result = await this.deleteUser(email);
+      results.push(result)
+    } catch (error) {
+      // 可以根据需求处理错误，这里简单记录
+      console.error(`删除用户 ${email} 时出错:`, error);
+    }
+   }
+   return results
+  }
 }

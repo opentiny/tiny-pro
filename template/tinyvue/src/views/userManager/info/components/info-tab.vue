@@ -1,13 +1,18 @@
 <template>
   <div class="tiny-fullscreen-scroll">
     <div class="tiny-fullscreen-wrapper">
-      <div class="user-add-btn">
+      <div class="user-header-btn">
         <tiny-button
           v-permission="'user::add'"
           type="primary"
           @click="handleAddUser"
           round
           >{{ $t('userInfo.modal.title.add') }}
+        </tiny-button>
+        <tiny-button
+          @click="handleBatchDeleteUser"
+          round
+          >{{ $t('locale.batchRemove') }}
         </tiny-button>
       </div>
       <div class="table">
@@ -17,14 +22,24 @@
           :pager="pagerConfig"
           :auto-resize="true"
           remote-filter
+          :edit-config="{ trigger: 'click', mode: 'cell', showStatus: true }"
         >
-          <tiny-grid-column type="selection" width="60"></tiny-grid-column>
-          <tiny-grid-column type="expand" width="60">
+          <tiny-grid-column type="selection" width="3%"></tiny-grid-column>
+          <tiny-grid-column type="expand" width="3%">
             <template #default="{ row }">
-              <UserSetting :email="row.email" @confirm="(props, value) => row[props] = value" />
+              <UserDetail
+                :email="row.email"
+                :status-map="statusMap"
+                @confirm="(props, value) => row[props] = value"
+              />
             </template>
           </tiny-grid-column>
-          <tiny-grid-column field="id" :title="$t('userInfo.table.id')" show-overflow="tooltip">
+          <tiny-grid-column
+            field="id"
+            :title="$t('userInfo.table.id')"
+            show-overflow="tooltip"
+            width="3%"
+          >
             <template #default="data">
               <span>{{ $t(`${data.row.id}`) }}</span>
             </template>
@@ -34,6 +49,15 @@
             :filter="inputFilter"
             :title="$t('userInfo.table.name')" 
             show-overflow="tooltip"
+            width="10%"
+            :editor="{
+              component: 'input',
+              autofocus: true,
+              events: { 
+                blur: handleNameUpdate, 
+                keyup:  handleKeyup
+              }
+            }"
           >
             <template #default="data">
               <span>{{ $t(`${data.row.name}`) }}</span>
@@ -42,7 +66,8 @@
           <tiny-grid-column
             field="email"
             :filter="inputFilter"
-            :title="$t('userInfo.table.email')" 
+            :title="$t('userInfo.table.email')"
+            width="9%"
             show-overflow="tooltip"
           >
             <template #default="data">
@@ -53,6 +78,15 @@
             field="department"
             :title="$t('userInfo.table.department')" 
             show-overflow="tooltip"
+            width="6%"
+            :editor="{
+              component: 'input',
+              autofocus: true,
+              events: { 
+                blur: handleNameUpdate, 
+                keyup:  handleKeyup
+              }
+            }"
           >
             <template #default="data">
               <span v-if="data.row.department !== null">{{
@@ -63,7 +97,19 @@
           <tiny-grid-column
             field="employeeType"
             :title="$t('userInfo.table.employeeType')"
-             show-overflow="tooltip"
+            show-overflow="tooltip"
+            width="6%"
+            :editor="{ 
+              component: TinySelect,
+              attrs: {
+                options: projectData,
+                textField: 'label',
+                valueField: 'value'
+              },
+              events: {
+                keyup:  handleKeyup
+              } 
+            }"
           >
             <template #default="data">
               <span v-if="data.row.employeeType !== null">{{
@@ -76,6 +122,18 @@
             :filter="jobFilter"
             :title="$t('userInfo.table.job')" 
             show-overflow="tooltip"
+            width="8%"
+            :editor="{ 
+              component: TinySelect,
+              attrs: {
+                options: state.roleData,
+                textField: 'name',
+                valueField: 'id'
+              },
+              events: {
+                keyup:  handleKeyup
+              } 
+            }"
           >
             <template #default="data">
               <span>{{ $t(`${data.row.role[0]?.name}`) }}</span>
@@ -85,6 +143,16 @@
             field="probationStart"
             :title="$t('userInfo.table.probationStart')" 
             show-overflow="tooltip"
+            width="9%"
+            :editor="{ 
+              component: TinyDatePicker,
+              attrs: {
+                valueFormat: 'yyyy-MM-dd'
+              },
+              events: {
+                blur:  handleDatePickerBlur
+              } 
+            }"
           >
             <template #default="data">
               <span v-if="data.row.probationStart !== null">{{
@@ -96,6 +164,16 @@
             field="probationEnd"
             :title="$t('userInfo.table.probationEnd')" 
             show-overflow="tooltip"
+            width="9%"
+            :editor="{ 
+              component: TinyDatePicker,
+              attrs: {
+                valueFormat: 'yyyy-MM-dd'
+              },
+              events: {
+                blur:  handleDatePickerBlur
+              } 
+            }"
           >
             <template #default="data">
               <span v-if="data.row.probationEnd !== null">{{
@@ -107,6 +185,15 @@
             field="probationDuration"
             :title="$t('userInfo.table.probationDuration')" 
             show-overflow="tooltip"
+            width="6%"
+            :editor="{
+              component: 'input',
+              autofocus: true,
+              events: { 
+                blur: handleNameUpdate, 
+                keyup:  handleKeyup
+              }
+            }"
           >
             <template #default="data">
               <span v-if="data.row.probationDuration !== null"
@@ -119,6 +206,15 @@
             field="address"
             :title="$t('userInfo.table.address')" 
             show-overflow="tooltip"
+            width="11%"
+            :editor="{
+              component: 'input',
+              autofocus: true,
+              events: { 
+                blur: handleNameUpdate, 
+                keyup:  handleKeyup
+              }
+            }"
           >
             <template #default="data">
               <span v-if="data.row.address !== null">{{
@@ -126,7 +222,23 @@
               }}</span>
             </template>
           </tiny-grid-column>
-          <tiny-grid-column field="status" :title="$t('userInfo.table.status')" show-overflow="tooltip">
+          <tiny-grid-column
+            field="status"
+            :title="$t('userInfo.table.status')"
+            show-overflow="tooltip"
+            width="6%"
+            :editor="{ 
+              component: TinySelect,
+              attrs: {
+                options: statusData,
+                textField: 'label',
+                valueField: 'value'
+              },
+              events: {
+                keyup:  handleKeyup
+              } 
+            }"
+          >
             <template #default="data">
               <div class="tiny-col-status">
                 <img
@@ -144,7 +256,7 @@
                   src="@/assets/images/tip2.png"
                   alt="tip"
                 />
-                <span>{{ STATUSDATA[data.row.status]}}</span>
+                <span>{{ statusMap[data.row.status]}}</span>
               </div>
             </template>
           </tiny-grid-column>
@@ -152,7 +264,7 @@
             :title="$t('userInfo.table.operations')"
             align="center" 
             show-overflow="tooltip"
-            width="178"
+            width="11%"
           >
             <template #default="data">
               <a
@@ -186,7 +298,11 @@
       width="800"
       :title="$t('userInfo.modal.title.add')"
     >
-      <UserAdd @confirm="onAddConfirm"></UserAdd>
+      <UserAdd
+        :status-data="statusData"
+        :project-data="projectData"
+        @confirm="onAddConfirm"
+      ></UserAdd>
     </tiny-modal>
   </div>
   <div v-if="state.isPwdUpdate">
@@ -265,7 +381,6 @@
   import { useI18n } from 'vue-i18n';
   import {
     Loading,
-    Modal,
     GridColumn as TinyGridColumn,
     Grid as TinyGrid,
     Pager as TinyPager,
@@ -276,23 +391,22 @@
     Row as TinyRow,
     Col as TinyCol,
     Input as TinyInput,
+    Select as TinySelect,
+    DatePicker as TinyDatePicker,
   } from '@opentiny/vue';
   import { iconCommission, iconDel } from '@opentiny/vue-icon';
   import { useUserStore } from '@/store';
-  import { getAllUser, deleteUser, updatePwdAdmin } from '@/api/user';
-  import { useRouter } from 'vue-router';
+  import { getAllUser, deleteUser, updatePwdAdmin, batchDeleteUsers, updateUserInfo } from '@/api/user';
+  import { getSimpleDate } from '@/utils/time';
   import { getAllRole } from '@/api/role';
   import { FilterType } from '@/types/global';
   import UserAdd from '../../useradd/index.vue';
-  import UserSetting from '../../setting/index.vue';
-  import { STATUSDATA } from '../../const'
+  import UserDetail from '../../user-detail/index.vue';
 
   const IconCommission = iconCommission();
   const IconDel = iconDel();
   const { t } = useI18n();
-  const router = useRouter();
   const grid = ref();
-  // 加载效果
   const state = reactive<{
     loading: any;
     tableData: any;
@@ -301,6 +415,7 @@
     isUserAdd: boolean;
     pwdData: any;
     email: string;
+    roleData: any;
   }>({
     loading: null,
     tableData: [] as any,
@@ -309,10 +424,52 @@
     isUserAdd: false,
     pwdData: {} as any,
     email: '',
+    roleData: [] as any,
   });
+
+  const statusData = [
+    {
+      value: 1,
+      label: t('userInfo.table.activeStatus'),
+    },
+    {
+      value: 2,
+      label: t('userInfo.table.disabledStatus'),
+    },
+    {
+      value: 3,
+      label: t('searchTable.form.status.doing'),
+    },
+  ];
+
+  const statusMap = {
+    1: t('userInfo.table.activeStatus'),
+    2: t('userInfo.table.disabledStatus'),
+    3: t('searchTable.form.status.doing'),
+  };
+
+  const projectData = [
+    {
+      value: '1',
+      label: t("userInfo.table.socialRecruitment"),
+    },
+    {
+      value: '2',
+      label: t("userInfo.table.schoolRecruitment"),
+    },
+    {
+      value: '3',
+      label: t("userInfo.table.jobTransfer"),
+    },
+  ];
 
   // 变量设置
   const userStore = useUserStore();
+
+  async function fetchRole() {
+    const { data } = await getAllRole();
+    state.roleData = data;
+  }
 
   const inputFilter = {
     inputFilter: true,
@@ -401,23 +558,28 @@
   };
 
   const handleDelete = async (email: string) => {
-    deleteUser(email)
-      .then((res) => {
-        TinyModal.message({
-          message: '已删除',
-          status: 'success',
-        });
-        grid.value.handleFetch();
-      })
-      .catch((error) => {
-        if (error.response && error.response.data) {
-          const errorMessage = error.response.data.message || '未知错误';
-          TinyModal.message({
-            message: errorMessage,
-            status: 'error',
+    TinyModal.confirm({
+      title: '删除确认',
+      message: '确定要删除此用户吗？',
+      onConfirm: () => {
+        deleteUser(email)
+          .then((res) => {
+            TinyModal.message({
+              message: '已删除',
+              status: 'success',
+            });
+            grid.value.handleFetch();
+          })
+          .catch((error) => {
+            if (error.response && error.response.data) {
+              const errorMessage = error.response.data.message || '未知错误';
+              TinyModal.message({
+                message: errorMessage,
+                status: 'error',
+              });
+            }
           });
-        }
-      });
+      }})
   };
 
   const handlePwdUpdate = (email: string) => {
@@ -433,6 +595,41 @@
   const handleAddUser = () => {
     state.isUserAdd = true;
   };
+
+  const handleBatchDeleteUser = () => {
+    const rowEmails = grid.value.getAllSelection().flatMap((row) => row.email);
+    if(rowEmails.length === 0) {
+      TinyModal.message({
+        message: '请选择要删除的用户',
+        status: 'error',
+      });
+      return;
+    }
+    TinyModal.confirm({
+      title: '删除确认',
+      message: '确定要批量删除选中的用户吗？',
+      onConfirm: () => {
+        batchDeleteUsers(rowEmails)
+          .then(() => {
+            TinyModal.message({
+              message: '批量删除成功',
+              status: 'success',
+            });
+            // 可以根据需求更新数据
+            grid.value.handleFetch(); 
+          })
+          .catch((error) => {
+            if (error.response && error.response.data) {
+              const errorMessage = error.response.data.message || '未知错误';
+              TinyModal.message({
+                message: errorMessage,
+                status: 'error',
+              });
+            }
+          })
+      }
+    });
+  }
 
   async function handlePwdUpdateSubmit() {
     let data = state.pwdData;
@@ -466,11 +663,75 @@
       }
     }
   }
+
+  const handleKeyup = (table: any, event: KeyboardEvent) => {
+    if (event.key === 'Enter') {
+      handleNameUpdate(table, event);
+    }
+  };
+
+  const handleDatePickerBlur = (table, vm) => {
+    handleNameUpdate(table, { target: { value: vm.modelValue } });
+  };
+  
+  // 处理提交
+  const handleNameUpdate = async ({ row, column }, { target: { value } }) => {
+    const { property } = column;
+    if(value) {
+      let data = row;
+      let newTemp = {
+        email: data.email,
+        name: data.name,
+        address: data.address,
+        department: data.department,
+        roleIds: [data.role[0]?.id],
+        employeeType: data.employeeType,
+        probationDuration: data.probationDuration,
+        probationStart: data.probationStart,
+        probationEnd: data.probationEnd,
+        protocolStart: data.protocolStart,
+        protocolEnd: data.protocolEnd,
+        status: data.status,
+      };
+
+      if(property === 'role') {
+        const roleIds = [state.roleData.find((item) => item.name === value).id];
+        newTemp.roleIds = roleIds;
+      } else if(property !== 'status'){
+        newTemp[property] = value;
+      }
+
+      try {
+        await updateUserInfo(newTemp);
+        TinyModal.message({
+          message: t('baseForm.form.submit.success'),
+          status: 'success',
+        });
+        
+        grid.value.handleFetch();
+      } catch (error) {
+        if (error.response && error.response.data) {
+          const errorMessage = error.response.data.message || '未知错误';
+          TinyModal.message({
+            message: errorMessage,
+            status: 'error',
+          });
+        }
+      }
+    }
+  };
+
+  // 请求职位类型
+  fetchRole();
 </script>
 
 <style scoped lang="less">
-  .user-add-btn {
-    padding: 10px 0 10px 10px;
+  .user-header-btn {
+    margin: 10px 0 10px 10px;
+
+    .tiny-button {
+      margin: 0 8px 0 0;
+    }
   }
 
   #contain {
