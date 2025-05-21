@@ -1,72 +1,24 @@
 <template>
-  <div class="detail-page">
-    <Breadcrumb :items="['menu.profile', 'menu.profile.detail']" />
-    <div id="container">
-      <div class="detail-contain">
-        <tiny-collapse v-model="state.activeNames">
-          <transition-fade-down-group>
-            <tiny-collapse-item
-              :title="$t('baseForm.form.label.type')"
-              name="1"
-            >
-              <tiny-row :flex="true" justify="left" class="margin-bottom">
-                <tiny-col :span="9">
-                  <div class="col">
-                    {{ $t('baseForm.form.label.type') }}
-                    <span>:</span>
-                    <tiny-select
-                      v-model="state.project"
-                      :placeholder="$t('baseForm.form.label.placeholder')"
-                      filterable
-                    >
-                      <tiny-option
-                        v-for="item in state.Project"
-                        :key="item"
-                        :label="$t(item as any)"
-                        :value="item"
-                      ></tiny-option>
-                    </tiny-select>
-                  </div>
-                </tiny-col>
-              </tiny-row>
-            </tiny-collapse-item>
-
-            <tiny-collapse-item
-              :title="$t('baseForm.form.label.people')"
-              name="2"
-            >
-              <planDetail></planDetail>
-            </tiny-collapse-item>
-
-            <tiny-collapse-item
-              :title="$t('baseForm.form.label.Objectives')"
-              name="3"
-            >
-              <targetDetail></targetDetail>
-            </tiny-collapse-item>
-            <tiny-collapse-item
-              :title="$t('baseForm.form.label.plan')"
-              name="4"
-            >
-              <evaluationDetail></evaluationDetail>
-            </tiny-collapse-item>
-            <tiny-collapse-item
-              :title="$t('baseForm.form.label.evaluation')"
-              name="5"
-            >
-              <wholeDetail></wholeDetail>
-            </tiny-collapse-item>
-            <tiny-collapse-item
-              :title="$t('baseForm.form.label.mentortitle')"
-              name="6"
-            >
-              <mentor></mentor>
-            </tiny-collapse-item>
-            <tiny-collapse-item :title="$t('baseForm.form.record')" name="7">
-              <recordDetail :table-data="state.tableData as any"></recordDetail>
-            </tiny-collapse-item>
-          </transition-fade-down-group>
-        </tiny-collapse>
+  <div class="container-detail">
+    <div class="container-header">{{ $t('menu.profile.detail') }}</div>
+    <div class="base-body">
+      <div class="detail-card">
+        <planDetail></planDetail>
+      </div>
+      <div class="detail-card mart_16">
+        <targetDetail></targetDetail>
+      </div>
+      <div class="detail-card mart_16">
+        <evaluationDetail></evaluationDetail>
+      </div>
+      <div class="detail-card mart_16">
+        <wholeDetail></wholeDetail>
+      </div>
+      <div class="detail-card mart_16">
+        <mentor></mentor>
+      </div>
+      <div class="detail-card footer-card mart_16">
+        <recordDetail :table-data="state.tableData as any"></recordDetail>
       </div>
     </div>
   </div>
@@ -94,18 +46,10 @@
   // 加载效果
   const state = reactive<{
     loading: any;
-    filterOptions: object;
-    activeNames: Array<string>;
-    Project: Array<string>;
     tableData: Array<object>;
-    project: string;
   }>({
     loading: null,
-    filterOptions: {},
-    activeNames: ['1', '2', '3', '4', '5', '6', '7'],
-    Project: [],
     tableData: [],
-    project: '',
   });
 
   // 请求数据接口方法
@@ -117,7 +61,6 @@
     });
     try {
       const { data } = await getDetailData();
-      state.Project = data.Project;
       state.tableData = data.tableData;
     } finally {
       state.loading.close();
@@ -131,55 +74,5 @@
 </script>
 
 <style scoped lang="less">
-  .detail-page {
-    height: 100%;
-  }
-
-  #container {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: calc(100% - 60px);
-    overflow-x: hidden;
-    overflow-y: auto;
-  }
-
-  .detail-contain {
-    flex: 1 1 auto;
-    height: 100%;
-    margin: 8px 10px;
-    padding: 22px 20px;
-    overflow: auto;
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 0 8px 8px rgba(169, 174, 184, 0.05);
-  }
-
-  :deep(.tiny-select) {
-    width: 400px;
-  }
-
-  :deep(.tiny-collapse-item) {
-    margin-bottom: 20px;
-  }
-
-  .margin-bottom {
-    margin-top: 15px;
-    margin-bottom: 15px;
-  }
-
-  .col > span {
-    padding: 0 10px;
-  }
-
-  :deep(
-      .tiny-collapse-item__arrow.is-active,
-      .tiny-collapse-item__arrow:hover
-    ) {
-    fill: var(--tv-common-color-text-highlight);
-  }
-
-  :deep(.tiny-collapse-item__header svg) {
-    fill: var(--tv-common-color-text-highlight);
-  }
+  @import '@/assets/style/details.less';
 </style>
