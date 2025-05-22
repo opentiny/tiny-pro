@@ -231,16 +231,7 @@
     return {
       email: [rulesType],
       password: [rulesType],
-      department: [rulesType],
-      roleIds: [rulesSelect],
-      employeeType: [rulesSelect],
-      probationDate: [rulesSelect],
-      probationDuration: [rulesType],
-      protocolStart: [rulesSelect],
-      protocolEnd: [rulesSelect],
-      name: [rulesType],
-      address: [rulesType],
-      status: [rulesSelect],
+      name: [rulesType]
     };
   });
 
@@ -249,22 +240,16 @@
       .validate()
       .then(async () => {
         let data = state.userData;
-        data.status = props.statusData.find(item => item.label === data.status).value;
         let newTemp = {
-          email: data.email,
-          password: data.password,
-          name: data.name,
-          address: data.address,
-          department: data.department,
-          roleIds: [data.roleIds],
-          employeeType: data.employeeType,
-          probationStart: getSimpleDate(data.probationDate[0]),
-          probationEnd: getSimpleDate(data.probationDate[1]),
-          probationDuration: data.probationDuration,
-          protocolStart: getSimpleDate(data.protocolStart),
-          protocolEnd: getSimpleDate(data.protocolEnd),
-          status: data.status,
+          ...data
         };
+        newTemp.roleIds && (newTemp.roleIds = [data.roleIds])
+        newTemp.probationStart && (newTemp.probationStart = getSimpleDate(data.probationDate[0]))
+        newTemp.probationEnd && (newTemp.probationEnd = getSimpleDate(data.probationDate[1]))
+        newTemp.protocolStart && (newTemp.protocolStart = getSimpleDate(data.protocolStart))
+        newTemp.protocolEnd && (newTemp.protocolEnd = getSimpleDate(data.protocolEnd))
+        newTemp.status && (newTemp.status = props.statusData.find(item => item.label === data.status).value)
+        console.log('12', newTemp)
 
         try {
           await registerUser(newTemp);

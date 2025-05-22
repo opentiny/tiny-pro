@@ -54,7 +54,7 @@
               component: 'input',
               autofocus: true,
               events: { 
-                blur: handleNameUpdate, 
+                blur: handleUpdate, 
                 keyup:  handleKeyup
               }
             }"
@@ -83,7 +83,7 @@
               component: 'input',
               autofocus: true,
               events: { 
-                blur: handleNameUpdate, 
+                blur: handleUpdate, 
                 keyup:  handleKeyup
               }
             }"
@@ -104,7 +104,7 @@
               attrs: {
                 options: projectData,
                 textField: 'label',
-                valueField: 'value'
+                valueField: 'label'
               },
               events: {
                 keyup:  handleKeyup
@@ -136,7 +136,7 @@
             }"
           >
             <template #default="data">
-              <span>{{ $t(`${data.row.role[0]?.name}`) }}</span>
+              <span v-if="data.row.role[0]">{{ $t(`${data.row.role[0]?.name}`) }}</span>
             </template>
           </tiny-grid-column>
           <tiny-grid-column
@@ -190,7 +190,7 @@
               component: 'input',
               autofocus: true,
               events: { 
-                blur: handleNameUpdate, 
+                blur: handleUpdate, 
                 keyup:  handleKeyup
               }
             }"
@@ -211,7 +211,7 @@
               component: 'input',
               autofocus: true,
               events: { 
-                blur: handleNameUpdate, 
+                blur: handleUpdate, 
                 keyup:  handleKeyup
               }
             }"
@@ -275,14 +275,22 @@
                 <IconCommission class="operation-icon"></IconCommission>
                 {{ $t('userInfo.table.operations.pwdUpdate') }}
               </a>
-              <a
-                v-permission="'user::remove'"
-                class="operation-delete"
-                @click="handleDelete(data.row.email)"
+              <tiny-popconfirm
+                title="确定要删除此用户吗？"
+                type="info"
+                trigger="click"
+                @confirm="handleDelete(data.row.email)"
               >
-                <IconDel class="operation-icon"></IconDel>
-                {{ $t('userInfo.table.operations.delete') }}
-              </a>
+                <template #reference>
+                  <a
+                    v-permission="'user::remove'"
+                    class="operation-delete"
+                  >
+                    <IconDel class="operation-icon"></IconDel>
+                    {{ $t('userInfo.table.operations.delete') }}
+                  </a>
+                </template>
+              </tiny-popconfirm>
             </template>
           </tiny-grid-column>
         </tiny-grid>
@@ -293,7 +301,6 @@
     <tiny-modal
       v-model="state.isUserAdd"
       :lock-scroll="true"
-      mask-closable="true"
       height="auto"
       width="800"
       :title="$t('userInfo.modal.title.add')"
@@ -393,6 +400,7 @@
     Input as TinyInput,
     Select as TinySelect,
     DatePicker as TinyDatePicker,
+    Popconfirm as TinyPopconfirm,
   } from '@opentiny/vue';
   import { iconCommission, iconDel } from '@opentiny/vue-icon';
   import { useUserStore } from '@/store';
@@ -558,28 +566,23 @@
   };
 
   const handleDelete = async (email: string) => {
-    TinyModal.confirm({
-      title: '删除确认',
-      message: '确定要删除此用户吗？',
-      onConfirm: () => {
-        deleteUser(email)
-          .then((res) => {
-            TinyModal.message({
-              message: '已删除',
-              status: 'success',
-            });
-            grid.value.handleFetch();
-          })
-          .catch((error) => {
-            if (error.response && error.response.data) {
-              const errorMessage = error.response.data.message || '未知错误';
-              TinyModal.message({
-                message: errorMessage,
-                status: 'error',
-              });
-            }
+    deleteUser(email)
+      .then((res) => {
+        TinyModal.message({
+          message: '已删除',
+          status: 'success',
+        });
+        grid.value.handleFetch();
+      })
+      .catch((error) => {
+        if (error.response && error.response.data) {
+          const errorMessage = error.response.data.message || '未知错误';
+          TinyModal.message({
+            message: errorMessage,
+            status: 'error',
           });
-      }})
+        }
+      });
   };
 
   const handlePwdUpdate = (email: string) => {
@@ -666,16 +669,16 @@
 
   const handleKeyup = (table: any, event: KeyboardEvent) => {
     if (event.key === 'Enter') {
-      handleNameUpdate(table, event);
+      handleUpdate(table, event);
     }
   };
 
   const handleDatePickerBlur = (table, vm) => {
-    handleNameUpdate(table, { target: { value: vm.modelValue } });
+    handleUpdate(table, { target: { value: vm.modelValue } });
   };
   
   // 处理提交
-  const handleNameUpdate = async ({ row, column }, { target: { value } }) => {
+  const handleUpdate = async ({ row, column }, { target: { value } }) => {
     const { property } = column;
     if(value) {
       let data = row;
