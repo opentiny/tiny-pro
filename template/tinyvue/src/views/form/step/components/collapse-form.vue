@@ -1,38 +1,40 @@
 <template>
-  <div id="container">
+  <div class="container-form">
     <transition-fade-down-group>
       <div>
-        <h3>{{ $t('stepForm.collapse.base') }}</h3>
-        <coachfrom
+        <div class="form-header">{{ $t('stepForm.collapse.base') }}</div>
+        <coach-form
           ref="coachFormRef"
           :project-data="projectData"
           :coach-play="coachPlay"
-        ></coachfrom>
+        ></coach-form>
       </div>
       <div v-if="directorVis">
         <transition-slide-group>
-          <h3>{{ $t('stepForm.collapse.supervisor') }}</h3>
-          <directorfrom
+          <div class="form-header">{{
+            $t('stepForm.collapse.supervisor')
+          }}</div>
+          <director-form
             ref="directorRef"
             :project-data="projectData"
             :director-play="directorPlay"
-          ></directorfrom>
+          ></director-form>
         </transition-slide-group>
       </div>
       <div v-if="targetVis" class="targetStyle">
         <transition-slide-group>
-          <h3>{{ $t('stepForm.collapse.goals') }}</h3>
-          <targetfrom ref="targetRef" :project-data="projectData"></targetfrom>
+          <div class="form-header">{{ $t('stepForm.collapse.goals') }}</div>
+          <target-form ref="targetRef" :project-data="projectData"></target-form>
         </transition-slide-group>
       </div>
       <div v-if="summationVis">
         <transition-slide-group>
-          <h3>{{ $t('stepForm.collapse.summary') }}</h3>
-          <summationfrom
+          <div class="form-header">{{ $t('stepForm.collapse.summary') }}</div>
+          <summation-form
             ref="summationRef"
             :project-data="projectData"
             :summation-play="summationPlay"
-          ></summationfrom>
+          ></summation-form>
         </transition-slide-group>
       </div>
     </transition-fade-down-group>
@@ -45,10 +47,10 @@
   import { Modal, Loading } from '@opentiny/vue';
   import { useAppStore } from '@/store';
   import { getStepData } from '@/api/form';
-  import coachfrom from './coach-from.vue';
-  import directorfrom from './director-from.vue';
-  import targetfrom from './target-from.vue';
-  import summationfrom from './summation-from.vue';
+  import CoachForm from './coach-form.vue';
+  import DirectorForm from './director-form.vue';
+  import TargetForm from './target-form.vue';
+  import SummationForm from './summation-form.vue';
 
   // 加载效果
   const state = reactive<{
@@ -103,12 +105,14 @@
   // watch控制显隐
   watch(
     appStore.$state,
-    (newValue, oldValue) => {
-      if (newValue.step === 1) {
+    (newValue) => {
+      if (newValue.step >= 1) {
         directorVis.value = true;
-      } else if (newValue.step === 2) {
+      }
+      if (newValue.step >= 2) {
         targetVis.value = true;
-      } else if (newValue.step === 3) {
+      }
+      if (newValue.step >= 3) {
         summationVis.value = true;
       }
     },
@@ -180,23 +184,4 @@
   });
 </script>
 
-<style scoped lang="less">
-  #container {
-    padding: 10px 50px;
-
-    div {
-      padding-top: 20px;
-    }
-
-    .targetStyle {
-      margin-bottom: 10px;
-    }
-  }
-
-  h3 {
-    color: #252b3a;
-    font-weight: 700;
-    font-size: 15px;
-    text-align: left;
-  }
-</style>
+<style scoped lang="less"></style>

@@ -1,16 +1,17 @@
 <template>
   <tiny-layout>
     <tiny-form
-      ref="coachFormRef"
+      ref="baseFormRef"
       :model="state.filterOptions"
       :rules="rules"
-      label-width="150px"
       :label-align="true"
-      label-position="left"
+      label-position="top"
+      class="form-base-info"
     >
-      <tiny-row :flex="true" justify="left">
+      <div class="form-header">{{ $t('stepForm.collapse.base') }}</div>
+      <tiny-row :flex="true">
         <transition-fade-down-group>
-          <tiny-col :span="4" label-width="100px">
+          <tiny-col :span="4">
             <tiny-form-item :label="$t('stepForm.coach.culture')" prop="sector">
               <tiny-input
                 v-model="state.filterOptions.sector"
@@ -19,7 +20,7 @@
               ></tiny-input>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="4" label-width="100px">
+          <tiny-col :span="4">
             <tiny-form-item
               :label="$t('stepForm.coach.position')"
               prop="position"
@@ -39,12 +40,7 @@
               </tiny-select>
             </tiny-form-item>
           </tiny-col>
-        </transition-fade-down-group>
-      </tiny-row>
-
-      <tiny-row :flex="true" justify="left">
-        <transition-fade-down-group>
-          <tiny-col :span="4" label-width="100px">
+          <tiny-col :span="4">
             <tiny-form-item label="HR" prop="hr">
               <tiny-select
                 v-model="state.filterOptions.hr"
@@ -61,7 +57,12 @@
               </tiny-select>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="4" label-width="100px">
+        </transition-fade-down-group>
+      </tiny-row>
+
+      <tiny-row :flex="true">
+        <transition-fade-down-group>
+          <tiny-col :span="4">
             <tiny-form-item :label="$t('stepForm.coach.mentor')" prop="teacher">
               <tiny-select
                 v-model="state.filterOptions.teacher"
@@ -78,12 +79,7 @@
               </tiny-select>
             </tiny-form-item>
           </tiny-col>
-        </transition-fade-down-group>
-      </tiny-row>
-
-      <tiny-row :flex="true" justify="left">
-        <transition-fade-down-group>
-          <tiny-col :span="4" label-width="100px">
+          <tiny-col :span="4">
             <tiny-form-item
               :label="$t('stepForm.coach.startTime')"
               prop="startTime"
@@ -95,7 +91,7 @@
               ></tiny-date-picker>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="4" label-width="100px">
+          <tiny-col :span="4">
             <tiny-form-item
               :label="$t('stepForm.coach.endTime')"
               prop="endTime"
@@ -163,34 +159,38 @@
 
   // 初始化请求数据
   const { t } = useI18n();
-  const coachFormRef = ref();
+  const baseFormRef = ref();
   const disabled = ref(false);
 
   const handleBlur = () => {
-    const start = new Date(
-      JSON.parse(JSON.stringify(state.filterOptions.startTime)),
-    ).getTime();
-    const end = new Date(
-      JSON.parse(JSON.stringify(state.filterOptions.endTime)),
-    ).getTime();
+    const start = state.filterOptions.startTime
+      ? new Date(
+          JSON.parse(JSON.stringify(state.filterOptions.startTime)),
+        )?.getTime()
+      : '';
+    const end = state.filterOptions.endTime
+      ? new Date(
+          JSON.parse(JSON.stringify(state.filterOptions.endTime)),
+        ).getTime()
+      : '';
     if (end < start) {
-      state.filterOptions.endTime = '';
       Modal.message({
         message: t('userInfo.time.message'),
         status: 'error',
       });
+      state.filterOptions.endTime = '';
     }
   };
 
   // 校验规则
   const rulesType = {
     required: true,
-    trigger: 'blur',
+    trigger: ['blur', 'change'],
   };
   const rulesSelect = {
     required: true,
     message: '必选',
-    trigger: 'blur',
+    trigger: ['blur', 'change'],
   };
 
   const rules = computed(() => {
@@ -204,31 +204,27 @@
     };
   });
 
-  const coachValid = () => {
-    let coachValidate = false;
-    coachFormRef.value.validate((valid: boolean) => {
+  const baseValid = () => {
+    let baseValidate = false;
+    baseFormRef.value.validate((valid: boolean) => {
       if (valid) {
         disabled.value = true;
       }
-      coachValidate = valid;
+      baseValidate = valid;
     });
 
-    return coachValidate;
+    return baseValidate;
   };
 
-  const coachReset = () => {
+  const baseReset = () => {
     disabled.value = false;
     state.filterOptions = {} as FilterOptions;
   };
 
   defineExpose({
-    coachValid,
-    coachReset,
+    baseValid,
+    baseReset,
   });
 </script>
 
-<style scoped lang="less">
-  :deep(.tiny-row) {
-    margin-bottom: 15px;
-  }
-</style>
+<style scoped lang="less"></style>
