@@ -60,6 +60,7 @@ const initData2 = mock({
       description: 'work.mock.collectDescription4',
       label1: 'work.mock.collectHotLabel1',
       label2: 'work.mock.collectLabel5',
+      isNews:true
     },
   ],
 });

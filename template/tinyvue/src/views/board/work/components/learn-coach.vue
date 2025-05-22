@@ -103,6 +103,7 @@
   
     img{
       height: 290px;
+      object-fit: scale-down;
     }
   }
 </style>

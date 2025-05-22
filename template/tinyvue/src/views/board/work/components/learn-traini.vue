@@ -10,7 +10,7 @@
             <div class="favorite-title">{{ $t(item.value) }}</div>
             <div class="favorite-description">{{ $t(item.description) }}</div>
             <div class="favorite-info">
-              <span class="favorite-tip tip1">{{ $t(item.label1) }}</span>
+              <span :class="{'favorite-tip':true,'tip1':true ,'news':item?.isNews}">{{ $t(item.label1) }}</span>
               <span class="favorite-tip tip2">{{ $t(item.label2) }}</span>
             </div>
           </div>
@@ -115,6 +115,12 @@ onMounted(() => {
     margin-right: 4px;
   }
 
+  .news{
+    color: #029931;
+    background: #E4F7E9;
+    margin-right: 4px;
+  }
+  
   .tip2 {
     color: #191919;
     background: #f5f5f5;

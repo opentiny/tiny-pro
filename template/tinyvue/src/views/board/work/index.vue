@@ -27,8 +27,8 @@
           </div>
           <div class="card card-home">
             <div class="card-title">{{ $t('work.index.Home') }}</div>
-            <div v-for="item in Home" :key="item as any" class="home-title">
-              <span class="dt-icon"></span>
+            <div v-for="item in Home" :key="item" class="home-title">
+              <span :class="{'dt-icon':true,'is-old':item?.isOld}"></span>
               <span>{{ $t(item.label) }}</span>
               <span v-if="item.value" class="home-tip">{{ $t(item.value) }}</span>
             </div>
@@ -55,7 +55,7 @@ import learntrain from './components/learn-traini.vue';
 const Home = [
   { label: 'work.index.Brave', value: 'work.index.Growth' },
   { label: 'work.index.Termbase',  value: ''},
-  { label: 'work.index.Library',  value: ''},
+  { label: 'work.index.Library',  value: '' ,isOld : true},
 ];
 </script>
 
@@ -197,6 +197,9 @@ const Home = [
     background: #f23030;
     margin-top: 7px;
     margin-right: 16px;
+  }
+  .is-old{
+    background: #ff8800;
   }
 
   .home-tip {
