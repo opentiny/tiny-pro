@@ -6,7 +6,7 @@
    :title="$t('roleInfo.table.bind')" 
    show-footer @close="() => emits('close')">
    <div class="menu-input">
-    <tiny-input v-model="filterText" :placeholder="$t('menu.add.placeholderd')"  @input="inputChange"></tiny-input>
+    <tiny-input v-model="filterText" :placeholder="$t('menu.add.placeholder')"  @input="inputChange"></tiny-input>
   </div>
     <tiny-tree 
     ref="treeRef" 
