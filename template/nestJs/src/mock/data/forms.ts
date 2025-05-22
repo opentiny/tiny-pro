@@ -2,56 +2,6 @@ import { mock } from 'mockjs';
 import { successResponseWrap } from '../utils';
 
 const initBase = mock({
-  Project: [
-    'baseForm.form.label.projectone',
-    'baseForm.form.label.projecttwo',
-    'baseForm.form.label.projectthree',
-  ],
-  rank: [
-    {
-      value: '1',
-      label: '01',
-    },
-    {
-      value: '2',
-      label: '02',
-    },
-    {
-      value: '3',
-      label: '03',
-    },
-    {
-      value: '4',
-      label: '04',
-    },
-    {
-      value: '5',
-      label: '05',
-    },
-  ],
-  person: [
-    {
-      value: 'local',
-      label: 'baseForm.form.label.personone',
-    },
-    {
-      value: 'noemployees',
-      label: 'baseForm.form.label.persontwo',
-    },
-    {
-      value: 'chineseemployees',
-      label: 'baseForm.form.label.personthree',
-    },
-  ],
-  frequency: [
-    'baseForm.form.label.frequencyone',
-    'baseForm.form.label.frequencytwo',
-    'baseForm.form.label.frequencythree',
-    'baseForm.form.label.frequencyfour',
-  ],
-});
-
-const initStep = mock({
   position: [
     {
       value: '1',
@@ -103,7 +53,7 @@ export default [
     url: '/api/step/getdata',
     method: 'get',
     response: () => {
-      return successResponseWrap(initStep);
+      return successResponseWrap(initBase);
     },
   },
 

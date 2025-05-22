@@ -1,71 +1,49 @@
 <template>
-  <div>
-    <tiny-layout>
-      <tiny-row :flex="true" justify="left" class="margin-bottom">
-        <tiny-col :span="9">
-          <div class="col">
-            {{ $t('menu.plan.develop') }}
-            <span>:</span>
-            {{ $t('menu.plan.yes') }}
-          </div>
-        </tiny-col>
-      </tiny-row>
-      <tiny-row :flex="true" justify="left" class="margin-bottom">
-        <tiny-col :span="9">
-          <div class="col">
-            {{ $t('menu.plan.frequency') }}
-            <span>:</span>
-            {{ $t('menu.plan.month') }}
-          </div>
-        </tiny-col>
-      </tiny-row>
-      <tiny-row :flex="true" justify="left" class="margin-bottom">
-        <tiny-col :span="9">
-          <div class="col">
-            {{ $t('menu.plan.goal') }}
-            <span>:</span>
-            {{ $t('menu.plan.trainees') }}
-          </div>
-        </tiny-col>
-      </tiny-row>
-
-      <tiny-row :flex="true" justify="left" class="margin-bottom">
-        <tiny-col :span="9">
-          <div class="col">
-            {{ $t('menu.plan.condition') }}
-            <span>:</span>
-            {{ $t('menu.plan.teacher') }}
-          </div>
-        </tiny-col>
-      </tiny-row>
-      <tiny-row :flex="true" justify="left" class="margin-bottom">
-        <tiny-col :span="9">
-          <div class="col">
-            {{ $t('menu.plan.phase') }}
-            <span>:</span>
-            {{ $t('menu.plan.evaluation') }}
-          </div>
-        </tiny-col>
-      </tiny-row>
-    </tiny-layout>
+  <div class="evaluation-detail">
+    <div class="detail-header">{{ $t('baseForm.form.label.plan') }}</div>
+    <tiny-row :flex="true" class="detail-row" noSpace>
+      <tiny-col :span="3">
+        <div class="title pad-title">
+          {{ $t('menu.plan.develop') }}
+        </div>
+        <div class="content pad-title">
+          {{ $t('menu.plan.yes') }}
+        </div>
+      </tiny-col>
+      <tiny-col :span="3">
+        <div class="title pad-title">
+          {{ $t('menu.plan.frequency') }}
+        </div>
+        <div class="content">
+          {{ $t('menu.plan.month') }}
+        </div>
+      </tiny-col>
+      <tiny-col :span="3">
+        <div class="title pad-title">
+          {{ $t('menu.plan.goal') }}
+        </div>
+        <div class="content pad-title"> {{ $t('menu.plan.trainees') }} </div>
+      </tiny-col>
+      <tiny-col :span="3">
+        <div class="title pad-title">
+          {{ $t('menu.plan.condition') }}
+        </div>
+        <div class="content pad-title"> {{ $t('menu.plan.teacher') }} </div>
+      </tiny-col>
+    </tiny-row>
+    <tiny-row :flex="true" class="detail-row mart_8" noSpace>
+      <tiny-col :span="3">
+        <div class="title pad-title">
+          {{ $t('menu.plan.phase') }}
+        </div>
+        <div class="content pad-title"> {{ $t('menu.plan.evaluation') }} </div>
+      </tiny-col>
+    </tiny-row>
   </div>
 </template>
 
 <script lang="ts" setup>
-  import {
-    Layout as TinyLayout,
-    Row as TinyRow,
-    Col as TinyCol,
-  } from '@opentiny/vue';
+  import { Row as TinyRow, Col as TinyCol } from '@opentiny/vue';
 </script>
 
-<style scoped lang="less">
-  .margin-bottom {
-    margin-top: 15px;
-    margin-bottom: 15px;
-  }
-
-  .col > span {
-    padding: 0 10px;
-  }
-</style>
+<style scoped lang="less"></style>
