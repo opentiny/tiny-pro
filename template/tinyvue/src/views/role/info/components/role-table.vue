@@ -1,23 +1,27 @@
 <script lang="ts" setup>
-  import { nextTick, ref, watch } from 'vue';
+  import { nextTick, reactive, ref, watch } from 'vue';
   import { Role } from '@/store/modules/user/types';
   import {
     Grid as TinyGrid,
     GridColumn as TinyGridColumn,
     Modal,
+    TinySelect 
   } from '@opentiny/vue';
-  import { deleteRole } from '@/api/role';
+  import { IconDel,IconCueL } from '@opentiny/vue-icon';
+  import { deleteRole , updateRole } from '@/api/role';
+  import { Permission } from '@/api/permission';
   import { ITreeNodeData } from '@/router/guard/menu';
   import { useI18n } from 'vue-i18n';
   import useLoading from '@/hooks/loading';
   import { Pager } from '@/types/global';
   import permissionTable from './permission-table.vue';
-
+  
   const props = defineProps<{
     tableData: (Role & { menus: ITreeNodeData[] })[];
     fetchOption: {
       api: (args: { page: Pager }) => any;
     };
+    permissions: Permission[];
     pagerConfig: {
       component: any;
       attrs: Pager;
@@ -27,19 +31,19 @@
 
   const emits = defineEmits<{
     menuUpdate: [ITreeNodeData[], number, Role];
-    roleUpdate: [Role];
     roleDelete: [number];
+    updateRoleClose: [];
   }>();
+  const roleTable = reactive([]);
 
+  const iconDel = IconDel();
+  const iconCueL = IconCueL();
   const { t } = useI18n();
   const grid = ref();
   const { loading, setLoading } = useLoading();
 
   const onMenuUpdate = (data: ITreeNodeData[], roldId: number, role: Role) => {
     emits('menuUpdate', data, roldId, role);
-  };
-  const onRoleUpdate = (row: Role) => {
-    emits('roleUpdate', row);
   };
   const onRoleDelete = (id: number, row) => {
     setLoading(true);
@@ -67,6 +71,37 @@
         setLoading(false);
       });
   };
+  const getPermission = (row:any) => {
+    let permissionDate = ''
+    if (row?.permission.length) {
+      row?.permission.forEach((item, index) => {
+        permissionDate = `${permissionDate} ${row?.permission[index].name}`
+      });
+    }
+    return permissionDate
+  };
+  const onUpdate = (args:any) => {
+    updateRole(args.row)
+      .then(({ data }) => {
+        Modal.message({
+          message: t('baseForm.form.submit.success'),
+          status: 'success',
+        });
+        emits('updateRoleClose');
+      })
+      .catch((error) => {
+        if (error.response && error.response.data) {
+          const errorMessage = error.response.data.message || '未知错误';
+          Modal.message({
+            message: errorMessage,
+            status: 'error',
+          });
+        }
+      })
+      .finally(() => {
+        emits('updateRoleClose');
+      });
+  };
   defineExpose({
     reload: () => {
       grid.value.handleFetch();
@@ -81,44 +116,59 @@
     auto-resize
     :loading="loading"
     :pager="props.pagerConfig"
+     :edit-config="{ trigger: 'click', mode: 'cell', showStatus: true }"
     remote-filter
+    @edit-closed="onUpdate"
   >
-    <tiny-grid-column type="expand">
+    <tiny-grid-column type="expand" width="60">
       <template #default="data">
         <permission-table :permission="data.row.permission" />
       </template>
     </tiny-grid-column>
     <tiny-grid-column
       field="id"
+      width="100"
       :title="$t('roleInfo.table.id')"
     ></tiny-grid-column>
     <tiny-grid-column
       field="name"
       :title="$t('roleInfo.table.name')"
       :filter="props.filter.inputFilter"
+      :editor="{ component: 'input', autoselect: true }"
     ></tiny-grid-column>
-    <tiny-grid-column field="type" :title="$t('roleInfo.table.menu')">
+    <tiny-grid-column
+    field="permissionIds" 
+    :title="$t('roleInfo.table.desc')"
+    show-overflow="tooltip"
+    :editor="{
+      component: TinySelect,
+      attrs: {
+        multiple: true,
+        'collapse-tags': true,
+        'value-key':'id',
+        options: props.permissions,
+        textField: 'name',
+        valueField: 'id'
+      }
+    }">
       <template #default="data">
-        <a
-          v-permission="'role::update'"
-          @click="onMenuUpdate(data.row.menus, data.row.id, data.row)"
-        >
-          {{ $t('roleInfo.table.bind') }}
-        </a>
+          {{ getPermission(data.row) }}
       </template>
     </tiny-grid-column>
     <tiny-grid-column :title="$t('roleInfo.table.operations')" align="center">
       <template #default="data">
+        <iconCueL class="del-icon"></iconCueL>
         <a
           v-permission="'role::update'"
           class="operation-update"
-          @click="onRoleUpdate(data.row)"
+          @click="onMenuUpdate(data.row.menus, data.row.id, data.row)"
         >
-          {{ $t('roleInfo.table.operations.update') }}
+          {{ $t('roleInfo.table.bind') }}
         </a>
+        <iconDel class="del-icon"></iconDel>
         <a
           v-permission="'role::remove'"
-          class="operation-delete"
+          class="operation-update"
           @click="onRoleDelete(data.row.id, data.row)"
         >
           {{ $t('roleInfo.table.operations.delete') }}
@@ -143,5 +193,12 @@
     &-pwd-update {
       color: orange;
     }
+  }
+  .del-icon{
+    fill: #1890ff;
+    margin-right: 8px;
+    margin-left: 16px;;
+    font-size: 16px;
+    margin-top: -3px;
   }
 </style>
