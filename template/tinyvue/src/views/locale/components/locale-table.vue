@@ -39,14 +39,22 @@
     ></tiny-grid-column>
     <tiny-grid-column :title="$t('searchTable.columns.operations')" width="14%">
       <template #default="data">
-        <tiny-button
-          v-permission="'i18n::remove'"
-          type="text"
-          @click="removeLocale(data.row)"
+        <tiny-popconfirm
+          title="确定要删除此词条吗？"
+          type="info"
+          trigger="click"
+          @confirm="removeLocale(data.row)"
         >
-          <IconDel class="operation-icon"></IconDel>
-          {{ $t('locale.remove') }}
-        </tiny-button>
+          <template #reference>
+            <tiny-button
+              v-permission="'i18n::remove'"
+              type="text"
+            >
+              <IconDel class="operation-icon"></IconDel>
+              {{ $t('locale.remove') }}
+            </tiny-button>
+          </template>
+        </tiny-popconfirm>
       </template>
     </tiny-grid-column>
   </tiny-grid>
@@ -65,7 +73,7 @@
     Grid as TinyGrid,
     GridColumn as TinyGridColumn,
     Button as TinyButton,
-    GridToolbar as TinyGridToolbar,
+    Popconfirm as TinyPopconfirm,
     TinyModal,
   } from '@opentiny/vue';
   import { iconDel } from '@opentiny/vue-icon';
@@ -253,31 +261,26 @@
   }
 
   const removeLocale = (row: any) => {
-    TinyModal.confirm({
-      title: '删除确认',
-      message: '确定要删除此词条吗？',
-      onConfirm: () => {
-        setLoading(true);
-        deleteLocale(row.id)
-          .then(() => {
-            localeStore.$patch({
-              locales: localeStore.locales.filter((locale) => locale.id !== row.id),
-            });
-            grid.value.remove(row);
-          })
-          .catch((error) => {
-            if (error.response && error.response.data) {
-              const errorMessage = error.response.data.message || '未知错误';
-              TinyModal.message({
-                message: errorMessage,
-                status: 'error',
-              });
-            }
-          })
-          .finally(() => {
-            setLoading(false);
+    setLoading(true);
+    deleteLocale(row.id)
+      .then(() => {
+        localeStore.$patch({
+          locales: localeStore.locales.filter((locale) => locale.id !== row.id),
+        });
+        grid.value.remove(row);
+      })
+      .catch((error) => {
+        if (error.response && error.response.data) {
+          const errorMessage = error.response.data.message || '未知错误';
+          TinyModal.message({
+            message: errorMessage,
+            status: 'error',
           });
-    }})
+        }
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   const fetchData = ref({
