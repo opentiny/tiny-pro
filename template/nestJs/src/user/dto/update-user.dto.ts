@@ -11,45 +11,15 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
     message: i18nValidationMessage<I18nTranslations>('validation.NOT_EMPTY'),
   })
   email: string;
-  @IsNotEmpty({
-    message: i18nValidationMessage<I18nTranslations>('validation.NOT_EMPTY'),
-  })
   roleIds: number[] = [];
-  @IsNotEmpty({
-    message: i18nValidationMessage<I18nTranslations>('validation.NOT_EMPTY'),
-  })
   department: string;
-  @IsNotEmpty({
-    message: i18nValidationMessage<I18nTranslations>('validation.NOT_EMPTY'),
-  })
   employeeType: string;
-  @IsNotEmpty({
-    message: i18nValidationMessage<I18nTranslations>('validation.NOT_EMPTY'),
-  })
   probationStart: string;
-  @IsNotEmpty({
-    message: i18nValidationMessage<I18nTranslations>('validation.NOT_EMPTY'),
-  })
   probationEnd: string;
-  @IsNotEmpty({
-    message: i18nValidationMessage<I18nTranslations>('validation.NOT_EMPTY'),
-  })
   probationDuration: string;
-  @IsNotEmpty({
-    message: i18nValidationMessage<I18nTranslations>('validation.NOT_EMPTY'),
-  })
   protocolStart: string;
-  @IsNotEmpty({
-    message: i18nValidationMessage<I18nTranslations>('validation.NOT_EMPTY'),
-  })
   protocolEnd: string;
-  @IsNotEmpty({
-    message: i18nValidationMessage<I18nTranslations>('validation.NOT_EMPTY'),
-  })
   address: string;
-  @IsNotEmpty({
-    message: i18nValidationMessage<I18nTranslations>('validation.NOT_EMPTY'),
-  })
   status: number;
   @IsNotEmpty({
     message: i18nValidationMessage<I18nTranslations>('validation.NOT_EMPTY'),

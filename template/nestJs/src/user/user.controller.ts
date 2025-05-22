@@ -89,4 +89,11 @@ export class UserController {
   async updatePwdUser(@Body() body: UpdatePwdUserDto) {
     return this.userService.updatePwdUser(body);
   }
+
+  @Reject()
+  @Post('/batch')
+  @Permission('user:batch-remove')
+  async batchRemoveUser(@Body() emails: string[]) {
+    return this.userService.batchDeleteUser(emails);
+  }
 }

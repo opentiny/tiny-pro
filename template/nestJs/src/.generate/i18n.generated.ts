@@ -13,6 +13,8 @@ export type I18nTranslations = {
             "forbidden": string;
         };
         "user": {
+            "requiredFieldsMissing": string;
+            "userNotFound": string;
             "oldPasswordError": string;
             "userExists": string;
             "userNumberNull": string;
