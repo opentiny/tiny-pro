@@ -5,6 +5,7 @@
       class="locale-add-btn"
       @lang-change="onChange"
       @local-change="onChange"
+      @batch-remove="onRemove"
     />
     <locale-table ref="localTable" />
   </general-layout>
@@ -20,10 +21,13 @@
   const onChange = () => {
     localTable.value.reload();
   };
+  const onRemove = () => {
+    localTable.value.batchRemoveLocale();
+  }
 </script>
 
 <style scoped lang="less">
   .locale-add-btn {
-    padding: 10px 0 10px 10px;
+    padding: 10px 0 24px 10px;
   }
 </style>

@@ -1,9 +1,16 @@
 <template>
   <div>
-    <tiny-button show-footer type="primary" @click="onOpen">
+    <tiny-button show-footer type="primary" @click="onOpen" round>
       {{ $t('locale.add.btn') }}
     </tiny-button>
-    <tiny-dialog-box v-model:visible="open" :title="$t('locale.add.title')">
+    <tiny-button round @click="onBatchRemove">
+      {{ $t('locale.batchRemove') }}
+    </tiny-button>
+    <tiny-dialog-box
+      v-model:visible="open"
+      :title="$t('locale.add.title')"
+      :close-on-click-modal="false"
+      >
       <tiny-form
         ref="localeForm"
         :model="locale"
@@ -62,6 +69,7 @@
     <tiny-dialog-box
       v-model:visible="langTableOpen"
       :title="$t('lang.manage.title')"
+      :close-on-click-modal="false"
       width="60%"
     >
       <lang-table />
@@ -107,6 +115,11 @@
     lang: '' as any,
   });
   const lang = reactive({ name: '' });
+
+  const onBatchRemove = () => {
+    
+    emits('batchRemove') 
+  }
 
   const rules = {
     key: [
