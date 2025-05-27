@@ -32,7 +32,6 @@
     <tiny-grid-column field="locale"  :title="$t('menuInfo.table.locale')"></tiny-grid-column>
     <tiny-grid-column :title="$t('permissionInfo.table.operations')" align="center">
       <template #default="{ row }">
-        <component :is="row.customIcon"></component>
         <a
           v-permission="'menu::update'"
           class="operation-update"
@@ -57,7 +56,7 @@
 
   import { ITreeNodeData } from '@/router/guard/menu';
   import { TinyGrid, TinyGridColumn  } from '@opentiny/vue';
-
+  
   export type Node = {
     data: ITreeNodeData;
     children: Node[];
@@ -66,7 +65,6 @@
     data: ITreeNodeData[];
     localeData: { value: string; label: string }[];
   }>();
-
   const treeOp = computed(() => ({ data: props.data }));
 
   const emits = defineEmits<{

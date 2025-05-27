@@ -100,7 +100,7 @@
     activeNode.value = data;
     readonly.value = false;
   };
-  const onCheck = ({ data }: Node) => {
+  const onCheck = (data : Node) => {
     activeNode.value = data;
     updateModal.value = true;
     readonly.value = true;
@@ -121,12 +121,14 @@
       });
     }
   };
-  const onDelete = ({ data }: Node) => {
+  const onDelete = ( data : Node) => {
+
     setTreeLoading(true);
     const node = useDeepClone(data);
     if (node.parentId === null) {
       node.parentId = -1;
     }
+    
     deleteMenu(Number(node.id.toString()), node.parentId)
       .then(() => {
         TinyModal.message({
