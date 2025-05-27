@@ -41,6 +41,17 @@ export class UserService {
       address,
       status,
     } = createUserDto;
+    
+    // 检查必填字段
+    if (!email || !password || !name) {
+      throw new HttpException(
+        this.i18n.translate('exception.user.requiredFieldsMissing', {
+          lang: I18nContext.current().lang,
+        }),
+        HttpStatus.BAD_REQUEST
+      );
+    }
+
     const userInfo = this.getUserInfo(email);
     if (isInit == true && (await userInfo)) {
       return userInfo;
@@ -318,30 +329,66 @@ export class UserService {
       status,
       name,
     } = updateUserDto;
-    const user = this.getUserInfo(email, ['role']);
-    const roles = this.roleRep.find({
+
+    // 检查必填字段
+    if (!email || !name) {
+      throw new HttpException(
+        this.i18n.translate('exception.user.requiredFieldsMissing', {
+          lang: I18nContext.current().lang,
+        }),
+        HttpStatus.BAD_REQUEST
+      );
+    }
+
+    const user = await this.getUserInfo(email, ['role']);
+    if (!user) {
+      throw new HttpException(
+        this.i18n.translate('exception.user.userNotFound', {
+          lang: I18nContext.current().lang,
+        }),
+        HttpStatus.NOT_FOUND
+      );
+    }
+
+    const roles = roleIds ? await this.roleRep.find({
       where: {
         id: In(roleIds),
       },
-    });
-    const userRoles = (await user).role.map((role) => role.id).join('');
-    if (user) {
-      (await user).name = name;
-      (await user).department = department;
-      (await user).employeeType = employeeType;
-      (await user).probationStart = probationStart;
-      (await user).probationEnd = probationEnd;
-      (await user).probationDuration = probationDuration;
-      (await user).protocolStart = protocolStart;
-      (await user).protocolEnd = protocolEnd;
-      (await user).address = address;
-      (await user).status = status;
-      (await user).role = await roles;
-    }
-    const newProfile = await this.userRep.save(await user);
-    if (userRoles !== roleIds.join('')) {
+    }) : user.role;
+
+    const userRoles = user.role.map((role) => role.id).join('');
+
+    // 更新用户信息
+    user.name = name;
+    if (department !== undefined) user.department = department;
+    if (employeeType !== undefined) user.employeeType = employeeType;
+    if (probationStart !== undefined) user.probationStart = probationStart;
+    if (probationEnd !== undefined) user.probationEnd = probationEnd;
+    if (probationDuration !== undefined) user.probationDuration = probationDuration;
+    if (protocolStart !== undefined) user.protocolStart = protocolStart;
+    if (protocolEnd !== undefined) user.protocolEnd = protocolEnd;
+    if (address !== undefined) user.address = address;
+    if (status !== undefined) user.status = status;
+    user.role = roles;
+
+    const newProfile = await this.userRep.save(user);
+    if (userRoles !== (roleIds || []).join('')) {
       await this.authService.kickOut(email);
     }
     return newProfile;
+  }
+
+  async batchDeleteUser(emails: string[]) {
+   const results = []
+   for (const email of emails) {
+    try {
+      const result = await this.deleteUser(email);
+      results.push(result)
+    } catch (error) {
+      // 可以根据需求处理错误，这里简单记录
+      console.error(`删除用户 ${email} 时出错:`, error);
+    }
+   }
+   return results
   }
 }

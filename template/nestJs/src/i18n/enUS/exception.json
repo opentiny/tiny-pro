@@ -6,6 +6,8 @@
     "forbidden": "Need `{permission}` permission, but you don't have it"
   },
   "user":{
+    "requiredFieldsMissing": "required fields missing",
+    "userNotFound": "user not found",
     "oldPasswordError": "Old password error",
     "userExists": "User exists",
     "userNumberNull": "Currently the last user, deletion is prohibited"

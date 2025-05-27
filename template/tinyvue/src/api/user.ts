@@ -103,3 +103,7 @@ export function updatePwdAdmin(data: any) {
 export function updatePwdUser(data: any) {
   return axios.patch('/api/user/updatePwd', data);
 }
+
+export const batchDeleteUsers = (emails: string[]) => {
+  return axios.post('/api/user/batch', emails)
+}
