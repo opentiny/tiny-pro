@@ -15,7 +15,8 @@
           </div>
         </div>
         <div class="card">
-          <div class="card-title">{{ $t('work.index.coach') }}</div>
+          <div class="card-title">{{ $t('work.index.trainees') }}</div>
+          <div class="card-title card-coach">{{ $t('work.index.coachNum') }}</div>
           <div>
             <learncoach></learncoach>
           </div>
@@ -101,6 +102,7 @@ const Home = [
       margin-top: 16px;
       padding: 24px;
       border-radius: 8px;
+      position: relative;
 
       .card-title {
         height: 24px;
@@ -109,6 +111,11 @@ const Home = [
         font-weight: 700;
         margin-bottom: 16px;
 
+      }
+      .card-coach{
+        position: absolute;
+        top: 24px;
+        left: calc(50% + 24px);
       }
     }
 
