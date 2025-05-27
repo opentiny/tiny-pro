@@ -76,4 +76,11 @@ export class I18Controller {
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.i18Service.remove(id);
   }
+
+  @Reject()
+  @Permission('i18n::batch-remove')
+  @Post('/batch')
+  batchRemove(@Body() ids: number[]) {
+    return this.i18Service.batchRemove(ids);
+  }
 }
