@@ -174,4 +174,17 @@ export class I18Service {
     await this.i18.remove(item);
     return item;
   }
+
+  async batchRemove(ids: number[]) {
+   const result = []
+    for (const id of ids) {
+     try {
+      const item = await this.remove(id);
+      result.push(item); 
+     } catch (error) {
+      console.log(`删除词条 ${id} 时出错`, error);
+     }
+    } 
+    return result;
+  }
 }

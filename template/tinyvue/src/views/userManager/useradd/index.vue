@@ -170,7 +170,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, onMounted, reactive, ref } from 'vue';
+  import { computed, onMounted, reactive, ref, defineProps } from 'vue';
   import { useI18n } from 'vue-i18n';
   import {
     Select as TinySelect,
@@ -188,6 +188,11 @@
   import { getSimpleDate } from '@/utils/time';
   import { registerUser } from '@/api/user';
   import { getAllRole } from '@/api/role';
+
+  const props = defineProps({
+    statusData: Object,
+    projectData: Object,
+  });
 
   // 初始化请求数据
   onMounted(() => {
@@ -211,32 +216,6 @@
     confirm: [];
   }>();
 
-  const projectData = [
-    {
-      value: '1',
-      label: 'Social Recruitment',
-    },
-    {
-      value: '2',
-      label: 'School Recruitment',
-    },
-    {
-      value: '3',
-      label: 'Job Transfer',
-    },
-  ];
-
-  const statusData = [
-    {
-      value: 1,
-      label: 'Active',
-    },
-    {
-      value: 2,
-      label: 'Disabled',
-    },
-  ];
-
   // 校验规则
   const rulesType = {
     required: true,
@@ -252,16 +231,7 @@
     return {
       email: [rulesType],
       password: [rulesType],
-      department: [rulesType],
-      roleIds: [rulesSelect],
-      employeeType: [rulesSelect],
-      probationDate: [rulesSelect],
-      probationDuration: [rulesType],
-      protocolStart: [rulesSelect],
-      protocolEnd: [rulesSelect],
-      name: [rulesType],
-      address: [rulesType],
-      status: [rulesSelect],
+      name: [rulesType]
     };
   });
 
@@ -270,26 +240,16 @@
       .validate()
       .then(async () => {
         let data = state.userData;
-        if (data.status === 'Active') {
-          data.status = 1;
-        } else {
-          data.status = 2;
-        }
         let newTemp = {
-          email: data.email,
-          password: data.password,
-          name: data.name,
-          address: data.address,
-          department: data.department,
-          roleIds: [data.roleIds],
-          employeeType: data.employeeType,
-          probationStart: getSimpleDate(data.probationDate[0]),
-          probationEnd: getSimpleDate(data.probationDate[1]),
-          probationDuration: data.probationDuration,
-          protocolStart: getSimpleDate(data.protocolStart),
-          protocolEnd: getSimpleDate(data.protocolEnd),
-          status: data.status,
+          ...data
         };
+        newTemp.roleIds && (newTemp.roleIds = [data.roleIds])
+        newTemp.probationStart && (newTemp.probationStart = getSimpleDate(data.probationDate[0]))
+        newTemp.probationEnd && (newTemp.probationEnd = getSimpleDate(data.probationDate[1]))
+        newTemp.protocolStart && (newTemp.protocolStart = getSimpleDate(data.protocolStart))
+        newTemp.protocolEnd && (newTemp.protocolEnd = getSimpleDate(data.protocolEnd))
+        newTemp.status && (newTemp.status = props.statusData.find(item => item.label === data.status).value)
+        console.log('12', newTemp)
 
         try {
           await registerUser(newTemp);
