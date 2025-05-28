@@ -4,7 +4,6 @@
     :data="props.data" 
     :tree-config="{ children: 'children' }"
     >
-    <tiny-grid-column type="selection"  width="40"></tiny-grid-column>
     <tiny-grid-column 
     width="250" 
     field="locale" 
@@ -24,14 +23,15 @@
     <tiny-grid-column field="order" :title="$t('menuInfo.table.order')"></tiny-grid-column>
     <tiny-grid-column field="customIcon" :title="$t('menuInfo.table.icon')">
       <template #default="{ row }">
-        <component :is="row.customIcon"></component>
-    </template>
+          {{ row.customIcon }}
+      </template>
     </tiny-grid-column>
     <tiny-grid-column field="component" :title="$t('menuInfo.table.component')"></tiny-grid-column>
     <tiny-grid-column field="url"  :title="$t('menuInfo.table.path')" ></tiny-grid-column>
     <tiny-grid-column field="locale"  :title="$t('menuInfo.table.locale')"></tiny-grid-column>
-    <tiny-grid-column :title="$t('permissionInfo.table.operations')" align="center">
+    <tiny-grid-column :title="$t('permissionInfo.table.operations')" align="center" width="200" >
       <template #default="{ row }">
+        <iconEdit class="del-icon"></iconEdit>
         <a
           v-permission="'menu::update'"
           class="operation-update"
@@ -39,13 +39,18 @@
         >
           {{ $t('menuInfo.table.operations.update') }}
         </a>
-        <a
-        v-permission="'menu::remove'"
-        class="operation-update"
-        @click="emits('delete', row)"
-      >
-        {{ $t('menuInfo.table.operations.delete') }}
-      </a>
+        <tiny-popconfirm :title="$t('menuInfo.modal.title.confirm')" type="warning" trigger="click" @confirm="confirm(row)">
+          <template #reference>
+            <iconDel class="del-icon"></iconDel>
+            <a
+              v-permission="'menu::remove'"
+              class="operation-update"
+            >
+              {{ $t('menuInfo.table.operations.delete') }}
+          </a>
+          </template>
+        </tiny-popconfirm>
+
       </template>
     </tiny-grid-column>
   </tiny-grid>
@@ -53,9 +58,9 @@
 
 <script lang="ts" setup>
   import { computed } from 'vue';
-
+  import { IconDel, IconEdit } from '@opentiny/vue-icon';
   import { ITreeNodeData } from '@/router/guard/menu';
-  import { TinyGrid, TinyGridColumn  } from '@opentiny/vue';
+  import { TinyGrid, TinyGridColumn ,TinyPopconfirm  } from '@opentiny/vue';
   
   export type Node = {
     data: ITreeNodeData;
@@ -66,12 +71,17 @@
     localeData: { value: string; label: string }[];
   }>();
   const treeOp = computed(() => ({ data: props.data }));
-
+  const iconDel = IconDel();
+  const iconEdit = IconEdit();
   const emits = defineEmits<{
     check: [Node];
     update: [Node];
     delete: [Node];
   }>();
+
+  const confirm = (row) =>{
+    emits('delete', row)
+  }
 </script>
 
 <style scoped lang="less">
@@ -90,5 +100,12 @@
       padding-right: 10px;
       color: orange;
     }
+  }
+  .del-icon{
+    fill: #1890ff;
+    margin-right: 8px;
+    margin-left: 16px;;
+    font-size: 16px;
+    margin-top: -3px;
   }
 </style>

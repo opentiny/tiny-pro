@@ -35,9 +35,14 @@
             </tiny-grid-column>
             <tiny-grid-column :title="$t('permissionInfo.table.operations')" align="center">
               <template #default="data">
-                <a v-permission="'permission::remove'" class="operation-update" @click="handleDelete(data.row)">
-                  {{ $t('permissionInfo.table.operations.delete') }}
-                </a>
+                <tiny-popconfirm :title="$t('menuInfo.modal.title.confirm')" type="warning" trigger="click" @confirm="handleDelete(data.row)">
+                  <template #reference>
+                    <iconDel class="del-icon"></iconDel>
+                    <a v-permission="'permission::remove'" class="operation-update">
+                      {{ $t('permissionInfo.table.operations.delete') }}
+                    </a>
+                  </template>
+                </tiny-popconfirm>
               </template>
             </tiny-grid-column>
           </tiny-grid>
@@ -50,27 +55,28 @@
       :lock-scroll="true" 
       show-header 
       show-footer 
-      mask-closable="true"
+      width="700"  
       height="auto" 
       :title="$t('permissionInfo.modal.title.add')"
       >
         <template #default>
           <tiny-form ref="addForm" :model="state.permissionAddData" :rules="rules" label-position="top">
-            <tiny-form-item :label="$t('permissionInfo.modal.input.permission')" prop="desc">
-              <tiny-input v-model="state.permissionAddData.desc"></tiny-input>
-            </tiny-form-item>
             <tiny-form-item :label="$t('permissionInfo.modal.input.name')" prop="name">
               <tiny-input v-model="state.permissionAddData.name"></tiny-input>
+            </tiny-form-item>
+            <tiny-form-item :label="$t('permissionInfo.modal.input.permission')">
+              <tiny-input v-model="state.permissionAddData.desc"></tiny-input>
             </tiny-form-item>
           </tiny-form>
         </template>
         <template #footer>
-          <tiny-button round type="primary" @click="handlePermissionAddSubmit">{{
-            $t('menu.btn.confirm')
-          }}</tiny-button>
           <tiny-button round @click="handlePermissionAddCancel">{{
             $t('menu.btn.cancel')
           }}</tiny-button>
+          <tiny-button round type="primary" @click="handlePermissionAddSubmit">{{
+            $t('menu.btn.confirm')
+          }}</tiny-button>
+  
         </template>
       </tiny-modal>
     </div>
@@ -92,8 +98,10 @@ import {
   Col as TinyCol,
   Input as TinyInput,
   Modal,
+  TinyPopconfirm,
   Layout as TinyLayout,
 } from '@opentiny/vue';
+import { IconDel } from '@opentiny/vue-icon';
 import { useUserStore } from '@/store';
 import {
   getAllPermission,
@@ -112,6 +120,7 @@ import {
 
 const roleGrid = ref();
 const addForm = ref();
+const iconDel = IconDel();
 
 const { t } = useI18n();
 
@@ -134,13 +143,13 @@ const rulesType = {
 const rules = computed(() => {
   return {
     name: [rulesType],
-    desc: [rulesType],
   };
 });
 
 const filter = {
   inputFilter: true,
 };
+
 
 const pagerConfig = reactive({
   component: TinyPager,
@@ -220,7 +229,7 @@ async function handlePermissionUpdateSubmit(args:any) {
       try {
         await updatePermission(newTemp);
         Modal.message({
-          message: t('baseForm.form.submit.success'),
+          message: t('permissionInfo.edit.success'),
           status: 'success',
         });
         roleGrid.value.handleFetch();
@@ -252,7 +261,7 @@ async function handlePermissionAddSubmit() {
       try {
         await createPermission(newTemp);
         Modal.message({
-          message: t('baseForm.form.submit.success'),
+          message: t('permissionInfo.add.success'),
           status: 'success',
         });
         state.isPermissionAdd = false;
@@ -307,5 +316,12 @@ async function handlePermissionAddCancel() {
   &-pwd-update {
     color: orange;
   }
+}
+.del-icon{
+  fill: #1890ff;
+  margin-right: 8px;
+  margin-left: 16px;;
+  font-size: 16px;
+  margin-top: -3px;
 }
 </style>

@@ -5,7 +5,8 @@
     Grid as TinyGrid,
     GridColumn as TinyGridColumn,
     Modal,
-    TinySelect 
+    TinySelect,
+    TinyPopconfirm
   } from '@opentiny/vue';
   import { IconDel,IconCueL } from '@opentiny/vue-icon';
   import { deleteRole , updateRole } from '@/api/role';
@@ -84,7 +85,7 @@
     updateRole(args.row)
       .then(({ data }) => {
         Modal.message({
-          message: t('baseForm.form.submit.success'),
+          message: t('permissionInfo.edit.success'),
           status: 'success',
         });
         emits('updateRoleClose');
@@ -165,14 +166,19 @@
         >
           {{ $t('roleInfo.table.bind') }}
         </a>
-        <iconDel class="del-icon"></iconDel>
-        <a
-          v-permission="'role::remove'"
-          class="operation-update"
-          @click="onRoleDelete(data.row.id, data.row)"
-        >
-          {{ $t('roleInfo.table.operations.delete') }}
-        </a>
+        <tiny-popconfirm :title="$t('menuInfo.modal.title.confirm')" type="warning" trigger="click" @confirm="onRoleDelete(data.row.id, data.row)">
+          <template #reference>
+            <iconDel class="del-icon"></iconDel>
+
+            <a
+            v-permission="'role::remove'"
+            class="operation-update"
+          >
+            {{ $t('roleInfo.table.operations.delete') }}
+          </a>
+          </template>
+        </tiny-popconfirm>
+
       </template>
     </tiny-grid-column>
   </tiny-grid>

@@ -157,7 +157,6 @@
         return flushRouter();
       })
       .catch((error) => {
-        console.log(error);
         if (error.response && error.response.data) {
           const errorMessage = error.response.data.message || '未知错误';
           TinyModal.message({
@@ -179,7 +178,7 @@
     createRole(role)
       .then(({ data }) => {
         Modal.message({
-          message: t('baseForm.form.submit.success'),
+          message: t('roleInfo.modal.add.success'),
           status: 'success',
         });
         tableData.value.push({
