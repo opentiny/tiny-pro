@@ -50,7 +50,7 @@ const options1 = ref({
     type: 'scroll',
     pageIconSize: 10,
   },
-  dataZonn: {
+  dataZoom: {
     show: false,
   },
   color: ['#1476ff', '#0bb8b2'],
@@ -120,7 +120,7 @@ const options2 = ref({
     name: '人',
     show: true,
     axisLabel: {
-      interva: 0,
+      intervar: 0,
       show: true,
     },
   },
@@ -137,7 +137,7 @@ const options2 = ref({
     type: 'scroll',
     pageIconSize: 10,
   },
-  dataZonn: {
+  dataZoom: {
     show: false,
   },
   color: ['#F2E70C', '#FFB700', '#FF8800', '#F23030'],
