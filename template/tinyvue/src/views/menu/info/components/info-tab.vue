@@ -70,7 +70,7 @@
         createMenu(menuInfo)
           .then(() => {
             TinyModal.message({
-              message: t('baseForm.form.submit.success'),
+              message: t('menuInfo.modal.add.success'),
               status: 'success',
             });
             addModal.value = false;
@@ -95,12 +95,12 @@
   const onClose = () => {
     activeNode.value = DEFAULT_NODE;
   };
-  const onUpdate = ({ data }: Node) => {
+  const onUpdate = ( data : Node) => {
     updateModal.value = true;
     activeNode.value = data;
     readonly.value = false;
   };
-  const onCheck = ({ data }: Node) => {
+  const onCheck = (data : Node) => {
     activeNode.value = data;
     updateModal.value = true;
     readonly.value = true;
@@ -121,16 +121,18 @@
       });
     }
   };
-  const onDelete = ({ data }: Node) => {
+  const onDelete = ( data : Node) => {
+
     setTreeLoading(true);
     const node = useDeepClone(data);
     if (node.parentId === null) {
       node.parentId = -1;
     }
+  
     deleteMenu(Number(node.id.toString()), node.parentId)
       .then(() => {
         TinyModal.message({
-          message: '已删除',
+          message: '删除成功',
           status: 'success',
         });
         return fetchMenu();
@@ -179,7 +181,7 @@
         })
           .then(() => {
             TinyModal.message({
-              message: t('baseForm.form.submit.success'),
+              message: t('menuInfo.modal.edit.success'),
               status: 'success',
             });
             setTimeout(() => {
@@ -257,6 +259,7 @@
       <menu-tree
         v-loading="treeLoading"
         :data="i18nMenuData"
+        :locale-data="localeData"
         @update="onUpdate"
         @check="onCheck"
         @delete="onDelete"
@@ -264,8 +267,9 @@
       <tiny-modal
         v-model="addModal"
         show-footer
-        :mask-closable="true"
         resize
+        width="700"  
+        height="auto" 
         :title="$t('menuInfo.modal.title.add')"
         @close="onAddMenuClose"
       >
@@ -276,8 +280,12 @@
           :locales="localeData"
         />
         <template #footer>
+          <tiny-button round  @click="onAddMenuClose">{{
+            $t('menu.btn.cancel')
+          }}</tiny-button>
           <tiny-button
             type="primary"
+            round
             :loading="addLoading"
             @click="onClickAdd"
             >{{ $t('menu.btn.confirm') }}</tiny-button

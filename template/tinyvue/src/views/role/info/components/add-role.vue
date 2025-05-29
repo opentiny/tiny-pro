@@ -69,8 +69,8 @@
     lock-scroll
     show-header
     show-footer
-    mask-closable
     height="auto"
+    width="700"  
     :title="$t('roleInfo.modal.title.add')"
   >
     <tiny-form ref="form" :model="data" :rules="rules" label-position="top">
@@ -97,10 +97,10 @@
       </tiny-form-item>
     </tiny-form>
     <template #footer>
-      <tiny-button type="primary" @click="onConfirm">{{
+      <tiny-button round  @click="onCancel">{{ $t('menu.btn.cancel') }}</tiny-button>
+      <tiny-button type="primary" round  @click="onConfirm">{{
         $t('menu.btn.confirm')
       }}</tiny-button>
-      <tiny-button @click="onCancel">{{ $t('menu.btn.cancel') }}</tiny-button>
     </template>
   </tiny-modal>
 </template>

@@ -94,7 +94,6 @@
     return {
       name: [rulesType],
       order: [rulesType],
-      icon: [rulesSelect],
       component: [rulesType],
       path: [rulesType],
       locale: [rulesSelect],

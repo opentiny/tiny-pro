@@ -38,6 +38,16 @@
       >
       </tiny-select>
     </tiny-form-item>
+    <tiny-form-item :label="$t('menuInfo.table.icon')" prop="icon">
+      <tiny-select
+        v-model="menuInfo.icon"
+        :placeholder="$t('baseForm.form.label.placeholder')"
+        filterable
+        no-match-text="No Match"
+        :options="iconDatas"
+        optimization
+      ></tiny-select>
+    </tiny-form-item>
     <tiny-form-item :label="$t('menuInfo.table.component')" prop="component">
       <tiny-input v-model="menuInfo.component"></tiny-input>
     </tiny-form-item>
@@ -55,8 +65,9 @@
     Select as TinySelect,
   } from '@opentiny/vue';
   import { ITreeNodeData } from '@/router/guard/menu';
-  import { computed, reactive, ref, unref } from 'vue';
+  import { computed, reactive, ref, unref , h} from 'vue';
   import { useDeepClone } from '@/hooks/useDeepClone';
+  import { icons } from '@opentiny/icons/json/icons.json';
 
   const props = defineProps<{
     node: ITreeNodeData;
@@ -109,12 +120,19 @@
     label: props.node.label,
     url: props.node.url,
     component: props.node.component,
-    customIcon: props.node.customIcon,
+    icon: props.node.customIcon,
     menuType: props.node.menuType,
     parentId: props.node.parentId,
     order: props.node.order,
     locale: props.node.locale,
     oldLabel: props.node.oldLabel,
+  });
+  const iconDatas = Object.keys(icons).map((key) => {
+    return {
+      label: key,
+      value: key,
+      icon: h('i', { class: `ci-${key}`, style: { fontSize: '18px',  marginRight: '6px' } }),
+    };
   });
 
   const getMenuInfo = () => {
