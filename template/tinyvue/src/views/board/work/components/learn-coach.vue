@@ -1,224 +1,216 @@
 <template>
-  <div class="coach-select">
-    <transition-fade-down-group>
-      <h3>{{ $t('work.index.coach') }}</h3>
-      <tiny-select
-        v-model="state.project"
-        :placeholder="$t('baseForm.form.label.placeholder')"
-        filterable
-      >
-        <tiny-option
-          v-for="item in state.options"
-          :key="item.value"
-          :label="$t(item.label)"
-          :value="item.value"
-        ></tiny-option>
-      </tiny-select>
-    </transition-fade-down-group>
-  </div>
   <div>
-    <tiny-layout>
-      <tiny-row :flex="true" justify="center">
-        <transition-fade-slide-group>
-          <tiny-col :span="8">
-            <div class="col">
-              <div class="left">
-                <div class="left-content">
-                  <span class="num">{{ number[0] }}</span>
-                  <span>&nbsp;/ {{ $t('work.index.Person') }}</span>
-                </div>
-                <div class="left-title">{{ $t('work.index.trainees') }}</div>
-              </div>
-              <div class="divider"></div>
-              <div class="right">
-                <img src="@/assets/images/coach-1.png" />
-              </div>
-            </div>
-          </tiny-col>
-          <tiny-col :span="8">
-            <div class="col">
-              <div class="left">
-                <div class="left-content">
-                  <span class="num">{{ number[1] }}</span>
-                  <span>&nbsp;/ {{ $t('work.index.Person') }}</span>
-                </div>
-                <div class="left-title">{{ $t('work.index.coachNum') }}</div>
-              </div>
-              <div class="divider"></div>
-              <div class="right">
-                <img src="@/assets/images/coach-2.png" />
-              </div>
-            </div>
-          </tiny-col>
-        </transition-fade-slide-group>
-      </tiny-row>
-    </tiny-layout>
+    <div class="chart">
+      <div class="left-chart">
+        <tiny-chart-bar ref="barRef" width="100%" height="272px" :options="options1"></tiny-chart-bar>
+      </div>
+      <div class="right-chart">
+        <tiny-chart-line ref="lineRef" width="100%" height="272px" :options="options2"></tiny-chart-line>
+      </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-  import {
-    Layout as TinyLayout,
-    Row as TinyRow,
-    Col as TinyCol,
-    Select as TinySelect,
-    Option as TinyOption,
-    Loading,
-  } from '@opentiny/vue';
-  import { reactive, onMounted, watch, ref } from 'vue';
-  import { getUserData, getUserChange } from '@/api/board';
-  import transitionFadeSlideGroup from '@/components/transition/transition-fade-slide-group.vue';
+import { ref, nextTick, onMounted } from 'vue';
+import transitionFadeSlideGroup from '@/components/transition/transition-fade-slide-group.vue';
+import { TinyHuichartsBar as TinyChartBar, TinyHuichartsLine as TinyChartLine } from '@opentiny/vue-huicharts'
 
-  // 加载效果
-  const state = reactive<{
-    loading: any;
-    options: any;
-    project: string;
-  }>({
-    loading: null,
-    options: [] as any,
-    project: '',
-  });
-
-  // 请求数据接口方法
-  const fetchData = async () => {
-    state.loading = Loading.service({
-      text: 'loading...',
-      target: document.getElementById('container'),
-      background: 'rgba(0, 0, 0, 0.7)',
-    });
-    try {
-      const { data } = await getUserData();
-      state.options = data.options;
-    } finally {
-      state.loading.close();
+// 加载效果
+const options1 = ref({
+  xAxis:
+  {
+    data: 'xkey',
+    show: true,
+    ellipsis: {
+      labelWidth: 30,
+      overflow: "truncate"
     }
-  };
-
-  // 初始化请求数据
-  onMounted(() => {
-    fetchData();
-  });
-
-  // 切换数据
-  let number = ref([]);
-  const fetchSelect = async (param: string) => {
-    const { data } = await getUserChange(param);
-    number.value = data;
-  };
-
-  // 切换数据
-  watch(
-    state,
-    (newValue, oldValue) => {
-      fetchSelect(newValue.project);
+  },
+  yAxis: {
+    name: 'Mbps',
+    show: true,
+    splitNumber: 5,
+    axisLabel: {
+      show: true,
     },
-    { immediate: true },
-  );
+  },
+  direction: 'vertical',
+  type: 'stack',
+  padding: [48, 0, 4, 0],
+  legend: {
+    show: true,
+    position: {
+      top: 4,
+      right: '0',
+    },
+    textStyle: {
+      padding: [-2, 0, 0, 0]
+    },
+    type: 'scroll',
+    pageIconSize: 10,
+  },
+  dataZoom: {
+    show: false,
+  },
+  color: ['#1476ff', '#0bb8b2'],
+  data: [
+    {
+      未完成: 100,
+      已完成: 380,
+      xkey: '1月',
+    },
+    {
+      未完成: 100,
+      已完成: 420,
+      xkey: '2月',
+    },
+    {
+      未完成: 100,
+      已完成: 780,
+      xkey: '3月',
+    },
+    {
+      未完成: 100,
+      已完成: 600,
+      xkey: '4月',
+    },
+    {
+      未完成: 100,
+      已完成: 680,
+      xkey: '5月',
+    },
+    {
+      未完成: 100,
+      已完成: 80,
+      xkey: '6月',
+    },
+    {
+      未完成: 100,
+      已完成: 380,
+      xkey: '7月',
+    },
+    {
+      未完成: 100,
+      已完成: 380,
+      xkey: '8月',
+    },
+    {
+      未完成: 100,
+      已完成: 380,
+      xkey: '9月',
+    },
+    {
+      未完成: 100,
+      已完成: 380,
+      xkey: '10月',
+    },
+  ]
+})
+const options2 = ref({
+  smooth: true,
+  area: true,
+  stack: true,
+  xAxis:
+  {
+    data: 'xkey',
+    show: true,
+  },
+  yAxis: {
+    name: '人',
+    show: true,
+    axisLabel: {
+      intervar: 0,
+      show: true,
+    },
+  },
+  padding: [48, 0, 4, 0],
+  legend: {
+    show: true,
+    position: {
+      top: 4,
+      right: '0',
+    },
+    textStyle: {
+      padding: [-2, 0, 0, 0]
+    },
+    type: 'scroll',
+    pageIconSize: 10,
+  },
+  dataZoom: {
+    show: false,
+  },
+  color: ['#F2E70C', '#FFB700', '#FF8800', '#F23030'],
+  data: [
+    {
+      财务部: 200,
+      研发部: 150,
+      xkey: '1月',
+      运营部: 100,
+      人力部: 50,
+    },
+    {
+      财务部: 400,
+      研发部: 350,
+      xkey: '2月',
+      运营部: 300,
+      人力部: 250,
+    },
+    {
+      财务部: 200,
+      研发部: 100,
+      xkey: '3月',
+      运营部: 500,
+      人力部: 100,
+    },
+    {
+      财务部: 500,
+      研发部: 450,
+      xkey: '4月',
+      运营部: 400,
+      人力部: 300,
+    },
+    {
+      财务部: 300,
+      研发部: 350,
+      xkey: '5月',
+      运营部: 300,
+      人力部: 250,
+    },
+    {
+      财务部: 200,
+      研发部: 150,
+      xkey: '6月',
+      运营部: 100,
+      人力部: 50,
+    },
+
+  ]
+})
+const barRef = ref()
+const lineRef = ref()
+onMounted(() => {
+    setTimeout(() => {
+      barRef.value.resize()
+      lineRef.value.resize()
+    }, 200)
+})
+
 </script>
 
 <style scoped lang="less">
-  .col {
-    display: flex;
-    justify-content: space-around;
-    min-height: 150px;
-    text-align: center;
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.05);
-  }
+.chart {
+  display: flex;
+  width: 100%;
+  gap: 40px;
+  min-height: 272px;
+}
 
-  .col:hover {
-    box-shadow: 0 3px 10px 0 rgb(64 98 225 / 45%);
-  }
+.left-chart {
+  width: 50%;
+}
 
-  .num {
-    color: #575d6c;
-    font-weight: 600;
-    font-size: 30px;
-    font-family:
-      PingFang SC,
-      PingFang SC-PingFang SC;
-    line-height: 36px;
-    text-align: left;
-  }
-
-  .left {
-    width: 50%;
-  }
-
-  .right {
-    width: 50%;
-  }
-
-  .left,
-  .right {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .left-title {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #4e5969;
-    font-weight: normal;
-    font-size: 18px;
-    line-height: 14px;
-  }
-
-  .left-content {
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    padding-bottom: 15px;
-  }
-
-  .divider {
-    width: 1px;
-    height: 41px;
-    margin: 0 20px;
-    margin-top: 8%;
-    background: #7b7e84;
-    opacity: 0.3;
-  }
-
-  .coach-select {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 8px;
-
-    h3 {
-      width: 20%;
-      color: #575d6c;
-      font-size: 16px;
-      line-height: 14px;
-      text-align: left;
-    }
-
-    div {
-      width: 323px;
-    }
-
-    :deep(.tiny-input) {
-      background-color: #f5f6f7;
-
-      input {
-        border-radius: 17px;
-      }
-    }
-  }
-  // responsive
-  @media (max-width: @screen-md) {
-    .num {
-      font-size: 24px;
-    }
-
-    .left-title {
-      font-size: 10px;
-    }
-  }
+.right-chart {
+  width: 50%;
+}
 </style>
