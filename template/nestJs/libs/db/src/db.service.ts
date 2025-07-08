@@ -15,7 +15,7 @@ export class DbService implements TypeOrmOptionsFactory {
       dropSchema: false, // 为true时启动时删除表结构
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
-      synchronize: process.env.DATABASE_SYNCHRONIZE === 'true',
+      // synchronize: process.env.DATABASE_SYNCHRONIZE === 'true',
       autoLoadEntities: process.env.DATABASE_AUTOLOADENTITIES === 'true',
     };
   }
