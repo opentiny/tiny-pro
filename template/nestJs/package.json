@@ -4,6 +4,8 @@
   "description": "Nest TypeScript starter repository",
   "license": "MIT",
   "scripts": {
+    "migrate:gen": "pnpm build && cross-env GEN_MIGRATION=TinyPro node dist/main.js",
+    "migrate:run": "node migrate.js",
     "prebuild": "rimraf dist",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -33,7 +35,7 @@
     "dotenv": "^16.4.5",
     "ioredis": "^5.4.1",
     "mockjs": "^1.1.0",
-    "mysql2": "3.4.3",
+    "mysql2": "^3.14.0",
     "nestjs-i18n": "^10.4.5",
     "nestjs-typeorm-paginate": "^4.0.4",
     "redis": "^4.6.15",
@@ -42,7 +44,7 @@
     "rxjs": "7.8.1",
     "sequelize": "6.32.1",
     "sequelize-typescript": "2.1.5",
-    "typeorm": "^0.3.20",
+    "typeorm": "^0.3.22",
     "typescript": "5.1.6"
   },
   "devDependencies": {
@@ -56,6 +58,7 @@
     "@types/supertest": "2.0.12",
     "@typescript-eslint/eslint-plugin": "7.18.0",
     "@typescript-eslint/parser": "7.18.0",
+    "cross-env": "^7.0.3",
     "eslint": "8.42.0",
     "eslint-config-prettier": "8.8.0",
     "eslint-plugin-import": "2.27.5",
