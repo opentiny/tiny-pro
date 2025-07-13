@@ -1,4 +1,4 @@
-package com.TinyPro.config;
+package com.TinyPro.config.i18n;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,11 +19,11 @@ public class I18nConfig {
     }
 
     @Bean
-    public ResourceBundleMessageSource messageSource() {
+    public PrefixedMessageSource messageSource() {
         ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
         messageSource.setBasename("i18n/messages");
         messageSource.setDefaultEncoding("UTF-8");
         messageSource.setUseCodeAsDefaultMessage(true);
-        return messageSource;
+        return new PrefixedMessageSource(messageSource ,"exception.");
     }
 }

@@ -2,7 +2,7 @@ package com.TinyPro.service.imp;
 
 import com.TinyPro.entity.po.Menu;
 import com.TinyPro.mappers.MenuMapper;
-import com.TinyPro.service.MenuService;
+import com.TinyPro.service.IMenuService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements MenuService{
+public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements IMenuService{
     @Autowired
     private MenuMapper menuMapper;
 

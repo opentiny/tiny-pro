@@ -1,0 +1,20 @@
+package com.TinyPro.service.imp;
+
+import com.TinyPro.entity.po.User;
+import com.TinyPro.mappers.UserMapper;
+import com.TinyPro.service.IUserService;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class IUserServiceImpl extends ServiceImpl<UserMapper,User>implements IUserService {
+    @Autowired
+    private UserMapper userMapper;
+    @Override
+    public User create(User user) {
+        userMapper.insert(user);
+        return user;
+
+    }
+}
