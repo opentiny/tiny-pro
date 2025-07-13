@@ -68,7 +68,7 @@ describe('UserService', () => {
   describe('create', () => {
     it('should return existing user if isInit is true and user exists', async () => {
       jest.spyOn(service, 'getUserInfo').mockResolvedValueOnce({ id: 1 } as User);
-      const result = await service.create({ email: 'test@example.com' } as any, true);
+      const result = await service.create({ email: 'test@example.com', password: 'pwd', name: 'name' } as any, true);
       expect(result).toEqual({ id: 1 });
     });
 
@@ -85,7 +85,7 @@ describe('UserService', () => {
       jest.spyOn(userRepository, 'create').mockReturnValue({} as User);
       jest.spyOn(userRepository, 'save').mockResolvedValueOnce({ id: 1 } as User);
 
-      const result = await service.create({ email: 'test@example.com' } as any, false);
+      const result = await service.create({ email: 'test@example.com', password: 'pwd', name: 'name' } as any, false);
       expect(result).toEqual({ id: 1 });
     });
 
