@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.TinyPro.mappers.LangMapper">
+    <!-- 定义resultMap -->
+    <resultMap id="BaseResultMap" type="com.TinyPro.entity.po.Lang">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+    </resultMap>
+
     <insert id="saveLang" parameterType="com.TinyPro.entity.po.Lang" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO lang (name) VALUES (#{item.name})
+        INSERT INTO lang (name) VALUES (#{name})
     </insert>
 </mapper>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.TinyPro.mappers.RoleMapper">
+
+    <!-- 结果映射：把扁平行按 roleId 聚合 -->
+    <resultMap id="rolePMMap" type="com.TinyPro.entity.vo.RolePMVo" autoMapping="true">
+        <!-- role 字段 -->
+        <association property="role" javaType="com.TinyPro.entity.po.Role">
+            <id    column="r_id"   property="id"/>
+            <result column="r_name" property="name"/>
+        </association>
+
+        <!-- 权限列表 -->
+        <collection property="permission" ofType="com.TinyPro.entity.po.Permission">
+            <id    column="p_id"   property="id"/>
+            <result column="p_name" property="name"/>
+        </collection>
+
+        <!-- 菜单列表 -->
+        <collection property="menus" ofType="com.TinyPro.entity.po.Menu">
+            <id    column="m_id"        property="id"/>
+            <result column="m_name"      property="name"/>
+            <result column="m_parent_id" property="parentId"/>
+        </collection>
+    </resultMap>
+
+    <!-- 查询方法 -->
+    <select id="selectRolePMAll" resultMap="rolePMMap">
+        SELECT
+        r.id          AS r_id,
+        r.name        AS r_name,
+        p.id          AS p_id,
+        p.name        AS p_name,
+        m.id          AS m_id,
+        m.name        AS m_name,
+        m.parent_id   AS m_parent_id
+        FROM role r
+        LEFT JOIN role_permission rp ON r.id = rp.role_id
+        LEFT JOIN permission      p  ON p.id = rp.permission_id
+        LEFT JOIN role_menu       rm ON r.id = rm.role_id
+        LEFT JOIN menu            m  ON m.id = rm.menu_id
+        WHERE r.name LIKE CONCAT('%', #{name}, '%')
+    </select>
+
+</mapper>
