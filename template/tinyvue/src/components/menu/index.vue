@@ -10,9 +10,9 @@
       only-check-children
       check-strictly
       menu-collapsible
+      class="h-[calc(100vh-60px)]"
       @current-change="currentChange"
       @collapse-change="collapseChange"
-      class="h-[calc(100vh-60px)]"
     >
       <template #default="slotScope">
         <template v-for="(item, index) in routerTitle" :key="index">
