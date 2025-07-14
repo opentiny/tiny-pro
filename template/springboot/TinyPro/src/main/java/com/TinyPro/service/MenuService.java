@@ -1,10 +1,10 @@
-package com.TinyPro.service;
-
-import com.TinyPro.entity.po.Menu;
-import com.baomidou.mybatisplus.extension.service.IService;
-
-import java.util.List;
-
-public interface MenuService extends IService<Menu> {
-    List<Integer> getMenuAllId();
-}
+//package com.TinyPro.service;
+//
+//import com.TinyPro.entity.po.Menu;
+//
+//import java.util.List;
+//
+//public interface MenuService {
+//    Menu createMenu(Menu menu);
+//    List<Integer> getMenuAllId();
+//}

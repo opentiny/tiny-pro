@@ -1,0 +1,48 @@
+package com.TinyPro.controller;
+
+import com.TinyPro.annotation.Permission;
+import com.TinyPro.annotation.Reject;
+import com.TinyPro.entity.dto.CreateRoleDto;
+import com.TinyPro.entity.po.Role;
+import com.TinyPro.service.IRoleService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/role")
+public class RoleController {
+    @Autowired
+    private IRoleService roleService;
+
+    @Reject()
+    @Permission("role::add")
+    @PostMapping()
+    public ResponseEntity<String> create(CreateRoleDto createRoleDto) {
+        return this.roleService.createRole(createRoleDto,false);
+    }
+
+    /**
+     * 获取所有的角色信息
+     * @return
+     */
+    @Permission("role::query")
+    @GetMapping()
+   public ResponseEntity<List<Role>> getAllRole() {
+        return new ResponseEntity<>(this.roleService.list(), HttpStatus.OK);
+    }
+
+    @Permission("role::query")
+    @GetMapping("/detail")
+    public ResponseEntity<List<Role>> getAllRoleDetail(
+            @RequestParam(value = "page", defaultValue = "1",required = false)Integer page,
+            @RequestParam(value = "limit", defaultValue = "10", required = false) Integer limit,
+            @RequestParam(value = "name",required = false) String name
+    ) {
+        return this.roleService.findAllDetail(page, limit, name);
+    }
+}
