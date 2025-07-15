@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements IMenuService{
+public class IMenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements IMenuService{
     @Autowired
     private MenuMapper menuMapper;
 
