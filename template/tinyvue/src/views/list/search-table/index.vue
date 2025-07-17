@@ -310,28 +310,29 @@
   const { loading, filterOptions } = toRefs(state);
 
   const createItems = (list) => {
-    if (!list || !list.length) {
-      return;
-    }
-    const itemsOptions = {}
-    list.forEach((item, index) => {
-      Object.keys(item).forEach((key) => {
-        if(['id', 'rank', 'description'].includes(key)) {
-          return;
+    if (!list || !list.length) return;
+
+    const excludeKeys = ['id', 'rank', 'description'];
+    const fieldOptionsMap = {};
+
+    list.forEach(item => {
+      Object.keys(item).forEach(key => {
+        if (excludeKeys.includes(key)) return;
+        if (!fieldOptionsMap[key]) {
+          fieldOptionsMap[key] = new Set();
         }
-        if(itemsOptions[key]) {
-          itemsOptions[key].options = [...new Set([...itemsOptions[key].options, item[key] ])];
-        } else {
-          itemsOptions[key] =  {
-            label: t(`searchTable.columns.${key}`),
-            field: key,
-            options: [item[key]]
-          };
-        }
-        if(index === list.length - 1) {
-          itemsOptions[key].options = itemsOptions[key].options.map((i) => ({ label: i }));
-          items.push(itemsOptions[key]);
-        }
+        fieldOptionsMap[key].add(item[key]);
+      });
+    });
+
+    // 清空原 items
+    items.length = 0;
+
+    Object.entries(fieldOptionsMap).forEach(([key, valueSet]) => {
+      items.push({
+        label: t(`searchTable.columns.${key}`),
+        field: key,
+        options: Array.from(valueSet).map(i => ({ label: i }))
       });
     });
   };
