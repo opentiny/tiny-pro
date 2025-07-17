@@ -8,8 +8,8 @@
         <Suspense>
           <Menu v-if="reloadKey !== 'menu' && layoutMode[myPattern].menu" class="shadow-[0_4px_12px_#0000001a] z-[100]" />
         </Suspense>
-        <div class="text-[#ccc] bg-[#f5f6f7] flex-1 h-[calc(100vh-60px)]" :style="{ width: isMenuCollapsed ? '100%' : 'calc(100% - 220px)' }">
-          <PageLayout class="!h-[calc(100%-70px)]" />
+        <div class="text-[#ccc] bg-[#f5f6f7] flex-1 h-[calc(100vh-60px)]" :style="{ width: isMenuCollapsed ? '100%' : 'calc(100% - 220px)', padding: '0 10px' }">
+          <PageLayout class="!h-[calc(100%-70px)] pl-4 pr-4" />
           <Footer v-if="layoutMode[myPattern].footer" class="h-[60px]" />
         </div>
       </div>

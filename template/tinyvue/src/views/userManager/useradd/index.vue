@@ -249,7 +249,6 @@
         newTemp.protocolStart && (newTemp.protocolStart = getSimpleDate(data.protocolStart))
         newTemp.protocolEnd && (newTemp.protocolEnd = getSimpleDate(data.protocolEnd))
         newTemp.status && (newTemp.status = props.statusData.find(item => item.label === data.status).value)
-        console.log('12', newTemp)
 
         try {
           await registerUser(newTemp);

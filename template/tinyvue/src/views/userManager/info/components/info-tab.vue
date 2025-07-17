@@ -5,13 +5,13 @@
         <tiny-button
           v-permission="'user::add'"
           type="primary"
-          @click="handleAddUser"
           round
+          @click="handleAddUser"
           >{{ $t('userInfo.modal.title.add') }}
         </tiny-button>
         <tiny-button
-          @click="handleBatchDeleteUser"
           round
+          @click="handleBatchDeleteUser"
           >{{ $t('locale.batchRemove') }}
         </tiny-button>
       </div>
@@ -262,7 +262,6 @@
           </tiny-grid-column>
           <tiny-grid-column
             :title="$t('userInfo.table.operations')"
-            align="center" 
             show-overflow="tooltip"
             width="11%"
           >
@@ -730,7 +729,7 @@
 
 <style scoped lang="less">
   .user-header-btn {
-    margin: 10px 0 24px 10px;
+    margin: 0px 0px 16px;
 
     .tiny-button {
       margin: 0 8px 0 0;
