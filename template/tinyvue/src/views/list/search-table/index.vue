@@ -3,149 +3,228 @@
     <Breadcrumb :items="['menu.list', 'menu.list.searchTable']" />
 
     <div class="search-table-container">
-      <tiny-fullscreen
-        :teleport="true"
-        :page-only="true"
-        :z-index="999"
-        :fullscreen="fullscreen"
-        @update:fullscreen="fullscreen = $event"
-      >
-        <div class="tiny-fullscreen-scroll">
-          <div class="tiny-fullscreen-wrapper">
-            <div class="btn">
-              <transition-fade-down-group>
-                <tiny-button @click="toCsvEvent">
-                  {{ $t('searchTable.operation.import') }}
-                </tiny-button>
-                <div class="search-box-container">
-                  <tiny-search-box
-                    v-model="tags"
-                    :items="items"
-                    :empty-placeholder="$t('searchTable.form.placeholder')"
-                    @change="reloadGrid"
-                  ></tiny-search-box>
-                </div>
-                <div class="screen" @click="toggle">
-                  <img
-                    v-if="!fullscreen"
-                    src="@/assets/images/screen-out.png"
-                    class="screen-image"
-                  />
-                  <img
-                    v-if="fullscreen"
-                    src="@/assets/images/screen-in.png"
-                    class="screen-image"
-                  />
-                  <span>
-                    {{
-                      fullscreen
-                        ? $t('searchTable.collapse.restores')
-                        : $t('searchTable.collapse.full')
-                    }}
-                  </span>
-                </div>
-              </transition-fade-down-group>
-            </div>
-            <tiny-grid
-              ref="taskGrid"
-              :fetch-data="fetchDataOption"
-              :pager="pagerConfig"
-              :loading="loading"
-              size="medium"
-              :height="fullscreen ? 820 : 600"
-              :auto-resize="true"
-            >
-              <tiny-grid-column type="selection" width="60"></tiny-grid-column>
-              <tiny-grid-column
-                field="name"
-                :title="$t('searchTable.columns.name')"
-                align="center"
-              ></tiny-grid-column>
-              <tiny-grid-column
-                field="employeeNo"
-                :title="$t('searchTable.columns.number')"
-                align="center"
-              ></tiny-grid-column>
-              <tiny-grid-column
-                field="departmentLevel"
-                :title="$t('searchTable.columns.filterType')"
-                align="center"
-              ></tiny-grid-column>
-              <tiny-grid-column
-                field="department"
-                :title="$t('searchTable.columns.department')"
-                align="center"
-              ></tiny-grid-column>
-              <tiny-grid-column
-                field="status"
-                :title="$t('searchTable.form.status')"
-                align="center"
-              >
-                <template #default="{ row }">
-                  <span
-                    class="status"
-                    :class="{
-                      'status-closed': row.status === '0',
-                      'status-finished': row.status === '1',
-                    }"
-                  >
-                    <span class="status-dot"></span>
-                    <span class="status-text">
-                      {{ getStatusText(row.status) }}
-                    </span>
-                  </span>
-                </template>
-              </tiny-grid-column>
-              <tiny-grid-column
-                field="workbenchName"
-                :title="$t('searchTable.columns.workname')"
-                align="center"
-              ></tiny-grid-column>
-              <tiny-grid-column
-                field="project"
-                :title="$t('searchTable.columns.enablement')"
-                align="center"
-              ></tiny-grid-column>
-              <tiny-grid-column
-                field="type"
-                :title="$t('searchTable.columns.type')"
-                align="center"
-              ></tiny-grid-column>
-              <tiny-grid-column
-                field="address"
-                :title="$t('searchTable.columns.study')"
-                align="center"
-              ></tiny-grid-column>
-              <tiny-grid-column
-                field="roles"
-                :title="$t('searchTable.columns.role')"
-                align="center"
-              ></tiny-grid-column>
-              <tiny-grid-column
-                field="lastUpdateUser"
-                :title="$t('searchTable.columns.updatesperson')"
-                align="center"
-              ></tiny-grid-column>
-              <tiny-grid-column
-                field="createTime"
-                :title="$t('searchTable.columns.createdTime')"
-                align="center"
-              ></tiny-grid-column>
-              <tiny-grid-column
-                :title="$t('searchTable.columns.operations')"
-                align="center"
-              >
-                <template #default="data">
-                  <a class="operation" @click="handleDelete(data.row.id)">
-                    {{ $t('searchTable.columns.operations.delete') }}
-                  </a>
-                </template>
-              </tiny-grid-column>
-            </tiny-grid>
+      <div class="button-group">
+        <tiny-button>{{ $t('stepForm.button.submit') }}</tiny-button>
+        <tiny-button>{{ $t('userInfo.table.operations.delete') }}</tiny-button>
+        <tiny-file-upload action="#" accept=".xls,.xlsx" @change="importExcel">
+          <tiny-button >{{ $t('userInfo.table.import') }}</tiny-button>
+        </tiny-file-upload>
+        <tiny-button @click="toCsvEvent">{{ $t('userInfo.table.export') }}</tiny-button>
+      </div>
+      <div class="tiny-fullscreen-scroll">
+        <div class="tiny-fullscreen-wrapper">
+          <div class="btn">
+            <transition-fade-down-group>
+              <tiny-select class="tiny-select-header" />
+              <div class="search-box-container">
+                <tiny-search-box
+                  v-model="tags"
+                  :items="items"
+                  :empty-placeholder="$t('searchTable.form.placeholder')"
+                  @change="reloadGrid"
+                ></tiny-search-box>
+              </div>
+              <div class="button-group">
+                <tiny-button :icon="IconRefresh" @click="handleRefresh"> </tiny-button>
+                <tiny-button :icon="IconSetting"> </tiny-button>
+              </div>
+            </transition-fade-down-group>
           </div>
+          <tiny-grid
+            ref="taskGrid"
+            :fetch-data="fetchDataOption"
+            :pager="pagerConfig"
+            :loading="loading"
+            size="medium"
+            :height="640"
+            :auto-resize="true"
+          >
+            <tiny-grid-column type="selection" width="60"></tiny-grid-column>
+            <tiny-grid-column
+              field="name"
+              :title="$t('searchTable.columns.name')"
+            ></tiny-grid-column>
+            <tiny-grid-column
+              field="employeeNo"
+              :title="$t('searchTable.columns.employeeNo')"
+              sortable
+            ></tiny-grid-column>
+            <tiny-grid-column
+              field="departmentLevel"
+              :title="$t('searchTable.columns.departmentLevel')"
+            ></tiny-grid-column>
+            <tiny-grid-column
+              field="department"
+              :title="$t('searchTable.columns.department')"
+            ></tiny-grid-column>
+            <tiny-grid-column
+              field="status"
+              :title="$t('searchTable.form.status')"
+            >
+              <template #default="{ row }">
+                <span
+                  class="status"
+                  :class="{
+                    'status-closed': row.status === '0',
+                    'status-finished': row.status === '1',
+                  }"
+                >
+                  <span class="status-dot"></span>
+                  <span class="status-text">
+                    {{ getStatusText(row.status) }}
+                  </span>
+                </span>
+              </template>
+            </tiny-grid-column>
+            <tiny-grid-column
+              field="workbenchName"
+              :title="$t('searchTable.columns.workbenchName')"
+            ></tiny-grid-column>
+            <tiny-grid-column
+              field="project"
+              :title="$t('searchTable.columns.project')"
+            ></tiny-grid-column>
+            <tiny-grid-column
+              field="type"
+              :title="$t('searchTable.columns.type')"
+            ></tiny-grid-column>
+            <tiny-grid-column
+              field="address"
+              :title="$t('searchTable.columns.address')"
+            ></tiny-grid-column>
+            <tiny-grid-column
+              field="roles"
+              :title="$t('searchTable.columns.roles')"
+            ></tiny-grid-column>
+            <tiny-grid-column
+              field="lastUpdateUser"
+              :title="$t('searchTable.columns.lastUpdateUser')"
+            ></tiny-grid-column>
+            <tiny-grid-column
+              field="createTime"
+              :title="$t('searchTable.columns.createTime')"
+            ></tiny-grid-column>
+            <tiny-grid-column
+              :title="$t('searchTable.columns.operations')"
+            >
+              <template #default="data">
+                <a
+                  class="operation"
+                  @click="handleUpdated(data.row.id)"
+                >
+                  <IconEditor class="operation-icon"></IconEditor>{{ $t('userInfo.table.operations.update') }}
+                </a>
+                <tiny-popconfirm
+                  title="确定要删除此用户吗？"
+                  type="info"
+                  trigger="click"
+                  @confirm="handleDelete(data.row.id)"
+                >
+                  <template #reference>
+                    <a
+                      class="operation"
+                    >
+                      <IconDel class="operation-icon"></IconDel>{{ $t('searchTable.columns.operations.delete') }}
+                    </a>
+                  </template>
+                </tiny-popconfirm>
+              </template>
+            </tiny-grid-column>
+          </tiny-grid>
         </div>
-      </tiny-fullscreen>
+      </div>
     </div>
+    <tiny-dialog-box
+      v-model:visible="state.updateVisibility"
+      :title="t('userInfo.table.updateTable')"
+      width="700px"
+      :close-on-click-modal="false"
+      >
+      <tiny-form
+        ref="localeForm"
+        :model="formModel"
+        label-position="left"
+        label-width="94px"
+        
+      >
+        <tiny-row>
+          <tiny-col :span="6">
+            <tiny-form-item :label="$t('searchTable.columns.name')" prop="name">
+              <tiny-input v-model="formModel.name" />
+            </tiny-form-item>
+          </tiny-col>
+          <tiny-col :span="6">
+            <tiny-form-item :label="$t('searchTable.columns.employeeNo')" prop="employeeNo">
+              <tiny-input v-model="formModel.employeeNo" />
+            </tiny-form-item>
+          </tiny-col>
+        </tiny-row>
+        <tiny-row>
+          <tiny-col :span="6">
+            <tiny-form-item :label="$t('searchTable.columns.departmentLevel')" prop="departmentLevel">
+              <tiny-select v-model="formModel.departmentLevel" :options="departmentLevelOptions" />
+            </tiny-form-item>
+          </tiny-col>
+          <tiny-col :span="6">
+            <tiny-form-item :label="$t('searchTable.columns.department')" prop="department">
+              <tiny-select v-model="formModel.department" :options="departmentOptions" />
+            </tiny-form-item>
+          </tiny-col>
+        </tiny-row>
+        <tiny-row>
+          <tiny-col :span="6">
+            <tiny-form-item :label="$t('searchTable.columns.status')" prop="status">
+              <tiny-select v-model="formModel.status" :options="statusOptions" />
+            </tiny-form-item>
+          </tiny-col>
+          <tiny-col :span="6">
+            <tiny-form-item :label="$t('searchTable.columns.workbenchName')" prop="workbenchName">
+              <tiny-input v-model="formModel.workbenchName" />
+            </tiny-form-item>
+          </tiny-col>
+        </tiny-row>
+        <tiny-row>
+          <tiny-col :span="6">
+            <tiny-form-item :label="$t('searchTable.columns.project')" prop="project">
+              <tiny-input v-model="formModel.project" />
+            </tiny-form-item>
+          </tiny-col>
+          <tiny-col :span="6">
+            <tiny-form-item :label="$t('searchTable.columns.type')" prop="type">
+              <tiny-input v-model="formModel.type" />
+            </tiny-form-item>
+          </tiny-col>
+        </tiny-row>
+        <tiny-row>
+          <tiny-col :span="6">
+            <tiny-form-item :label="$t('searchTable.columns.address')" prop="address">
+              <tiny-input v-model="formModel.address" />
+            </tiny-form-item>
+          </tiny-col>
+          <tiny-col :span="6">
+            <tiny-form-item :label="$t('searchTable.columns.roles')" prop="roles">
+              <tiny-select v-model="formModel.roles" :options="rolesOptions" />
+            </tiny-form-item>
+          </tiny-col>
+        </tiny-row>
+        <tiny-row>
+          <tiny-col :span="6">
+            <tiny-form-item :label="$t('searchTable.columns.lastUpdateUser')" prop="lastUpdateUser">
+              <tiny-select v-model="formModel.lastUpdateUser" :options="lastUpdateUserOptions" />
+            </tiny-form-item>
+          </tiny-col>
+          <tiny-col :span="6">
+            <tiny-form-item :label="$t('searchTable.columns.createTime')" prop="createTime">
+              <tiny-date-picker v-model="formModel.createTime" placeholder="请选择日期"></tiny-date-picker>
+            </tiny-form-item>
+          </tiny-col>
+        </tiny-row>
+      </tiny-form>
+      <template #footer>
+        <tiny-button size="small" @click="state.updateVisibility = false">取 消</tiny-button>
+        <tiny-button size="small" type="primary" @click="handleUpdateSubmit">确 定</tiny-button>
+      </template>
+    </tiny-dialog-box>
   </div>
 </template>
 
@@ -165,16 +244,28 @@
     Pager as TinyPager,
     Fullscreen as TinyFullscreen,
     Modal,
+    DialogBox as TinyDialogBox,
+    FileUpload as TinyFileUpload,
+    DatePicker as TinyDatePicker,
+    Popconfirm as TinyPopconfirm,
   } from '@opentiny/vue';
+  import { iconEditor, iconDel, iconRefresh, iconSetting } from '@opentiny/vue-icon';
   import TinySearchBox from '@opentiny/vue-search-box';
   import {
     queryEmployeeList,
     deleteEmployee,
     QueryTaskParmas,
+    getEmployeeInfo,
+    updateEmployeeInfo,
   } from '@/api/list';
+  import * as XLSX from 'xlsx';
   import { t } from '@opentiny/vue-locale';
   import TransitionFadeSlideGroup from '@/components/transition/transition-fade-slide-group.vue';
 
+  const IconEditor = iconEditor();
+  const IconDel = iconDel();
+  const IconRefresh = iconRefresh()
+  const IconSetting = iconSetting()
   // 初始化请求数据
   interface FilterOptions {
     id: string;
@@ -191,62 +282,16 @@
   const tags = ref([]);
 
   // 搜索配置
-  const items = [
-    {
-      label: t('searchTable.columns.name'),
-      field: 'name',
-    },
-    {
-      label: t('searchTable.columns.department'),
-      field: 'department',
-    },
-    {
-      label: t('searchTable.columns.role'),
-      field: 'roles',
-    },
-    {
-      label: t('searchTable.columns.workname'),
-      field: 'workbenchName',
-    },
-    {
-      label: t('searchTable.columns.enablement'),
-      field: 'project',
-    },
-    {
-      label: t('searchTable.columns.type'),
-      field: 'type',
-    },
-    {
-      label: t('searchTable.columns.study'),
-      field: 'address',
-    },
-    {
-      label: t('searchTable.form.status'),
-      field: 'status',
-      replace: true,
-      options: [
-        {
-          id: '0',
-          label: 'offline',
-        },
-        {
-          id: '1',
-          label: 'online',
-        },
-        {
-          id: '2',
-          label: 'doing',
-        },
-      ],
-    },
-  ];
+  const items = reactive([])
   // 加载效果
   const state = reactive<{
     loading: boolean;
     filterOptions: FilterOptions;
+    updateVisibility: boolean;
   }>({
     loading: false,
     filterOptions: {} as FilterOptions,
+    updateVisibility: false,
   });
 
   const pagerConfig = reactive({
@@ -256,7 +301,7 @@
       pageSize: 10,
       pageSizes: [10, 20],
       total: 10,
-      layout: 'total, prev, pager, next, jumper, sizes',
+      layout: 'total, sizes, prev, pager, next, jumper',
     },
   });
 
@@ -264,20 +309,32 @@
   const taskGrid = ref();
   const { loading, filterOptions } = toRefs(state);
 
-  const statusOptions = [
-    {
-      value: '0',
-      label: 'offline',
-    },
-    {
-      value: '1',
-      label: 'online',
-    },
-    {
-      value: '2',
-      label: 'doing',
-    },
-  ];
+  const createItems = (list) => {
+    if (!list || !list.length) {
+      return;
+    }
+    const itemsOptions = {}
+    list.forEach((item, index) => {
+      Object.keys(item).forEach((key) => {
+        if(['id', 'rank', 'description'].includes(key)) {
+          return;
+        }
+        if(itemsOptions[key]) {
+          itemsOptions[key].options = [...new Set([...itemsOptions[key].options, item[key] ])];
+        } else {
+          itemsOptions[key] =  {
+            label: t(`searchTable.columns.${key}`),
+            field: key,
+            options: [item[key]]
+          };
+        }
+        if(index === list.length - 1) {
+          itemsOptions[key].options = itemsOptions[key].options.map((i) => ({ label: i }));
+          items.push(itemsOptions[key]);
+        }
+      });
+    });
+  };
 
   // 请求数据接口方法
   async function fetchData(
@@ -304,6 +361,7 @@
       const { data } = await queryEmployeeList(queryParmas);
       const { data: list, total } = data;
       tableData.value = list;
+      createItems(list)
       return {
         result: list,
         page: { total },
@@ -341,20 +399,115 @@
     taskGrid?.value.handleFetch('reload');
   }
 
-  // 导出
-  const toCsvEvent = () => {
-    taskGrid.value.exportCsv({
-      filename: 'table.csv',
-      original: true,
-      isHeader: false,
-      data: tableData.value,
+  function handleRefresh() {
+    taskGrid?.value.handleFetch('reload'); 
+  }
+
+  const localeForm = ref();
+  const formModel = reactive({
+    id: '',
+    name: '',
+    employeeNo: '',
+    departmentLevel: '',
+    department: '',
+    status: '',
+    workbenchName: '',
+    project: '',
+    type: '',
+    address: '',
+    roles: '',
+    lastUpdateUser: '',
+    createTime: '',
+  });
+  const departmentLevelOptions = reactive([
+    { label: '一级', value: '一级' },
+    { label: '二级', value: '二级' },
+    { label: '三级', value: '三级' },
+  ]);
+  const departmentOptions = reactive([
+    { label: '公共服务部', value: '公共服务部' },
+    { label: '计算管理部', value: '计算管理部' },
+  ]);
+  const statusOptions = reactive([
+    {
+      value: '0',
+      label: 'offline',
+    },
+    {
+      value: '1',
+      label: 'online',
+    },
+    {
+      value: '2',
+      label: 'doing',
+    },
+  ]);
+  const rolesOptions = reactive([
+    { label: '前端', value: '前端' },
+    { label: '后端', value: '后端' },
+    { label: '测试', value: '测试' },
+  ]);
+  const lastUpdateUserOptions = reactive([
+    { label: '张三', value: '张三' },
+    { label: '李四', value: '李四' },
+    { label: '王五', value: '王五' },
+  ]);
+
+  const handleUpdateSubmit = () => {
+    localeForm.value.validate().then(() => {
+      // 提交表单
+      updateEmployeeInfo(formModel).then(() => {
+        Modal.message({
+          message: '更新成功',
+          status: 'success',
+        });
+        handleRefresh()
+        state.updateVisibility = false;
+      });
     });
   };
 
-  // 全屏缩放设置
-  const fullscreen = ref(false);
-  const toggle = () => {
-    fullscreen.value = !fullscreen.value;
+  const handleUpdated  = async (id) => {
+    const res = await getEmployeeInfo(id);
+    Object.keys(formModel).forEach(key => {
+      formModel[key] = res[key] || '';
+    });
+    state.updateVisibility = true; 
+  }
+
+  const importExcel = (files) => {
+    const fileReader = new FileReader()
+    fileReader.onload = (ev) => {
+      try {
+        const data = ev.target.result
+        const workbook = XLSX.read(data, {
+          type: 'binary'
+        })
+        // 取 Excel 的第一张 Sheet 表
+        const wsname = workbook.SheetNames[0]
+        // 生成 JSON 表格内容
+        const ws = XLSX.utils.sheet_to_json(workbook.Sheets[wsname])
+        // 将数据赋值给 Grid 数据源
+        tableData.value = ws
+        return true
+        // 可以在这里给后端发请求，将读取的 Excel 数据存到数据库表中
+      } catch (e) {
+        return false
+      }
+    }
+    fileReader.readAsBinaryString(files.raw)
+    
+  }
+
+  // 导出
+  const toCsvEvent = () => {
+    taskGrid.value.exportCsv({
+      filename: 'table',
+      original: true,
+      isHeader: false,
+      useTabs: false,
+      data: tableData.value,
+    });
   };
 </script>
 
