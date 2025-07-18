@@ -261,7 +261,7 @@
   }
 
   .role-add-btn {
-    padding: 10px 0 10px 10px;
+    padding: 0 0 24px 0;
   }
 
   .table {
