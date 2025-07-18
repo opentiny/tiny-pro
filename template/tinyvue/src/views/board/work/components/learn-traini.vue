@@ -87,6 +87,9 @@ onMounted(() => {
     line-height: 22px;
     font-weight: 700;
     font-size: 14px;
+    &:hover{
+      text-decoration: underline;
+    }
   }
 
   .favorite-description {

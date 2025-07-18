@@ -29,7 +29,7 @@
     <tiny-grid-column field="component" :title="$t('menuInfo.table.component')"></tiny-grid-column>
     <tiny-grid-column field="url"  :title="$t('menuInfo.table.path')" ></tiny-grid-column>
     <tiny-grid-column field="locale"  :title="$t('menuInfo.table.locale')"></tiny-grid-column>
-    <tiny-grid-column :title="$t('permissionInfo.table.operations')" align="center" width="200" >
+    <tiny-grid-column :title="$t('permissionInfo.table.operations')" width="200" >
       <template #default="{ row }">
         <iconEdit class="del-icon"></iconEdit>
         <a
@@ -104,8 +104,11 @@
   .del-icon{
     fill: #1890ff;
     margin-right: 8px;
-    margin-left: 16px;;
     font-size: 16px;
     margin-top: -3px;
+  }
+
+  .operation-update:hover{
+    text-decoration: underline;
   }
 </style>

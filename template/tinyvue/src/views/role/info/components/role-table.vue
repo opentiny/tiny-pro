@@ -156,7 +156,7 @@
           {{ getPermission(data.row) }}
       </template>
     </tiny-grid-column>
-    <tiny-grid-column :title="$t('roleInfo.table.operations')" align="center">
+    <tiny-grid-column :title="$t('roleInfo.table.operations')">
       <template #default="data">
         <iconCueL class="del-icon"></iconCueL>
         <a
@@ -203,8 +203,11 @@
   .del-icon{
     fill: #1890ff;
     margin-right: 8px;
-    margin-left: 16px;;
     font-size: 16px;
     margin-top: -3px;
   }
+  .operation-update:hover{
+    text-decoration: underline;
+  }
+
 </style>

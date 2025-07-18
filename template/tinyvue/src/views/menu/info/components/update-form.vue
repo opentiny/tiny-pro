@@ -4,56 +4,71 @@
     :display-only="props.readonly"
     :rules="rules"
     :model="menuInfo"
-    label-position="top"
   >
-    <tiny-form-item :label="$t('menuInfo.table.name')" prop="locale">
-      <tiny-select
-        v-model="menuInfo.locale"
-        :placeholder="$t('baseForm.form.label.placeholder')"
-        filterable
-        no-match-text="No Match"
-        :options="props.localeData"
-        optimization
-      >
-      </tiny-select>
-    </tiny-form-item>
-    <tiny-form-item
-      prop="oldLabel"
-      :label="$t('menuInfo.table.id')"
-      :extra="$t('menuInfo.modal.tips.upd-id')"
-    >
-      <tiny-input v-model="menuInfo.oldLabel" />
-    </tiny-form-item>
-    <tiny-form-item :label="$t('menuInfo.table.order')" prop="order">
-      <tiny-input v-model="menuInfo.order"></tiny-input>
-    </tiny-form-item>
-    <tiny-form-item :label="$t('menuInfo.table.parentId')" prop="parentId">
-      <tiny-select
-        v-model="menuInfo.parentId"
-        value-field="id"
-        text-field="label"
-        render-type="tree"
-        :tree-op="treeOp"
-        clearable
-      >
-      </tiny-select>
-    </tiny-form-item>
-    <tiny-form-item :label="$t('menuInfo.table.icon')" prop="icon">
-      <tiny-select
-        v-model="menuInfo.icon"
-        :placeholder="$t('baseForm.form.label.placeholder')"
-        filterable
-        no-match-text="No Match"
-        :options="iconDatas"
-        optimization
-      ></tiny-select>
-    </tiny-form-item>
-    <tiny-form-item :label="$t('menuInfo.table.component')" prop="component">
-      <tiny-input v-model="menuInfo.component"></tiny-input>
-    </tiny-form-item>
-    <tiny-form-item :label="$t('menuInfo.table.path')" prop="url">
-      <tiny-input v-model="menuInfo.url"></tiny-input>
-    </tiny-form-item>
+    <tiny-row>
+      <tiny-col :span="6">
+        <tiny-form-item :label="$t('menuInfo.table.name')" prop="locale">
+          <tiny-select
+            v-model="menuInfo.locale"
+            :placeholder="$t('baseForm.form.label.placeholder')"
+            filterable
+            no-match-text="No Match"
+            :options="props.localeData"
+            optimization
+          >
+          </tiny-select>
+        </tiny-form-item>
+      </tiny-col>
+      <tiny-col :span="6">
+        <tiny-form-item :label="$t('menuInfo.table.order')" prop="order">
+          <tiny-input v-model="menuInfo.order"></tiny-input>
+        </tiny-form-item>
+      </tiny-col>
+      <tiny-col :span="6">
+        <tiny-form-item :label="$t('menuInfo.table.parentId')" prop="parentId">
+          <tiny-select
+            v-model="menuInfo.parentId"
+            value-field="id"
+            text-field="label"
+            render-type="tree"
+            :tree-op="treeOp"
+            clearable
+          >
+          </tiny-select>
+        </tiny-form-item>
+      </tiny-col>
+      <tiny-col :span="6">
+        <tiny-form-item :label="$t('menuInfo.table.icon')" prop="icon">
+          <tiny-select
+            v-model="menuInfo.icon"
+            :placeholder="$t('baseForm.form.label.placeholder')"
+            filterable
+            no-match-text="No Match"
+            :options="iconDatas"
+            optimization
+          ></tiny-select>
+        </tiny-form-item>
+      </tiny-col>
+      <tiny-col :span="6">
+        <tiny-form-item :label="$t('menuInfo.table.component')" prop="component">
+          <tiny-input v-model="menuInfo.component"></tiny-input>
+        </tiny-form-item>
+      </tiny-col>
+      <tiny-col :span="6">
+        <tiny-form-item :label="$t('menuInfo.table.path')" prop="url">
+          <tiny-input v-model="menuInfo.url"></tiny-input>
+        </tiny-form-item>
+      </tiny-col>
+      <tiny-col :span="6">
+        <tiny-form-item
+          prop="oldLabel"
+          :label="$t('menuInfo.table.id')"
+          :extra="$t('menuInfo.modal.tips.upd-id')"
+        >
+          <tiny-input v-model="menuInfo.oldLabel" />
+        </tiny-form-item>
+      </tiny-col>
+    </tiny-row>
   </tiny-form>
 </template>
 
@@ -63,6 +78,8 @@
     FormItem as TinyFormItem,
     Input as TinyInput,
     Select as TinySelect,
+    TinyRow, 
+    TinyCol
   } from '@opentiny/vue';
   import { ITreeNodeData } from '@/router/guard/menu';
   import { computed, reactive, ref, unref , h} from 'vue';

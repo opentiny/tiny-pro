@@ -1,5 +1,5 @@
 <template>
-  <tiny-layout>
+  <tiny-layout style="margin-left:-10px">
     <tiny-row :flex="true" justify="center">
         <tiny-col>
           <div class="col">
