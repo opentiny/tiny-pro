@@ -119,10 +119,10 @@ importers:
         version: 10.0.3(@nestjs/common@10.0.3(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.1.13)(rxjs@7.8.1))(@nestjs/core@10.0.3)
       '@nestjs/sequelize':
         specifier: 10.0.0
-        version: 10.0.0(@nestjs/common@10.0.3(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.1.13)(rxjs@7.8.1))(@nestjs/core@10.0.3)(reflect-metadata@0.1.13)(rxjs@7.8.1)(sequelize-typescript@2.1.5(@types/node@20.3.3)(@types/validator@13.12.3)(reflect-metadata@0.1.13)(sequelize@6.32.1(mysql2@3.4.3)))(sequelize@6.32.1(mysql2@3.4.3))
+        version: 10.0.0(@nestjs/common@10.0.3(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.1.13)(rxjs@7.8.1))(@nestjs/core@10.0.3)(reflect-metadata@0.1.13)(rxjs@7.8.1)(sequelize-typescript@2.1.5(@types/node@20.3.3)(@types/validator@13.12.3)(reflect-metadata@0.1.13)(sequelize@6.32.1(mysql2@3.14.0)))(sequelize@6.32.1(mysql2@3.14.0))
       '@nestjs/typeorm':
         specifier: ^10.0.2
-        version: 10.0.2(@nestjs/common@10.0.3(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.1.13)(rxjs@7.8.1))(@nestjs/core@10.0.3)(reflect-metadata@0.1.13)(rxjs@7.8.1)(typeorm@0.3.22(ioredis@5.6.1)(mysql2@3.4.3)(redis@4.7.0)(reflect-metadata@0.1.13)(ts-node@10.9.1(@types/node@20.3.3)(typescript@5.1.6)))
+        version: 10.0.2(@nestjs/common@10.0.3(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.1.13)(rxjs@7.8.1))(@nestjs/core@10.0.3)(reflect-metadata@0.1.13)(rxjs@7.8.1)(typeorm@0.3.22(ioredis@5.6.1)(mysql2@3.14.0)(redis@4.7.0)(reflect-metadata@0.1.13)(ts-node@10.9.1(@types/node@20.3.3)(typescript@5.1.6)))
       class-transformer:
         specifier: ^0.5.1
         version: 0.5.1
@@ -139,14 +139,14 @@ importers:
         specifier: ^1.1.0
         version: 1.1.0
       mysql2:
-        specifier: 3.4.3
-        version: 3.4.3
+        specifier: ^3.14.0
+        version: 3.14.0
       nestjs-i18n:
         specifier: ^10.4.5
         version: 10.5.1(@nestjs/common@10.0.3(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.1.13)(rxjs@7.8.1))(@nestjs/core@10.0.3)(class-validator@0.14.1)(rxjs@7.8.1)
       nestjs-typeorm-paginate:
         specifier: ^4.0.4
-        version: 4.1.0(@nestjs/common@10.0.3(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.1.13)(rxjs@7.8.1))(typeorm@0.3.22(ioredis@5.6.1)(mysql2@3.4.3)(redis@4.7.0)(reflect-metadata@0.1.13)(ts-node@10.9.1(@types/node@20.3.3)(typescript@5.1.6)))
+        version: 4.1.0(@nestjs/common@10.0.3(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.1.13)(rxjs@7.8.1))(typeorm@0.3.22(ioredis@5.6.1)(mysql2@3.14.0)(redis@4.7.0)(reflect-metadata@0.1.13)(ts-node@10.9.1(@types/node@20.3.3)(typescript@5.1.6)))
       redis:
         specifier: ^4.6.15
         version: 4.7.0
@@ -161,13 +161,13 @@ importers:
         version: 7.8.1
       sequelize:
         specifier: 6.32.1
-        version: 6.32.1(mysql2@3.4.3)
+        version: 6.32.1(mysql2@3.14.0)
       sequelize-typescript:
         specifier: 2.1.5
-        version: 2.1.5(@types/node@20.3.3)(@types/validator@13.12.3)(reflect-metadata@0.1.13)(sequelize@6.32.1(mysql2@3.4.3))
+        version: 2.1.5(@types/node@20.3.3)(@types/validator@13.12.3)(reflect-metadata@0.1.13)(sequelize@6.32.1(mysql2@3.14.0))
       typeorm:
-        specifier: ^0.3.20
-        version: 0.3.22(ioredis@5.6.1)(mysql2@3.4.3)(redis@4.7.0)(reflect-metadata@0.1.13)(ts-node@10.9.1(@types/node@20.3.3)(typescript@5.1.6))
+        specifier: ^0.3.22
+        version: 0.3.22(ioredis@5.6.1)(mysql2@3.14.0)(redis@4.7.0)(reflect-metadata@0.1.13)(ts-node@10.9.1(@types/node@20.3.3)(typescript@5.1.6))
       typescript:
         specifier: 5.1.6
         version: 5.1.6
@@ -202,6 +202,9 @@ importers:
       '@typescript-eslint/parser':
         specifier: 7.18.0
         version: 7.18.0(eslint@8.42.0)(typescript@5.1.6)
+      cross-env:
+        specifier: ^7.0.3
+        version: 7.0.3
       eslint:
         specifier: 8.42.0
         version: 8.42.0
@@ -7879,10 +7882,6 @@ packages:
     resolution: {integrity: sha512-jumlc0BIUrS3qJGgIkWZsyfAM7NCWiBcCDhnd+3NNM5KbBmLTgHVfWBcg6W+rLUsIpzpERPsvwUP7CckAQSOoA==}
     engines: {node: '>=12'}
 
-  lru-cache@8.0.5:
-    resolution: {integrity: sha512-MhWWlVnuab1RG5/zMRRcVGXZLCXrZTgfwMikgzCegsPnG62yDQo5JnqKkrK4jO5iKqDAZGItAqN5CtKBCBWRUA==}
-    engines: {node: '>=16.14'}
-
   lru.min@1.1.2:
     resolution: {integrity: sha512-Nv9KddBcQSlQopmBHXSsZVY5xsdlZkdH/Iey0BlcBYggMd4two7cZnKOK9vmy3nY0O5RGH99z1PCeTpPqszUYg==}
     engines: {bun: '>=1.0.0', deno: '>=1.30.0', node: '>=8.0.0'}
@@ -8260,6 +8259,7 @@ packages:
   multer@1.4.4-lts.1:
     resolution: {integrity: sha512-WeSGziVj6+Z2/MwQo3GvqzgR+9Uc+qt8SwHKh3gvNPiISKfsMfG4SvCOFYlxxgkXt7yIV2i1yczehm0EOKIxIg==}
     engines: {node: '>= 6.0.0'}
+    deprecated: Multer 1.x is impacted by a number of vulnerabilities, which have been patched in 2.x. You should upgrade to the latest 2.x version.
 
   multicast-dns@7.2.5:
     resolution: {integrity: sha512-2eznPJP8z2BFLX50tf0LuODrpINqP1RVIm/CObbTcBRITQgmC/TjcREF1NeTBzIcR5XO/ukWo+YHOjBbFwIupg==}
@@ -8278,10 +8278,6 @@ packages:
 
   mysql2@3.14.0:
     resolution: {integrity: sha512-8eMhmG6gt/hRkU1G+8KlGOdQi2w+CgtNoD1ksXZq9gQfkfDsX4LHaBwTe1SY0Imx//t2iZA03DFnyYKPinxSRw==}
-    engines: {node: '>= 8.0'}
-
-  mysql2@3.4.3:
-    resolution: {integrity: sha512-pgXnfmZlJ2JnJk9A5z3tnJcG4w8ly/AbVsVsgcavhiOQ7VQpxMwmIyR2CTNxNLKQWQUdD5QOkKkY1DdoRDgSnA==}
     engines: {node: '>= 8.0'}
 
   named-placeholders@1.1.3:
@@ -11924,7 +11920,7 @@ snapshots:
       '@babel/traverse': 7.27.0
       '@babel/types': 7.27.0
       convert-source-map: 2.0.0
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0
       gensync: 1.0.0-beta.2
       json5: 2.2.3
       semver: 6.3.1
@@ -12180,7 +12176,7 @@ snapshots:
 
   '@babel/plugin-syntax-async-generators@7.8.4(@babel/core@7.26.10)':
     dependencies:
-      '@babel/core': 7.26.10(supports-color@7.2.0)
+      '@babel/core': 7.26.10
       '@babel/helper-plugin-utils': 7.26.5
 
   '@babel/plugin-syntax-bigint@7.8.3(@babel/core@7.26.10)':
@@ -12240,12 +12236,12 @@ snapshots:
 
   '@babel/plugin-syntax-object-rest-spread@7.8.3(@babel/core@7.26.10)':
     dependencies:
-      '@babel/core': 7.26.10(supports-color@7.2.0)
+      '@babel/core': 7.26.10
       '@babel/helper-plugin-utils': 7.26.5
 
   '@babel/plugin-syntax-optional-catch-binding@7.8.3(@babel/core@7.26.10)':
     dependencies:
-      '@babel/core': 7.26.10(supports-color@7.2.0)
+      '@babel/core': 7.26.10
       '@babel/helper-plugin-utils': 7.26.5
 
   '@babel/plugin-syntax-optional-chaining@7.8.3(@babel/core@7.26.10)':
@@ -12722,7 +12718,7 @@ snapshots:
       '@babel/parser': 7.27.0
       '@babel/template': 7.27.0
       '@babel/types': 7.27.0
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0
       globals: 11.12.0
     transitivePeerDependencies:
       - supports-color
@@ -13116,7 +13112,7 @@ snapshots:
   '@eslint/eslintrc@2.1.4':
     dependencies:
       ajv: 6.12.6
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0
       espree: 9.6.1
       globals: 13.24.0
       ignore: 5.3.2
@@ -13268,7 +13264,7 @@ snapshots:
   '@humanwhocodes/config-array@0.11.14':
     dependencies:
       '@humanwhocodes/object-schema': 2.0.3
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0
       minimatch: 3.1.2
     transitivePeerDependencies:
       - supports-color
@@ -13722,14 +13718,14 @@ snapshots:
     transitivePeerDependencies:
       - chokidar
 
-  '@nestjs/sequelize@10.0.0(@nestjs/common@10.0.3(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.1.13)(rxjs@7.8.1))(@nestjs/core@10.0.3)(reflect-metadata@0.1.13)(rxjs@7.8.1)(sequelize-typescript@2.1.5(@types/node@20.3.3)(@types/validator@13.12.3)(reflect-metadata@0.1.13)(sequelize@6.32.1(mysql2@3.4.3)))(sequelize@6.32.1(mysql2@3.4.3))':
+  '@nestjs/sequelize@10.0.0(@nestjs/common@10.0.3(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.1.13)(rxjs@7.8.1))(@nestjs/core@10.0.3)(reflect-metadata@0.1.13)(rxjs@7.8.1)(sequelize-typescript@2.1.5(@types/node@20.3.3)(@types/validator@13.12.3)(reflect-metadata@0.1.13)(sequelize@6.32.1(mysql2@3.14.0)))(sequelize@6.32.1(mysql2@3.14.0))':
     dependencies:
       '@nestjs/common': 10.0.3(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.1.13)(rxjs@7.8.1)
       '@nestjs/core': 10.0.3(@nestjs/common@10.0.3(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.1.13)(rxjs@7.8.1))(@nestjs/microservices@10.4.16)(@nestjs/platform-express@10.0.3)(encoding@0.1.13)(reflect-metadata@0.1.13)(rxjs@7.8.1)
       reflect-metadata: 0.1.13
       rxjs: 7.8.1
-      sequelize: 6.32.1(mysql2@3.4.3)
-      sequelize-typescript: 2.1.5(@types/node@20.3.3)(@types/validator@13.12.3)(reflect-metadata@0.1.13)(sequelize@6.32.1(mysql2@3.4.3))
+      sequelize: 6.32.1(mysql2@3.14.0)
+      sequelize-typescript: 2.1.5(@types/node@20.3.3)(@types/validator@13.12.3)(reflect-metadata@0.1.13)(sequelize@6.32.1(mysql2@3.14.0))
       uuid: 9.0.0
 
   '@nestjs/testing@10.0.3(@nestjs/common@10.0.3(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.1.13)(rxjs@7.8.1))(@nestjs/core@10.0.3)(@nestjs/microservices@10.4.16)(@nestjs/platform-express@10.0.3)':
@@ -13741,13 +13737,13 @@ snapshots:
       '@nestjs/microservices': 10.4.16(@nestjs/common@10.0.3(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.1.13)(rxjs@7.8.1))(@nestjs/core@10.0.3)(ioredis@5.6.1)(reflect-metadata@0.1.13)(rxjs@7.8.1)
       '@nestjs/platform-express': 10.0.3(@nestjs/common@10.0.3(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.1.13)(rxjs@7.8.1))(@nestjs/core@10.0.3)
 
-  '@nestjs/typeorm@10.0.2(@nestjs/common@10.0.3(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.1.13)(rxjs@7.8.1))(@nestjs/core@10.0.3)(reflect-metadata@0.1.13)(rxjs@7.8.1)(typeorm@0.3.22(ioredis@5.6.1)(mysql2@3.4.3)(redis@4.7.0)(reflect-metadata@0.1.13)(ts-node@10.9.1(@types/node@20.3.3)(typescript@5.1.6)))':
+  '@nestjs/typeorm@10.0.2(@nestjs/common@10.0.3(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.1.13)(rxjs@7.8.1))(@nestjs/core@10.0.3)(reflect-metadata@0.1.13)(rxjs@7.8.1)(typeorm@0.3.22(ioredis@5.6.1)(mysql2@3.14.0)(redis@4.7.0)(reflect-metadata@0.1.13)(ts-node@10.9.1(@types/node@20.3.3)(typescript@5.1.6)))':
     dependencies:
       '@nestjs/common': 10.0.3(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.1.13)(rxjs@7.8.1)
       '@nestjs/core': 10.0.3(@nestjs/common@10.0.3(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.1.13)(rxjs@7.8.1))(@nestjs/microservices@10.4.16)(@nestjs/platform-express@10.0.3)(encoding@0.1.13)(reflect-metadata@0.1.13)(rxjs@7.8.1)
       reflect-metadata: 0.1.13
       rxjs: 7.8.1
-      typeorm: 0.3.22(ioredis@5.6.1)(mysql2@3.4.3)(redis@4.7.0)(reflect-metadata@0.1.13)(ts-node@10.9.1(@types/node@20.3.3)(typescript@5.1.6))
+      typeorm: 0.3.22(ioredis@5.6.1)(mysql2@3.14.0)(redis@4.7.0)(reflect-metadata@0.1.13)(ts-node@10.9.1(@types/node@20.3.3)(typescript@5.1.6))
       uuid: 9.0.1
 
   '@nodelib/fs.scandir@2.1.5':
@@ -16312,14 +16308,14 @@ snapshots:
     dependencies:
       '@babel/core': 7.26.10
       postcss: 7.0.39
-      postcss-syntax: 0.36.2(postcss-html@0.36.0(postcss-syntax@0.36.2)(postcss@7.0.39))(postcss-jsx@0.36.4)(postcss-less@3.1.4)(postcss-markdown@0.36.0)(postcss-scss@2.1.1)(postcss@7.0.39)
+      postcss-syntax: 0.36.2(postcss-html@0.36.0(postcss-syntax@0.36.2)(postcss@7.0.39))(postcss-jsx@0.36.4(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@7.0.39))(postcss-less@3.1.4)(postcss-markdown@0.36.0)(postcss-scss@2.1.1)(postcss@7.0.39)
     transitivePeerDependencies:
       - supports-color
 
   '@stylelint/postcss-markdown@0.36.2(postcss-syntax@0.36.2)(postcss@7.0.39)':
     dependencies:
       postcss: 7.0.39
-      postcss-syntax: 0.36.2(postcss-html@0.36.0(postcss-syntax@0.36.2)(postcss@7.0.39))(postcss-jsx@0.36.4)(postcss-less@3.1.4)(postcss-markdown@0.36.0)(postcss-scss@2.1.1)(postcss@7.0.39)
+      postcss-syntax: 0.36.2(postcss-html@0.36.0(postcss-syntax@0.36.2)(postcss@7.0.39))(postcss-jsx@0.36.4(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@7.0.39))(postcss-less@3.1.4)(postcss-markdown@0.36.0)(postcss-scss@2.1.1)(postcss@7.0.39)
       remark: 13.0.0
       unist-util-find-all-after: 3.0.2
     transitivePeerDependencies:
@@ -16676,7 +16672,7 @@ snapshots:
       '@typescript-eslint/types': 7.18.0
       '@typescript-eslint/typescript-estree': 7.18.0(typescript@5.1.6)
       '@typescript-eslint/visitor-keys': 7.18.0
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0
       eslint: 8.42.0
     optionalDependencies:
       typescript: 5.1.6
@@ -16709,7 +16705,7 @@ snapshots:
     dependencies:
       '@typescript-eslint/typescript-estree': 7.18.0(typescript@5.1.6)
       '@typescript-eslint/utils': 7.18.0(eslint@8.42.0)(typescript@5.1.6)
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0
       eslint: 8.42.0
       ts-api-utils: 1.4.3(typescript@5.1.6)
     optionalDependencies:
@@ -16739,7 +16735,7 @@ snapshots:
     dependencies:
       '@typescript-eslint/types': 7.18.0
       '@typescript-eslint/visitor-keys': 7.18.0
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0
       globby: 11.1.0
       is-glob: 4.0.3
       minimatch: 9.0.5
@@ -18790,6 +18786,10 @@ snapshots:
     dependencies:
       ms: 2.1.3
 
+  debug@4.4.0:
+    dependencies:
+      ms: 2.1.3
+
   debug@4.4.0(supports-color@7.2.0):
     dependencies:
       ms: 2.1.3
@@ -19616,7 +19616,7 @@ snapshots:
       ajv: 6.12.6
       chalk: 4.1.2
       cross-spawn: 7.0.6
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0
       doctrine: 3.0.0
       escape-string-regexp: 4.0.0
       eslint-scope: 7.2.2
@@ -21080,7 +21080,7 @@ snapshots:
     dependencies:
       '@ioredis/commands': 1.2.0
       cluster-key-slot: 1.1.2
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0
       denque: 2.1.0
       lodash.defaults: 4.2.0
       lodash.isarguments: 3.1.0
@@ -21458,7 +21458,7 @@ snapshots:
 
   istanbul-lib-source-maps@4.0.1:
     dependencies:
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0
       istanbul-lib-coverage: 3.2.2
       source-map: 0.6.1
     transitivePeerDependencies:
@@ -22287,8 +22287,6 @@ snapshots:
 
   lru-cache@7.18.3: {}
 
-  lru-cache@8.0.5: {}
-
   lru.min@1.1.2: {}
 
   macos-release@2.5.1: {}
@@ -22792,17 +22790,6 @@ snapshots:
       seq-queue: 0.0.5
       sqlstring: 2.3.3
 
-  mysql2@3.4.3:
-    dependencies:
-      denque: 2.1.0
-      generate-function: 2.3.1
-      iconv-lite: 0.6.3
-      long: 5.3.1
-      lru-cache: 8.0.5
-      named-placeholders: 1.1.3
-      seq-queue: 0.0.5
-      sqlstring: 2.3.3
-
   named-placeholders@1.1.3:
     dependencies:
       lru-cache: 7.18.3
@@ -22856,10 +22843,10 @@ snapshots:
       rxjs: 7.8.1
       string-format: 2.0.0
 
-  nestjs-typeorm-paginate@4.1.0(@nestjs/common@10.0.3(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.1.13)(rxjs@7.8.1))(typeorm@0.3.22(ioredis@5.6.1)(mysql2@3.4.3)(redis@4.7.0)(reflect-metadata@0.1.13)(ts-node@10.9.1(@types/node@20.3.3)(typescript@5.1.6))):
+  nestjs-typeorm-paginate@4.1.0(@nestjs/common@10.0.3(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.1.13)(rxjs@7.8.1))(typeorm@0.3.22(ioredis@5.6.1)(mysql2@3.14.0)(redis@4.7.0)(reflect-metadata@0.1.13)(ts-node@10.9.1(@types/node@20.3.3)(typescript@5.1.6))):
     dependencies:
       '@nestjs/common': 10.0.3(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.1.13)(rxjs@7.8.1)
-      typeorm: 0.3.22(ioredis@5.6.1)(mysql2@3.4.3)(redis@4.7.0)(reflect-metadata@0.1.13)(ts-node@10.9.1(@types/node@20.3.3)(typescript@5.1.6))
+      typeorm: 0.3.22(ioredis@5.6.1)(mysql2@3.14.0)(redis@4.7.0)(reflect-metadata@0.1.13)(ts-node@10.9.1(@types/node@20.3.3)(typescript@5.1.6))
 
   nice-try@1.0.5: {}
 
@@ -23719,13 +23706,13 @@ snapshots:
     dependencies:
       htmlparser2: 3.10.1
       postcss: 7.0.39
-      postcss-syntax: 0.36.2(postcss-html@0.36.0(postcss-syntax@0.36.2)(postcss@7.0.39))(postcss-jsx@0.36.4)(postcss-less@3.1.4)(postcss-markdown@0.36.0)(postcss-scss@2.1.1)(postcss@7.0.39)
+      postcss-syntax: 0.36.2(postcss-html@0.36.0(postcss-syntax@0.36.2)(postcss@7.0.39))(postcss-jsx@0.36.4(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@7.0.39))(postcss-less@3.1.4)(postcss-markdown@0.36.0)(postcss-scss@2.1.1)(postcss@7.0.39)
 
   postcss-jsx@0.36.4(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@7.0.39):
     dependencies:
       '@babel/core': 7.26.10
       postcss: 7.0.39
-      postcss-syntax: 0.36.2(postcss-html@0.36.0(postcss-syntax@0.36.2)(postcss@7.0.39))(postcss-jsx@0.36.4)(postcss-less@3.1.4)(postcss-markdown@0.36.0)(postcss-scss@2.1.1)(postcss@7.0.39)
+      postcss-syntax: 0.36.2(postcss-html@0.36.0(postcss-syntax@0.36.2)(postcss@7.0.39))(postcss-jsx@0.36.4(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@7.0.39))(postcss-less@3.1.4)(postcss-markdown@0.36.0)(postcss-scss@2.1.1)(postcss@7.0.39)
     transitivePeerDependencies:
       - supports-color
 
@@ -23736,7 +23723,7 @@ snapshots:
   postcss-markdown@0.36.0(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@7.0.39):
     dependencies:
       postcss: 7.0.39
-      postcss-syntax: 0.36.2(postcss-html@0.36.0(postcss-syntax@0.36.2)(postcss@7.0.39))(postcss-jsx@0.36.4)(postcss-less@3.1.4)(postcss-markdown@0.36.0)(postcss-scss@2.1.1)(postcss@7.0.39)
+      postcss-syntax: 0.36.2(postcss-html@0.36.0(postcss-syntax@0.36.2)(postcss@7.0.39))(postcss-jsx@0.36.4(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@7.0.39))(postcss-less@3.1.4)(postcss-markdown@0.36.0)(postcss-scss@2.1.1)(postcss@7.0.39)
       remark: 10.0.1
       unist-util-find-all-after: 1.0.5
 
@@ -23816,7 +23803,7 @@ snapshots:
       lodash: 4.17.21
       postcss: 7.0.39
 
-  postcss-syntax@0.36.2(postcss-html@0.36.0(postcss-syntax@0.36.2)(postcss@7.0.39))(postcss-jsx@0.36.4)(postcss-less@3.1.4)(postcss-markdown@0.36.0)(postcss-scss@2.1.1)(postcss@7.0.39):
+  postcss-syntax@0.36.2(postcss-html@0.36.0(postcss-syntax@0.36.2)(postcss@7.0.39))(postcss-jsx@0.36.4(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@7.0.39))(postcss-less@3.1.4)(postcss-markdown@0.36.0)(postcss-scss@2.1.1)(postcss@7.0.39):
     dependencies:
       postcss: 7.0.39
     optionalDependencies:
@@ -24542,19 +24529,19 @@ snapshots:
 
   sequelize-pool@7.1.0: {}
 
-  sequelize-typescript@2.1.5(@types/node@20.3.3)(@types/validator@13.12.3)(reflect-metadata@0.1.13)(sequelize@6.32.1(mysql2@3.4.3)):
+  sequelize-typescript@2.1.5(@types/node@20.3.3)(@types/validator@13.12.3)(reflect-metadata@0.1.13)(sequelize@6.32.1(mysql2@3.14.0)):
     dependencies:
       '@types/node': 20.3.3
       '@types/validator': 13.12.3
       glob: 7.2.0
       reflect-metadata: 0.1.13
-      sequelize: 6.32.1(mysql2@3.4.3)
+      sequelize: 6.32.1(mysql2@3.14.0)
 
-  sequelize@6.32.1(mysql2@3.4.3):
+  sequelize@6.32.1(mysql2@3.14.0):
     dependencies:
       '@types/debug': 4.1.12
       '@types/validator': 13.12.3
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0
       dottie: 2.0.6
       inflection: 1.13.4
       lodash: 4.17.21
@@ -24569,7 +24556,7 @@ snapshots:
       validator: 13.15.0
       wkx: 0.5.0
     optionalDependencies:
-      mysql2: 3.4.3
+      mysql2: 3.14.0
     transitivePeerDependencies:
       - supports-color
 
@@ -25212,7 +25199,7 @@ snapshots:
       postcss-sass: 0.4.4
       postcss-scss: 2.1.1
       postcss-selector-parser: 6.1.2
-      postcss-syntax: 0.36.2(postcss-html@0.36.0(postcss-syntax@0.36.2)(postcss@7.0.39))(postcss-jsx@0.36.4)(postcss-less@3.1.4)(postcss-markdown@0.36.0)(postcss-scss@2.1.1)(postcss@7.0.39)
+      postcss-syntax: 0.36.2(postcss-html@0.36.0(postcss-syntax@0.36.2)(postcss@7.0.39))(postcss-jsx@0.36.4(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@7.0.39))(postcss-less@3.1.4)(postcss-markdown@0.36.0)(postcss-scss@2.1.1)(postcss@7.0.39)
       postcss-value-parser: 4.2.0
       resolve-from: 5.0.0
       slash: 3.0.0
@@ -25268,7 +25255,7 @@ snapshots:
       postcss-sass: 0.3.5
       postcss-scss: 2.1.1
       postcss-selector-parser: 3.1.2
-      postcss-syntax: 0.36.2(postcss-html@0.36.0(postcss-syntax@0.36.2)(postcss@7.0.39))(postcss-jsx@0.36.4)(postcss-less@3.1.4)(postcss-markdown@0.36.0)(postcss-scss@2.1.1)(postcss@7.0.39)
+      postcss-syntax: 0.36.2(postcss-html@0.36.0(postcss-syntax@0.36.2)(postcss@7.0.39))(postcss-jsx@0.36.4(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@7.0.39))(postcss-less@3.1.4)(postcss-markdown@0.36.0)(postcss-scss@2.1.1)(postcss@7.0.39)
       postcss-value-parser: 3.3.1
       resolve-from: 4.0.0
       signal-exit: 3.0.7
@@ -25290,7 +25277,7 @@ snapshots:
     dependencies:
       component-emitter: 1.3.1
       cookiejar: 2.1.4
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0
       fast-safe-stringify: 2.1.1
       form-data: 4.0.2
       formidable: 2.1.2
@@ -25808,14 +25795,14 @@ snapshots:
 
   typedarray@0.0.6: {}
 
-  typeorm@0.3.22(ioredis@5.6.1)(mysql2@3.4.3)(redis@4.7.0)(reflect-metadata@0.1.13)(ts-node@10.9.1(@types/node@20.3.3)(typescript@5.1.6)):
+  typeorm@0.3.22(ioredis@5.6.1)(mysql2@3.14.0)(redis@4.7.0)(reflect-metadata@0.1.13)(ts-node@10.9.1(@types/node@20.3.3)(typescript@5.1.6)):
     dependencies:
       '@sqltools/formatter': 1.2.5
       ansis: 3.17.0
       app-root-path: 3.1.0
       buffer: 6.0.3
       dayjs: 1.11.13
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.0
       dotenv: 16.4.7
       glob: 10.4.5
       reflect-metadata: 0.1.13
@@ -25826,7 +25813,7 @@ snapshots:
       yargs: 17.7.2
     optionalDependencies:
       ioredis: 5.6.1
-      mysql2: 3.4.3
+      mysql2: 3.14.0
       redis: 4.7.0
       ts-node: 10.9.1(@types/node@20.3.3)(typescript@5.1.6)
     transitivePeerDependencies:

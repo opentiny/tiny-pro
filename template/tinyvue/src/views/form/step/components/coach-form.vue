@@ -222,9 +222,3 @@
     coachReset,
   });
 </script>
-
-<style scoped lang="less">
-  :deep(.tiny-row) {
-    margin-bottom: 15px;
-  }
-</style>
