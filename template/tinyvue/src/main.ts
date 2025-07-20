@@ -28,4 +28,20 @@ app.use(i18n({ locale: localStorage.getItem('tiny-locale') }));
 app.use(globalComponents);
 app.use(directive);
 
+// 检测设备类型
+const detectDevice = () => {
+  const width = window.innerWidth;
+  if (width < 768) {
+    app.config.globalProperties.tiny_mode = { value: 'mobile-first' };
+    app.config.globalProperties.isMobile = true;
+  } else {
+    app.config.globalProperties.tiny_mode = { value: 'pc' };
+    app.config.globalProperties.isMobile = false;
+  }
+};
+
+detectDevice();
+
+window.addEventListener('resize', detectDevice);
+
 app.mount('#app');
