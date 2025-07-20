@@ -1,10 +1,15 @@
 package com.TinyPro.aspect;
 
 import com.TinyPro.annotation.IsPublic;
+import com.TinyPro.entity.contants.Contants;
 import com.TinyPro.entity.enums.ResponseCodeEnum;
 import com.TinyPro.entity.po.User;
 import com.TinyPro.exception.BusinessException;
+import com.TinyPro.redis.RedisUtil;
+import com.TinyPro.utils.JwtUtil;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -22,10 +27,12 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 @Aspect
 @Component
 public class IsPublicAspect {
-//    private static final Logger logger = LoggerFactory.getLogger(AuthAspect.class);
+    private static final Logger logger = LoggerFactory.getLogger(IsPublicAspect.class);
 
-//    @Value("${jwt.secret}")
-//    private String jwtSecret;
+    @Autowired
+    private RedisUtil redisUtil;
+    @Autowired
+    private JwtUtil jwtUtil;
 
 
 
@@ -45,19 +52,21 @@ public class IsPublicAspect {
         if (token == null) {
             throw new BusinessException(ResponseCodeEnum.CODE_403);
         }
-
         try {
-           // TODO redis验证获取Token
-            User user=new User();
-            // 注入用户信息到请求
-            request.setAttribute("user", user);
-
-           // TODO验证缓存Token
-
-
+            Claims claims = jwtUtil.parseJwt(token);
+            String email = claims.get("email", String.class); // 你当初放进去的字段
+            if (StringUtils.isBlank(email)) {
+                throw new RuntimeException("非法 token");
+            }
+            String key= Contants.UserJwtTop+email+Contants.UserJwtbt;
+            String jwt = redisUtil.getValue(key);
+            //如果为空或者和前端的token不一样，就报错
+            if (StringUtils.isBlank(jwt)||!StringUtils.equals(jwt,token)){
+                throw new RuntimeException("token不对");
+            }
         } catch (Exception e) {
-//            logger.error("JWT 验证失败", e);
-//            throw new AuthException("Token 已过期", HttpStatus.UNAUTHORIZED);
+            logger.error("JWT 验证失败", e);
+            throw new RuntimeException(e);
         }
     }
 
