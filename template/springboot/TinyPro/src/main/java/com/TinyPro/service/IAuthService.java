@@ -1,11 +1,13 @@
 package com.TinyPro.service;
 
 import com.TinyPro.entity.dto.CreateAuthDto;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotEmpty;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.servlet.function.ServerResponse;
 
 public interface IAuthService {
-    ResponseEntity<String> login(CreateAuthDto createAuthDto) throws Exception;
+    ResponseEntity<String> login(CreateAuthDto createAuthDto, HttpServletResponse response) throws Exception;
 
     ResponseEntity<String> logout(@NotEmpty(message = "validation.NOT_EMPTY_HUMAN") String token);
 }

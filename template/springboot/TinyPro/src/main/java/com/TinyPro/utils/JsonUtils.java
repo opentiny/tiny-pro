@@ -1,7 +1,10 @@
 package com.TinyPro.utils;
+
+import com.TinyPro.entity.dto.InitMenuDto;
 import com.TinyPro.entity.po.Menu;
 import com.alibaba.fastjson.JSON;
 
+import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,9 +18,9 @@ public class JsonUtils {
         String json = new String(Files.readAllBytes(path));
         return JSON.parseObject(json, Map.class);
     }
-    public static List<Menu> readJsonFiletoMenu(String filePath) throws IOException {
+    public static List<InitMenuDto> readJsonFiletoMenu(String filePath) throws IOException {
         Path path = Paths.get(filePath);
         String json = new String(Files.readAllBytes(path));
-        return JSON.parseArray(json, Menu.class);
+        return JSON.parseArray(json, InitMenuDto.class);
     }
 }
