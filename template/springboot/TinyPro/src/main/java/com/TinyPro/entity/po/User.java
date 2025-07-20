@@ -1,5 +1,6 @@
 package com.TinyPro.entity.po;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
@@ -8,6 +9,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -28,7 +30,8 @@ public class User {
     @JoinTable(name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> role;
+    @TableField(select = false)
+    private List<Role> role;
 
     private String department;
     private String employeeType;
@@ -44,11 +47,15 @@ public class User {
     private Integer status;
 
     @CreatedDate
-    @Column(name = "create_time", updatable = false)
+    @Column(name = "createTime", updatable = false)
     private LocalDateTime createTime;
+    @Column(name = "create_time", updatable = false)
+    private LocalDateTime create_time;
     @LastModifiedDate
-    @Column(name = "update_time")
+    @Column(name = "updateTime")
     private LocalDateTime updateTime;
+    @Column(name = "update_time")
+    private LocalDateTime update_time;
 
     /* 密码盐 */
     @Column(name = "salt", length = 64)

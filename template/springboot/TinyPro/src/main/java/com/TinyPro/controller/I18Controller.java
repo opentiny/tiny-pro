@@ -45,8 +45,8 @@ public class I18Controller {
      return i18Service.findAll(page,limit,allBool,lang,key,content);
     }
     @Permission("i18n::query")
-    @GetMapping(":id")
-    public ResponseEntity<I18> findOne(@PathVariable("id")Integer id) {
+    @GetMapping("{id}")
+    public ResponseEntity<I18> findOne(@PathVariable Integer id) {
         return new ResponseEntity<I18>(i18Service.getById(id),HttpStatus.OK);
     }
     @PatchMapping("/{id}")
@@ -58,8 +58,8 @@ public class I18Controller {
     }
     @Reject()
     @Permission("i18n::remove")
-    @DeleteMapping(":id")
-   public ResponseEntity<String> remove(@Param("id") Integer id) {
+    @DeleteMapping("{id}")
+   public ResponseEntity<String> remove(@PathVariable Integer id) {
          this.i18Service.removeById(id);
          return new ResponseEntity<>("success",HttpStatus.OK);
     }

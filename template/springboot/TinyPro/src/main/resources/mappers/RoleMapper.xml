@@ -43,5 +43,9 @@
         LEFT JOIN menu            m  ON m.id = rm.menu_id
         WHERE r.name LIKE CONCAT('%', #{name}, '%')
     </select>
+    <delete id="removeUserRById">
+            DELETE FROM user_role WHERE role_id = #{roleId};
+            DELETE FROM role WHERE id = #{roleId};
+    </delete>
 
 </mapper>
