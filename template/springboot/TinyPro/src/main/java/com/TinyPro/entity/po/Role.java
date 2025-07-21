@@ -1,6 +1,7 @@
 package com.TinyPro.entity.po;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -15,6 +16,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Entity
 @Table(name = "role")
+@Data
 public class Role implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,14 +28,14 @@ public class Role implements Serializable {
     @JoinTable(name = "role_permission",
             joinColumns = @JoinColumn(name = "role_id"),
             inverseJoinColumns = @JoinColumn(name = "permission_id"))
-    private Set<Permission> permission;
+    @TableField(select = false)
+    private List<Permission> permission;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "role_menu",
             joinColumns = @JoinColumn(name = "role_id"),
             inverseJoinColumns = @JoinColumn(name = "menu_id"))
-    private Set<Menu> menus;
-    @ManyToOne
-    private User user;
+    @TableField(select = false)
+    private List<Menu> menus;
 
 }

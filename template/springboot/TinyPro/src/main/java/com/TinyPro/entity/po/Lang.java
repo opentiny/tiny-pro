@@ -1,6 +1,7 @@
 package com.TinyPro.entity.po;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
@@ -22,5 +23,6 @@ public class Lang implements Serializable {
     private String name;
 
     @OneToMany(mappedBy = "lang", fetch = FetchType.LAZY)
+    @TableField(select = false)
     private List<I18> i18ns;
 }
