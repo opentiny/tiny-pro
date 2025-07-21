@@ -21,6 +21,7 @@ public class Menu implements Serializable {
     private Integer id;
 
     private String name;
+    @TableField("'order'")
     private Integer order;
     private Integer parentId;
     private String menuType;

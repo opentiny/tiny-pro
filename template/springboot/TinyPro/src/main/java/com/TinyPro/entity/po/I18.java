@@ -13,21 +13,20 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
-@Table(name = "i18")
 @TableName("i18")
 public class I18 implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
+    @Column(name = "`key`")
     private String key;
 
+    @Column(name = "content",length = 65535)
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "lang_id")
+    @TableField(select = false)
     private Lang lang;
 }
