@@ -1,7 +1,7 @@
 [
   {
     "name": "Board",
-    "order": "1",
+    "order": 1,
     "menuType": "normal",
     "icon": "IconApplication",
     "component": "board/index",
@@ -10,7 +10,7 @@
     "children": [
       {
         "name": "Home",
-        "order": "1",
+        "order": 1,
         "menuType": "normal",
         "icon": "",
         "component": "board/home/index",
@@ -19,7 +19,7 @@
       },
       {
         "name": "Work",
-        "order": "2",
+        "order": 2,
         "menuType": "normal",
         "icon": "",
         "component": "board/work/index",
@@ -30,7 +30,7 @@
   },
   {
     "name": "List",
-    "order": "2",
+    "order": 2,
     "menuType": "normal",
     "icon": "IconFiles",
     "component": "list/index",
@@ -39,7 +39,7 @@
     "children": [
       {
         "name": "Table",
-        "order": "1",
+        "order": 1,
         "menuType": "normal",
         "icon": "",
         "component": "list/search-table/index",
@@ -50,7 +50,7 @@
   },
   {
     "name": "Form",
-    "order": "3",
+    "order": 3,
     "menuType": "normal",
     "icon": "IconSetting",
     "component": "form/index",
@@ -59,7 +59,7 @@
     "children": [
       {
         "name": "Base",
-        "order": "1",
+        "order": 1,
         "menuType": "normal",
         "icon": "",
         "component": "form/base/index",
@@ -68,7 +68,7 @@
       },
       {
         "name": "Step",
-        "order": "2",
+        "order": 2,
         "menuType": "normal",
         "icon": "",
         "component": "form/step/index",
@@ -79,7 +79,7 @@
   },
   {
     "name": "Profile",
-    "order": "4",
+    "order": 4,
     "menuType": "normal",
     "icon": "IconFiletext",
     "component": "profile/index",
@@ -88,7 +88,7 @@
     "children": [
       {
         "name": "Detail",
-        "order": "1",
+        "order": 1,
         "menuType": "normal",
         "icon": "",
         "component": "profile/detail/index",
@@ -99,7 +99,7 @@
   },
   {
     "name": "Result",
-    "order": "5",
+    "order": 5,
     "menuType": "normal",
     "icon": "IconSuccessful",
     "component": "result/index",
@@ -108,7 +108,7 @@
     "children": [
       {
         "name": "Success",
-        "order": "1",
+        "order": 1,
         "menuType": "normal",
         "icon": "",
         "component": "result/success/index",
@@ -117,7 +117,7 @@
       },
       {
         "name": "Error",
-        "order": "2",
+        "order": 2,
         "menuType": "normal",
         "icon": "",
         "component": "result/error/index",
@@ -128,7 +128,7 @@
   },
   {
     "name": "Exception",
-    "order": "6",
+    "order": 6,
     "menuType": "normal",
     "icon": "IconCueL",
     "component": "exception/index",
@@ -137,7 +137,7 @@
     "children": [
       {
         "name": "403",
-        "order": "1",
+        "order": 1,
         "menuType": "normal",
         "icon": "",
         "component": "exception/403/index",
@@ -146,7 +146,7 @@
       },
       {
         "name": "404",
-        "order": "2",
+        "order": 2,
         "menuType": "normal",
         "icon": "",
         "component": "exception/404/index",
@@ -155,7 +155,7 @@
       },
       {
         "name": "500",
-        "order": "1",
+        "order": 1,
         "menuType": "normal",
         "icon": "",
         "component": "exception/500/index",
@@ -166,7 +166,7 @@
   },
   {
     "name": "User",
-    "order": "7",
+    "order": 7,
     "menuType": "normal",
     "icon": "IconUser",
     "component": "user/index",
@@ -175,7 +175,7 @@
     "children": [
       {
         "name": "Info",
-        "order": "1",
+        "order": 1,
         "menuType": "normal",
         "icon": "",
         "component": "user/info/index",
@@ -186,7 +186,7 @@
   },
   {
     "name": "Cloud",
-    "order": "8",
+    "order": 8,
     "menuType": "normal",
     "icon": "IconDownloadCloud",
     "component": "cloud/index",
@@ -195,7 +195,7 @@
     "children": [
       {
         "name": "Hello",
-        "order": "1",
+        "order": 1,
         "menuType": "normal",
         "icon": "",
         "component": "cloud/hello/index",
@@ -204,7 +204,7 @@
       },
       {
         "name": "Contracts",
-        "order": "2",
+        "order": 2,
         "menuType": "normal",
         "icon": "",
         "component": "cloud/contracts/index",
@@ -215,7 +215,7 @@
   },
   {
     "name": "MenuPage",
-    "order": "9",
+    "order": 9,
     "menuType": "normal",
     "icon": "IconApp",
     "component": "menu/index",
@@ -224,7 +224,7 @@
     "children": [
       {
         "name": "SecondMenu",
-        "order": "1",
+        "order": 1,
         "menuType": "normal",
         "icon": "",
         "component": "menu/index",
@@ -233,7 +233,7 @@
         "children": [
           {
             "name": "ThirdMenu",
-            "order": "1",
+            "order": 1,
             "menuType": "normal",
             "icon": "",
             "component": "menu/demo/index",
@@ -246,7 +246,7 @@
   },
   {
     "name": "SystemManager",
-    "order": "10",
+    "order": 10,
     "menuType": "normal",
     "icon": "IconTotal",
     "component": "menu/index",
@@ -255,7 +255,7 @@
     "children": [
       {
         "name": "AllMenu",
-        "order": "1",
+        "order": 1,
         "menuType": "admin",
         "icon": "IconGrade",
         "component": "menu/info/index",
@@ -264,7 +264,7 @@
       },
       {
         "name": "AllPermission",
-        "order": "1",
+        "order": 1,
         "menuType": "admin",
         "icon": "IconFolderOpened",
         "component": "permission/info/index",
@@ -273,7 +273,7 @@
       },
       {
         "name": "AllRole",
-        "order": "1",
+        "order": 1,
         "menuType": "admin",
         "icon": "IconActivation",
         "component": "role/info/index",
@@ -282,7 +282,7 @@
       },
       {
         "name": "AllInfo",
-        "order": "1",
+        "order": 1,
         "menuType": "admin",
         "icon": "IconGroup",
         "component": "userManager/info/index",
@@ -291,7 +291,7 @@
       },
       {
         "name": "Local",
-        "order": "14",
+        "order": 14,
         "menuType": "normal",
         "icon": "IconFlag",
         "component": "locale/index",
@@ -302,7 +302,7 @@
   },
   {
     "name": "MyOrder",
-    "order": "0",
+    "order": 0,
     "menuType": "normal",
     "icon": "IconPurchasePlannedOrder",
     "component": "order/index",
@@ -311,7 +311,7 @@
     "children": [
       {
         "name": "Bought",
-        "order": "0",
+        "order": 0,
         "menuType": "normal",
         "icon": "IconDiscountSup",
         "component": "order/bought/index",
@@ -320,7 +320,7 @@
       },
       {
         "name": "CreateOrder",
-        "order": "1",
+        "order": 1,
         "menuType": "normal",
         "icon": "IconAdd",
         "component": "order/create/index",
