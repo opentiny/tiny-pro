@@ -4,14 +4,14 @@ const taskList = mock({
   'list|60': [
     {
       id: '@id',
-      name: 'xiaoming',
+      name: '@cname',
       rank: '初级',
       description: '一段描述文字',
       createTime: '@datetime',
       'status|1': ['0', '1', '2'],
       type: 'Tiny Design',
       roles: '前端',
-      employeeNo: '00022456',
+      employeeNo: '@integer(10000000, 99999999)',
       department: '公共服务',
       departmentLevel: '二级',
       workbenchName: 'work',

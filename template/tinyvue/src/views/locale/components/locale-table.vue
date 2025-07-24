@@ -115,7 +115,7 @@
       currentPage: 1,
       pageSize: 10,
       pageSizes: Array.from({ length: 20 }).map(
-        (cur, index) => (index + 1) * 5,
+        (cur, index) => (index + 1) * 10,
       ),
       total: 0,
       align: 'right',

@@ -15,7 +15,6 @@
         <div class="tiny-fullscreen-wrapper">
           <div class="btn">
             <transition-fade-down-group>
-              <tiny-select class="tiny-select-header" />
               <div class="search-box-container">
                 <tiny-search-box
                   v-model="tags"
@@ -314,9 +313,18 @@
 
     const excludeKeys = ['id', 'rank', 'description'];
     const fieldOptionsMap = {};
-
+    
+    let minDate = new Date();
+    let maxDate = new Date();
     list.forEach(item => {
       Object.keys(item).forEach(key => {
+        if(key === 'createTime'){
+          const currentDate = new Date(item[key]);
+          // 使用 getTime() 方法获取时间戳进行比较
+          minDate = minDate.getTime() < currentDate.getTime() ? minDate : currentDate;
+          maxDate = maxDate.getTime() > currentDate.getTime() ? maxDate : currentDate;
+          return
+        }
         if (excludeKeys.includes(key)) return;
         if (!fieldOptionsMap[key]) {
           fieldOptionsMap[key] = new Set();
@@ -335,6 +343,13 @@
         options: Array.from(valueSet).map(i => ({ label: i }))
       });
     });
+    items.push({
+      label: t(`searchTable.columns.createTime`),
+      field: 'createTime',
+      type: 'datetimeRange',
+      min: minDate,
+      max: maxDate
+    })
   };
 
   // 请求数据接口方法
