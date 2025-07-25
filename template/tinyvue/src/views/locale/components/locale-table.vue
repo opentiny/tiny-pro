@@ -114,9 +114,7 @@
     attrs: {
       currentPage: 1,
       pageSize: 10,
-      pageSizes: Array.from({ length: 20 }).map(
-        (cur, index) => (index + 1) * 10,
-      ),
+      pageSizes: [10, 20, 50, 100],
       total: 0,
       align: 'right',
       layout: 'sizes, total, prev, pager, next, jumper',
