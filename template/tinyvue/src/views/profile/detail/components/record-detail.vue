@@ -40,10 +40,10 @@
         :current-page="custPager.currentPage"
         :page-size="custPager.pageSize"
         :total="tableData.length"
-        :page-sizes="[5, 10, 20, 50]"
+        :page-sizes="[10, 20, 50, 100]"
+        layout="total, sizes, prev, pager, next, jumper"
         @current-change="currentChange"
         @size-change="sizeChange"
-        layout="total, sizes, prev, pager, next, jumper"
       ></tiny-pager>
     </div>
   </div>

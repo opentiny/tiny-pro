@@ -197,27 +197,27 @@
       const vaild = coachFormRef.value?.coachValid();
       if (vaild && coachFormRef.value?.state?.filterOptions) {
         saveCache(0, JSON.parse(JSON.stringify(coachFormRef.value.state.filterOptions)));
+        packaged(vaild, 1, '2');
       }
 
-      packaged(vaild, 1, '2');
     } if (appStore.step === 1) {
       const vaild = directorRef.value?.directorValid();
       if (vaild && directorRef.value?.state?.filterOptions) {
         saveCache(1, JSON.parse(JSON.stringify(directorRef.value.state.filterOptions)));
+        packaged(vaild, 2, '3');
       }
-      packaged(vaild, 2, '3');
     } else if (appStore.step === 2) {
       const vaild = targetRef.value?.targetSubmit();
       if (targetRef.value?.targetModel?.length) {
         saveCache(2, JSON.parse(JSON.stringify(targetRef.value.targetModel)));
+        packaged(vaild, 3, '4');
       }
-      packaged(vaild, 3, '4');
     } else if (appStore.step === 3) {
       const vaild = summationRef.value?.summarizeValid();
       if (vaild && summationRef.value?.state?.filterOptions) {
         saveCache(3, JSON.parse(JSON.stringify(summationRef.value.state.filterOptions)));
+        packaged(vaild, 4, '4');
       }
-      packaged(vaild, 4, '4');
     }
   };
 
