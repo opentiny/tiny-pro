@@ -135,10 +135,10 @@
 
   const handleBlur = () => {
     const start = new Date(
-      JSON.parse(JSON.stringify(state.filterOptions.startTime)),
+      state.filterOptions.startTime,
     ).getTime();
     const end = new Date(
-      JSON.parse(JSON.stringify(state.filterOptions.endTime)),
+      state.filterOptions.endTime,
     ).getTime();
     if (end < start) {
       state.filterOptions.endTime = '';
