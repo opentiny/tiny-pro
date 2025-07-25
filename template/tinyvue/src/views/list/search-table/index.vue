@@ -4,7 +4,6 @@
 
     <div class="search-table-container">
       <div class="button-group">
-        <tiny-button>{{ $t('stepForm.button.submit') }}</tiny-button>
         <tiny-button>{{ $t('userInfo.table.operations.delete') }}</tiny-button>
         <tiny-file-upload action="#" accept=".xls,.xlsx" @change="importExcel">
           <tiny-button >{{ $t('userInfo.table.import') }}</tiny-button>
@@ -144,7 +143,6 @@
         :model="formModel"
         label-position="left"
         label-width="94px"
-        
       >
         <tiny-row>
           <tiny-col :span="6">

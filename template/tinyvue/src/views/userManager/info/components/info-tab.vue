@@ -301,7 +301,7 @@
       v-model="state.isUserAdd"
       :lock-scroll="true"
       height="auto"
-      width="800"
+      width="700"
       :title="$t('userInfo.modal.title.add')"
     >
       <UserAdd
