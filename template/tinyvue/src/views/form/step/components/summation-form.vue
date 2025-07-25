@@ -84,6 +84,8 @@
   defineExpose({
     summarizeValid,
     summarizeReset,
+    state,
+    disabled
   });
 </script>
 
