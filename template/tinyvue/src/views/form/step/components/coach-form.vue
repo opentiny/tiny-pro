@@ -220,5 +220,7 @@
   defineExpose({
     coachValid,
     coachReset,
+    state,
+    disabled
   });
 </script>
