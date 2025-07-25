@@ -168,6 +168,8 @@
   defineExpose({
     directorValid,
     directorReset,
+    state,
+    disabled
   });
 </script>
 

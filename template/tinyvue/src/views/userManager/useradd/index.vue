@@ -249,7 +249,6 @@
         newTemp.protocolStart && (newTemp.protocolStart = getSimpleDate(data.protocolStart))
         newTemp.protocolEnd && (newTemp.protocolEnd = getSimpleDate(data.protocolEnd))
         newTemp.status && (newTemp.status = props.statusData.find(item => item.label === data.status).value)
-        console.log('12', newTemp)
 
         try {
           await registerUser(newTemp);
@@ -296,13 +295,11 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    width: 98%;
+    width: 100%;
     height: inherit;
-    margin: 0 auto;
 
     .general-card {
       height: 100%;
-      padding: 10px;
       overflow-x: hidden;
       overflow-y: auto;
       border-radius: 10px;
@@ -322,7 +319,7 @@
         flex-direction: column;
         justify-content: center;
         min-height: 75%;
-        padding: 30px 0 10px 0;
+        padding-bottom: 32px;
 
         .tiny-layout {
           width: 100%;
