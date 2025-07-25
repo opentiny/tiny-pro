@@ -63,7 +63,7 @@
         </tiny-form-item>
       </tiny-form>
       <template #footer>
-        <tiny-button size="small" @click="onClose">取 消</tiny-button>
+        <tiny-button size="small" @click="onClose">{{ $t('menu.btn.cancel') }}</tiny-button>
         <tiny-button
           size="small"
           :text="$t('locale.add.btn')"

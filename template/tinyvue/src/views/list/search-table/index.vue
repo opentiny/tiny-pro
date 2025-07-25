@@ -218,8 +218,8 @@
         </tiny-row>
       </tiny-form>
       <template #footer>
-        <tiny-button size="small" @click="state.updateVisibility = false">取 消</tiny-button>
-        <tiny-button size="small" type="primary" @click="handleUpdateSubmit">确 定</tiny-button>
+        <tiny-button size="small" @click="state.updateVisibility = false">{{ $t('menu.btn.cancel') }}</tiny-button>
+        <tiny-button size="small" type="primary" @click="handleUpdateSubmit">{{ $t('menu.btn.confirm') }}</tiny-button>
       </template>
     </tiny-dialog-box>
   </div>
