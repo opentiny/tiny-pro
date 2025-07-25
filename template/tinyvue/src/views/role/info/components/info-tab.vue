@@ -67,7 +67,7 @@
     attrs: {
       currentPage: 1,
       pageSize: 5,
-      pageSizes: [10, 20,50,100],
+      pageSizes: [10, 20, 50, 100],
       total: 0,
       layout: 'sizes, total, prev, pager, next, jumper',
     },
