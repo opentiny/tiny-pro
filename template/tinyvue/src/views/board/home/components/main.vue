@@ -106,7 +106,6 @@
     .col {
       display: flex;
       justify-content: space-around;
-      min-width: 396px;
       height: 150px;
       background: #fff;
       border-radius: 6px;
@@ -184,8 +183,11 @@
     }
   }
 
-  :deep(.tiny-col) {
-    padding: 0 11.5px;
+  :deep(.tiny-col:first-child) {
+    padding-left: 0;
+  }
+  :deep(.tiny-col:last-child) {
+    padding-right: 0;
   }
 </style>
 

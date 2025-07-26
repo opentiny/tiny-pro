@@ -163,7 +163,7 @@ const pagerConfig = reactive({
   attrs: {
     currentPage: 1,
     pageSize: 10,
-    pageSizes: [5, 10, 15, 20],
+    pageSizes: [10, 20, 50,100],
     total: 10,
     layout: 'sizes,total, prev, pager, next, jumper',
   },

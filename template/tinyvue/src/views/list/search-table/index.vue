@@ -4,7 +4,6 @@
 
     <div class="search-table-container">
       <div class="button-group">
-        <tiny-button>{{ $t('stepForm.button.submit') }}</tiny-button>
         <tiny-button>{{ $t('userInfo.table.operations.delete') }}</tiny-button>
         <tiny-file-upload action="#" accept=".xls,.xlsx" @change="importExcel">
           <tiny-button >{{ $t('userInfo.table.import') }}</tiny-button>
@@ -144,7 +143,6 @@
         :model="formModel"
         label-position="left"
         label-width="94px"
-        
       >
         <tiny-row>
           <tiny-col :span="6">
@@ -220,8 +218,8 @@
         </tiny-row>
       </tiny-form>
       <template #footer>
-        <tiny-button size="small" @click="state.updateVisibility = false">取 消</tiny-button>
-        <tiny-button size="small" type="primary" @click="handleUpdateSubmit">确 定</tiny-button>
+        <tiny-button size="small" @click="state.updateVisibility = false">{{ $t('menu.btn.cancel') }}</tiny-button>
+        <tiny-button size="small" type="primary" @click="handleUpdateSubmit">{{ $t('menu.btn.confirm') }}</tiny-button>
       </template>
     </tiny-dialog-box>
   </div>

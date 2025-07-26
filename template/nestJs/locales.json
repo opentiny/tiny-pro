@@ -1271,7 +1271,7 @@
     "exception.result.demo.description": "这是一个新增的菜单demo页",
     "locale.add.btn": "添加词条",
     "locale.add.title": "添加词条",
-    "locale.add.key": "词条Key",
+    "locale.add.key": "词条关键字",
     "locale.add.content": "词条内容",
     "locale.add.lang": "词条语言",
     "lang.add.title": "语言名称",
