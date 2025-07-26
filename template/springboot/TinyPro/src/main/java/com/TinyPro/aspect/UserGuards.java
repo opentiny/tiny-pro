@@ -48,13 +48,13 @@ public class UserGuards {
         String token = extractTokenFromHeader(request);
         if (StringUtils.isEmpty(token)){
             //TODO 返回类型的潘顿，AUthor的判断
-            throw new BusinessException( ResponseCodeEnum.CODE_404,messageSource.getMessage("exception.common.tokenError",null, LocaleUntil.getLocale()));
+//            throw new BusinessException( ResponseCodeEnum.CODE_404,messageSource.getMessage("exception.common.tokenError",null, LocaleUntil.getLocale()));
         }
         Claims claims = jwtUtil.parseJwt(token);
         String email = claims.get("email").toString();
         String jwt = redisUtil.getValue(Contants.UserJwtTop + email + Contants.UserJwtbt);
         if (!StringUtils.equals(jwt,token)){
-            throw new BusinessException( ResponseCodeEnum.CODE_404,messageSource.getMessage("exception.common.tokenError",null, LocaleUntil.getLocale()));
+//            throw new BusinessException( ResponseCodeEnum.CODE_404,messageSource.getMessage("exception.common.tokenError",null, LocaleUntil.getLocale()));
         }
         return joinPoint.proceed();
 

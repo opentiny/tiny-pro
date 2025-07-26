@@ -2,8 +2,9 @@ package com.TinyPro.service;
 
 import com.TinyPro.entity.dto.CreateI18Dto;
 import com.TinyPro.entity.dto.UpdateI18Dto;
+import com.TinyPro.entity.page.PageWrapper;
 import com.TinyPro.entity.po.I18;
-import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.TinyPro.entity.vo.I18Vo;
 import com.baomidou.mybatisplus.extension.service.IService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -13,11 +14,15 @@ import java.util.Map;
 
 public interface II18Service extends IService<I18> {
 
-    ResponseEntity<String> create(CreateI18Dto createI18Dto);
+    ResponseEntity<String>  create(CreateI18Dto createI18Dto);
 
     Map<String, Map<String, String>> getFormat(String lang);
 
-    ResponseEntity<IPage<I18>> findAll(Integer page, Integer limit, Boolean allBool, List<Integer> lang, String key, String content);
+    ResponseEntity<PageWrapper<I18Vo>> findAll(Integer page, Integer limit, Boolean allBool, List<String> lang, String key, String content);
 
-    ResponseEntity<String> updateByi18nId(java.lang.Long id, @Valid UpdateI18Dto dto);
+    ResponseEntity<I18> updateByi18nId(java.lang.Long id, @Valid UpdateI18Dto dto);
+
+    I18Vo getI18ById(Integer id);
+
+    I18 removei18ById(Integer id);
 }

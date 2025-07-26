@@ -2,11 +2,12 @@ package com.TinyPro.service.imp;
 
 import com.TinyPro.entity.contants.Contants;
 import com.TinyPro.entity.dto.CreateAuthDto;
+import com.TinyPro.entity.enums.ResponseCodeEnum;
 import com.TinyPro.entity.po.User;
+import com.TinyPro.exception.BusinessException;
 import com.TinyPro.redis.RedisUtil;
 import com.TinyPro.service.IAuthService;
-import com.TinyPro.service.IUserService;
-import com.TinyPro.utils.JsonUtils;
+import com.TinyPro.service.jpa.IUserRepository;
 import com.TinyPro.utils.JwtUtil;
 import com.TinyPro.utils.LocaleUntil;
 import com.TinyPro.utils.Sha256Utils;
@@ -20,12 +21,15 @@ import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.function.ServerResponse;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class AuthServiceImpl implements IAuthService {
     @Autowired
-    private IUserService userService;
+    private IUserRepository userService;
     @Autowired
     private MessageSource messageSource;
     @Autowired
@@ -34,28 +38,27 @@ public class AuthServiceImpl implements IAuthService {
     private JwtUtil jwtUtil;
 
     @Override
-    public ResponseEntity<String> login(CreateAuthDto createAuthDto, HttpServletResponse response) throws Exception {
+    public ResponseEntity<?> login(CreateAuthDto createAuthDto, HttpServletResponse response) throws Exception {
         QueryWrapper<User> wrapper = new QueryWrapper<>();
-        wrapper.eq("email",createAuthDto.getEmail());
-        User user = userService.getOne(wrapper);
-        if (user==null){
-            String message = messageSource.getMessage("exception.auth.userNotExists", null, LocaleUntil.getLocale());
-            return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
+        wrapper.eq("email", createAuthDto.getEmail());
+        User user = userService.findByEmail(createAuthDto.getEmail()).orElseThrow(null);
+        if (user == null) {
+            throw new BusinessException("exception.auth.userNotExists", null);
         }
-        if (StringUtils.equals(Sha256Utils.encry(createAuthDto.getPassword(),user.getSalt()),user.getPassword())){
-            String message = messageSource.getMessage("exception.auth.passwordOrEmailError", null, LocaleUntil.getLocale());
-             return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+        if (!StringUtils.equals(Sha256Utils.encry(createAuthDto.getPassword(), user.getSalt()), user.getPassword())) {
+            throw new BusinessException("exception.auth.passwordOrEmailError", null);
         }
         String jwt = jwtUtil.generateJwt(user.getEmail(), Contants.H_2);
-        String key=Contants.UserJwtTop+user.getEmail()+Contants.UserJwtbt;
-        redisUtil.setValue(key, JSON.toJSONString(user),Contants.H_2);
-        //设置token
-        response.setHeader("Authorization", "Bearer " + jwt);
-        return new ResponseEntity<>(jwt,HttpStatus.OK);
+        String key = Contants.UserJwtTop + user.getEmail() + Contants.UserJwtbt;
+        redisUtil.setValue(key, JSON.toJSONString(user), Contants.H_2);
+        Map<String, String> result = new HashMap<>();
+        result.put("token", jwt);
+        response.setHeader("Authorization","Bearer "+jwt);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<String> logout(String token){
+    public ResponseEntity<String> logout(String token) {
         try {
             Claims claims = jwtUtil.parseJwt(token);
             String email = (String) claims.get("email");

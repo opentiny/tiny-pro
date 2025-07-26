@@ -226,7 +226,8 @@ public class DataInitializer implements CommandLineRunner {
         user.setName(Contants.ADMIN);
         user.setSalt(Contants.PUBLICK_SALT);
         user.setStatus(Contants.USER_STATUS_YES);
-        Role adminRole=roleRepository.findByName(Contants.ADMIN);
+        Optional<Role> optionalRole=roleRepository.findByName(Contants.ADMIN);
+        Role adminRole = optionalRole.get();
         List<Role> roleList = List.of(adminRole);
         user.setRole(roleList);
         user = userRepository.save(user);
