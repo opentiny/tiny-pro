@@ -17,7 +17,7 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 @Component
-public class AuthInterceptor implements HandlerInterceptor {
+public class UserGuardsFilter implements HandlerInterceptor {
 
     @Autowired
     private RedisUtil redisUtil;
