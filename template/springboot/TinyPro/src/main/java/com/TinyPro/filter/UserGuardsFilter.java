@@ -56,8 +56,7 @@ public class UserGuardsFilter implements HandlerInterceptor {
         User user = JSON.parseObject(cached, User.class);
 
         if (StringUtils.isBlank(cached) || !user.getEmail().equals(email)) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return false;
+          throw new BusinessException("common.tokenError");
         }
         return true;
     }
