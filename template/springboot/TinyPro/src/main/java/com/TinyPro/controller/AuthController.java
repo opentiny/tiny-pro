@@ -15,18 +15,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.function.ServerResponse;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
     @Autowired
     private IAuthService authService;
+
     @IsPublic()
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody  CreateAuthDto createAuthDto, HttpServletResponse response) throws Exception {
-        return authService.login(createAuthDto,response);
+    public ResponseEntity<?> login(@RequestBody CreateAuthDto createAuthDto, HttpServletResponse response) throws Exception {
+        return authService.login(createAuthDto, response);
     }
+
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(@Valid @RequestBody LogoutAuthDto logoutAuthDto){
+    public ResponseEntity<String> logout(@Valid @RequestBody LogoutAuthDto logoutAuthDto) {
         return authService.logout(logoutAuthDto.getToken());
     }
 }
