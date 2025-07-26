@@ -1,7 +1,7 @@
 <template>
   <tiny-grid  
     ref="grid" 
-    :data="props.data" 
+    :data="menuList" 
     :tree-config="{ children: 'children' }"
     >
     <tiny-grid-column 
@@ -57,7 +57,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed } from 'vue';
+  import { watch,ref } from 'vue';
   import { IconDel, IconEdit } from '@opentiny/vue-icon';
   import { ITreeNodeData } from '@/router/guard/menu';
   import { TinyGrid, TinyGridColumn ,TinyPopconfirm  } from '@opentiny/vue';
@@ -70,8 +70,8 @@
     data: ITreeNodeData[];
     localeData: { value: string; label: string }[];
   }>();
-  const treeOp = computed(() => ({ data: props.data }));
   const iconDel = IconDel();
+  const menuList = ref([])
   const iconEdit = IconEdit();
   const emits = defineEmits<{
     check: [Node];
@@ -82,6 +82,13 @@
   const confirm = (row) =>{
     emits('delete', row)
   }
+  watch(
+      () => props.data.length,
+      () => {
+          menuList.value = props.data
+      },
+      { immediate: true },
+    );
 </script>
 
 <style scoped lang="less">
