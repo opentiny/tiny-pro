@@ -59,10 +59,6 @@ public class AuthInterceptor implements HandlerInterceptor {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return false;
         }
-        //扩展token时间
-//        String newtoken = jwtUtil.extendExpiration(token);
-//        //设置token
-//        response.setHeader("Authorization", "Bearer " + newtoken);
         return true;
     }
 

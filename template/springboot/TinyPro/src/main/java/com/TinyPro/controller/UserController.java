@@ -18,21 +18,24 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     @Autowired
     private IUserService userService;
+
     @PostMapping("/reg")
     @Permission("user::add")
     @Reject()
-    public ResponseEntity<String> register(@RequestBody CreateUserDto createUserDto){
-       return userService.create(createUserDto);
+    public ResponseEntity<String> register(@RequestBody CreateUserDto createUserDto) {
+        return userService.create(createUserDto);
     }
+
     @GetMapping("/info/{email}")
-    public ResponseEntity<User> getUserInfo(HttpServletRequest request, @PathVariable String email){
+    public ResponseEntity<User> getUserInfo(HttpServletRequest request, @PathVariable String email) {
         //TODO email
         return userService.getUserInfo(email);
     }
+
     @Reject()
     @DeleteMapping("/info/{email}")
     @Permission("user::remove")
-    public ResponseEntity<String> delUser(@PathVariable String email){
+    public ResponseEntity<String> delUser(@PathVariable String email) {
         //TODO email
         return userService.removeUserInfo(email);
     }

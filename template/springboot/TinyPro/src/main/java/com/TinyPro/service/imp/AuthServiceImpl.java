@@ -53,7 +53,6 @@ public class AuthServiceImpl implements IAuthService {
         redisUtil.setValue(key, JSON.toJSONString(user), Contants.H_2);
         Map<String, String> result = new HashMap<>();
         result.put("token", jwt);
-        response.setHeader("Authorization","Bearer "+jwt);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 

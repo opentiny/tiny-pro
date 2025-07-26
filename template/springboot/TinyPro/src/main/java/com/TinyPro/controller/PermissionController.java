@@ -18,19 +18,22 @@ import java.util.List;
 public class PermissionController {
     @Autowired
     private IPermissionService iPermissionService;
+
     @PostMapping()
     @Reject()
     @Permission("permission::add")
-    public ResponseEntity<PermissionVo> create(@RequestBody CreatePermissionDto createPermissionDto){
+    public ResponseEntity<PermissionVo> create(@RequestBody CreatePermissionDto createPermissionDto) {
         boolean b = false;
-        return iPermissionService.create(createPermissionDto,b);
+        return iPermissionService.create(createPermissionDto, b);
     }
+
     @PatchMapping()
     @Reject
     @Permission("permission::update")
-    public ResponseEntity<PermissionVo> updatePermission(@RequestBody UpdatePermissionDto updatePermissionDto){
+    public ResponseEntity<PermissionVo> updatePermission(@RequestBody UpdatePermissionDto updatePermissionDto) {
         return iPermissionService.updatePermission(updatePermissionDto);
     }
+
     @GetMapping
     @Permission("permission::get")
     public ResponseEntity<List<PermissionVo>> findPermissions(
@@ -40,10 +43,11 @@ public class PermissionController {
 
         return iPermissionService.findPermissions(page, limit, name);
     }
+
     @DeleteMapping("/{id}")
     @Reject
     @Permission("permission::remove")
-    public ResponseEntity<CreatePermissionDto> del(@PathVariable Integer id){
+    public ResponseEntity<CreatePermissionDto> del(@PathVariable Integer id) {
         return iPermissionService.delPermission(id);
     }
 }

@@ -22,13 +22,15 @@ import java.util.Map;
 public class AuthController {
     @Autowired
     private IAuthService authService;
+
     @IsPublic()
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody  CreateAuthDto createAuthDto, HttpServletResponse response) throws Exception {
-        return authService.login(createAuthDto,response);
+    public ResponseEntity<?> login(@RequestBody CreateAuthDto createAuthDto, HttpServletResponse response) throws Exception {
+        return authService.login(createAuthDto, response);
     }
+
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(@Valid @RequestBody LogoutAuthDto logoutAuthDto){
+    public ResponseEntity<String> logout(@Valid @RequestBody LogoutAuthDto logoutAuthDto) {
         return authService.logout(logoutAuthDto.getToken());
     }
 }

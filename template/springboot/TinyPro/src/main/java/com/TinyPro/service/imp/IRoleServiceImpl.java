@@ -72,43 +72,6 @@ public class IRoleServiceImpl extends ServiceImpl<RoleMapper,Role>implements IRo
 
     @Override
     public ResponseEntity<List<MenuTreeVo>> findAllDetail(Integer page, Integer limit, String name) {
-//        // 构建分页参数
-//        Pageable pageable = PageRequest.of(
-//                page == null || page <= 0 ? 0 : page - 1,
-//                limit == null || limit <= 0 ? 10 : limit
-//        );
-//
-//        // 构建查询条件
-//        Specification<Role> spec = (root, query, cb) -> {
-//            List<Predicate> predicates = new ArrayList<>();
-//            if (StringUtils.hasText(name)) {
-//                predicates.add(cb.like(root.get("name"), "%" + name + "%"));
-//            }
-//            return cb.and(predicates.toArray(new Predicate[0]));
-//        };
-//
-//        // 查询角色（仅加载 menus）
-//        Page<Role> rolePage = iRoleRepository.findAllWithMenus(spec, pageable);
-//
-//        // 手动加载 permission
-//        List<Long> roleIds = rolePage.getContent().stream()
-//                .map(Role::getId)
-//                .collect(Collectors.toList());
-//
-//        Map<Long, List<Permission>> permissionsMap = permissionService.findByRoleIdIn(roleIds)
-//                .stream()
-//                .collect(Collectors.groupingBy(Permission::getRoleId));
-//
-//        rolePage.getContent().forEach(role ->
-//                role.setPermission(permissionsMap.get(role.getId()))
-//        );
-//
-//        // 构建菜单树
-//        List<MenuTreeVo> menuTrees = rolePage.getContent().stream()
-//                .map(role -> convertToTree(role.getMenus()))
-//                .collect(Collectors.toList());
-//
-//        return ResponseEntity.ok(menuTrees);
         return ResponseEntity.ok(new ArrayList<>());
     }
 

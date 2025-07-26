@@ -27,31 +27,33 @@ public class RoleController {
     @Permission("role::add")
     @PostMapping()
     public ResponseEntity<Role> create(@RequestBody CreateRoleDto createRoleDto) {
-        return this.roleService.createRole(createRoleDto,false);
+        return this.roleService.createRole(createRoleDto, false);
     }
 
     /**
      * 获取所有的角色信息
+     *
      * @return
      */
     @Permission("role::query")
     @GetMapping()
-   public ResponseEntity<List<RoleSimpleVo>> getAllRole() {
+    public ResponseEntity<List<RoleSimpleVo>> getAllRole() {
         return roleService.findAllRole();
     }
 
     @Permission("role::query")
     @GetMapping("/detail")
     public ResponseEntity<List<MenuTreeVo>> getAllRoleDetail(
-            @RequestParam(value = "page", defaultValue = "1",required = false)Integer page,
+            @RequestParam(value = "page", defaultValue = "1", required = false) Integer page,
             @RequestParam(value = "limit", defaultValue = "10", required = false) Integer limit,
-            @RequestParam(value = "name",required = false) String name
+            @RequestParam(value = "name", required = false) String name
     ) {
         return this.roleService.findAllDetail(page, limit, name);
     }
 
     /**
      * 获取所有的角色信息
+     *
      * @return
      */
     @Permission("role::update")
@@ -64,6 +66,7 @@ public class RoleController {
 
     /**
      * 更具id删除角色
+     *
      * @param id
      * @return
      */
