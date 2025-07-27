@@ -1,9 +1,6 @@
 package com.TinyPro.utils;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import org.springframework.beans.factory.annotation.Value;
@@ -67,18 +64,39 @@ public class JwtUtil {
      * @return 解析后的 JWT 声明
      * @throws SignatureException 如果 JWT 签名无效
      */
-    public  Claims parseJwt(String jwt) throws SignatureException {
+    public Claims parseJwt(String jwt) throws SignatureException {
         try {
-            Jws<Claims> claimsJws = Jwts.parserBuilder()
+            return Jwts.parserBuilder()
                     .setSigningKey(secretKey)
+                    .setAllowedClockSkewSeconds(60) // 允许 60 秒误差
                     .build()
-                    .parseClaimsJws(jwt);
-
-            return claimsJws.getBody();
+                    .parseClaimsJws(jwt)
+                    .getBody();
+        } catch (ExpiredJwtException e) {
+            // 可以再次捕获，自定义提示
+            throw new IllegalArgumentException("Token 已过期", e);
         } catch (SignatureException e) {
             throw new SignatureException("Invalid JWT signature");
         } catch (Exception e) {
             throw new IllegalArgumentException("Invalid JWT token", e);
         }
+    }
+    /**
+     * 传入旧 JWT，把过期时间整体 +2 分钟，返回新的 JWT
+     *
+     * @param oldJwt  原来的 token
+     * @return        延长 2 分钟后的新 token
+     */
+    public String extendExpiration(String oldJwt) {
+        Claims claims = parseJwt(oldJwt);          // 先解析（会校验签名/过期）
+        Date  newExp  = new Date(System.currentTimeMillis() + 120_000); // +2 分钟
+
+        return Jwts.builder()
+                .setClaims(claims)           // 保留原 payload
+                .setSubject(claims.getSubject())
+                .setIssuedAt(new Date())     // 可更新签发时间
+                .setExpiration(newExp)       // 新的过期时间
+                .signWith(secretKey)         // 用同一 key 重新签名
+                .compact();
     }
 }
