@@ -34,14 +34,15 @@ public class User {
     private List<Role> role;
 
     private String department;
-    private String employeeType;
 
-    private LocalDateTime probationStart;
-    private LocalDateTime probationEnd;
-    private String probationDuration;
+    private String employee_type;
 
-    private LocalDateTime protocolStart;
-    private LocalDateTime protocolEnd;
+    private LocalDateTime probation_start;
+    private LocalDateTime probation_end;
+    private String probation_duration;
+
+    private LocalDateTime protocol_start;
+    private LocalDateTime protocol_end;
 
     private String address;
     private Integer status;

@@ -25,8 +25,7 @@ public class I18 implements Serializable {
     @Column(name = "content",length = 65535)
     private String content;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "lang_id")
-    @TableField(select = false)
     private Lang lang;
 }
