@@ -5,6 +5,8 @@ import com.TinyPro.annotation.Reject;
 import com.TinyPro.entity.dto.CreateRoleDto;
 import com.TinyPro.entity.dto.UpdateRoleDto;
 import com.TinyPro.entity.po.Role;
+import com.TinyPro.entity.vo.MenuTreeVo;
+import com.TinyPro.entity.vo.RoleSimpleVo;
 import com.TinyPro.service.IRoleService;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,32 +26,34 @@ public class RoleController {
     @Reject()
     @Permission("role::add")
     @PostMapping()
-    public ResponseEntity<String> create(CreateRoleDto createRoleDto) {
-        return this.roleService.createRole(createRoleDto,false);
+    public ResponseEntity<Role> create(@RequestBody CreateRoleDto createRoleDto) {
+        return this.roleService.createRole(createRoleDto, false);
     }
 
     /**
      * 获取所有的角色信息
+     *
      * @return
      */
     @Permission("role::query")
     @GetMapping()
-   public ResponseEntity<List<Role>> getAllRole() {
-        return new ResponseEntity<>(this.roleService.list(), HttpStatus.OK);
+    public ResponseEntity<List<RoleSimpleVo>> getAllRole() {
+        return roleService.findAllRole();
     }
 
     @Permission("role::query")
     @GetMapping("/detail")
-    public ResponseEntity<List<Role>> getAllRoleDetail(
-            @RequestParam(value = "page", defaultValue = "1",required = false)Integer page,
+    public ResponseEntity<List<MenuTreeVo>> getAllRoleDetail(
+            @RequestParam(value = "page", defaultValue = "1", required = false) Integer page,
             @RequestParam(value = "limit", defaultValue = "10", required = false) Integer limit,
-            @RequestParam(value = "name",required = false) String name
+            @RequestParam(value = "name", required = false) String name
     ) {
         return this.roleService.findAllDetail(page, limit, name);
     }
 
     /**
      * 获取所有的角色信息
+     *
      * @return
      */
     @Permission("role::update")
@@ -62,6 +66,7 @@ public class RoleController {
 
     /**
      * 更具id删除角色
+     *
      * @param id
      * @return
      */
