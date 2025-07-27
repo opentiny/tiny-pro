@@ -5,20 +5,25 @@ import com.TinyPro.entity.contants.Contants;
 import com.TinyPro.entity.dto.InitMenuDto;
 import com.TinyPro.entity.po.*;
 
+import com.TinyPro.exception.BusinessException;
 import com.TinyPro.service.jpa.*;
-import com.TinyPro.utils.JsonUtils;
 import com.TinyPro.utils.Sha256Utils;
+import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.rmi.RemoteException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -37,6 +42,7 @@ public class DataInitializer implements CommandLineRunner {
     private LangRepository langRepository;
     @Autowired
     private I18Repository i18Repository;
+
     @Override
     public void run(String... args) throws Exception {
         File lockFile = new File("data/lock");
@@ -66,40 +72,43 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void initI18n() throws IOException {
-        String i18nFilePath = this.getClass().getClassLoader().getResource("locales.json").getPath();
-        if (i18nFilePath.startsWith("/")) {
-            i18nFilePath = i18nFilePath.substring(1);
-        }
-        Map<String, Map<String, String>> i18nData = JsonUtils.readJsonFile(i18nFilePath);
-
-        // 遍历外层 Map
-        for (Map.Entry<String, Map<String, String>> outerEntry : i18nData.entrySet()) {
-            String langName = outerEntry.getKey(); // 外层键作为 Lang 的 name
-            Lang lang = new Lang();
-            lang.setName(langName);
-            List<I18> i18List = new ArrayList<>();
-            // 遍历内层 Map
-            for (Map.Entry<String, String> innerEntry : outerEntry.getValue().entrySet()) {
-                String key = innerEntry.getKey(); // 内层键
-                String content = innerEntry.getValue(); // 内层值
-                // 创建 I18 对象
-                I18 i18 = new I18();
-                i18.setKey(key);
-                i18.setContent(content);
-                i18List.add(i18);
+        ClassPathResource pathResource = new ClassPathResource("locales.json");
+        try (InputStream is = pathResource.getInputStream()) {
+            String json = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+            Map<String, Map<String, String>> i18nData = JSON.parseObject(json, Map.class);
+            // 遍历外层 Map
+            for (Map.Entry<String, Map<String, String>> outerEntry : i18nData.entrySet()) {
+                String langName = outerEntry.getKey(); // 外层键作为 Lang 的 name
+                Lang lang = new Lang();
+                lang.setName(langName);
+                List<I18> i18List = new ArrayList<>();
+                // 遍历内层 Map
+                for (Map.Entry<String, String> innerEntry : outerEntry.getValue().entrySet()) {
+                    String key = innerEntry.getKey(); // 内层键
+                    String content = innerEntry.getValue(); // 内层值
+                    // 创建 I18 对象
+                    I18 i18 = new I18();
+                    i18.setKey(key);
+                    i18.setContent(content);
+                    i18List.add(i18);
+                }
+                // 将 I18 对象列表设置到 Lang 对象中
+                lang.setI18ns(i18List);
+                // 先保存 Lang 对象，生成 id
+                langRepository.save(lang);
+                i18List.forEach(i18 -> {
+                    i18.setLang(lang);
+                });
+                // 保存 I18 对象
+                i18Repository.saveAll(i18List);
+                // 清空 I18 列表，为下一个 Lang 准备
+                i18List.clear();
             }
-            // 将 I18 对象列表设置到 Lang 对象中
-            lang.setI18ns(i18List);
-            // 先保存 Lang 对象，生成 id
-            langRepository.save(lang);
-            i18List.forEach(i18 -> {
-                i18.setLang(lang);
-            });
-            // 保存 I18 对象
-            i18Repository.saveAll(i18List);
-            // 清空 I18 列表，为下一个 Lang 准备
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
+
     private void initPermissions() {
         Map<String, String[]> permissions = new HashMap<>();
         permissions.put("user", new String[]{"add", "remove", "update", "query", "password::force-update"});
@@ -137,6 +146,7 @@ public class DataInitializer implements CommandLineRunner {
             }
         }
     }
+
     private void initMenus() throws IOException {
         List<InitMenuDto> menuData = getMenuData();
         try {
@@ -150,13 +160,13 @@ public class DataInitializer implements CommandLineRunner {
                     .filter(menu -> !existingMenuNames.contains(menu.getName()))
                     .collect(Collectors.toList());
             //3.dfs储存数据
-            newMenus.forEach(item->{
-               dfs(item,null);
+            newMenus.forEach(item -> {
+                dfs(item, null);
             });
 
             // 4. 批量导入新增菜单
             if (!newMenus.isEmpty()) {
-                try{
+                try {
                     logger.info("成功导入 " + newMenus.size() + " 个新菜单");
                 } catch (Exception e) {
                     logger.error("导入失败");
@@ -175,26 +185,26 @@ public class DataInitializer implements CommandLineRunner {
 
     private void dfs(InitMenuDto item, Integer value) {
         Menu menu = new Menu();
-        if (ObjectUtils.isNotEmpty(item)){
-            BeanUtils.copyProperties(item,menu);
+        if (ObjectUtils.isNotEmpty(item)) {
+            BeanUtils.copyProperties(item, menu);
             menu.setParentId(value);
             menu = menuRepository.save(menu);
         }
-        if (ObjectUtils.isEmpty(item.getChildren())){
-            return ;
+        if (ObjectUtils.isEmpty(item.getChildren())) {
+            return;
         }
         for (InitMenuDto menuDto : item.getChildren()) {
-            dfs(menuDto,menu.getId());
+            dfs(menuDto, menu.getId());
         }
     }
 
-    private List<InitMenuDto>getMenuData() throws IOException {
-        String MenuFilePath = this.getClass().getClassLoader().getResource("MenuData.json").getPath();
-        if (MenuFilePath.startsWith("/")){
-            MenuFilePath=MenuFilePath.substring(1);
+    private List<InitMenuDto> getMenuData() throws IOException {
+        ClassPathResource pathResource = new ClassPathResource("MenuData.json");
+        try (InputStream is = pathResource.getInputStream()) {
+            String json = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+            List<InitMenuDto> menuData = JSON.parseArray(json, InitMenuDto.class);
+            return menuData;
         }
-        List<InitMenuDto> menuData = JsonUtils.readJsonFiletoMenu(MenuFilePath);
-        return menuData;
     }
 
     private Role initRole() {
@@ -208,7 +218,7 @@ public class DataInitializer implements CommandLineRunner {
         role.setPermission(permissions);
 
         List<Menu> all = menuRepository.findAll();
-        role.setMenus( all);
+        role.setMenus(all);
         roleRepository.save(role);
         return role;
     }
@@ -216,7 +226,7 @@ public class DataInitializer implements CommandLineRunner {
     private void initUser(Role role) {
         User user = new User();
         user.setEmail("admin@no-reply.com");
-        String password ;
+        String password;
         try {
             password = Sha256Utils.encry(Contants.ADMIN, Contants.PUBLICK_SALT);
         } catch (Exception e) {
@@ -226,7 +236,8 @@ public class DataInitializer implements CommandLineRunner {
         user.setName(Contants.ADMIN);
         user.setSalt(Contants.PUBLICK_SALT);
         user.setStatus(Contants.USER_STATUS_YES);
-        Role adminRole=roleRepository.findByName(Contants.ADMIN);
+        Optional<Role> optionalRole = roleRepository.findByName(Contants.ADMIN);
+        Role adminRole = optionalRole.get();
         List<Role> roleList = List.of(adminRole);
         user.setRole(roleList);
         user = userRepository.save(user);
@@ -235,7 +246,8 @@ public class DataInitializer implements CommandLineRunner {
         logger.info("[APP]: password: 'admin'");
         logger.info("Enjoy!");
     }
-    private  String capitalizeFirst(String str) {
+
+    private String capitalizeFirst(String str) {
         if (str == null || str.isEmpty()) {
             return str;
         }
