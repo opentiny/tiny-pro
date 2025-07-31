@@ -32,7 +32,7 @@ app.use(directive);
 const detectDevice = () => {
   const width = window.innerWidth;
   if (width < 768) {
-    app.config.globalProperties.tiny_mode = { value: 'mobile-first' };
+    app.config.globalProperties.tiny_mode = { value: 'mobile' };
     app.config.globalProperties.isMobile = true;
   } else {
     app.config.globalProperties.tiny_mode = { value: 'pc' };

@@ -125,6 +125,9 @@
   const expandeArr = ref<(string | number)[]>([]);
   const tabStore = useTabStore();
   onMounted(() => {
+    if (window.innerWidth <= 768) {
+      document.querySelector('.tiny-tree-menu')?.classList.add('is-collapsed');
+    }
     watch(
       () => tabStore.current,
       () => {
