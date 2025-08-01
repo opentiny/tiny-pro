@@ -43,7 +43,7 @@
     "@opentiny/vue-huicharts": "^3.22.0",
     "@opentiny/vue-icon": "^3.21.0",
     "@opentiny/vue-locale": "^3.21.0",
-    "@opentiny/vue-search-box": "^0.0.1",
+    "@opentiny/vue-search-box": "^0.1.3",
     "@opentiny/vue-theme": "^3.21.0",
     "@types/mockjs": "^1.0.10",
     "@types/node": "^22.7.4",
