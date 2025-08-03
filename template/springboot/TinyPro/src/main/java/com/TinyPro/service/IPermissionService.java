@@ -19,4 +19,6 @@ public interface IPermissionService  {
     ResponseEntity<PageWrapper<PermissionVo>> findPermissions(Integer page, Integer limit, String name);
 
     ResponseEntity<CreatePermissionDto> delPermission(Integer id);
+
+    List<Permission> findAllPermission();
 }

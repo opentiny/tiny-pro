@@ -121,5 +121,10 @@ public class IPermissionServiceImpl  implements IPermissionService {
         return ResponseEntity.ok(result);
     }
 
+    @Override
+    public List<Permission> findAllPermission() {
+        return iPermissionRepository.findAll();
+    }
+
 
 }

@@ -158,9 +158,6 @@ public class IRoleServiceImpl implements IRoleService {
         // 根据ID查询权限列表
         Set<Permission> permissions = permissionService.findAllById(updateRoleDto.getPermissionIds()).stream().collect(Collectors.toSet());
 
-        // 根据ID查询菜单列表
-        Set<Menu> menus = menuService.findAllById(updateRoleDto.getMenuIds()).stream().collect(Collectors.toSet());
-
         // 查询角色
         Optional<Role> roleOptional = iRoleRepository.findById(Long.valueOf(updateRoleDto.getId()));
         if (roleOptional.isEmpty()) {
@@ -175,10 +172,7 @@ public class IRoleServiceImpl implements IRoleService {
             role.setPermission(permissions);
         }
 
-        // 更新菜单关联
-        if (updateRoleDto.getMenuIds() != null && !updateRoleDto.getMenuIds().isEmpty()) {
-            role.setMenus(menus);
-        }
+
 
         return ResponseEntity.ok(iRoleRepository.save(role));
     }

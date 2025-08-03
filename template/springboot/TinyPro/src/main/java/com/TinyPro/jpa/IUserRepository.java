@@ -18,6 +18,4 @@ public interface IUserRepository extends JpaRepository<User, Long> , JpaSpecific
     // 使用 JOIN FETCH 加载 roles
     @Query("SELECT DISTINCT u FROM User u LEFT JOIN FETCH u.role WHERE u.id = :userId")
     Optional<User> findByIdWithRoles(@Param("userId") Integer userId);
-//    @EntityGraph(attributePaths = {"role"})
-//    Optional<User> findByEmails(String email);
 }

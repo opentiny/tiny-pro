@@ -16,14 +16,14 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Autowired
     private RejectInterceptor rejectInterceptor;
 
-//    @Override
-//    public void addInterceptors(InterceptorRegistry registry) {
-//        registry.addInterceptor(authInterceptor)
-//                .addPathPatterns("/**")     // 拦截所有
-//                .excludePathPatterns("/auth/login", "/swagger-ui/**", "/error");
-//        registry.addInterceptor(rejectInterceptor)
-//                .addPathPatterns("/**"); // 白名单
-//    }
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(authInterceptor)
+                .addPathPatterns("/**")     // 拦截所有
+                .excludePathPatterns("/auth/login", "/swagger-ui/**", "/error");
+        registry.addInterceptor(rejectInterceptor)
+                .addPathPatterns("/**"); // 白名单
+    }
 
 
     @Override

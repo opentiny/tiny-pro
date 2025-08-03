@@ -65,9 +65,9 @@ public class IUserServiceImpl  implements IUserService {
         // 3. 创建并保存用户
         try {
             User user = new User();
-            user.setEmail(createUserDto.getUsername());
+            user.setEmail(createUserDto.getEmail());
             user.setPassword(Sha256Utils.encry(createUserDto.getPassword(), Contants.PUBLICK_SALT));
-            user.setName(createUserDto.getEmail());
+            user.setName(createUserDto.getName());
             user.setRole(roles);
             user.setSalt(Contants.PUBLICK_SALT);
             user.setDepartment(createUserDto.getDepartment());
@@ -76,14 +76,14 @@ public class IUserServiceImpl  implements IUserService {
                 user.setProbation_start(toStandardDateFormat(createUserDto.getProbationStart()));
             }
             if (StringUtils.isNotEmpty(createUserDto.getProbationEnd())) {
-                user.setProbation_start(toStandardDateFormat(createUserDto.getProbationEnd()));
+                user.setProbation_end(toStandardDateFormat(createUserDto.getProbationEnd()));
             }
             user.setProbation_duration(createUserDto.getProbationDuration());
             if (StringUtils.isNotEmpty(createUserDto.getProtocolStart())) {
-                user.setProbation_start(toStandardDateFormat(createUserDto.getProtocolStart()));
+                user.setProtocol_start(toStandardDateFormat(createUserDto.getProtocolStart()));
             }
             if (StringUtils.isNotEmpty(createUserDto.getProtocolEnd())) {
-                user.setProbation_start(toStandardDateFormat(createUserDto.getProtocolEnd()));
+                user.setProtocol_end(toStandardDateFormat(createUserDto.getProtocolEnd()));
             }
             user.setAddress(createUserDto.getAddress());
             user.setStatus(createUserDto.getStatus());
@@ -185,9 +185,9 @@ public class IUserServiceImpl  implements IUserService {
                 .map(Object::toString)
                 .collect(Collectors.joining());
 
-//        if (!originalRoleIds.equals(newRoleIds)) {
-//            authService.logout(updateUserDto.getEmail());
-//        }
+        if (!originalRoleIds.equals(newRoleIds)) {
+            authService.logout(updateUserDto.getEmail());
+        }
 
         return ResponseEntity.ok(result);
     }

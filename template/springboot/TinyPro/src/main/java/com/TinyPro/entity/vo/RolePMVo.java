@@ -10,5 +10,8 @@ import java.util.List;
 @Data
 public class RolePMVo {
     private PageWrapper<Role> roleInfo;
-    private MenuTreeVo menuTree;
+    private List<List<MenuTreeVo>> menuTree;
+    public void setMenuTree(MenuTreeVo menuTree) {
+        this.menuTree = menuTree.toDoubleArrayFormat();
+    }
 }

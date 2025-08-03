@@ -13,7 +13,7 @@ import java.util.List;
 @Data
 public class CreateUserDto {
     @NotEmpty(message = "{validation.NOT_EMPTY}")
-    private String username;
+    private String name;
     
     @NotEmpty(message = "{validation.NOT_EMPTY}")
     @Email

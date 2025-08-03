@@ -29,6 +29,7 @@ public class UserGuardsFilter implements HandlerInterceptor {
                              HttpServletResponse response,
                              Object handler) throws Exception {
 
+
         // 1. 只处理方法级别的 handler
         if (!(handler instanceof HandlerMethod)) {
             return true; // 静态资源直接放行

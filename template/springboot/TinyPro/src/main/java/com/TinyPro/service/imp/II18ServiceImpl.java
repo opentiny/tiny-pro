@@ -91,7 +91,7 @@ public class II18ServiceImpl implements II18Service {
 
         // 1. 构造分页/不分页
         Pageable pageable;
-        if (Boolean.TRUE.equals(allBool)) {
+        if (Boolean.FALSE.equals(allBool)) {
             pageable = Pageable.unpaged();
         } else if (page != null && limit != null && page > 0 && limit > 0) {
             pageable = PageRequest.of(page - 1, limit);

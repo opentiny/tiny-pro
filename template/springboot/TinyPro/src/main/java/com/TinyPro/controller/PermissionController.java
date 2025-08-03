@@ -5,11 +5,14 @@ import com.TinyPro.annotation.Reject;
 import com.TinyPro.entity.dto.CreatePermissionDto;
 import com.TinyPro.entity.dto.UpdatePermissionDto;
 import com.TinyPro.entity.page.PageWrapper;
+import com.TinyPro.entity.po.Permission;
 import com.TinyPro.entity.vo.PermissionVo;
 import com.TinyPro.service.IPermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/permission")
@@ -34,11 +37,14 @@ public class PermissionController {
 
     @GetMapping
     @PermissionAnnotation("permission::get")
-    public ResponseEntity<PageWrapper<PermissionVo>> findPermissions(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "0") int limit,
+    public ResponseEntity<?> findPermissions(
+            @RequestParam(required = false) Integer page,
+            @RequestParam (required = false)Integer limit,
             @RequestParam(required = false) String name) {
-
+        if (page == null && limit == null){
+            List<Permission> permissionList= iPermissionService.findAllPermission();
+            return ResponseEntity.ok(permissionList);
+        }
         return iPermissionService.findPermissions(page, limit, name);
     }
 
