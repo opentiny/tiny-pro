@@ -1,40 +1,43 @@
 package com.TinyPro.entity.dto;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
 public class CreateUserDto {
-
-    @NotBlank(message = "{validation.NOT_EMPTY}")
-    private String name;
-
-    @NotBlank(message = "{validation.NOT_EMPTY}")
-    private String email;
-
-    @NotBlank(message = "{validation.NOT_EMPTY}")
-    private String password;
-
-    /** 角色 ID 列表，默认为空 */
     @NotEmpty(message = "{validation.NOT_EMPTY}")
-    private List<Integer> roleIds = List.of();
-
-    /** 可选字段 */
+    private String username;
+    
+    @NotEmpty(message = "{validation.NOT_EMPTY}")
+    @Email
+    private String email;
+    
+    @NotEmpty(message = "{validation.NOT_EMPTY}")
+    private String password;
+    
+    private List<Long> roleIds = new ArrayList<>();
+    
     private String department;
+    
     private String employeeType;
-
-    /** 日期字段建议用 LocalDate 或 LocalDateTime，视业务需要而定 */
-    private LocalDate probationStart;
-    private LocalDate probationEnd;
+    @NotEmpty(message = "{validation.NOT_EMPTY}")
+    private String probationStart;
+    @NotEmpty(message = "{validation.NOT_EMPTY}")
+    private String probationEnd;
     private String probationDuration;
-
-    private LocalDate protocolStart;
-    private LocalDate protocolEnd;
-
+    @NotEmpty(message = "{validation.NOT_EMPTY}")
+    private String protocolStart;
+    @NotEmpty(message = "{validation.NOT_EMPTY}")
+    private String protocolEnd;
+    
     private String address;
+    
     private Integer status;
 }

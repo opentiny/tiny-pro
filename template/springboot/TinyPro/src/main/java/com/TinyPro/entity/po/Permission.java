@@ -8,11 +8,13 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.io.Serializable;
 @Entity
 @Table(name = "permission")
 @Data
+@DynamicUpdate
 public class Permission implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,6 +22,4 @@ public class Permission implements Serializable {
 
     private String name;
     private String desc;
-
-
 }

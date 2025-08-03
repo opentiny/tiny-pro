@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.io.Serializable;
 import java.util.List;
@@ -17,6 +18,7 @@ import java.util.Set;
 @Entity
 @Table(name = "role")
 @Data
+@DynamicUpdate
 public class Role implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,18 +26,16 @@ public class Role implements Serializable {
 
     private String name;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "role_permission",
             joinColumns = @JoinColumn(name = "role_id"),
             inverseJoinColumns = @JoinColumn(name = "permission_id"))
-    @TableField(select = false)
-    private List<Permission> permission;
+    private Set<Permission> permission;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "role_menu",
             joinColumns = @JoinColumn(name = "role_id"),
             inverseJoinColumns = @JoinColumn(name = "menu_id"))
-    @TableField(select = false)
-    private List<Menu> menus;
+    private Set<Menu> menus;
 
 }
