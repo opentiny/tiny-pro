@@ -33,7 +33,7 @@
         <tiny-grid-column
           field="time"
           :title="$t('menu.plan.time')"
-          show-overflow
+          show-overflow="false"
         ></tiny-grid-column>
       </tiny-grid>
       <tiny-pager
@@ -41,22 +41,43 @@
         :page-size="custPager.pageSize"
         :total="tableData.length"
         :page-sizes="[5, 10, 20, 50]"
+        :layout="pagerLayout"
         @current-change="currentChange"
         @size-change="sizeChange"
-        layout="total, sizes, prev, pager, next, jumper"
       ></tiny-pager>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-  import { defineProps, ref, toRefs } from 'vue';
+  import { defineProps, ref, toRefs, computed, onMounted, onBeforeUnmount } from 'vue';
   import {
     Row as TinyRow,
     Grid as TinyGrid,
     GridColumn as TinyGridColumn,
     Pager as TinyPager,
   } from '@opentiny/vue';
+
+
+  const isMobile = ref(false)
+
+  function checkIsMobile() {
+    isMobile.value = window.innerWidth < 768
+  }
+  
+  // responsive tiny-pager layout
+  onMounted(() => {
+    checkIsMobile()
+    window.addEventListener('resize', checkIsMobile)
+  })
+
+  onBeforeUnmount(() => {
+    window.removeEventListener('resize', checkIsMobile)
+  })
+  
+  const pagerLayout = computed(() =>
+    isMobile.value ? 'total, prev, pager, next' : 'total, sizes, prev, pager, next, jumper'
+  )
 
   // 父组件传值
   const props = defineProps({
