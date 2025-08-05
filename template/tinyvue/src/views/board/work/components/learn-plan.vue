@@ -1,7 +1,7 @@
 <template>
   <tiny-layout>
-    <tiny-row :flex="true" justify="center">
-        <tiny-col>
+    <tiny-row class="flex justify-center max-md:flex-wrap">
+        <tiny-col class="w-1/4 max-md:w-1/2 max-sm:w-full max-md:mb-4">
           <div class="col">
             <div class="title">
               <span>{{ $t('work.index.plans') }}</span>
@@ -18,7 +18,7 @@
             </div>
           </div>
         </tiny-col>
-        <tiny-col>
+        <tiny-col class="w-1/4 max-md:w-1/2 max-sm:w-full max-md:mb-4">
           <div class="col">
             <div class="title">
               <span>{{ $t('work.index.Unfinished') }}</span>
@@ -35,7 +35,7 @@
             </div>
           </div>
         </tiny-col>
-        <tiny-col>
+        <tiny-col class="w-1/4 max-md:w-1/2 max-sm:w-full max-md:mb-4">
           <div class="col">
             <div class="title">
               <span>{{ $t('work.index.beOverdue') }}</span>
@@ -52,7 +52,7 @@
             </div>
           </div>
         </tiny-col>
-        <tiny-col>
+        <tiny-col class="w-1/4 max-md:w-1/2 max-sm:w-full max-md:mb-4">
           <div class="col">
             <div class="title">
               <span>{{ $t('work.index.Overdue') }}</span>

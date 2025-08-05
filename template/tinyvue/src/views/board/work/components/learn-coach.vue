@@ -1,10 +1,12 @@
 <template>
   <div>
-    <div class="chart">
-      <div class="left-chart">
+    <div class="flex gap-10 w-full min-h-[272px] max-md:flex-col">
+      <div class="w-1/2 max-md:w-full">
+        <div class="card-title mb-2">{{ $t('work.index.trainees') }}</div>
         <tiny-chart-bar ref="barRef" width="100%" height="272px" :options="options1"></tiny-chart-bar>
       </div>
-      <div class="right-chart">
+      <div class="w-1/2 max-md:w-full">
+        <div class="card-title mb-2">{{ $t('work.index.coachNum') }}</div>
         <tiny-chart-line ref="lineRef" width="100%" height="272px" :options="options2"></tiny-chart-line>
       </div>
     </div>
@@ -199,18 +201,12 @@ onMounted(() => {
 </script>
 
 <style scoped lang="less">
-.chart {
-  display: flex;
-  width: 100%;
-  gap: 40px;
-  min-height: 272px;
-}
+.card-title {
+  height: 24px;
+  line-height: 24px;
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 16px;
 
-.left-chart {
-  width: 50%;
-}
-
-.right-chart {
-  width: 50%;
 }
 </style>

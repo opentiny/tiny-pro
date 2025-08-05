@@ -15,22 +15,20 @@
           </div>
         </div>
         <div class="card">
-          <div class="card-title">{{ $t('work.index.trainees') }}</div>
-          <div class="card-title card-coach">{{ $t('work.index.coachNum') }}</div>
           <div>
             <learncoach></learncoach>
           </div>
         </div>
-        <div class="card-center">
-          <div class="card card-issue">
+        <div class="card-center flex gap-2 max-md:flex-col">
+          <div class="card card-issue flex-3 max-md:w-full">
             <div class="card-title">{{ $t('work.index.formalization') }}</div>
             <learnprobation></learnprobation>
           </div>
-          <div class="card card-home">
+          <div class="card card-home flex-1 max-md:w-full">
             <div class="card-title">{{ $t('work.index.Home') }}</div>
             <div v-for="item in Home" :key="item" class="home-title">
               <span :class="{'dt-icon':true,'is-old':item?.isOld}"></span>
-              <span>{{ $t(item.label) }}</span>
+              <span class="line-clamp-2">{{ $t(item.label) }}</span>
               <span v-if="item.value" class="home-tip">{{ $t(item.value) }}</span>
             </div>
           </div>
@@ -123,7 +121,6 @@ const Home = [
       display: flex;
       gap: 8px;
       width: 100%;
-      height: 200px;
       margin-top: 16px;
       border-radius: 8px;
 
