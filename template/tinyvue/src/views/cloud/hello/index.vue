@@ -2,7 +2,7 @@
   <div class="container">
     <Breadcrumb :items="['menu.cloud', 'menu.cloud.hello']" />
     <div class="content">
-      <text x="40" y="150">{{ text }}</text>
+      <text x="40" y="150" class="text-[72px] max-md:text-[42px] max-sm:text-[18px]">{{ text }}</text>
     </div>
   </div>
 </template>
@@ -52,7 +52,6 @@
         height: 100px;
         color: #5e7ce0;
         font-weight: normal;
-        font-size: 72px;
         line-height: 300px;
         text-align: left;
       }
