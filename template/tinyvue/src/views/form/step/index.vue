@@ -93,7 +93,6 @@
     }
   }
   .form-scroll {
-    height: calc(100% - 275px);
     overflow: auto;
   }
 </style>
