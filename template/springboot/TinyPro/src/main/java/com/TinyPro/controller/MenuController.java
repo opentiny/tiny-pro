@@ -1,6 +1,6 @@
 package com.TinyPro.controller;
 
-import com.TinyPro.annotation.Permission;
+import com.TinyPro.annotation.PermissionAnnotation;
 import com.TinyPro.annotation.Reject;
 import com.TinyPro.entity.dto.CreateMenuDto;
 import com.TinyPro.entity.dto.UpdateMenuDto;
@@ -26,13 +26,13 @@ public class MenuController {
     }
 
     @GetMapping
-    @Permission("menu::query")
+    @PermissionAnnotation("menu::query")
     public ResponseEntity<List<MenuVo>> getAllMenus() {
         return iMenuService.findAllMenu();
     }
 
     @Reject
-    @Permission("menu::add")
+    @PermissionAnnotation("menu::add")
     @PostMapping
     public ResponseEntity<Menu> createMenu(@RequestBody CreateMenuDto createMenuDto) {
         boolean b = false;
@@ -41,14 +41,14 @@ public class MenuController {
 
     @PatchMapping
     @Reject
-    @Permission("menu::update")
+    @PermissionAnnotation("menu::update")
     public ResponseEntity<Boolean> updateMenu(@RequestBody UpdateMenuDto updateMenuDto) {
         return iMenuService.updateMenu(updateMenuDto);
     }
 
     @DeleteMapping
     @Reject
-    @Permission("menu::remove")
+    @PermissionAnnotation("menu::remove")
     public ResponseEntity<Menu> deleteMenu(@Param("id") Integer id, @Param("parentId") Integer parentId) {
         return iMenuService.deleteMenu(id, parentId);
     }

@@ -2,18 +2,15 @@ package com.TinyPro.service.imp;
 
 import com.TinyPro.entity.contants.Contants;
 import com.TinyPro.entity.dto.CreateAuthDto;
-import com.TinyPro.entity.enums.ResponseCodeEnum;
 import com.TinyPro.entity.po.User;
 import com.TinyPro.exception.BusinessException;
 import com.TinyPro.redis.RedisUtil;
 import com.TinyPro.service.IAuthService;
-import com.TinyPro.service.jpa.IUserRepository;
+import com.TinyPro.jpa.IUserRepository;
 import com.TinyPro.utils.JwtUtil;
-import com.TinyPro.utils.LocaleUntil;
 import com.TinyPro.utils.Sha256Utils;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +21,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 public class AuthServiceImpl implements IAuthService {
@@ -43,10 +39,10 @@ public class AuthServiceImpl implements IAuthService {
         wrapper.eq("email", createAuthDto.getEmail());
         User user = userService.findByEmail(createAuthDto.getEmail()).orElseThrow(null);
         if (user == null) {
-            throw new BusinessException("exception.auth.userNotExists", null);
+            throw new BusinessException("exception.auth.userNotExists",HttpStatus.NOT_FOUND,null);
         }
         if (!StringUtils.equals(Sha256Utils.encry(createAuthDto.getPassword(), user.getSalt()), user.getPassword())) {
-            throw new BusinessException("exception.auth.passwordOrEmailError", null);
+            throw new BusinessException("exception.auth.passwordOrEmailError",HttpStatus.BAD_REQUEST,  null);
         }
         String jwt = jwtUtil.generateJwt(user.getEmail(), Contants.H_2);
         String key = Contants.UserJwtTop + user.getEmail() + Contants.UserJwtbt;
@@ -57,15 +53,13 @@ public class AuthServiceImpl implements IAuthService {
     }
 
     @Override
-    public ResponseEntity<String> logout(String token) {
+    public String logout(String email) {
         try {
-            Claims claims = jwtUtil.parseJwt(token);
-            String email = (String) claims.get("email");
             if (StringUtils.isAllEmpty(email)) {
-                return new ResponseEntity<>("Fila", HttpStatus.NOT_FOUND);
+                throw new BusinessException("Fila", HttpStatus.NOT_FOUND,null);
             }
             redisUtil.deleteValue(email);
-            return new ResponseEntity<>("success", HttpStatus.OK);
+            return "redirect:/login";
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

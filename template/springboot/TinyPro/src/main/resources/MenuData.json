@@ -299,34 +299,5 @@
         "locale": "menu.i18n"
       }
     ]
-  },
-  {
-    "name": "MyOrder",
-    "order": 0,
-    "menuType": "normal",
-    "icon": "IconPurchasePlannedOrder",
-    "component": "order/index",
-    "path": "order",
-    "locale": "menu.myOrder",
-    "children": [
-      {
-        "name": "Bought",
-        "order": 0,
-        "menuType": "normal",
-        "icon": "IconDiscountSup",
-        "component": "order/bought/index",
-        "path": "bought",
-        "locale": "menu.myOrder.bought"
-      },
-      {
-        "name": "CreateOrder",
-        "order": 1,
-        "menuType": "normal",
-        "icon": "IconAdd",
-        "component": "order/create/index",
-        "path": "order/create",
-        "locale": "menu.myOrder.create"
-      }
-    ]
   }
 ]
