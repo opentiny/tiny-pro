@@ -58,8 +58,8 @@ public class MockDataService {
     }
 
     @PostMapping("/getselect")
-    public ResponseEntity<Map<String, Object>> getSelect(@RequestBody Map<String, Object> requestBody) {
-        int body = (int) requestBody.get("body");
+    public ResponseEntity<Map<String, Object>> getSelect(@RequestParam Integer body) {
+
         Object result = null;
         
         if (body == 1) {

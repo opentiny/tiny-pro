@@ -53,13 +53,13 @@ public class AuthServiceImpl implements IAuthService {
     }
 
     @Override
-    public ResponseEntity<String> logout(String email) {
+    public String logout(String email) {
         try {
             if (StringUtils.isAllEmpty(email)) {
-                return new ResponseEntity<>("Fila", HttpStatus.NOT_FOUND);
+                throw new BusinessException("Fila", HttpStatus.NOT_FOUND,null);
             }
             redisUtil.deleteValue(email);
-            return new ResponseEntity<>("success", HttpStatus.OK);
+            return "redirect:/login";
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

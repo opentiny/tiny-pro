@@ -155,25 +155,14 @@ public class IRoleServiceImpl implements IRoleService {
 
     @Override
     public ResponseEntity<Role> updateRole(UpdateRoleDto updateRoleDto) {
-        // 根据ID查询权限列表
-        Set<Permission> permissions = permissionService.findAllById(updateRoleDto.getPermissionIds()).stream().collect(Collectors.toSet());
-
         // 查询角色
         Optional<Role> roleOptional = iRoleRepository.findById(Long.valueOf(updateRoleDto.getId()));
         if (roleOptional.isEmpty()) {
             throw new BusinessException("exception.role.notExists", HttpStatus.BAD_REQUEST, null);
         }
-
         Role role = roleOptional.get();
-        role.setName(updateRoleDto.getName());
-
-        // 更新权限关联
-        if (updateRoleDto.getPermissionIds() != null && !updateRoleDto.getPermissionIds().isEmpty()) {
-            role.setPermission(permissions);
-        }
-
-
-
+        List<Menu> allById = menuService.findAllById(updateRoleDto.getMenuIds());
+        role.setMenus(allById.stream().collect(Collectors.toSet()));
         return ResponseEntity.ok(iRoleRepository.save(role));
     }
 

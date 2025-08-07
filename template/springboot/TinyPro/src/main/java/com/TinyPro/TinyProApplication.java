@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {"com.TinyPro"})
 @MapperScan(basePackages = {"com.TinyPro.mappers"})
 @EntityScan(basePackages = "com.TinyPro.entity.po")
 @EnableJpaAuditing

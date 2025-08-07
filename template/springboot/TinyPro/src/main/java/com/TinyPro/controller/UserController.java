@@ -4,6 +4,7 @@ import com.TinyPro.annotation.PermissionAnnotation;
 import com.TinyPro.annotation.Reject;
 import com.TinyPro.entity.dto.*;
 import com.TinyPro.entity.page.PageWrapper;
+import com.TinyPro.entity.po.Lang;
 import com.TinyPro.entity.po.User;
 import com.TinyPro.entity.vo.UserVo;
 import com.TinyPro.exception.BusinessException;
@@ -17,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/user")
@@ -77,7 +80,7 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
     @PatchMapping("/admin/updatePwd")
-    @PermissionAnnotation("user::password::force-update") // 假设有自定义权限注解
+    @PermissionAnnotation("user::password::force-update")
     public ResponseEntity<?> updatePwdAdmin(@RequestBody  @Valid UpdatePwdAdminDto dto) {
         return userService.updatePwdAdmin(dto);
     }
@@ -86,6 +89,13 @@ public class UserController {
     public ResponseEntity<?> updatePwdUser(@RequestBody @Valid UpdatePwdUserDto dto) {
         userService.updatePwdUser(dto);
         return ResponseEntity.ok().build();
+    }
+
+    @Reject()
+    @PostMapping("/batch")
+    @PermissionAnnotation("user:batch-remove")
+    public ResponseEntity<List<UserVo>> batchRemoveUser (@RequestBody List<String> emails) {
+        return userService.batchDeleteUser(emails);
     }
 
     private String extractToken(String authHeader) {

@@ -32,13 +32,14 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(@Valid @RequestBody LogoutAuthDto logoutAuthDto) {
+    public String logout(@Valid @RequestBody LogoutAuthDto logoutAuthDto) {
         Claims claims = jwtUtil.parseJwt(logoutAuthDto.getToken());
         String email = (String) claims.get("email");
         return authService.logout(email);
     }
+
     @GetMapping("/test")
-    public ResponseEntity<MenuTreeVo> gettext(){
+    public ResponseEntity<MenuTreeVo> gettext() {
         return ResponseEntity.ok(new MenuTreeVo());
     }
 }

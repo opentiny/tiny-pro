@@ -18,6 +18,7 @@ import com.TinyPro.utils.Sha256Utils;
 import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
@@ -35,7 +36,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class IUserServiceImpl  implements IUserService {
+public class IUserServiceImpl implements IUserService {
     @Autowired
     private IUserRepository iUserRepository;
     @Autowired
@@ -101,10 +102,10 @@ public class IUserServiceImpl  implements IUserService {
     public List<Permission> getRoleByUserId(User user) {
         Optional<User> userOpt = iUserRepository.findByIdWithRoles(user.getId());
         User result = userOpt.get();
-        List<Permission> resultList=new ArrayList<>();
+        List<Permission> resultList = new ArrayList<>();
         result.getRole()
                 .stream()
-                .map(item->{
+                .map(item -> {
                     Set<Permission> permission = item.getPermission();
                     resultList.addAll(permission.stream().toList());
                     return item;
@@ -159,17 +160,17 @@ public class IUserServiceImpl  implements IUserService {
         user.setName(updateUserDto.getName());
         user.setDepartment(updateUserDto.getDepartment());
         user.setEmployee_type(updateUserDto.getEmployeeType());
-        if (!StringUtils.equals(updateUserDto.getProbationStart(),"NaN-NaN-NaN") && StringUtils.isNotEmpty(updateUserDto.getProbationStart())) {
+        if (!StringUtils.equals(updateUserDto.getProbationStart(), "NaN-NaN-NaN") && StringUtils.isNotEmpty(updateUserDto.getProbationStart())) {
             user.setProbation_start(toStandardDateFormat(updateUserDto.getProbationStart()));
         }
-        if (!StringUtils.equals(updateUserDto.getProbationEnd(),"NaN-NaN-NaN") && StringUtils.isNotEmpty(updateUserDto.getProbationEnd())) {
+        if (!StringUtils.equals(updateUserDto.getProbationEnd(), "NaN-NaN-NaN") && StringUtils.isNotEmpty(updateUserDto.getProbationEnd())) {
             user.setProbation_end(toStandardDateFormat(updateUserDto.getProbationEnd()));
         }
         user.setProbation_duration(updateUserDto.getProbationDuration());
-        if (!StringUtils.equals(updateUserDto.getProtocolStart(),"NaN-NaN-NaN") && StringUtils.isNotEmpty(updateUserDto.getProtocolStart()) && !StringUtils.equals(updateUserDto.getProtocolStart(),"NaN-NaN-NaN")) {
+        if (!StringUtils.equals(updateUserDto.getProtocolStart(), "NaN-NaN-NaN") && StringUtils.isNotEmpty(updateUserDto.getProtocolStart()) && !StringUtils.equals(updateUserDto.getProtocolStart(), "NaN-NaN-NaN")) {
             user.setProtocol_start(toStandardDateFormat(updateUserDto.getProtocolStart()));
         }
-        if (!StringUtils.equals(updateUserDto.getProtocolEnd(),"NaN-NaN-NaN") && StringUtils.isNotEmpty(updateUserDto.getProtocolEnd())) {
+        if (!StringUtils.equals(updateUserDto.getProtocolEnd(), "NaN-NaN-NaN") && StringUtils.isNotEmpty(updateUserDto.getProtocolEnd())) {
             user.setProtocol_end(toStandardDateFormat(updateUserDto.getProtocolEnd()));
         }
         user.setAddress(updateUserDto.getAddress());
@@ -253,7 +254,7 @@ public class IUserServiceImpl  implements IUserService {
             iUserRepository.save(user);
 
             // 3. 强制登出该用户
-            authService.logout(user.getEmail());
+            redisUtil.deleteValue(Contants.UserJwtTop + user.getEmail() + Contants.UserJwtbt);
         } else {
             throw new BusinessException("用户不存在");
         }
@@ -276,8 +277,22 @@ public class IUserServiceImpl  implements IUserService {
         user.setPassword(encryptedPwd);
         iUserRepository.save(user);
 
-        // 4. 强制登出该用户
-        authService.logout(user.getEmail());
+        // 4. 删除redis的信息
+        redisUtil.deleteValue(Contants.UserJwtTop + user.getEmail() + Contants.UserJwtbt);
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<List<UserVo>> batchDeleteUser(List<String> emails) {
+        List<UserVo> result = new ArrayList<>();
+        iUserRepository.finByEmailBatch(emails).stream().map(item -> {
+            UserVo userVo = new UserVo();
+            BeanUtils.copyProperties(item, userVo);
+            result.add(userVo);
+            return item;
+        }).collect(Collectors.toList());
+        iUserRepository.deleteByEmailIn(emails);
+        return ResponseEntity.ok(result);
     }
 
     private boolean verifyPassword(String inputPassword, String storedPassword, String salt) {
@@ -299,6 +314,7 @@ public class IUserServiceImpl  implements IUserService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-M-d");
         return LocalDate.parse(dateTime, formatter);
     }
+
     private Page<UserVo> convertToUserVoPage(Page<User> userPage) {
         // 将Page<User>的内容转换为List<UserVo>
         List<UserVo> userVoList = userPage.getContent()

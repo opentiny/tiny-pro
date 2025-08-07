@@ -9,10 +9,12 @@ import java.util.List;
 
 @Data
 public class UpdateRoleDto {
-    @NotBlank
+    @NotBlank(message = "{NOT_EMPTY}")
     private Integer id;
-    @NotBlank
+    @NotBlank(message = "{NOT_EMPTY}")
     private String name;
-    @NotEmpty
+    @NotEmpty(message = "{NOT_EMPTY}")
     private List<@NotNull Long> permissionIds;
+    @NotEmpty(message = "{NOT_EMPTY}")
+    private List<Long> menuIds;
 }

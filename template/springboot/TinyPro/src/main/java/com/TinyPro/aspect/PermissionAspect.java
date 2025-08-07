@@ -59,7 +59,6 @@ public class PermissionAspect {
         if (requiredPermissions.isEmpty()) {
             return null;
         }
-        try {
             // 获取当前认证用户
             // 1.从请求头获取Token
             String authHeader = request.getHeader("Authorization");
@@ -83,9 +82,7 @@ public class PermissionAspect {
                 throw new BusinessException("exception.common.forbidden", HttpStatus.FORBIDDEN, requiredPermissions);
             }
             return joinPoint.proceed();
-        } catch (Exception e) {
-            throw new BusinessException("exception.common.forbidden", HttpStatus.FORBIDDEN, requiredPermissions);
-        }
+
     }
 
     private String extractToken(String authHeader) {

@@ -28,4 +28,6 @@ public interface IUserService  {
     ResponseEntity<?> updatePwdAdmin(@Valid UpdatePwdAdminDto dto);
 
     void updatePwdUser(@Valid UpdatePwdUserDto dto);
+
+    ResponseEntity<List<UserVo>> batchDeleteUser(List<String> emails);
 }
