@@ -13,19 +13,19 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class EmployeeServiceimpl implements IEmployeeService {
-  @Autowired
-  private IEmployeRepository iEmployeRepository;
+public class EmployeeServiceimpl  implements IEmployeeService {
+    @Autowired
+    private IEmployeRepository iEmployeRepository;
 
-  @Override
-  public List<Employee> list(List<Long> query) {
-    List<Employee> allById = iEmployeRepository.findAllById(query);
-    return allById;
-  }
+    @Override
+    public List<Employee> list(List<Long> query) {
+        List<Employee> allById = iEmployeRepository.findAllById(query);
+        return allById;
+    }
 
-  @Override
-  public Employee getById(String id) {
-    Optional<Employee> byId = iEmployeRepository.findById(Long.valueOf(id));
-    return byId.get();
-  }
+    @Override
+    public Employee getById(String id) {
+        Optional<Employee> byId = iEmployeRepository.findById(Long.valueOf(id));
+        return byId.get();
+    }
 }

@@ -55,18 +55,14 @@ public class UserGuardsFilter implements HandlerInterceptor {
             String email = claims.get("email", String.class);
             String key = Contants.UserJwtTop + email + Contants.UserJwtbt;
             String cached = redisUtil.getValue(key);
-            if (StringUtils.isBlank(cached)) {
-                response.sendRedirect("/vue-pro/login");
-                return false;
-            }
             User user = JSON.parseObject(cached, User.class);
 
             if (StringUtils.isBlank(cached) || !user.getEmail().equals(email)) {
-                throw new BusinessException("exception.common.tokenError", HttpStatus.NOT_FOUND, null);
+                throw new BusinessException("exception.common.tokenError", HttpStatus.UNAUTHORIZED, null);
             }
             return true;
         } catch (Exception e) {
-            throw new BusinessException("exception.common.tokenError", HttpStatus.NOT_FOUND, null);
+            throw new BusinessException("exception.common.tokenError", HttpStatus.UNAUTHORIZED, null);
         }
     }
 
