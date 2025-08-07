@@ -11,7 +11,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @EntityScan(basePackages = "com.TinyPro.entity.po")
 @EnableJpaAuditing
 public class TinyProApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(TinyProApplication.class,args);
-    }
+  public static void main(String[] args) {
+    SpringApplication.run(TinyProApplication.class, args);
+  }
 }
