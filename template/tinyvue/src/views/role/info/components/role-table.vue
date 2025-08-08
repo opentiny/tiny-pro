@@ -16,7 +16,7 @@
   import useLoading from '@/hooks/loading';
   import { Pager } from '@/types/global';
   import permissionTable from './permission-table.vue';
-  
+
   const props = defineProps<{
     tableData: (Role & { menus: ITreeNodeData[] })[];
     fetchOption: {
@@ -82,7 +82,11 @@
     return permissionDate
   };
   const onUpdate = (args:any) => {
-    updateRole(args.row)
+    const menuIds = args.row.menus.map(menu => menu.id);
+    updateRole({
+      ...args.row,
+      menuIds
+    })
       .then(({ data }) => {
         Modal.message({
           message: t('permissionInfo.edit.success'),
@@ -138,7 +142,7 @@
       :editor="{ component: 'input', autoselect: true }"
     ></tiny-grid-column>
     <tiny-grid-column
-    field="permissionIds" 
+    field="permissionIds"
     :title="$t('roleInfo.table.desc')"
     show-overflow="tooltip"
     :editor="{
