@@ -1,55 +1,42 @@
 import { defineConfig, presetMini, presetAttributify } from 'unocss'
 
+const breakpoints = {
+  sm: '376px',     // 手机（小屏，iPhone SE、Mini 等）
+  md: '769px',     // 平板（竖屏，iPad Mini、iPad）
+  lg: '1025px',    // 平板横屏 / 小型笔记本（iPad 横屏、Surface Go）
+  xl: '1367px',    // 笔记本主流分辨率（MacBook Air、13寸笔记本）
+  '2xl': '1441px', // 高分辨率笔记本（MacBook Pro 14、部分高清显示器）
+  '3xl': '1921px', // 全高清显示器 / 桌面大屏（1080p 显示器）
+}
+
 export default defineConfig({
   presets: [
-    presetMini(),
+    presetMini({
+      breakpoints,
+    }),
     presetAttributify(),
   ],
-  theme: {
-    breakpoints: {
-      // 移动端断点
-      xs: '320px',    // 手机竖屏
-      sm: '375px',    // 手机横屏
-      md: '768px',    // 平板竖屏
-      lg: '1024px',   // 平板横屏
-      xl: '1280px',   // 桌面端
-      '2xl': '1536px' // 大屏
-    },
-    colors: {
-      primary: {
-        50: '#eff6ff',
-        500: '#3b82f6',
-        600: '#2563eb',
-        700: '#1d4ed8',
+  variants: [
+    (matcher) => {
+      const match = matcher.match(/^max-([a-z0-9]+):/)
+      if (match) {
+        const bp = match[1]
+        const value = breakpoints[bp]
+        if (!value) return
+        return {
+          matcher: matcher.replace(`max-${bp}:`, ''),
+          parent: `@media (max-width: ${value})`,
+        }
       }
-    }
+    },
+  ],
+  theme: {
+    breakpoints
   },
   shortcuts: {
-    // 响应式布局
-    'container-responsive': 'px-4 md:px-6 lg:px-8 max-w-7xl mx-auto',
-    'layout-responsive': 'min-h-screen bg-gray-50',
-
-    // 移动端优化
-    'btn-mobile': 'px-4 py-3 rounded-lg bg-primary-500 text-white text-base font-medium touch-manipulation active:bg-primary-600',
-    'input-mobile': 'w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:ring-2 focus:ring-primary-500 focus:border-transparent',
-    'card-mobile': 'bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6',
-
-    // 响应式显示隐藏
-    'hide-mobile': 'block md:hidden',
-    'show-mobile': 'hidden md:block',
-    'hide-tablet': 'block lg:hidden',
-    'show-tablet': 'hidden lg:block',
-
-    // 布局相关
-    'sidebar-responsive': 'fixed inset-y-0 left-0 z-40 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0',
-    'content-responsive': 'flex-1 overflow-auto',
+    'line-clamp-2': 'overflow-hidden text-ellipsis [-webkit-line-clamp:2] [-webkit-box-orient:vertical] [display:-webkit-box]',
   },
-  rules: [
-    // 触摸操作优化
-    [/^touch-/, ([, d]) => ({ 'touch-action': d })],
-    // 移动端字体大小
-    [/^text-mobile-(\d+)$/, ([, d]) => ({ 'font-size': `${d}px` })],
-    // 安全区域适配
-    [/^safe-(\w+)$/, ([, d]) => ({ [`padding-${d}`]: 'env(safe-area-inset-' + d + ')' })]
+  safelist: [
+    'line-clamp-2',
   ]
 })
