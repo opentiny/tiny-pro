@@ -20,10 +20,8 @@ public class EmployeesController {
     private IEmployeeService employeeService;
 
     @PostMapping("/getEmployee")
-    public ResponseEntity<List<Employee>> getEmployee(@RequestBody List<String> searchInfo) {
-        QueryWrapper<Employee> employeeQueryWrapper = new QueryWrapper<>();
-        employeeQueryWrapper.in("id", searchInfo);
-        return new ResponseEntity<>(employeeService.list(employeeQueryWrapper), HttpStatus.OK);
+    public ResponseEntity<List<Employee>> getEmployee(@RequestBody List<Long> searchInfo) {
+        return new ResponseEntity<>(employeeService.list(searchInfo), HttpStatus.OK);
     }
 
     @GetMapping("getEmployee/{id}")

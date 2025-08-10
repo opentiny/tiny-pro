@@ -5,8 +5,7 @@ import com.TinyPro.entity.contants.Contants;
 import com.TinyPro.entity.dto.InitMenuDto;
 import com.TinyPro.entity.po.*;
 
-import com.TinyPro.exception.BusinessException;
-import com.TinyPro.service.jpa.*;
+import com.TinyPro.jpa.*;
 import com.TinyPro.utils.Sha256Utils;
 import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.ObjectUtils;
@@ -23,7 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.rmi.RemoteException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -211,13 +209,13 @@ public class DataInitializer implements CommandLineRunner {
         Role role = new Role();
         role.setName("admin");
 
-        List<Permission> permissions = permissionRepository.findByDesc("super permission")
+        Set<Permission> permissions = permissionRepository.findByDesc("super permission")
                 .stream()
-                .toList();  // Java 17+ 不可变列表
+                .collect(Collectors.toSet());  // Java 17+ 不可变列表
 
         role.setPermission(permissions);
 
-        List<Menu> all = menuRepository.findAll();
+        Set<Menu> all = menuRepository.findAll().stream().collect(Collectors.toSet());
         role.setMenus(all);
         roleRepository.save(role);
         return role;

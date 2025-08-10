@@ -5,6 +5,6 @@ import lombok.Data;
 
 @Data
 public class UpdatePermissionDto extends CreatePermissionDto{
-    @NotEmpty(message = "{validation.NOT_EMPTY}")
+    @NotEmpty(message = "{NOT_EMPTY}")
     private Integer id;
 }

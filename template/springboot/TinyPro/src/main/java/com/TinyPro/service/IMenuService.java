@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
-public interface IMenuService extends IService<Menu> {
+public interface IMenuService  {
     List<Integer> getMenuAllId();
 
     ResponseEntity<List<MenuVo>>  getMenubyEmail(String email);

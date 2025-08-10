@@ -12,4 +12,6 @@ public class Contants {
     public static final Integer USER_STATUS_YES=1;
     //用户禁用
     public static final Integer USER_STATUS_NO=0;
+    //超级权限
+    public static final String ADMIN_SUPE_POWER="*";
 }
