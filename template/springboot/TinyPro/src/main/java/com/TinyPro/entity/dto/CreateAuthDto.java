@@ -6,8 +6,8 @@ import lombok.NonNull;
 
 @Data
 public class CreateAuthDto {
-    @NotNull(message = "{NOT_EMPTY}")
-    private String email;
-    @NotNull(message = "{NOT_EMPTY}")
-    private String password;
+  @NotNull(message = "{NOT_EMPTY}")
+  private String email;
+  @NotNull(message = "{NOT_EMPTY}")
+  private String password;
 }
