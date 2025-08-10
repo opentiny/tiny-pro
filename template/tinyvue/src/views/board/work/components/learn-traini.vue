@@ -8,7 +8,7 @@
           class="p-6 bg-white rounded col flex flex-col justify-start items-start"
         >
           <img src="@/assets/images/collectImage1.png" class="w-10 h-10" />
-          <div class="mt-3 text-[14px] font-bold leading-[22px] max-md:text-[12px] max-md:leading-[18px]">
+          <div class="favorite-title mt-3 text-[14px] font-bold leading-[22px] max-md:text-[12px] max-md:leading-[18px]">
             {{ $t(item.value) }}
           </div>
           <div class="mt-2 text-[12px] text-gray-500 text-left max-md:text-[10px] max-md:leading-[16px]">
@@ -58,11 +58,6 @@ const state = reactive<{
   span: 3,
 });
 
-const updateSpan = () => {
-  const isMobile = window.innerWidth < 768
-  state.span = isMobile ? 6 : 3
-}
-
 const fetchData = async () => {
   state.loading = Loading.service({
     text: 'loading...',
@@ -81,11 +76,13 @@ const fetchData = async () => {
 // 初始化请求数据
 onMounted(() => {
   fetchData();
-  updateSpan()
-  window.addEventListener('resize', updateSpan)
 })
 
-onBeforeUnmount(() => {
-  window.removeEventListener('resize', updateSpan)
-})
 </script>
+<style scoped lang="less">
+  .favorite-title {
+    &:hover{
+      text-decoration: underline;
+    }
+  }
+</style>

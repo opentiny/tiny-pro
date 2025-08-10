@@ -5,13 +5,13 @@
         <tiny-button
           v-permission="'user::add'"
           type="primary"
-          @click="handleAddUser"
           round
+          @click="handleAddUser"
           >{{ $t('userInfo.modal.title.add') }}
         </tiny-button>
         <tiny-button
-          @click="handleBatchDeleteUser"
           round
+          @click="handleBatchDeleteUser"
           >{{ $t('locale.batchRemove') }}
         </tiny-button>
       </div>
@@ -262,7 +262,6 @@
           </tiny-grid-column>
           <tiny-grid-column
             :title="$t('userInfo.table.operations')"
-            align="center" 
             show-overflow="tooltip"
             width="11%"
           >
@@ -302,7 +301,7 @@
       v-model="state.isUserAdd"
       :lock-scroll="true"
       height="auto"
-      width="800"
+      width="700"
       :title="$t('userInfo.modal.title.add')"
     >
       <UserAdd
@@ -499,7 +498,7 @@
     attrs: {
       currentPage: 1,
       pageSize: 10,
-      pageSizes: [5, 10, 15, 20],
+      pageSizes: [10, 20, 50, 100],
       total: 10,
       layout: 'total, sizes, prev, pager, next, jumper',
     },
@@ -730,7 +729,7 @@
 
 <style scoped lang="less">
   .user-header-btn {
-    margin: 10px 0 24px 10px;
+    margin: 0px 0px 16px;
 
     .tiny-button {
       margin: 0 8px 0 0;

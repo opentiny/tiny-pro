@@ -193,8 +193,8 @@ const barRef = ref()
 const lineRef = ref()
 onMounted(() => {
     setTimeout(() => {
-      barRef.value.resize()
-      lineRef.value.resize()
+      barRef.value?.resize()
+      lineRef.value?.resize()
     }, 200)
 })
 

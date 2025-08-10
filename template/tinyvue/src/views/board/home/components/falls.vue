@@ -189,15 +189,15 @@
 
   onMounted(() => {
     window.addEventListener('resize', () => {
-      waterFallRef.value.resize();
+      waterFallRef.value?.resize();
     });
-    nextTick(() => {
-      waterFallRef.value.resize();
-    });
+    setTimeout(() => {
+      waterFallRef.value?.resize();
+    }, 200)
   });
 
   watch(currentLocale, (newValue, oldValue) => {
-    waterFallRef.value.resize();
+    waterFallRef.value?.resize();
   });
 </script>
 

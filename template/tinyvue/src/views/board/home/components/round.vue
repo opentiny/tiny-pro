@@ -81,27 +81,31 @@
     }
   })
 
-
   const windowWidth = ref(0)
   const handleResize = () => {
     windowWidth.value = window.innerWidth
-    nextTick(() => {
-      ringRef.value.resize();
-    });
   }
-
+  const onResizeChart = () => {
+    ringRef.value?.resize();
+  };
   onMounted(() => {
     window.addEventListener('resize', handleResize);
+    window.addEventListener('resize', onResizeChart);
     handleResize();
+    onResizeChart();
+    setTimeout(() => {
+      ringRef.value?.resize();
+    }, 200)
   });
 
   onUnmounted(() => {
     window.removeEventListener('resize', handleResize);
+    window.addEventListener('resize', onResizeChart);
   });
   const chartWidth = computed(() => windowWidth.value <= 768 ? '80vw' : '30vw')
 
   watch(currentLocale, (newValue, oldValue) => {
-    ringRef.value.resize();
+    ringRef.value?.resize();
   });
 </script>
 

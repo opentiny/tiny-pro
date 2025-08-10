@@ -119,9 +119,10 @@
     window.addEventListener('resize', handleResize);
     window.addEventListener('resize', onResizeChart);
     handleResize();
-    nextTick(() => {
-      mapChartsRef.value.resize();
-    });
+    onResizeChart();
+    setTimeout(() => {
+      mapChartsRef.value?.resize();
+    }, 200)
   });
 
   onUnmounted(() => {

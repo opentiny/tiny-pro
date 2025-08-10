@@ -92,6 +92,7 @@
       margin-left: -58px;
     }
   }
+
   .form-scroll {
     overflow: auto;
   }
