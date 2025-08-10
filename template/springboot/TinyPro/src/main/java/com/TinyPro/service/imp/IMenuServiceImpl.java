@@ -7,13 +7,13 @@ import com.TinyPro.entity.po.Role;
 import com.TinyPro.entity.po.User;
 import com.TinyPro.entity.vo.MenuVo;
 import com.TinyPro.exception.BusinessException;
-import com.TinyPro.mappers.MenuMapper;
+
 import com.TinyPro.service.IMenuService;
-import com.TinyPro.service.jpa.IMenuRepository;
-import com.TinyPro.service.jpa.IRoleRepository;
-import com.TinyPro.service.jpa.IUserRepository;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.TinyPro.jpa.IMenuRepository;
+import com.TinyPro.jpa.IRoleRepository;
+import com.TinyPro.jpa.IUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +22,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
- public class IMenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements IMenuService {
+ public class IMenuServiceImpl  implements IMenuService {
     @Autowired
     private IMenuRepository menuRepository;
     @Autowired
@@ -97,7 +97,7 @@ import java.util.stream.Collectors;
         }
 
         if (existingMenu.isPresent() && !isInit) {
-            throw new BusinessException("exception.menu.exists");
+            throw new BusinessException("exception.menu.exists", HttpStatus.BAD_REQUEST, null);
         }
 
         // 创建新菜单

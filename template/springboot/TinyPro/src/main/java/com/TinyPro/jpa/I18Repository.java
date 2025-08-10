@@ -1,4 +1,4 @@
-package com.TinyPro.service.jpa;
+package com.TinyPro.jpa;
 
 import com.TinyPro.entity.flat.I18Flat;
 import com.TinyPro.entity.po.I18;

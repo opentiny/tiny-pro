@@ -11,5 +11,5 @@ import java.util.Map;
 public interface IAuthService {
     ResponseEntity<?> login(CreateAuthDto createAuthDto, HttpServletResponse response) throws Exception;
 
-    ResponseEntity<String> logout(@NotEmpty(message = "validation.NOT_EMPTY_HUMAN") String token);
+    String logout(@NotEmpty(message = "validation.NOT_EMPTY_HUMAN") String token);
 }

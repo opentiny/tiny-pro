@@ -5,6 +5,6 @@ import lombok.Data;
 
 @Data
 public class UpdateMenuDto extends CreateMenuDto{
-    @NotBlank(message = "{validation.NOT_EMPTY}")
+    @NotBlank(message = "{NOT_EMPTY}")
     private Integer id;
 }

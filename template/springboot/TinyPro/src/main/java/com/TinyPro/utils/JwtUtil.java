@@ -46,13 +46,12 @@ public class JwtUtil {
         claims.put("email", email); // 将 email 作为声明
 
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + expiration);
 
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(email) // 使用 email 作为主题
                 .setIssuedAt(now)
-                .setExpiration(expiryDate)
+                .setExpiration(new Date(System.currentTimeMillis() + expiration * 1000))
                 .signWith(secretKey)
                 .compact();
     }

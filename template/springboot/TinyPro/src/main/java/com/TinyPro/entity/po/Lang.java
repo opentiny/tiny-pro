@@ -10,6 +10,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
@@ -17,6 +19,7 @@ import java.util.Set;
 @Entity
 @Table(name = "lang")
 @Data
+@DynamicUpdate
 public class Lang implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -3,11 +3,14 @@ package com.TinyPro.entity.po;
 import com.baomidou.mybatisplus.annotation.TableField;
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import jakarta.persistence.*;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -15,6 +18,7 @@ import java.util.Set;
 @Data
 @Entity
 @Table(name = "user")
+@DynamicUpdate
 @EntityListeners(AuditingEntityListener.class)   // 自动填充创建/更新时间
 public class User {
 
@@ -30,33 +34,34 @@ public class User {
     @JoinTable(name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
-    @TableField(select = false)
     private List<Role> role;
 
     private String department;
 
     private String employee_type;
 
-    private LocalDateTime probation_start;
-    private LocalDateTime probation_end;
+    private LocalDate probation_start;
+    private LocalDate  probation_end;
     private String probation_duration;
 
-    private LocalDateTime protocol_start;
-    private LocalDateTime protocol_end;
+    private LocalDate  protocol_start;
+    private LocalDate  protocol_end;
 
     private String address;
     private Integer status;
 
     @CreatedDate
     @Column(name = "createTime", updatable = false)
-    private LocalDateTime createTime;
+    private LocalDate createTime;
+    @CreatedDate
     @Column(name = "create_time", updatable = false)
-    private LocalDateTime create_time;
+    private LocalDate create_time;
     @LastModifiedDate
     @Column(name = "updateTime")
-    private LocalDateTime updateTime;
+    private LocalDate updateTime;
+    @LastModifiedDate
     @Column(name = "update_time")
-    private LocalDateTime update_time;
+    private LocalDate update_time;
 
     /* 密码盐 */
     @Column(name = "salt", length = 64)

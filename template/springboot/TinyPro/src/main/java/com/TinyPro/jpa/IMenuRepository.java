@@ -1,9 +1,6 @@
-package com.TinyPro.service.jpa;
+package com.TinyPro.jpa;
 
-import com.TinyPro.annotation.Permission;
-import com.TinyPro.entity.po.Lang;
 import com.TinyPro.entity.po.Menu;
-import com.TinyPro.entity.po.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

@@ -11,9 +11,9 @@ public class CreateRoleDto {
     @NotBlank
     private String name;
 
-    @NotEmpty
+    @NotNull(message = "{NOT_NULL}")
     private List<@NotNull Long> permissionIds;
 
-    @NotEmpty
+    @NotNull(message = "{NOT_NULL}")
     private List<@NotNull Long> menuIds;
 }

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -23,7 +24,7 @@ public class RejectInterceptor implements HandlerInterceptor {
                              HttpServletResponse response,
                              Object handler) throws Exception {
 
-        if (!rejectStart){
+        if (!rejectStart) {
             return true;
         }
         if (!(handler instanceof HandlerMethod)) {
@@ -32,10 +33,10 @@ public class RejectInterceptor implements HandlerInterceptor {
 
         HandlerMethod hm = (HandlerMethod) handler;
         boolean reject = hm.hasMethodAnnotation(Reject.class) ||
-                         hm.getBeanType().isAnnotationPresent(Reject.class);
+                hm.getBeanType().isAnnotationPresent(Reject.class);
 
         if (reject) {
-            throw new BusinessException("exception.preview.reject-this-request",null);
+            throw new BusinessException("exception.preview.reject-this-request", HttpStatus.BAD_REQUEST, null);
         }
         return true;
     }
