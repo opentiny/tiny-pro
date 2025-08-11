@@ -1,8 +1,8 @@
 <template>
   <div class="whole-detail">
     <div class="detail-header">{{ $t('baseForm.form.label.evaluation') }}</div>
-    <tiny-row :flex="true" class="detail-row" noSpace>
-      <tiny-col :span="3">
+    <tiny-row class="flex flex-wrap detail-row" noSpace>
+      <tiny-col class="w-1/4 max-md:w-1/2 max-sm:w-full">
         <div class="title pad-title">
           {{ $t('menu.plan.develop') }}
         </div>
@@ -10,7 +10,7 @@
           {{ $t('menu.plan.yes') }}
         </div>
       </tiny-col>
-      <tiny-col :span="3">
+      <tiny-col class="w-1/4 max-md:w-1/2 max-sm:w-full">
         <div class="title pad-title">
           {{ $t('menu.plan.whole') }}
         </div>

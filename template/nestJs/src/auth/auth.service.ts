@@ -46,8 +46,6 @@ export class AuthService {
       );
     }
 
-    console.log(encry(password, userInfo.salt))
-
     if (encry(password, userInfo.salt) !== userInfo.password) {
       throw new HttpException(
         this.i18n.translate('exception.auth.passwordOrEmailError', {

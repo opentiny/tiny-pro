@@ -8,6 +8,8 @@
     Option as TinyOption,
     Select as TinySelect,
     Button as TinyButton,
+    TinyRow, 
+    TinyCol
   } from '@opentiny/vue';
   import { computed, reactive, ref, unref, watch } from 'vue';
 
@@ -73,28 +75,34 @@
     width="700"  
     :title="$t('roleInfo.modal.title.add')"
   >
-    <tiny-form ref="form" :model="data" :rules="rules" label-position="top">
-      <tiny-form-item :label="$t('roleInfo.modal.input.name')" prop="name">
-        <tiny-input v-model="data.name" />
-      </tiny-form-item>
 
-      <tiny-form-item
-        :label="$t('roleInfo.modal.input.desc')"
-        prop="permissionIds"
-      >
-        <tiny-select
-          v-model="data.permissionIds"
-          :placeholder="$t('baseForm.form.label.placeholder')"
-          multiple
+    <tiny-form ref="form" :model="data" :rules="rules">
+      <tiny-row>
+        <tiny-col :span="6">
+          <tiny-form-item :label="$t('roleInfo.modal.input.name')" prop="name">
+            <tiny-input v-model="data.name" />
+          </tiny-form-item>
+        </tiny-col>
+        <tiny-col :span="6">
+          <tiny-form-item
+          :label="$t('roleInfo.modal.input.desc')"
+          prop="permissionIds"
         >
-          <tiny-option
-            v-for="item in props.permissions"
-            :key="item.id"
-            :label="$t(item.name)"
-            :value="item.id"
-          ></tiny-option>
-        </tiny-select>
-      </tiny-form-item>
+          <tiny-select
+            v-model="data.permissionIds"
+            :placeholder="$t('baseForm.form.label.placeholder')"
+            multiple
+          >
+            <tiny-option
+              v-for="item in props.permissions"
+              :key="item.id"
+              :label="$t(item.name)"
+              :value="item.id"
+            ></tiny-option>
+          </tiny-select>
+        </tiny-form-item>
+        </tiny-col>
+      </tiny-row>
     </tiny-form>
     <template #footer>
       <tiny-button round  @click="onCancel">{{ $t('menu.btn.cancel') }}</tiny-button>

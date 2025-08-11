@@ -1,8 +1,8 @@
 <template>
   <div class="evaluation-detail">
     <div class="detail-header">{{ $t('baseForm.form.label.plan') }}</div>
-    <tiny-row :flex="true" class="detail-row" noSpace>
-      <tiny-col :span="3">
+    <tiny-row class="flex flex-wrap detail-row" noSpace>
+      <tiny-col class="w-1/4 max-md:w-1/2 max-sm:w-full">
         <div class="title pad-title">
           {{ $t('menu.plan.develop') }}
         </div>
@@ -10,7 +10,7 @@
           {{ $t('menu.plan.yes') }}
         </div>
       </tiny-col>
-      <tiny-col :span="3">
+      <tiny-col class="w-1/4 max-md:w-1/2 max-sm:w-full">
         <div class="title pad-title">
           {{ $t('menu.plan.frequency') }}
         </div>
@@ -18,21 +18,19 @@
           {{ $t('menu.plan.month') }}
         </div>
       </tiny-col>
-      <tiny-col :span="3">
+      <tiny-col class="w-1/4 max-md:w-1/2 max-sm:w-full">
         <div class="title pad-title">
           {{ $t('menu.plan.goal') }}
         </div>
         <div class="content pad-title"> {{ $t('menu.plan.trainees') }} </div>
       </tiny-col>
-      <tiny-col :span="3">
+      <tiny-col class="w-1/4 max-md:w-1/2 max-sm:w-full">
         <div class="title pad-title">
           {{ $t('menu.plan.condition') }}
         </div>
         <div class="content pad-title"> {{ $t('menu.plan.teacher') }} </div>
       </tiny-col>
-    </tiny-row>
-    <tiny-row :flex="true" class="detail-row mart_8" noSpace>
-      <tiny-col :span="3">
+      <tiny-col class="w-1/4 max-md:w-1/2 max-sm:w-full">
         <div class="title pad-title">
           {{ $t('menu.plan.phase') }}
         </div>

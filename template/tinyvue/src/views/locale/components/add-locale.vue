@@ -10,12 +10,14 @@
       v-model:visible="open"
       :title="$t('locale.add.title')"
       :close-on-click-modal="false"
-      >
+      dialog-class="locale-dialog-box"
+    >
       <tiny-form
         ref="localeForm"
         :model="locale"
         :rules="rules"
-        label-position="top"
+        label-position="left"
+        label-width="118px"
       >
         <tiny-form-item :label="$t('locale.add.key')" prop="key">
           <tiny-input v-model="locale.key" />
@@ -60,16 +62,20 @@
           </tiny-popover>
         </tiny-form-item>
       </tiny-form>
-      <tiny-button
-        type="text"
-        :text="$t('locale.add.btn')"
-        @click="addLocale"
-      ></tiny-button>
+      <template #footer>
+        <tiny-button size="small" @click="onClose">{{ $t('menu.btn.cancel') }}</tiny-button>
+        <tiny-button
+          size="small"
+          :text="$t('locale.add.btn')"
+          type="primary"
+          @click="addLocale"
+          round
+        ></tiny-button>
+      </template>
     </tiny-dialog-box>
     <tiny-dialog-box
       v-model:visible="langTableOpen"
       :title="$t('lang.manage.title')"
-      :close-on-click-modal="false"
       width="60%"
     >
       <lang-table />
@@ -93,7 +99,7 @@
     Option as TinyOption,
     Popover as TinyPopover,
   } from '@opentiny/vue';
-  import { computed, reactive, ref } from 'vue';
+  import { computed, reactive, ref, watch } from 'vue';
   import { useI18n } from 'vue-i18n';
   import langTable from './lang-table.vue';
 
@@ -104,7 +110,7 @@
   const { open, onOpen, onClose } = useDisclosure();
   const { open: langPopoverOpen, onClose: setLangPopoverClose } =
     useDisclosure();
-  const { open: langTableOpen, onOpen: setLangTableOpen } = useDisclosure();
+  const { open: langTableOpen, onOpen: setLangTableOpen, onClose: setLangTableClose } = useDisclosure();
   const localeForm = ref();
   const langForm = ref();
   const locales = useLocales();
@@ -202,4 +208,21 @@
       })
       .catch(() => {});
   };
+  watch(open, (value) => {
+    if(!value && (langPopoverOpen.value || langTableOpen.value)) {
+      setLangPopoverClose()
+      setLangTableClose()
+    }
+  })
 </script>
+
+<style scoped lang="less">
+.locale-dialog-box :deep(.tiny-dialog-box .tiny-dialog-box__body) {
+  padding-right: 110px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+.tiny-button {
+  width: 96px;
+}
+</style>

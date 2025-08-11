@@ -6,18 +6,19 @@
         <div v-if="active === 4" class="result-alert">
           <img src="@/assets/images/error.png" alt="error" />
           <div>
-            <div>{{ $t('menu.result.messageError') }}</div>
-            <div>{{ $t('error.result.title') }}</div>
+            <div class="text-[20px] max-sm:text-[16px]">{{ $t('menu.result.messageError') }}</div>
+            <div class="text-[14px] max-sm:text-[12px]">{{ $t('error.result.title') }}</div>
           </div>
         </div>
         <div class="result-btn">
           <tiny-button
+            class="text-[14px] max-sm:text-[12px]"
             type="primary"
             native-type="submit"
             @click="handleSubmit"
             >{{ $t('error.result.home') }}</tiny-button
           >
-          <tiny-button @click="handleFormReset">
+          <tiny-button class="text-[14px] max-sm:text-[12px]" @click="handleFormReset">
             {{ $t('menu.btn.cancel') }}
           </tiny-button>
         </div>
@@ -124,12 +125,10 @@
     div:first-child {
       padding-top: 50px;
       font-weight: 900;
-      font-size: 20px;
     }
 
     div:last-child {
       padding-top: 20px;
-      font-size: 14px;
     }
   }
 

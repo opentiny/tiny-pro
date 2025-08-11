@@ -16,7 +16,7 @@
   import useLoading from '@/hooks/loading';
   import { Pager } from '@/types/global';
   import permissionTable from './permission-table.vue';
-  
+
   const props = defineProps<{
     tableData: (Role & { menus: ITreeNodeData[] })[];
     fetchOption: {
@@ -82,7 +82,11 @@
     return permissionDate
   };
   const onUpdate = (args:any) => {
-    updateRole(args.row)
+    const menuIds = args.row.menus.map(menu => menu.id);
+    updateRole({
+      ...args.row,
+      menuIds
+    })
       .then(({ data }) => {
         Modal.message({
           message: t('permissionInfo.edit.success'),
@@ -138,7 +142,7 @@
       :editor="{ component: 'input', autoselect: true }"
     ></tiny-grid-column>
     <tiny-grid-column
-    field="permissionIds" 
+    field="permissionIds"
     :title="$t('roleInfo.table.desc')"
     show-overflow="tooltip"
     :editor="{
@@ -156,7 +160,7 @@
           {{ getPermission(data.row) }}
       </template>
     </tiny-grid-column>
-    <tiny-grid-column :title="$t('roleInfo.table.operations')" align="center">
+    <tiny-grid-column :title="$t('roleInfo.table.operations')">
       <template #default="data">
         <iconCueL class="del-icon"></iconCueL>
         <a
@@ -203,8 +207,11 @@
   .del-icon{
     fill: #1890ff;
     margin-right: 8px;
-    margin-left: 16px;;
     font-size: 16px;
     margin-top: -3px;
   }
+  .operation-update:hover{
+    text-decoration: underline;
+  }
+
 </style>
