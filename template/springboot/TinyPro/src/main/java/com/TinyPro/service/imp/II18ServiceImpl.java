@@ -19,6 +19,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
@@ -29,7 +30,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
+
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -111,13 +112,13 @@ public class II18ServiceImpl implements II18Service {
                 predicates.add(root.get("lang").get("name").in(lang));
             }
             // 按 content 过滤，支持不同的匹配模式
-            if (StringUtils.hasText(content)) {
+            if (StringUtils.isNoneBlank(content)) {
                 Predicate contentPredicate = buildLikePredicate(root, cb, "content", content);
                 predicates.add(contentPredicate);
             }
 
             // 按 key 过滤，支持不同的匹配模式
-            if (StringUtils.hasText(key)) {
+            if (StringUtils.isNoneBlank(key)) {
                 Predicate keyPredicate = buildLikePredicate(root, cb, "key", key);
                 predicates.add(keyPredicate);
             }
@@ -141,18 +142,21 @@ public class II18ServiceImpl implements II18Service {
     }
 
     @Override
-    public ResponseEntity<I18> updateByi18nId(Long id, UpdateI18Dto dto) {
+    public ResponseEntity<I18Vo> updateByi18nId(Long id, UpdateI18Dto dto) {
         I18 i18 = i18Repository.getById(id);
-        i18.setKey(dto.getKey());
-        i18.setContent(dto.getContent());
+        if (StringUtils.isNotEmpty(dto.getKey())) {
+            i18.setKey(dto.getKey());
+        }
+        if (StringUtils.isNotEmpty(dto.getContent())) {
+            i18.setContent(dto.getContent());
+        }
         Lang lang = langRepository.getById(Long.valueOf(dto.getLang()));
         if (lang == null) {
             throw new BusinessException("exception.auth.passwordOrEmailError", HttpStatus.NOT_FOUND, null);
         }
-        i18.setLang(lang);
-        I18 newi18 = i18Repository.save(i18);
+        I18Vo result = new I18Vo(i18.getId(),i18.getKey(),i18.getContent(),new LangVo(lang.getId(),lang.getName()));
         //TODO 需要仔细看看
-        return new ResponseEntity<>(newi18, HttpStatus.OK);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @Override

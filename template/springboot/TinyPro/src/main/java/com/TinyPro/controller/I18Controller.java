@@ -59,7 +59,7 @@ public class I18Controller {
 
     @PatchMapping("/{id}")
     @PermissionAnnotation("i18n::update")
-    public ResponseEntity<I18> update(
+    public ResponseEntity<I18Vo> update(
             @PathVariable Long id,
             @RequestBody @Valid UpdateI18Dto dto) {
         return i18Service.updateByi18nId(id, dto);

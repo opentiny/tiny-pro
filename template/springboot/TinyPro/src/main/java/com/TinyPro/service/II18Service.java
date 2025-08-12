@@ -20,7 +20,7 @@ public interface II18Service {
 
     ResponseEntity<PageWrapper<I18Vo>> findAll(Integer page, Integer limit, Boolean allBool, List<String> lang, String key, String content);
 
-    ResponseEntity<I18> updateByi18nId(java.lang.Long id, @Valid UpdateI18Dto dto);
+    ResponseEntity<I18Vo> updateByi18nId(java.lang.Long id, @Valid UpdateI18Dto dto);
 
     I18Vo getI18ById(Integer id);
 

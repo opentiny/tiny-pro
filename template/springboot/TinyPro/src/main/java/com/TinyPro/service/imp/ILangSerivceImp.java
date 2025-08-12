@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -53,18 +54,12 @@ public class ILangSerivceImp  implements ILangService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<Lang> remove(Integer id) {
         Optional<Lang> byId = langRepository.findById(Long.valueOf(id));
-        if (byId.isEmpty()) {
-            throw new BusinessException("exception.lang.notExistsCommon", HttpStatus.NOT_FOUND, null);
-        }
-        Lang lang = byId.get();
+        Lang lang = byId.orElseThrow(() -> new BusinessException("exception.lang.notExistsCommon", HttpStatus.NOT_FOUND, null));
+        i18Repository.deleteByLangId(lang.getId());
         langRepository.deleteById(Long.valueOf(id));
-        List<I18> byLangId = i18Repository.findByLang_Id(Long.valueOf(id));
-        if (byLangId.isEmpty()) {
-            throw new BusinessException("exception.lang.notExistsCommon", HttpStatus.NOT_FOUND, null);
-        }
-        i18Repository.deleteAllInBatch(byLangId);
         return ResponseEntity.ok(lang);
     }
 }

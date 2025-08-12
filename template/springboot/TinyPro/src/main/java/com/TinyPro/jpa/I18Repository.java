@@ -33,4 +33,6 @@ public interface I18Repository extends JpaRepository<I18, Long>,
         where i.id = :id
     """)
     Optional<I18Vo> findI18VoById(@Param("id") Long id);
+
+    void deleteByLangId(Integer id);
 }
