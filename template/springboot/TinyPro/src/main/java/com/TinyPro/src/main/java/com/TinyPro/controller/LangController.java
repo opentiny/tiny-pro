@@ -21,7 +21,7 @@ public class LangController {
     @Reject()
     @PermissionAnnotation("lang::add")
     @PostMapping
-    public ResponseEntity<Lang> createLang(CreateLangDto createLangDto) {
+    public ResponseEntity<Lang> createLang(@RequestBody CreateLangDto createLangDto) {
         return this.langService.create(createLangDto);
     }
 

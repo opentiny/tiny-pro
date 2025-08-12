@@ -3,6 +3,7 @@ package com.TinyPro.service.imp;
 import com.TinyPro.entity.contants.Contants;
 import com.TinyPro.entity.dto.*;
 import com.TinyPro.entity.page.PageWrapper;
+import com.TinyPro.entity.po.I18;
 import com.TinyPro.entity.po.Permission;
 import com.TinyPro.entity.po.Role;
 import com.TinyPro.entity.po.User;
@@ -202,24 +203,26 @@ public class IUserServiceImpl implements IUserService {
                 Sort.by("id").ascending()
         );
 
-        // 2. 构建动态查询条件
+
         Specification<User> spec = (Root<User> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            // 名称模糊查询
+            // 1. 名称模糊查询，支持不同的匹配模式
             if (StringUtils.isNoneBlank(name)) {
-                predicates.add(cb.like(root.get("name"), "%" + name + "%"));
+                Predicate namePredicate = buildLikePredicate(root, cb, "name", name);
+                predicates.add(namePredicate);
             }
 
-            // 角色ID数组查询
+            // 2. 角色ID数组查询
             if (role != null && role.length > 0) {
                 Join<User, Role> roleJoin = root.join("role", JoinType.INNER);
                 predicates.add(roleJoin.get("id").in((Object[]) role));
             }
 
-            // 邮箱模糊查询
+            // 3. 邮箱模糊查询，支持不同的匹配模式
             if (StringUtils.isNoneBlank(email)) {
-                predicates.add(cb.like(root.get("email"), "%" + email + "%"));
+                Predicate emailPredicate = buildLikePredicate(root, cb, "email", email);
+                predicates.add(emailPredicate);
             }
 
             return cb.and(predicates.toArray(new Predicate[0]));
@@ -328,5 +331,29 @@ public class IUserServiceImpl implements IUserService {
                 userPage.getPageable(),   // 保持原有的分页信息
                 userPage.getTotalElements() // 总记录数
         );
+    }
+    private Predicate buildLikePredicate(Root<User> root, CriteriaBuilder cb, String field, String input) {
+        if (input.contains("%")) {
+            if (input.startsWith("%") && input.endsWith("%")) {
+                // 包含匹配 LIKE '%value%'
+                String value = input.substring(1, input.length() - 1);
+                return cb.like(root.get(field), "%" + value + "%");
+            } else if (input.startsWith("%")) {
+                // 后缀匹配 LIKE '%value'
+                String value = input.substring(1);
+                return cb.like(root.get(field), "%" + value);
+            } else if (input.endsWith("%")) {
+                // 前缀匹配 LIKE 'value%'
+                String value = input.substring(0, input.length() - 1);
+                return cb.like(root.get(field), value + "%");
+            } else {
+                // 如果包含 % 但不以 % 开头或结尾，可以根据需求处理
+                // 这里简单地将所有 % 视为通配符，您可以根据需要调整
+                return cb.like(root.get(field), input);
+            }
+        } else {
+            // 精确匹配 =
+            return cb.equal(root.get(field), input);
+        }
     }
 }

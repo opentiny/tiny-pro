@@ -5,7 +5,6 @@ import com.TinyPro.entity.dto.UpdateI18Dto;
 import com.TinyPro.entity.page.PageWrapper;
 import com.TinyPro.entity.po.I18;
 import com.TinyPro.entity.vo.I18Vo;
-import com.baomidou.mybatisplus.extension.service.IService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -26,4 +25,6 @@ public interface II18Service {
     I18Vo getI18ById(Integer id);
 
     I18 removei18ById(Integer id);
+
+    ResponseEntity<List<I18>> batchDeleteUser(List<Long> ids);
 }

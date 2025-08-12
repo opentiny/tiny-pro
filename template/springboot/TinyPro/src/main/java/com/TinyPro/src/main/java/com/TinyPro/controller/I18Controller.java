@@ -72,4 +72,10 @@ public class I18Controller {
         I18 result = i18Service.removei18ById(id);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
+    @Reject()
+    @PostMapping("/batch")
+    @PermissionAnnotation("user:batch-remove")
+    public ResponseEntity<List<I18>> batchRemoveUser(@RequestBody List<Long> ids) {
+        return this.i18Service.batchDeleteUser(ids);
+    }
 }

@@ -19,7 +19,9 @@ import com.TinyPro.jpa.IRoleRepository;
 import com.TinyPro.jpa.IUserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -94,12 +96,13 @@ public class IRoleServiceImpl implements IRoleService {
         Specification<Role> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
             if (StringUtils.isNotEmpty(name)) {
-                predicates.add(cb.like(root.get("name"), "%" + name + "%"));
+                Predicate namePreidcate = buildLikePredicate(root, cb, "name", name);
+                predicates.add(namePreidcate);
             }
             return cb.and(predicates.toArray(new Predicate[0]));
         };
 
-        Page<Role> rolePage = iRoleRepository.findAllWithAssociations(spec, pageable);
+        Page<Role> rolePage = iRoleRepository.findAll(spec, pageable);
         List<Menu> menuList = menuService.findAll();
 
         PageWrapper<Role> rolePageWrapper = PageWrapper.of(rolePage);
@@ -230,5 +233,29 @@ public class IRoleServiceImpl implements IRoleService {
         entityManager.createQuery("DELETE FROM Role r WHERE r.id = :roleId")
                 .setParameter("roleId", roleId)
                 .executeUpdate();
+    }
+    private Predicate buildLikePredicate(Root<Role> root, CriteriaBuilder cb, String field, String input) {
+        if (input.contains("%")) {
+            if (input.startsWith("%") && input.endsWith("%")) {
+                // 包含匹配 LIKE '%value%'
+                String value = input.substring(1, input.length() - 1);
+                return cb.like(root.get(field), "%" + value + "%");
+            } else if (input.startsWith("%")) {
+                // 后缀匹配 LIKE '%value'
+                String value = input.substring(1);
+                return cb.like(root.get(field), "%" + value);
+            } else if (input.endsWith("%")) {
+                // 前缀匹配 LIKE 'value%'
+                String value = input.substring(0, input.length() - 1);
+                return cb.like(root.get(field), value + "%");
+            } else {
+                // 如果包含 % 但不以 % 开头或结尾，可以根据需求处理
+                // 这里简单地将所有 % 视为通配符，您可以根据需要调整
+                return cb.like(root.get(field), input);
+            }
+        } else {
+            // 精确匹配 =
+            return cb.equal(root.get(field), input);
+        }
     }
 }

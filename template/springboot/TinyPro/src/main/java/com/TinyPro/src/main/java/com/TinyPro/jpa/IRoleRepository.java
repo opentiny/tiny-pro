@@ -27,8 +27,7 @@ public interface IRoleRepository extends JpaRepository<Role, Long> {
             nativeQuery = true)
     void deleteByMenuId(@Param("menuId") Integer menuId);
     @EntityGraph(attributePaths = {"menus", "permission"})
-    @Query("SELECT r FROM Role r")
-    Page<Role> findAllWithAssociations(Specification<Role> spec, Pageable pageable);
+    Page<Role> findAll(Specification<Role> spec, Pageable pageable);
     @Query("SELECT r FROM Role r LEFT JOIN FETCH r.menus WHERE r.id IN :ids")
     List<Role> findAllWithMenusByIds(@Param("ids") List<Integer> ids);
 

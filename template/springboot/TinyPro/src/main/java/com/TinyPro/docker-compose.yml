@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  # ======================
+  # Spring Boot 应用服务
+  # ======================
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tinypro-app
+    restart: unless-stopped
+    ports:
+      - "8080:3000"  # 注意：你的应用端口可能不是 3000，请确认！
+    depends_on:
+      - mysql
+      - redis
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/tinypro_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 123456
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+
+  # ======================
+  # MySQL 数据库
+  # ======================
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: tinypro_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql  # 使用命名的 volume 存储 MySQL 数据
+
+  # ======================
+  # Redis 缓存
+  # ======================
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data  # 使用命名的 volume 存储 Redis 数据
+
+# ======================
+# 定义命名卷（数据持久化）
+# ======================
+volumes:
+  mysql_data:
+  redis_data:

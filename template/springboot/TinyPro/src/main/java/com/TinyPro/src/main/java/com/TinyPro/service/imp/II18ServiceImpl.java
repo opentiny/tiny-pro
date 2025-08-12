@@ -15,7 +15,9 @@ import com.TinyPro.jpa.I18Repository;
 import com.TinyPro.jpa.LangRepository;
 import com.alibaba.fastjson.JSON;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -99,31 +101,39 @@ public class II18ServiceImpl implements II18Service {
             pageable = PageRequest.of(0, 10);
         }
 
-        // 2. 动态条件（复用原来的 Specification）
+        // 2. 动态条件（改进后的 Specification）
         Specification<I18> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
+            // 按 lang.name 过滤
             if (lang != null && !lang.isEmpty()) {
-                predicates.add(root.get("lang").get("name").in(lang)); // 按 lang.name 过滤
+                // 假设 lang 是 List<String>
+                predicates.add(root.get("lang").get("name").in(lang));
             }
+            // 按 content 过滤，支持不同的匹配模式
             if (StringUtils.hasText(content)) {
-                predicates.add(cb.like(root.get("content"), "%" + content + "%"));
+                Predicate contentPredicate = buildLikePredicate(root, cb, "content", content);
+                predicates.add(contentPredicate);
             }
+
+            // 按 key 过滤，支持不同的匹配模式
             if (StringUtils.hasText(key)) {
-                predicates.add(cb.like(root.get("key"), "%" + key + "%"));
+                Predicate keyPredicate = buildLikePredicate(root, cb, "key", key);
+                predicates.add(keyPredicate);
             }
+
             return cb.and(predicates.toArray(new Predicate[0]));
         };
 
         // 3. 查询并返回 D
-        Page<I18Flat> flatPage = i18Repository.findAllDto(spec, pageable);
+        Page<I18> flatPage = i18Repository.findAll(spec, pageable);
         List<I18Vo> dtoList = flatPage.getContent()
                 .stream()
                 .map(f -> new I18Vo(
                         f.getId(),
                         f.getKey(),
                         f.getContent(),
-                        new LangVo(f.getLangId(), f.getLangName())
+                        new LangVo(f.getLang().getId(), f.getLang().getName())
                 ))
                 .toList();
         Page<I18Vo> result = new PageImpl<>(dtoList, flatPage.getPageable(), flatPage.getTotalElements());
@@ -160,5 +170,40 @@ public class II18ServiceImpl implements II18Service {
                 .orElseThrow(() -> new BusinessException("I18 not found with id: " + id));
         i18Repository.deleteById(Long.valueOf(id));
         return result;
+    }
+
+    @Override
+    public ResponseEntity<List<I18>> batchDeleteUser(List<Long> ids) {
+        try {
+            List<I18> result = i18Repository.findAllById(ids);
+            i18Repository.deleteAllByIdInBatch(ids);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            throw new BusinessException("删除id失败",HttpStatus.NOT_FOUND,null);
+        }
+    }
+    private Predicate buildLikePredicate(Root<I18> root, CriteriaBuilder cb, String field, String input) {
+        if (input.contains("%")) {
+            if (input.startsWith("%") && input.endsWith("%")) {
+                // 包含匹配 LIKE '%value%'
+                String value = input.substring(1, input.length() - 1);
+                return cb.like(root.get(field), "%" + value + "%");
+            } else if (input.startsWith("%")) {
+                // 后缀匹配 LIKE '%value'
+                String value = input.substring(1);
+                return cb.like(root.get(field), "%" + value);
+            } else if (input.endsWith("%")) {
+                // 前缀匹配 LIKE 'value%'
+                String value = input.substring(0, input.length() - 1);
+                return cb.like(root.get(field), value + "%");
+            } else {
+                // 如果包含 % 但不以 % 开头或结尾，可以根据需求处理
+                // 这里简单地将所有 % 视为通配符，您可以根据需要调整
+                return cb.like(root.get(field), input);
+            }
+        } else {
+            // 精确匹配 =
+            return cb.equal(root.get(field), input);
+        }
     }
 }
