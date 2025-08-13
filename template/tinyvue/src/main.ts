@@ -10,7 +10,7 @@ import App from './App.vue';
 import '@/api/interceptor';
 import '@/assets/style/global.less';
 import config from '../hwc-exports.json';
-// import '@opentiny/vue-search-box/index.css';
+import '@opentiny/vue-search-box/index.css';
 import 'virtual:uno.css';
 import "@opentiny/icons/style/all.css";
 
