@@ -154,7 +154,8 @@ public class II18ServiceImpl implements II18Service {
         if (lang == null) {
             throw new BusinessException("exception.auth.passwordOrEmailError", HttpStatus.NOT_FOUND, null);
         }
-        I18Vo result = new I18Vo(i18.getId(),i18.getKey(),i18.getContent(),new LangVo(lang.getId(),lang.getName()));
+        i18Repository.save(i18);
+        I18Vo result = new I18Vo(i18.getId(), i18.getKey(), i18.getContent(), new LangVo(lang.getId(), lang.getName()));
         //TODO 需要仔细看看
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
@@ -163,7 +164,7 @@ public class II18ServiceImpl implements II18Service {
     public I18Vo getI18ById(Integer id) {
         I18Vo i18 = i18Repository.findI18VoById(Long.valueOf(id)).get();
         if (i18 == null) {
-            throw new BusinessException("exception.i18.notExists", HttpStatus.NOT_FOUND ,null);
+            throw new BusinessException("exception.i18.notExists", HttpStatus.NOT_FOUND, null);
         }
         return i18;
     }
@@ -183,9 +184,10 @@ public class II18ServiceImpl implements II18Service {
             i18Repository.deleteAllByIdInBatch(ids);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
-            throw new BusinessException("删除id失败",HttpStatus.NOT_FOUND,null);
+            throw new BusinessException("删除id失败", HttpStatus.NOT_FOUND, null);
         }
     }
+
     private Predicate buildLikePredicate(Root<I18> root, CriteriaBuilder cb, String field, String input) {
         if (input.contains("%")) {
             if (input.startsWith("%") && input.endsWith("%")) {

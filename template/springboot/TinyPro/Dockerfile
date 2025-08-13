@@ -4,23 +4,23 @@ FROM maven:3.9-eclipse-temurin-17 AS build
 # 设置工作目录
 WORKDIR /app
 
-# 复制整个项目文件到容器中
+# 复制项目文件和 Maven 配置
 COPY . .
+COPY settings.xml /root/.m2/settings.xml
 
-# 执行 Maven 打包命令（跳过测试）
+# 执行打包（跳过测试）
 RUN mvn clean package -DskipTests
 
-# ===== 第二阶段：运行阶段，仅使用 JRE 运行 JAR =====
-FROM eclipse-temurin:17-jre-jammy
+# ===== 第二阶段：运行阶段，使用更小的 JRE Alpine 镜像 =====
+FROM eclipse-temurin:17-jre-alpine
 
 # 设置工作目录
 WORKDIR /app
 
-# 从构建阶段拷贝打包好的 jar 文件（假设你的项目打包后是 target/*.jar）
-# 通常 Spring Boot 项目默认打包出的 jar 是：target/项目名-版本号.jar
+# 从构建阶段拷贝最终的 jar 包
 COPY --from=build /app/target/TinyPro-1.0-SNAPSHOT.jar app.jar
 
-# 暴露应用端口（根据你的 Spring Boot 配置，比如 8080）
+# 暴露端口（根据你的 application.properties 中 server.port）
 EXPOSE 3000
 
 # 启动 Spring Boot 应用

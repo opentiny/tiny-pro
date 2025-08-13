@@ -11,7 +11,7 @@ services:
     container_name: tinypro-app
     restart: unless-stopped
     ports:
-      - "8080:3000"  # 注意：你的应用端口可能不是 3000，请确认！
+      - "3000:3000"
     depends_on:
       - mysql
       - redis
@@ -21,6 +21,8 @@ services:
       SPRING_DATASOURCE_PASSWORD: 123456
       SPRING_REDIS_HOST: redis
       SPRING_REDIS_PORT: 6379
+      command: >
+        sh -c "sleep 10 && java -jar app.jar"
 
   # ======================
   # MySQL 数据库
