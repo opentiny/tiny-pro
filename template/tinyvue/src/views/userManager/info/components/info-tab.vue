@@ -119,7 +119,7 @@
             </template>
           </tiny-grid-column>
           <tiny-grid-column
-            field="role"
+            field="roleIds"
             :filter="jobFilter"
             :title="$t('userInfo.table.job')"
             show-overflow="tooltip"
@@ -135,11 +135,11 @@
               attrs: {
                 options: state.roleData,
                 textField: 'name',
-                valueField: 'id'
+                valueField: 'id',
               },
               events: {
                 keyup:  handleKeyup,
-                change: handleSelectChange
+                change: handleSelectChange,
               }
             }"
           >
@@ -706,9 +706,8 @@
         protocolEnd: data.protocolEnd,
         status: data.status,
       };
-
-      if(property === 'role') {
-        const roleIds = [value];
+      if(property === 'roleIds') {
+        const roleIds = [value ?? newTemp.roleIds[0]];
         newTemp.roleIds = roleIds;
       } else if(property !== 'status'){
         newTemp[property] = value;
