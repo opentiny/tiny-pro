@@ -150,7 +150,7 @@ public class II18ServiceImpl implements II18Service {
         if (StringUtils.isNotEmpty(dto.getContent())) {
             i18.setContent(dto.getContent());
         }
-        if (dto.getLang() != null){
+        if (dto.getLang() != null) {
             Lang lang = langRepository.getById(Long.valueOf(dto.getLang()));
             if (lang == null) {
                 throw new BusinessException("exception.auth.passwordOrEmailError", HttpStatus.NOT_FOUND, null);
@@ -159,9 +159,8 @@ public class II18ServiceImpl implements II18Service {
             I18Vo result = new I18Vo(i18.getId(), i18.getKey(), i18.getContent(), new LangVo(lang.getId(), lang.getName()));
             return new ResponseEntity<>(result, HttpStatus.OK);
         } else {
-            i18.setLang(null);
             i18Repository.save(i18);
-            return ResponseEntity.ok(new I18Vo(i18.getId(),i18.getKey(),i18.getContent(),null));
+            return ResponseEntity.ok(new I18Vo(i18.getId(), i18.getKey(), i18.getContent(), new LangVo(i18.getLang().getId(), i18.getLang().getName())));
         }
         //TODO 需要仔细看看
     }
