@@ -159,6 +159,8 @@ public class II18ServiceImpl implements II18Service {
             I18Vo result = new I18Vo(i18.getId(), i18.getKey(), i18.getContent(), new LangVo(lang.getId(), lang.getName()));
             return new ResponseEntity<>(result, HttpStatus.OK);
         } else {
+            i18.setLang(null);
+            i18Repository.save(i18);
             return ResponseEntity.ok(new I18Vo(i18.getId(),i18.getKey(),i18.getContent(),null));
         }
         //TODO 需要仔细看看
