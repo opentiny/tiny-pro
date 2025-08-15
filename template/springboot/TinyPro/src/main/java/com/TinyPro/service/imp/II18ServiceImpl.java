@@ -160,9 +160,13 @@ public class II18ServiceImpl implements II18Service {
             try {
                 Lang lang = langRepository.getById(Long.valueOf(dto.getLang()));
                 if (lang == null) {
-                    throw new BusinessException("exception.auth.passwordOrEmailError", HttpStatus.NOT_FOUND, null);
+                    throw new BusinessException(
+                        "lang.notExists",
+                        HttpStatus.NOT_FOUND,
+                        null
+                    );
                 }
-                i18.setLang(lang); // 补充原代码遗漏的设置lang逻辑
+                i18.setLang(lang);
                 i18Repository.save(i18);
                 
                 I18Vo result = new I18Vo(
@@ -173,7 +177,11 @@ public class II18ServiceImpl implements II18Service {
                 );
                 return new ResponseEntity<>(result, HttpStatus.OK);
             } catch (Throwable e) {
-                throw new BusinessException("exception.auth.passwordOrEmailError", HttpStatus.NOT_FOUND, null);
+                throw new BusinessException(
+                   "lang.notExists", 
+                    HttpStatus.NOT_FOUND,
+                    null
+                );
             }
         } else {
             i18Repository.save(i18);
