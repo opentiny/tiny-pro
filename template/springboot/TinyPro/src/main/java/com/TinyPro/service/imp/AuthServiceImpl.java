@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class AuthServiceImpl implements IAuthService {
@@ -37,10 +38,9 @@ public class AuthServiceImpl implements IAuthService {
     public ResponseEntity<?> login(CreateAuthDto createAuthDto, HttpServletResponse response) throws Exception {
         QueryWrapper<User> wrapper = new QueryWrapper<>();
         wrapper.eq("email", createAuthDto.getEmail());
-        User user = userService.findByEmail(createAuthDto.getEmail()).orElseThrow(null);
-        if (user == null) {
-            throw new BusinessException("exception.auth.userNotExists",HttpStatus.NOT_FOUND,null);
-        }
+        Optional<User> optionalUser = userService.findByEmail(createAuthDto.getEmail());
+        User user = optionalUser
+                .orElseThrow(() -> new BusinessException("exception.auth.userNotExists", HttpStatus.NOT_FOUND, null));
         if (!StringUtils.equals(Sha256Utils.encry(createAuthDto.getPassword(), user.getSalt()), user.getPassword())) {
             throw new BusinessException("exception.auth.passwordOrEmailError",HttpStatus.BAD_REQUEST,  null);
         }

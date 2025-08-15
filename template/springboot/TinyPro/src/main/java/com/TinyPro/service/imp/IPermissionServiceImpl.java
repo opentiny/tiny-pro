@@ -5,26 +5,33 @@ import com.TinyPro.entity.dto.CreatePermissionDto;
 import com.TinyPro.entity.dto.UpdatePermissionDto;
 import com.TinyPro.entity.page.PageWrapper;
 import com.TinyPro.entity.po.Permission;
+import com.TinyPro.entity.po.Role;
 import com.TinyPro.entity.vo.PermissionVo;
 import com.TinyPro.exception.BusinessException;
 import com.TinyPro.service.IPermissionService;
 import com.TinyPro.jpa.IPermissionRepository;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class IPermissionServiceImpl  implements IPermissionService {
+public class IPermissionServiceImpl implements IPermissionService {
     @Autowired
     private IPermissionRepository iPermissionRepository;
 
@@ -84,11 +91,15 @@ public class IPermissionServiceImpl  implements IPermissionService {
 
         // 执行查询
         Page<Permission> permissionPage;
-        if (name != null && !name.trim().isEmpty()) {
-            permissionPage = iPermissionRepository.findByNameContainingIgnoreCase(name.trim(), pageable);
-        } else {
-            permissionPage = iPermissionRepository.findAll(pageable);
-        }
+        Specification<Permission> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            if (StringUtils.isNotEmpty(name)) {
+                Predicate namePreidcate = buildLikePredicate(root, cb, "name", name);
+                predicates.add(namePreidcate);
+            }
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+        permissionPage = iPermissionRepository.findAll(spec, pageable);
         List<PermissionVo> permissionVoList = permissionPage.getContent()
                 .stream()
                 .map(permission -> {
@@ -124,6 +135,32 @@ public class IPermissionServiceImpl  implements IPermissionService {
     @Override
     public List<Permission> findAllPermission() {
         return iPermissionRepository.findAll();
+    }
+
+
+    private Predicate buildLikePredicate(Root<Permission> root, CriteriaBuilder cb, String field, String input) {
+        if (input.contains("%")) {
+            if (input.startsWith("%") && input.endsWith("%")) {
+                // 包含匹配 LIKE '%value%'
+                String value = input.substring(1, input.length() - 1);
+                return cb.like(root.get(field), "%" + value + "%");
+            } else if (input.startsWith("%")) {
+                // 后缀匹配 LIKE '%value'
+                String value = input.substring(1);
+                return cb.like(root.get(field), "%" + value);
+            } else if (input.endsWith("%")) {
+                // 前缀匹配 LIKE 'value%'
+                String value = input.substring(0, input.length() - 1);
+                return cb.like(root.get(field), value + "%");
+            } else {
+                // 如果包含 % 但不以 % 开头或结尾，可以根据需求处理
+                // 这里简单地将所有 % 视为通配符，您可以根据需要调整
+                return cb.like(root.get(field), input);
+            }
+        } else {
+            // 精确匹配 =
+            return cb.equal(root.get(field), input);
+        }
     }
 
 

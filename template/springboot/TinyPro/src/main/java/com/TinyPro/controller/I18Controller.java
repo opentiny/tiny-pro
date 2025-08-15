@@ -59,7 +59,7 @@ public class I18Controller {
 
     @PatchMapping("/{id}")
     @PermissionAnnotation("i18n::update")
-    public ResponseEntity<I18> update(
+    public ResponseEntity<I18Vo> update(
             @PathVariable Long id,
             @RequestBody @Valid UpdateI18Dto dto) {
         return i18Service.updateByi18nId(id, dto);
@@ -71,5 +71,11 @@ public class I18Controller {
     public ResponseEntity<I18> remove(@PathVariable Integer id) {
         I18 result = i18Service.removei18ById(id);
         return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+    @Reject()
+    @PostMapping("/batch")
+    @PermissionAnnotation("user:batch-remove")
+    public ResponseEntity<List<I18>> batchRemoveUser(@RequestBody List<Long> ids) {
+        return this.i18Service.batchDeleteUser(ids);
     }
 }

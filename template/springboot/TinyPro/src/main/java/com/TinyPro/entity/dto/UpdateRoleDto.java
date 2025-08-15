@@ -1,5 +1,7 @@
 package com.TinyPro.entity.dto;
 
+import com.TinyPro.entity.po.Menu;
+import com.TinyPro.entity.po.Permission;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -13,8 +15,12 @@ public class UpdateRoleDto {
     private Integer id;
     @NotBlank(message = "{NOT_EMPTY}")
     private String name;
-    @NotEmpty(message = "{NOT_EMPTY}")
+    @NotNull(message = "{NOT_NULL}")
     private List<@NotNull Long> permissionIds;
-    @NotEmpty(message = "{NOT_EMPTY}")
+    @NotNull(message = "{NOT_NULL}")
+    private List<Menu> menus;
+    @NotNull(message = "{NOT_NULL}")
     private List<Long> menuIds;
+    @NotNull(message = "{NOT_NULL}")
+    private List<Permission> permission;
 }

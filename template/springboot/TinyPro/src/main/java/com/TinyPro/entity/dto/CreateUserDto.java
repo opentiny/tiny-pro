@@ -12,14 +12,14 @@ import java.util.List;
 
 @Data
 public class CreateUserDto {
-    @NotEmpty(message = "{validation.NOT_EMPTY}")
+    @NotEmpty(message = "{NOT_EMPTY}")
     private String name;
     
-    @NotEmpty(message = "{validation.NOT_EMPTY}")
+    @NotEmpty(message = "{NOT_EMPTY}")
     @Email
     private String email;
     
-    @NotEmpty(message = "{validation.NOT_EMPTY}")
+    @NotEmpty(message = "{NOT_EMPTY}")
     private String password;
     
     private List<Long> roleIds = new ArrayList<>();
@@ -27,14 +27,14 @@ public class CreateUserDto {
     private String department;
     
     private String employeeType;
-    @NotEmpty(message = "{validation.NOT_EMPTY}")
+    @NotEmpty(message = "{NOT_EMPTY}")
     private String probationStart;
-    @NotEmpty(message = "{validation.NOT_EMPTY}")
+    @NotEmpty(message = "{NOT_EMPTY}")
     private String probationEnd;
     private String probationDuration;
-    @NotEmpty(message = "{validation.NOT_EMPTY}")
+    @NotEmpty(message = "{NOT_EMPTY}")
     private String protocolStart;
-    @NotEmpty(message = "{validation.NOT_EMPTY}")
+    @NotEmpty(message = "{NOT_EMPTY}")
     private String protocolEnd;
     
     private String address;
