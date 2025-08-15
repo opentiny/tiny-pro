@@ -2,19 +2,16 @@ package com.TinyPro.service.imp;
 
 import com.TinyPro.entity.dto.CreateI18Dto;
 import com.TinyPro.entity.dto.UpdateI18Dto;
-import com.TinyPro.entity.flat.I18Flat;
 import com.TinyPro.entity.page.PageWrapper;
 import com.TinyPro.entity.po.I18;
 import com.TinyPro.entity.po.Lang;
 import com.TinyPro.entity.vo.I18Vo;
 import com.TinyPro.entity.vo.LangVo;
 import com.TinyPro.exception.BusinessException;
-
 import com.TinyPro.service.II18Service;
 import com.TinyPro.jpa.I18Repository;
 import com.TinyPro.jpa.LangRepository;
 import com.alibaba.fastjson.JSON;
-
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
@@ -30,7 +27,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -52,16 +48,19 @@ public class II18ServiceImpl implements II18Service {
         if (lang == null) {
             throw new BusinessException("exception.lang.notExists", HttpStatus.NOT_FOUND, null);
         }
-        // 2. 校验 key + lang 是否已存在
+        
+        // 校验 key + lang 是否已存在
         if (i18Repository.findByKeyAndLang_Id(createI18Dto.getKey(), Long.valueOf(lang.getId())).isPresent()) {
             throw new BusinessException("exception.i18.exists", HttpStatus.BAD_REQUEST, null);
         }
+        
         I18 i18 = new I18();
         i18.setLang(lang);
         i18.setKey(createI18Dto.getKey());
         i18.setContent(createI18Dto.getContent());
         I18 save = i18Repository.save(i18);
-        //TODO 这个地方的返回值进行转变成字符串
+        
+        // TODO 这个地方的返回值进行转变成字符串
         return new ResponseEntity<>(JSON.toJSONString(save), HttpStatus.OK);
     }
 
@@ -70,29 +69,33 @@ public class II18ServiceImpl implements II18Service {
         if (StringUtils.isEmpty(lang)) {
             lang = request.getHeader("x-lang");
         }
+        
         Map<String, Map<String, String>> result = new HashMap<>();
         Lang langData = langRepository.findByName(lang).orElse(null);
         if (langData == null) {
             throw new BusinessException("exception.lang.notExists", HttpStatus.NOT_FOUND, null);
         }
+        
         List<I18> i18List = i18Repository.findByLang_Id(Long.valueOf(langData.getId()));
         Map<String, String> i18map = new HashMap<>();
         i18List.forEach(item -> {
             i18map.put(item.getKey(), item.getContent());
         });
+        
         result.put(lang, i18map);
         return result;
     }
 
     @Override
-    public ResponseEntity<PageWrapper<I18Vo>> findAll(Integer page,
-                                                      Integer limit,
-                                                      Boolean allBool,
-                                                      List<String> lang,
-                                                      String key,
-                                                      String content) {
-
-        // 1. 构造分页/不分页
+    public ResponseEntity<PageWrapper<I18Vo>> findAll(
+            Integer page,
+            Integer limit,
+            Boolean allBool,
+            List<String> lang,
+            String key,
+            String content
+    ) {
+        // 构造分页/不分页
         Pageable pageable;
         if (Boolean.FALSE.equals(allBool)) {
             pageable = Pageable.unpaged();
@@ -102,22 +105,22 @@ public class II18ServiceImpl implements II18Service {
             pageable = PageRequest.of(0, 10);
         }
 
-        // 2. 动态条件（改进后的 Specification）
+        // 动态条件
         Specification<I18> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
             // 按 lang.name 过滤
             if (lang != null && !lang.isEmpty()) {
-                // 假设 lang 是 List<String>
                 predicates.add(root.get("lang").get("name").in(lang));
             }
-            // 按 content 过滤，支持不同的匹配模式
+            
+            // 按 content 过滤
             if (StringUtils.isNoneBlank(content)) {
                 Predicate contentPredicate = buildLikePredicate(root, cb, "content", content);
                 predicates.add(contentPredicate);
             }
 
-            // 按 key 过滤，支持不同的匹配模式
+            // 按 key 过滤
             if (StringUtils.isNoneBlank(key)) {
                 Predicate keyPredicate = buildLikePredicate(root, cb, "key", key);
                 predicates.add(keyPredicate);
@@ -126,9 +129,9 @@ public class II18ServiceImpl implements II18Service {
             return cb.and(predicates.toArray(new Predicate[0]));
         };
 
-        // 3. 查询并返回 D
-        Page<I18> flatPage = i18Repository.findAll(spec, pageable);
-        List<I18Vo> dtoList = flatPage.getContent()
+        // 查询并返回
+        Page<I18> i18Page = i18Repository.findAll(spec, pageable);
+        List<I18Vo> dtoList = i18Page.getContent()
                 .stream()
                 .map(f -> new I18Vo(
                         f.getId(),
@@ -137,37 +140,50 @@ public class II18ServiceImpl implements II18Service {
                         new LangVo(f.getLang().getId(), f.getLang().getName())
                 ))
                 .toList();
-        Page<I18Vo> result = new PageImpl<>(dtoList, flatPage.getPageable(), flatPage.getTotalElements());
+        
+        Page<I18Vo> result = new PageImpl<>(dtoList, i18Page.getPageable(), i18Page.getTotalElements());
         return ResponseEntity.ok(PageWrapper.of(result));
     }
 
     @Override
     public ResponseEntity<I18Vo> updateByi18nId(Long id, UpdateI18Dto dto) {
         I18 i18 = i18Repository.getById(id);
+        
         if (StringUtils.isNotEmpty(dto.getKey())) {
             i18.setKey(dto.getKey());
         }
         if (StringUtils.isNotEmpty(dto.getContent())) {
             i18.setContent(dto.getContent());
         }
+        
         if (dto.getLang() != null) {
-          try{
-            Lang lang = langRepository.getById(Long.valueOf(dto.getLang()));
-            if (lang == null) {
+            try {
+                Lang lang = langRepository.getById(Long.valueOf(dto.getLang()));
+                if (lang == null) {
+                    throw new BusinessException("exception.auth.passwordOrEmailError", HttpStatus.NOT_FOUND, null);
+                }
+                i18.setLang(lang); // 补充原代码遗漏的设置lang逻辑
+                i18Repository.save(i18);
+                
+                I18Vo result = new I18Vo(
+                        i18.getId(), 
+                        i18.getKey(), 
+                        i18.getContent(), 
+                        new LangVo(lang.getId(), lang.getName())
+                );
+                return new ResponseEntity<>(result, HttpStatus.OK);
+            } catch (Throwable e) {
                 throw new BusinessException("exception.auth.passwordOrEmailError", HttpStatus.NOT_FOUND, null);
             }
-            i18Repository.save(i18);
-            I18Vo result = new I18Vo(i18.getId(), i18.getKey(), i18.getContent(), new LangVo(lang.getId(), lang.getName()));
-            return new ResponseEntity<>(result, HttpStatus.OK);
-            } catch (Throwable e){
-            throw new
-BusinessException("exception.auth.passwordOrEmailError", HttpStatus.NOT_FOUND, null);
-             }
         } else {
             i18Repository.save(i18);
-            return ResponseEntity.ok(new I18Vo(i18.getId(), i18.getKey(), i18.getContent(), new LangVo(i18.getLang().getId(), i18.getLang().getName())));
+            return ResponseEntity.ok(new I18Vo(
+                    i18.getId(), 
+                    i18.getKey(), 
+                    i18.getContent(), 
+                    new LangVo(i18.getLang().getId(), i18.getLang().getName())
+            ));
         }
-        //TODO 需要仔细看看
     }
 
     @Override
@@ -213,12 +229,11 @@ BusinessException("exception.auth.passwordOrEmailError", HttpStatus.NOT_FOUND, n
                 String value = input.substring(0, input.length() - 1);
                 return cb.like(root.get(field), value + "%");
             } else {
-                // 如果包含 % 但不以 % 开头或结尾，可以根据需求处理
-                // 这里简单地将所有 % 视为通配符，您可以根据需要调整
+                // 包含%但不以%开头/结尾，直接作为通配符处理
                 return cb.like(root.get(field), input);
             }
         } else {
-            // 精确匹配 =
+            // 精确匹配
             return cb.equal(root.get(field), input);
         }
     }
