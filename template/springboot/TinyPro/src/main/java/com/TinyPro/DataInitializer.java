@@ -15,19 +15,30 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.stereotype.Component;
 
+import javax.sql.DataSource;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
 public class DataInitializer implements CommandLineRunner {
     private static final Logger logger = LoggerFactory.getLogger(DataInitializer.class);
+
+    @Autowired
+    private DataSource dataSource; // 用于测试 MySQL
+
+    @Autowired
+    private RedisConnectionFactory redisConnectionFactory;
     @Autowired
     private IUserRepository userRepository;
     @Autowired
@@ -43,6 +54,11 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        // 1. 测试 MySQL
+        testMysqlConnection();
+
+        // 2. 测试 Redis
+        testRedisConnection();
         File lockFile = new File("data/lock");
         if (lockFile.exists()) {
             logger.warn("Lock file exists, if you want init again, please remove data/lock");
@@ -250,5 +266,20 @@ public class DataInitializer implements CommandLineRunner {
             return str;
         }
         return str.substring(0, 1).toUpperCase() + str.substring(1);
+    }
+    private void testMysqlConnection() {
+        try (Connection connection = dataSource.getConnection()) {
+            logger.info("[✅ TEST] MySQL 数据库连接成功！数据库状态正常。");
+        } catch (SQLException e) {
+            logger.error("[❌ ERROR] MySQL 数据库连接失败！", e);
+        }
+    }
+
+    private void testRedisConnection() {
+        try (RedisConnection redisConnection = redisConnectionFactory.getConnection()) {
+            logger.info("[✅ TEST] Redis 连接成功！缓存服务状态正常。");
+        } catch (Exception e) {
+            logger.error("[❌ ERROR] Redis 连接失败！", e);
+        }
     }
 }

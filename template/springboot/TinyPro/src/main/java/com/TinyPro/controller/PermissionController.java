@@ -49,7 +49,7 @@ public class PermissionController {
     }
 
     @DeleteMapping("/{id}")
-    @Reject
+    @Reject()
     @PermissionAnnotation("permission::remove")
     public ResponseEntity<CreatePermissionDto> del(@PathVariable Integer id) {
         return iPermissionService.delPermission(id);

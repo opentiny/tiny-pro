@@ -8,11 +8,11 @@ import org.hibernate.validator.constraints.Length;
 @Data
 public class UpdatePwdAdminDto {
 
-    @NotEmpty(message = "{validation.NOT_EMPTY}")
+    @NotEmpty(message = "{NOT_EMPTY}")
     @JsonProperty("email")
     private String email;
 
-    @NotEmpty(message = "{validation.NOT_EMPTY}")
+    @NotEmpty(message = "{NOT_EMPTY}")
     @JsonProperty("newPassword")
     private String newPassword;
     @JsonProperty("confirmNewPassword")

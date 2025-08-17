@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 public class CreateLangDto {
 
-    @NotEmpty(message = "{validation.NOT_EMPTY}")
+    @NotEmpty(message = "{NOT_EMPTY}")
     private String name;
 }

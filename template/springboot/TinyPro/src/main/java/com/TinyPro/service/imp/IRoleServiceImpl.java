@@ -19,8 +19,12 @@ import com.TinyPro.jpa.IRoleRepository;
 import com.TinyPro.jpa.IUserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,7 +34,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
+
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -91,13 +95,14 @@ public class IRoleServiceImpl implements IRoleService {
         // 构建查询条件
         Specification<Role> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
-            if (StringUtils.hasText(name)) {
-                predicates.add(cb.like(root.get("name"), "%" + name + "%"));
+            if (StringUtils.isNotEmpty(name)) {
+                Predicate namePreidcate = buildLikePredicate(root, cb, "name", name);
+                predicates.add(namePreidcate);
             }
             return cb.and(predicates.toArray(new Predicate[0]));
         };
 
-        Page<Role> rolePage = iRoleRepository.findAllWithAssociations(spec, pageable);
+        Page<Role> rolePage = iRoleRepository.findAll(spec, pageable);
         List<Menu> menuList = menuService.findAll();
 
         PageWrapper<Role> rolePageWrapper = PageWrapper.of(rolePage);
@@ -161,8 +166,17 @@ public class IRoleServiceImpl implements IRoleService {
             throw new BusinessException("exception.role.notExists", HttpStatus.BAD_REQUEST, null);
         }
         Role role = roleOptional.get();
-        List<Menu> allById = menuService.findAllById(updateRoleDto.getMenuIds());
-        role.setMenus(allById.stream().collect(Collectors.toSet()));
+        if (updateRoleDto.getPermissionIds() != null) {
+            List<Permission> permissionList = permissionService.findAllById(updateRoleDto.getPermissionIds());
+            role.setPermission(permissionList.stream().collect(Collectors.toSet()));
+        }
+        if (updateRoleDto.getMenuIds() != null) {
+            List<Menu> menuList = menuService.findAllById(updateRoleDto.getMenuIds());
+            role.setMenus(menuList.stream().collect(Collectors.toSet()));
+        }
+        if (StringUtils.isNotEmpty(updateRoleDto.getName())) {
+            role.setName(updateRoleDto.getName());
+        }
         return ResponseEntity.ok(iRoleRepository.save(role));
     }
 
@@ -219,5 +233,29 @@ public class IRoleServiceImpl implements IRoleService {
         entityManager.createQuery("DELETE FROM Role r WHERE r.id = :roleId")
                 .setParameter("roleId", roleId)
                 .executeUpdate();
+    }
+    private Predicate buildLikePredicate(Root<Role> root, CriteriaBuilder cb, String field, String input) {
+        if (input.contains("%")) {
+            if (input.startsWith("%") && input.endsWith("%")) {
+                // 包含匹配 LIKE '%value%'
+                String value = input.substring(1, input.length() - 1);
+                return cb.like(root.get(field), "%" + value + "%");
+            } else if (input.startsWith("%")) {
+                // 后缀匹配 LIKE '%value'
+                String value = input.substring(1);
+                return cb.like(root.get(field), "%" + value);
+            } else if (input.endsWith("%")) {
+                // 前缀匹配 LIKE 'value%'
+                String value = input.substring(0, input.length() - 1);
+                return cb.like(root.get(field), value + "%");
+            } else {
+                // 如果包含 % 但不以 % 开头或结尾，可以根据需求处理
+                // 这里简单地将所有 % 视为通配符，您可以根据需要调整
+                return cb.like(root.get(field), input);
+            }
+        } else {
+            // 精确匹配 =
+            return cb.equal(root.get(field), input);
+        }
     }
 }
