@@ -29,7 +29,7 @@ public class PermissionController {
     }
 
     @PatchMapping()
-    @Reject
+    @Reject()
     @PermissionAnnotation("permission::update")
     public ResponseEntity<PermissionVo> updatePermission(@RequestBody UpdatePermissionDto updatePermissionDto) {
         return iPermissionService.updatePermission(updatePermissionDto);

@@ -28,4 +28,9 @@ public class EmployeeServiceimpl  implements IEmployeeService {
         Optional<Employee> byId = iEmployeRepository.findById(Long.valueOf(id));
         return byId.get();
     }
+    @Override
+    public void remove(String Id) {
+      Employee employee = iEmployeRepository.findById(Long.valueOf(Id)).get();
+      iEmployeRepository.delete(employee);
+    }
 }
