@@ -48,18 +48,18 @@ public class II18ServiceImpl implements II18Service {
         if (lang == null) {
             throw new BusinessException("exception.lang.notExists", HttpStatus.NOT_FOUND, null);
         }
-        
+
         // 校验 key + lang 是否已存在
         if (i18Repository.findByKeyAndLang_Id(createI18Dto.getKey(), Long.valueOf(lang.getId())).isPresent()) {
             throw new BusinessException("exception.i18.exists", HttpStatus.BAD_REQUEST, null);
         }
-        
+
         I18 i18 = new I18();
         i18.setLang(lang);
         i18.setKey(createI18Dto.getKey());
         i18.setContent(createI18Dto.getContent());
         I18 save = i18Repository.save(i18);
-        
+
         // TODO 这个地方的返回值进行转变成字符串
         return new ResponseEntity<>(JSON.toJSONString(save), HttpStatus.OK);
     }
@@ -69,19 +69,19 @@ public class II18ServiceImpl implements II18Service {
         if (StringUtils.isEmpty(lang)) {
             lang = request.getHeader("x-lang");
         }
-        
+
         Map<String, Map<String, String>> result = new HashMap<>();
         Lang langData = langRepository.findByName(lang).orElse(null);
         if (langData == null) {
             throw new BusinessException("exception.lang.notExists", HttpStatus.NOT_FOUND, null);
         }
-        
+
         List<I18> i18List = i18Repository.findByLang_Id(Long.valueOf(langData.getId()));
         Map<String, String> i18map = new HashMap<>();
         i18List.forEach(item -> {
             i18map.put(item.getKey(), item.getContent());
         });
-        
+
         result.put(lang, i18map);
         return result;
     }
@@ -113,7 +113,7 @@ public class II18ServiceImpl implements II18Service {
             if (lang != null && !lang.isEmpty()) {
                 predicates.add(root.get("lang").get("name").in(lang));
             }
-            
+
             // 按 content 过滤
             if (StringUtils.isNoneBlank(content)) {
                 Predicate contentPredicate = buildLikePredicate(root, cb, "content", content);
@@ -140,7 +140,7 @@ public class II18ServiceImpl implements II18Service {
                         new LangVo(f.getLang().getId(), f.getLang().getName())
                 ))
                 .toList();
-        
+
         Page<I18Vo> result = new PageImpl<>(dtoList, i18Page.getPageable(), i18Page.getTotalElements());
         return ResponseEntity.ok(PageWrapper.of(result));
     }
@@ -148,47 +148,47 @@ public class II18ServiceImpl implements II18Service {
     @Override
     public ResponseEntity<I18Vo> updateByi18nId(Long id, UpdateI18Dto dto) {
         I18 i18 = i18Repository.getById(id);
-        
+
         if (StringUtils.isNotEmpty(dto.getKey())) {
             i18.setKey(dto.getKey());
         }
         if (StringUtils.isNotEmpty(dto.getContent())) {
             i18.setContent(dto.getContent());
         }
-        
+
         if (dto.getLang() != null) {
             try {
                 Lang lang = langRepository.getById(Long.valueOf(dto.getLang()));
                 if (lang == null) {
                     throw new BusinessException(
-                        "lang.notExists",
-                        HttpStatus.NOT_FOUND,
-                        null
+                            "lang.notExists",
+                            HttpStatus.NOT_FOUND,
+                            null
                     );
                 }
                 i18.setLang(lang);
                 i18Repository.save(i18);
-                
+
                 I18Vo result = new I18Vo(
-                        i18.getId(), 
-                        i18.getKey(), 
-                        i18.getContent(), 
+                        i18.getId(),
+                        i18.getKey(),
+                        i18.getContent(),
                         new LangVo(lang.getId(), lang.getName())
                 );
                 return new ResponseEntity<>(result, HttpStatus.OK);
             } catch (Throwable e) {
                 throw new BusinessException(
-                   "lang.notExists", 
-                    HttpStatus.NOT_FOUND,
-                    null
+                        "lang.notExists",
+                        HttpStatus.NOT_FOUND,
+                        null
                 );
             }
         } else {
             i18Repository.save(i18);
             return ResponseEntity.ok(new I18Vo(
-                    i18.getId(), 
-                    i18.getKey(), 
-                    i18.getContent(), 
+                    i18.getId(),
+                    i18.getKey(),
+                    i18.getContent(),
                     new LangVo(i18.getLang().getId(), i18.getLang().getName())
             ));
         }

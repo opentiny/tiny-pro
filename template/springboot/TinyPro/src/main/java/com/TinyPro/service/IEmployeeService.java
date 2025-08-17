@@ -10,4 +10,6 @@ public interface IEmployeeService {
     List<Employee> list(List<Long> employeeQueryWrapper);
 
     Employee getById(String id);
+
+    void remove(String Id);
 }

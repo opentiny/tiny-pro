@@ -19,8 +19,8 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/tinypro_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: 123456
-      SPRING_REDIS_HOST: redis
-      SPRING_REDIS_PORT: 6379
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
       command: >
         sh -c "sleep 10 && java -jar app.jar"
 

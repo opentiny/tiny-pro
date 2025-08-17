@@ -31,7 +31,7 @@ public class MenuController {
         return iMenuService.findAllMenu();
     }
 
-    @Reject
+    @Reject()
     @PermissionAnnotation("menu::add")
     @PostMapping
     public ResponseEntity<Menu> createMenu(@RequestBody CreateMenuDto createMenuDto) {
@@ -40,14 +40,14 @@ public class MenuController {
     }
 
     @PatchMapping
-    @Reject
+    @Reject()
     @PermissionAnnotation("menu::update")
     public ResponseEntity<Boolean> updateMenu(@RequestBody UpdateMenuDto updateMenuDto) {
         return iMenuService.updateMenu(updateMenuDto);
     }
 
     @DeleteMapping
-    @Reject
+    @Reject()
     @PermissionAnnotation("menu::remove")
     public ResponseEntity<Menu> deleteMenu(@Param("id") Integer id, @Param("parentId") Integer parentId) {
         return iMenuService.deleteMenu(id, parentId);

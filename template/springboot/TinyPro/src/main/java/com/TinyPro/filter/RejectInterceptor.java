@@ -35,7 +35,7 @@ public class RejectInterceptor implements HandlerInterceptor {
         boolean reject = hm.hasMethodAnnotation(Reject.class) ||
                 hm.getBeanType().isAnnotationPresent(Reject.class);
 
-        if (reject) {
+        if (rejectStart && reject) {
             throw new BusinessException("exception.preview.reject-this-request", HttpStatus.BAD_REQUEST, null);
         }
         return true;

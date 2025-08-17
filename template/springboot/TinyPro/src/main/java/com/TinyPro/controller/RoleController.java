@@ -56,7 +56,7 @@ public class RoleController {
      */
     @PermissionAnnotation("role::update")
     @PatchMapping()
-    @Reject
+    @Reject()
     public ResponseEntity<Role> updateRole(@RequestBody UpdateRoleDto updateRoleDto) {
        return this.roleService.updateRole(updateRoleDto);
 
@@ -70,7 +70,7 @@ public class RoleController {
      */
     @PermissionAnnotation("role::remove")
     @DeleteMapping("/{id}")
-    @Reject
+    @Reject()
     public ResponseEntity<List<Map<String, String>>> deleteRole(@PathVariable Integer id) {
         return roleService.removeUserRById(id);
     }

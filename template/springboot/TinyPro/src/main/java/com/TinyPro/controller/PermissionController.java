@@ -29,7 +29,7 @@ public class PermissionController {
     }
 
     @PatchMapping()
-    @Reject
+    @Reject()
     @PermissionAnnotation("permission::update")
     public ResponseEntity<PermissionVo> updatePermission(@RequestBody UpdatePermissionDto updatePermissionDto) {
         return iPermissionService.updatePermission(updatePermissionDto);
@@ -49,7 +49,7 @@ public class PermissionController {
     }
 
     @DeleteMapping("/{id}")
-    @Reject
+    @Reject()
     @PermissionAnnotation("permission::remove")
     public ResponseEntity<CreatePermissionDto> del(@PathVariable Integer id) {
         return iPermissionService.delPermission(id);
