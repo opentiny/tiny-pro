@@ -25,43 +25,43 @@ import java.util.Optional;
 
 @Service
 public class AuthServiceImpl implements IAuthService {
-    @Autowired
-    private IUserRepository userService;
-    @Autowired
-    private MessageSource messageSource;
-    @Autowired
-    private RedisUtil redisUtil;
-    @Autowired
-    private JwtUtil jwtUtil;
+  @Autowired
+  private IUserRepository userService;
+  @Autowired
+  private MessageSource messageSource;
+  @Autowired
+  private RedisUtil redisUtil;
+  @Autowired
+  private JwtUtil jwtUtil;
 
-    @Override
-    public ResponseEntity<?> login(CreateAuthDto createAuthDto, HttpServletResponse response) throws Exception {
-        QueryWrapper<User> wrapper = new QueryWrapper<>();
-        wrapper.eq("email", createAuthDto.getEmail());
-        Optional<User> optionalUser = userService.findByEmail(createAuthDto.getEmail());
-        User user = optionalUser
-                .orElseThrow(() -> new BusinessException("exception.auth.userNotExists", HttpStatus.NOT_FOUND, null));
-        if (!StringUtils.equals(Sha256Utils.encry(createAuthDto.getPassword(), user.getSalt()), user.getPassword())) {
-            throw new BusinessException("exception.auth.passwordOrEmailError",HttpStatus.BAD_REQUEST,  null);
-        }
-        String jwt = jwtUtil.generateJwt(user.getEmail(), Contants.H_2);
-        String key = Contants.UserJwtTop + user.getEmail() + Contants.UserJwtbt;
-        redisUtil.setValue(key, JSON.toJSONString(user), Contants.H_2);
-        Map<String, String> result = new HashMap<>();
-        result.put("token", jwt);
-        return new ResponseEntity<>(result, HttpStatus.OK);
+  @Override
+  public ResponseEntity<?> login(CreateAuthDto createAuthDto, HttpServletResponse response) throws Exception {
+    QueryWrapper<User> wrapper = new QueryWrapper<>();
+    wrapper.eq("email", createAuthDto.getEmail());
+    Optional<User> optionalUser = userService.findByEmail(createAuthDto.getEmail());
+    User user = optionalUser
+      .orElseThrow(() -> new BusinessException("exception.auth.userNotExists", HttpStatus.NOT_FOUND, null));
+    if (!StringUtils.equals(Sha256Utils.encry(createAuthDto.getPassword(), user.getSalt()), user.getPassword())) {
+      throw new BusinessException("exception.auth.passwordOrEmailError", HttpStatus.BAD_REQUEST, null);
     }
+    String jwt = jwtUtil.generateJwt(user.getEmail(), Contants.H_2);
+    String key = Contants.UserJwtTop + user.getEmail() + Contants.UserJwtbt;
+    redisUtil.setValue(key, JSON.toJSONString(user), Contants.H_2);
+    Map<String, String> result = new HashMap<>();
+    result.put("token", jwt);
+    return new ResponseEntity<>(result, HttpStatus.OK);
+  }
 
-    @Override
-    public String logout(String email) {
-        try {
-            if (StringUtils.isAllEmpty(email)) {
-                throw new BusinessException("Fila", HttpStatus.NOT_FOUND,null);
-            }
-            redisUtil.deleteValue(email);
-            return "redirect:/login";
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+  @Override
+  public String logout(String email) {
+    try {
+      if (StringUtils.isAllEmpty(email)) {
+        throw new BusinessException("Fila", HttpStatus.NOT_FOUND, null);
+      }
+      redisUtil.deleteValue(email);
+      return "redirect:/login";
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
+  }
 }
