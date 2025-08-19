@@ -14,9 +14,12 @@
   import { ITreeNodeData } from '@/router/guard/menu';
   import { useI18n } from 'vue-i18n';
   import useLoading from '@/hooks/loading';
+  import { useResponsiveGrid } from '@/hooks/responsive'
   import { Pager } from '@/types/global';
   import permissionTable from './permission-table.vue';
 
+  const { gridSize } = useResponsiveGrid()
+  
   const props = defineProps<{
     tableData: (Role & { menus: ITreeNodeData[] })[];
     fetchOption: {
@@ -123,16 +126,18 @@
     :pager="props.pagerConfig"
      :edit-config="{ trigger: 'click', mode: 'cell', showStatus: true }"
     remote-filter
+    :size="gridSize"
+    align="center"
     @edit-closed="onUpdate"
   >
-    <tiny-grid-column type="expand" width="60">
+    <tiny-grid-column type="expand" width="5%">
       <template #default="data">
         <permission-table :permission="data.row.permission" />
       </template>
     </tiny-grid-column>
     <tiny-grid-column
       field="id"
-      width="100"
+      width="20%"
       :title="$t('roleInfo.table.id')"
     ></tiny-grid-column>
     <tiny-grid-column

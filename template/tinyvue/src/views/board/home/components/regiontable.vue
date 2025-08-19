@@ -1,20 +1,18 @@
 <template>
   <div class="container">
-    <tiny-grid ref="grid" :fetch-data="fetchDataOption" :pager="pagerConfig">
+    <tiny-grid ref="grid" :fetch-data="fetchDataOption" :pager="pagerConfig" :size="gridSize" align="center">
       <tiny-grid-column
         field="id"
         :title="$t('home.roundtable.index')"
-        width="200"
+        width="16%"
       ></tiny-grid-column>
       <tiny-grid-column
         field="space"
         :title="$t('home.region.title')"
-        width="260"
       ></tiny-grid-column>
       <tiny-grid-column
         field="pv"
         :title="$t('home.roundtable.pv')"
-        width="260"
       ></tiny-grid-column>
       <tiny-grid-column
         field="page"
@@ -32,8 +30,10 @@
     Grid as TinyGrid,
     GridColumn as TinyGridColumn,
   } from '@opentiny/vue';
+  import { useResponsiveGrid } from '@/hooks/responsive'
 
   const { t } = useI18n();
+  const { gridSize } = useResponsiveGrid()
 
   const tableData = [
     {

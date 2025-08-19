@@ -6,7 +6,7 @@
     </div>
     <div class="region flex w-full max-md:flex-col max-md:items-center">
       <tiny-chart-map v-if="chartSettings.mapOrigin" ref="mapChartsRef" :width="chartWidth" :settings="chartSettings" :data="chartData" :visual-map="visualMap" :legend-visible="legendVisible"></tiny-chart-map>
-      <div class="region-from w-[46vw] ml-[5%]  max-md:w-[100%] max-md:ml-[0%] max-sm:pt-[10%]">
+      <div class="region-from w-[46vw] ml-[5%]  max-md:w-[100%] max-md:ml-[0%] max-md:pt-[5%] max-sm:pt-[10%]">
         <RegionTable></RegionTable>
       </div>
     </div>
@@ -169,7 +169,4 @@
     opacity: 0.6;
   }
 
-  .region-from {
-    margin-top: 2%;
-  }
 </style>

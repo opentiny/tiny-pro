@@ -3,9 +3,10 @@
     ref="grid" 
     :data="menuList" 
     :tree-config="{ children: 'children' }"
+    align="center"
+    :size="gridSize"
     >
     <tiny-grid-column 
-    width="250" 
     field="locale" 
     :title="$t('menuInfo.table.name')" 
     tree-node
@@ -61,6 +62,9 @@
   import { IconDel, IconEdit } from '@opentiny/vue-icon';
   import { ITreeNodeData } from '@/router/guard/menu';
   import { TinyGrid, TinyGridColumn ,TinyPopconfirm  } from '@opentiny/vue';
+  import { useResponsiveGrid } from '@/hooks/responsive'
+
+  const { gridSize } = useResponsiveGrid()
   
   export type Node = {
     data: ITreeNodeData;

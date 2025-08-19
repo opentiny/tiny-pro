@@ -12,6 +12,8 @@
         "
         seq-serial
         auto-resize
+        :size="gridSize"
+        align="center"
       >
         <tiny-grid-column
           :title="$t('home.roundtable.index')"
@@ -57,26 +59,12 @@
     GridColumn as TinyGridColumn,
     Pager as TinyPager,
   } from '@opentiny/vue';
+  import { useResponsiveGrid } from '@/hooks/responsive'
 
-
-  const isMobile = ref(false)
-
-  function checkIsMobile() {
-    isMobile.value = window.innerWidth < 768
-  }
-  
-  // responsive tiny-pager layout
-  onMounted(() => {
-    checkIsMobile()
-    window.addEventListener('resize', checkIsMobile)
-  })
-
-  onBeforeUnmount(() => {
-    window.removeEventListener('resize', checkIsMobile)
-  })
-  
+  const { sm, gridSize } = useResponsiveGrid()
+   
   const pagerLayout = computed(() =>
-    isMobile.value ? 'total, prev, pager, next' : 'total, sizes, prev, pager, next, jumper'
+    sm.value ? 'total, prev, pager, next' : 'total, sizes, prev, pager, next, jumper'
   )
 
   // 父组件传值

@@ -14,20 +14,27 @@
           :pager="pagerConfig"
           :edit-config="{ trigger: 'click', mode: 'cell', showStatus: true }" 
           remote-filter
+          :size="gridSize"
+          align="center"
           @edit-closed="handlePermissionUpdateSubmit"
           >
-            <tiny-grid-column field="id" :title="$t('permissionInfo.table.id')">
+            <tiny-grid-column field="id" :title="$t('permissionInfo.table.id')" width="10%">
               <template #default="data">
                 <span>{{ $t(`${data.row.id}`) }}</span>
               </template>
             </tiny-grid-column>
-            <tiny-grid-column field="name" :title="$t('permissionInfo.table.name')" :filter="filter"
+            <tiny-grid-column 
+              field="name" 
+              :title="$t('permissionInfo.table.name')" 
+              :filter="filter"
               :editor="{ component: 'input', autoselect: true }">
               <template #default="data">
                 <span>{{ $t(`${data.row.name}`) }}</span>
               </template>
             </tiny-grid-column>
-            <tiny-grid-column field="desc" :title="$t('permissionInfo.table.desc')"
+            <tiny-grid-column 
+              field="desc" 
+              :title="$t('permissionInfo.table.desc')"
               :editor="{ component: 'input', autoselect: true }">
               <template #default="data">
                 <span>{{ $t(`${data.row.desc}`) }}</span>
@@ -124,12 +131,15 @@ import {
   IPaginationMeta,
   Pager,
 } from '@/types/global';
+import { useResponsiveGrid } from '@/hooks/responsive'
 
 const roleGrid = ref();
 const addForm = ref();
 const iconDel = IconDel();
 
 const { t } = useI18n();
+
+const { gridSize } = useResponsiveGrid()
 
 // 加载效果
 const state = reactive<{

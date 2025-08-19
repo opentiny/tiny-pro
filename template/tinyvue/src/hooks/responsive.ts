@@ -1,4 +1,4 @@
-import { onMounted, onBeforeMount, onBeforeUnmount } from 'vue';
+import { ref, computed, onMounted, onBeforeMount, onBeforeUnmount, onUnmounted } from 'vue';
 import { useDebounceFn } from '@vueuse/core';
 import { useAppStore } from '@/store';
 import { addEventListen, removeEventListen } from '@/utils/event';
@@ -29,4 +29,29 @@ export default function useResponsive(immediate?: boolean) {
   onBeforeUnmount(() => {
     removeEventListen(window, 'resize', debounceFn);
   });
+}
+
+// responsive gridSize
+const globalMd = ref(window.innerWidth <= 768)
+const globalSm = ref(window.innerWidth <= 375)
+let isInitialized = false
+
+function initGlobalResize() {
+  if (isInitialized) return
+  const onResize = () => {
+    globalMd.value = window.innerWidth <= 768
+    globalSm.value = window.innerWidth <= 375
+  }
+  window.addEventListener('resize', onResize)
+  isInitialized = true
+}
+
+export function useResponsiveGrid() {
+  initGlobalResize()
+  const gridSize = computed(() => (globalMd.value ? 'mini' : 'medium'))
+  return {
+    md: globalMd,
+    sm: globalSm,
+    gridSize
+  }
 }

@@ -3,22 +3,23 @@
     <Breadcrumb :items="['menu.list', 'menu.list.searchTable']" />
 
     <div class="search-table-container">
-      <div class="button-group">
-        <tiny-button>{{ $t('userInfo.table.operations.delete') }}</tiny-button>
-        <tiny-file-upload action="#" accept=".xls,.xlsx" @change="importExcel">
-          <tiny-button >{{ $t('userInfo.table.import') }}</tiny-button>
-        </tiny-file-upload>
-        <tiny-button @click="toCsvEvent">{{ $t('userInfo.table.export') }}</tiny-button>
+      <div class="button-group flex-wrap gap-4 max-sm:gap-[3%]">
+        <tiny-button class="max-sm:w-[30%]">{{ $t('userInfo.table.operations.delete') }}</tiny-button>
+          <tiny-file-upload class="max-sm:w-[30%]" action="#" accept=".xls,.xlsx" @change="importExcel">
+            <tiny-button class="max-sm:w-full">{{ $t('userInfo.table.import') }}</tiny-button>
+          </tiny-file-upload>
+        <tiny-button class="max-sm:w-[30%]" @click="toCsvEvent">{{ $t('userInfo.table.export') }}</tiny-button>
       </div>
       <div class="tiny-fullscreen-scroll">
         <div class="tiny-fullscreen-wrapper">
-          <div class="btn">
+          <div class="btn max-sm:flex-wrap">
             <transition-fade-down-group>
               <div class="search-box-container">
                 <tiny-search-box
                   v-model="tags"
                   :items="items"
                   :empty-placeholder="$t('searchTable.form.placeholder')"
+                  
                   @change="reloadGrid"
                 ></tiny-search-box>
               </div>
@@ -33,9 +34,10 @@
             :fetch-data="fetchDataOption"
             :pager="pagerConfig"
             :loading="loading"
-            size="medium"
+            :size="gridSize"
             :height="640"
             :auto-resize="true"
+            align="center"
           >
             <tiny-grid-column type="selection" width="60"></tiny-grid-column>
             <tiny-grid-column
@@ -257,11 +259,13 @@
   import * as XLSX from 'xlsx';
   import { t } from '@opentiny/vue-locale';
   import TransitionFadeSlideGroup from '@/components/transition/transition-fade-slide-group.vue';
+  import { useResponsiveGrid } from '@/hooks/responsive'
 
   const IconEditor = iconEditor();
   const IconDel = iconDel();
   const IconRefresh = iconRefresh()
   const IconSetting = iconSetting()
+  const { gridSize } = useResponsiveGrid()
   // 初始化请求数据
   interface FilterOptions {
     id: string;
