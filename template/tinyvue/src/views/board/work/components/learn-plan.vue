@@ -101,9 +101,6 @@
       }
     }
   }
-  :deep(.tiny-col:first-child) {
-   padding-left: 0;
-  }
 
   .font {
     font-weight: 600;

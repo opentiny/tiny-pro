@@ -3,7 +3,7 @@
     <div class="falls">
       <img src="@/assets/images/map-background2.png" class="image" />
       <h3>{{ $t('home.falls.line') }}</h3>
-      <tiny-chart-waterfall id="flow" ref="waterFallRef" height="100%" :options="options" :extend="chartExtend" ></tiny-chart-waterfall>
+      <tiny-chart-waterfall id="flow" ref="waterFallRef" width="100%" height="100%" :options="options" :extend="chartExtend" ></tiny-chart-waterfall>
     </div>
   </div>
 </template>

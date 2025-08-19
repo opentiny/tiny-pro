@@ -3,7 +3,7 @@
     <img src="@/assets/images/map-background3.png" class="image" />
     <h3>{{ $t('home.curve.trend') }}</h3>
     <div class="curve">
-      <tiny-chart-histogram ref="chartRef" height="100%" :data-zoom="dataZoom" :options="options" :extend="chartExtend" class="max-sm:pt-[10%]"></tiny-chart-histogram>
+      <tiny-chart-histogram ref="chartRef" width="100%" height="100%" :data-zoom="dataZoom" :options="options" :extend="chartExtend" class="max-sm:pt-[10%]"></tiny-chart-histogram>
     </div>
   </div>
 </template>
