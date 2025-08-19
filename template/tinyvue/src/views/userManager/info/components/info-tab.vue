@@ -416,6 +416,7 @@
   import { getSimpleDate } from '@/utils/time';
   import { getAllRole } from '@/api/role';
   import { FilterType } from '@/types/global';
+  import { isUndefined } from '@/utils/is';
   import UserAdd from '../../useradd/index.vue';
   import UserDetail from '../../user-detail/index.vue';
 
@@ -697,7 +698,7 @@
         name: data.name,
         address: data.address,
         department: data.department,
-        roleIds: [data.role[0]?.id],
+        roleIds: isUndefined(data.role[0]?.id) ? [] : [data.role[0]?.id],
         employeeType: data.employeeType,
         probationDuration: data.probationDuration,
         probationStart: data.probationStart,
