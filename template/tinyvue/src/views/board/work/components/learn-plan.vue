@@ -88,7 +88,6 @@
     text-align: center;
     background: #f5f5f5;
     border-radius: 10px;
-
     .col-content{
       margin: 0 24px;
       display: flex;
@@ -101,9 +100,10 @@
         font-weight: 700;
       }
     }
-
   }
-
+  :deep(.tiny-col:first-child) {
+   padding-left: 0;
+  }
 
   .font {
     font-weight: 600;

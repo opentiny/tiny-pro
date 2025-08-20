@@ -203,11 +203,11 @@
 
   onMounted(() => {
     window.addEventListener('resize', () => {
-      chartRef.value.resize();
+      chartRef.value?.resize();
     });
-    nextTick(() => {
-      chartRef.value.resize();
-    });
+    setTimeout(() => {
+      chartRef.value?.resize();
+    }, 200)
   });
 
   watch(currentLocale, (newValue, oldValue) => {
@@ -226,7 +226,7 @@
       chartExtend.value.series[1].name = 'Visible on the first screen';
       chartExtend.value.series[2].name = 'Page Onload';
     }
-    chartRef.value.resize();
+    chartRef.value?.resize();
   });
 </script>
 

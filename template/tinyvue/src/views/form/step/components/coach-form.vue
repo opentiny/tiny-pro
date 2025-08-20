@@ -220,11 +220,7 @@
   defineExpose({
     coachValid,
     coachReset,
+    state,
+    disabled
   });
 </script>
-
-<style scoped lang="less">
-  :deep(.tiny-row) {
-    margin-bottom: 15px;
-  }
-</style>
