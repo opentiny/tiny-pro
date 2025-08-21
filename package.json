@@ -79,6 +79,8 @@
     "inquirer": "^8.0.2",
     "mysql2": "^3.4.2",
     "open": "^8.4.0",
+    "properties-parser": "^0.6.0",
+    "tiny-cli": "^1.1.5",
     "yaml": "^2.6.1"
   },
   "devDependencies": {
@@ -100,7 +102,7 @@
     "tslint-config-airbnb": "^5.11.1",
     "tslint-config-prettier": "^1.18.0",
     "tslint-immutable": "^6.0.1",
-    "typescript": "^5.1.6"
+    "typescript": "^3.9.10"
   },
   "ava": {
     "failFast": true,
