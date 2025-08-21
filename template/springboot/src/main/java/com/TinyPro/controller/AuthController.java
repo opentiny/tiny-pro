@@ -27,7 +27,7 @@ public class AuthController {
 
     @IsPublic()
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody CreateAuthDto createAuthDto, HttpServletResponse response) throws Exception {
+    public ResponseEntity<?> login(@RequestBody @Valid CreateAuthDto createAuthDto, HttpServletResponse response) throws Exception {
         return authService.login(createAuthDto, response);
     }
 

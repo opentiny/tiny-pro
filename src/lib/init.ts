@@ -6,6 +6,7 @@ import chalk from 'chalk';
 import spawn from 'cross-spawn';
 import inquirer, { QuestionCollection } from 'inquirer';
 import { cliConfig, logs, fs } from '@opentiny/cli-devkit';
+import {createEditor} from 'properties-parser';
 import {
   buildCommand,
   buildConfigs,
@@ -60,7 +61,7 @@ const getProjectInfo = (): Promise<ProjectInfo> => {
       message: '请选择您希望使用的服务端技术栈：',
       choices: [
         // { name: 'Egg.js', value: ServerFrameworks.EggJs },
-        // { name: 'Spring Cloud', value: ServerFrameworks.SpringCloud },
+        { name: 'SpringBoot', value: ServerFrameworks.SpringBoot },
         { name: 'Nest.js', value: ServerFrameworks.NestJs },
         { name: '暂不配置', value: ServerFrameworks.Skip },
       ],
@@ -176,45 +177,132 @@ const createServerSync = (answers: ProjectInfo) => {
   // 复制服务端相关目录
   const serverFrom = utils.getTemplatePath(`${serverFramework}`);
   const serverTo = utils.getDistPath(`${name}/${serverFramework}`);
-  const config = {
-    DATABASE_HOST: answers.dialect && (answers.host ?? 'localhost'),
-    DATABASE_PORT: answers.dialect && Number(answers.port ?? 3306),
-    DATABASE_USERNAME: answers.dialect && (answers.username ?? 'root'),
-    DATABASE_PASSWORD: answers.dialect && (answers.password ?? 'root'),
-    DATABASE_NAME: answers.dialect && answers.database,
-    DATABASE_SYNCHRONIZE: false,
-    DATABASE_AUTOLOADENTITIES: true,
-    AUTH_SECRET: 'secret',
-    REDIS_SECONDS: 7200,
-    REDIS_HOST: answers.redisHost ?? 'localhost',
-    REDIS_PORT: Number(answers.redisPort ?? 6379),
-    EXPIRES_IN: '2h',
-    PAGINATION_PAGE: 1,
-    PAGINATION_LIMIT: 10,
-  };
-  const envStr = objToEnv(config);
-  const overwriteDockerComposeConfig = {
-    // @see https://hub.docker.com/_/mysql
-    // This variable is mandatory and specifies the password that will be set for the MySQL root superuser account.
-    MYSQL_ROOT_PASSWORD: config.DATABASE_PASSWORD,
-    MYSQL_DATABASE: config.DATABASE_NAME,
-    MYSQL_USER:
-      config.DATABASE_USERNAME === 'root' ? undefined : config.DATABASE_NAME,
-    MYSQL_PASSWORD:
-      config.DATABASE_USERNAME === 'root'
-        ? undefined
-        : config.DATABASE_PASSWORD,
-  };
-  copySync(serverFrom, serverTo);
-  writeFileSync(path.join(serverTo, '.env'), envStr);
-  const dockerComposeYaml = readFileSync(
-    path.join(serverTo, 'docker-compose.yml')
-  ).toString();
-  const yaml = parse(dockerComposeYaml);
-  const { services } = yaml;
-  const mysql = services.mysql;
-  mysql.environment = overwriteDockerComposeConfig;
-  writeFileSync(path.join(serverTo, 'docker-compose.yml'), stringify(yaml));
+  if (serverFramework == ServerFrameworks.SpringBoot) {
+    console.log("springboot的服务端配置")
+    // 拷贝 SpringBoot 模板代码到目标目录
+    copySync(serverFrom, serverTo);
+
+    // ===== 1. 定义统一的配置对象（从用户输入中提取，不写死）=====
+    const config = {
+      DB_HOST: answers.host ?? 'localhost',
+      DB_PORT: Number(answers.port ?? 3306),
+      DB_USERNAME: answers.username ?? 'root',
+      DB_PASSWORD: answers.password ?? 'root',
+      DB_NAME: answers.database ?? 'mydb',
+      DB_SYNCHRONIZE: false,
+      DB_AUTOLOADENTITIES: true,
+      AUTH_SECRET: 'secret',
+      REDIS_SECONDS: 7200,
+      REDIS_HOST: answers.redisHost ?? 'localhost',
+      REDIS_PORT: Number(answers.redisPort ?? 6379),
+      EXPIRES_IN: '2h',
+      PAGINATION_PAGE: 1,
+      PAGINATION_LIMIT: 10,
+      SERVER_PORT: 3000, // 可以改为 answers.serverPort || 3000，如果将来要支持动态端口
+    };
+
+    // ===== 2. 拷贝模板后，设置 Spring Boot 配置文件路径 =====
+    const propertiesFilePath = path.join(
+      serverTo,
+      'src/main/resources/application.properties'
+    );
+
+    if (!existsSync(propertiesFilePath)) {
+      log.error(`❌ 未找到 Spring Boot 配置文件：${propertiesFilePath}`);
+      return;
+    }
+
+if (!existsSync(propertiesFilePath)) {
+  log.error(`❌ 未找到 Spring Boot 配置文件：${propertiesFilePath}`);
+  return;
+}
+
+// ✅ 1. 使用 createEditor 读取 properties 文件
+const editor = createEditor(propertiesFilePath);
+
+// ✅ 3. 使用 editor.set(...) 方法逐一设置每一个配置项
+editor.set('server.port', config.SERVER_PORT.toString()); // 动态端口
+
+editor.set('spring.datasource.url', `jdbc:mysql://${config.DB_HOST}:${config.DB_PORT}/${config.DB_NAME}?allowMultiQueries=true&serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=utf8&autoReconnect=true&allowMultiQueries=true&allowPublicKeyRetrieval=true&useSSL=false`);
+editor.set('spring.datasource.username', config.DB_USERNAME);
+editor.set('spring.datasource.password', config.DB_PASSWORD);
+editor.set('spring.datasource.driver-class-name', 'com.mysql.cj.jdbc.Driver');
+
+// HikariCP 配置
+editor.set('spring.datasource.hikari.pool-name', 'HikariCPDatasource');
+editor.set('spring.datasource.hikari.minimum-idle', '5');
+editor.set('spring.datasource.hikari.idle-timeout', '180000');
+editor.set('spring.datasource.hikari.maximum-pool-size', '10');
+editor.set('spring.datasource.hikari.auto-commit', 'true');
+editor.set('spring.datasource.hikari.max-lifetime', '180000');
+editor.set('spring.datasource.hikari.connection-timeout', '30000');
+
+// MyBatis-Plus
+editor.set('mybatis-plus.mapper-locations', 'classpath:mappers/*.xml');
+editor.set('mybatis-plus.type-aliases-package', 'com.TinyPro.entity.po');
+editor.set('mybatis-plus.configuration.map-underscore-to-camel-case', 'true');
+editor.set('mybatis-plus.configuration.default-enum-type-handler', 'org.apache.ibatis.type.EnumOrdinalTypeHandler');
+
+// JPA (如同时使用)
+editor.set('spring.jpa.hibernate.ddl-auto', 'update');
+editor.set('spring.jpa.database-platform', 'org.hibernate.dialect.MySQL8Dialect');
+editor.set('spring.jpa.properties.hibernate.dialect', 'org.hibernate.dialect.MySQL8Dialect');
+editor.set('spring.jpa.properties.hibernate.dialect.storage_engine', 'innodb');
+editor.set('spring.jpa.properties.hibernate.globally_quoted_identifiers', 'true');
+editor.set('spring.jpa.hibernate.naming.physical-strategy', 'org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl');
+
+// JWT
+editor.set('jwt.secret', '0Zi4SA==');
+
+// Redis
+editor.set('spring.data.redis.host', config.REDIS_HOST);
+editor.set('spring.data.redis.port', config.REDIS_PORT.toString());
+
+// ✅ 4. 保存修改后的内容到原 .properties 文件
+editor.save(propertiesFilePath);
+
+log.success(`✅ Spring Boot 配置文件已更新：${propertiesFilePath}`);
+  } else if (serverFramework == ServerFrameworks.NestJs) {
+    const config = {
+      DATABASE_HOST: answers.dialect && (answers.host ?? 'localhost'),
+      DATABASE_PORT: answers.dialect && Number(answers.port ?? 3306),
+      DATABASE_USERNAME: answers.dialect && (answers.username ?? 'root'),
+      DATABASE_PASSWORD: answers.dialect && (answers.password ?? 'root'),
+      DATABASE_NAME: answers.dialect && answers.database,
+      DATABASE_SYNCHRONIZE: false,
+      DATABASE_AUTOLOADENTITIES: true,
+      AUTH_SECRET: 'secret',
+      REDIS_SECONDS: 7200,
+      REDIS_HOST: answers.redisHost ?? 'localhost',
+      REDIS_PORT: Number(answers.redisPort ?? 6379),
+      EXPIRES_IN: '2h',
+      PAGINATION_PAGE: 1,
+      PAGINATION_LIMIT: 10,
+    };
+    const envStr = objToEnv(config);
+    const overwriteDockerComposeConfig = {
+      // @see https://hub.docker.com/_/mysql
+      // This variable is mandatory and specifies the password that will be set for the MySQL root superuser account.
+      MYSQL_ROOT_PASSWORD: config.DATABASE_PASSWORD,
+      MYSQL_DATABASE: config.DATABASE_NAME,
+      MYSQL_USER:
+        config.DATABASE_USERNAME === 'root' ? undefined : config.DATABASE_NAME,
+      MYSQL_PASSWORD:
+        config.DATABASE_USERNAME === 'root'
+          ? undefined
+          : config.DATABASE_PASSWORD,
+    };
+    copySync(serverFrom, serverTo);
+    writeFileSync(path.join(serverTo, '.env'), envStr);
+    const dockerComposeYaml = readFileSync(
+      path.join(serverTo, 'docker-compose.yml')
+    ).toString();
+    const yaml = parse(dockerComposeYaml);
+    const { services } = yaml;
+    const mysql = services.mysql;
+    mysql.environment = overwriteDockerComposeConfig;
+    writeFileSync(path.join(serverTo, 'docker-compose.yml'), stringify(yaml));
+  }
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -320,7 +408,7 @@ const packageJsonProcess = (
  * @dbAnswers  询问服务端配置的选择值
  */
 const createProjectSync = (answers: ProjectInfo) => {
-  const { description, name, serverConfirm, buildTool } = answers;
+  const { description, name, serverConfirm, buildTool,serverFramework } = answers;
   const templatePath = VueVersion.Vue3;
   // 模板来源目录
   const from = utils.getTemplatePath(templatePath);
@@ -328,22 +416,24 @@ const createProjectSync = (answers: ProjectInfo) => {
   const to = utils.getDistPath(serverConfirm ? `${name}/web` : name);
   fs.copyTpl(from, to);
   // 将项目名称、描述写入 package.json中
-  try {
-    const packageJsonPath = path.join(to, 'package.json');
-    let packageJson = JSON.parse(
-      fs.readFileSync(packageJsonPath, { encoding: 'utf8' })
-    );
-    packageJson = { ...packageJson, name, description };
-    const remove = packageJsonProcess(buildTool, packageJson, to);
-    fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2), {
-      encoding: 'utf8',
-    });
-    remove();
-  } catch (e) {
-    log.error(e);
-    log.error('配置项目信息创建失败');
-  }
+  if (serverFramework ==  ServerFrameworks.NestJs) {
+    try {
+      const packageJsonPath = path.join(to, 'package.json');
+      let packageJson = JSON.parse(
+        fs.readFileSync(packageJsonPath, { encoding: 'utf8' })
+      );
+      packageJson = { ...packageJson, name, description };
+      const remove = packageJsonProcess(buildTool, packageJson, to);
+      fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2), {
+        encoding: 'utf8',
+      });
+      remove();
+    } catch (e) {
+      log.error(e);
+      log.error('配置项目信息创建失败');
+    }
 
+  }
   // 如果不对接服务端，全部接口采用mock
   if (!serverConfirm) {
     try {
@@ -362,6 +452,7 @@ const createProjectSync = (answers: ProjectInfo) => {
       log.info('请手动配置env信息');
     }
   } else {
+    console.log("执行文件复制及相关配置（ WIP: 后台接口暂未全量完成，部分接口还是使用mock ）")
     // 如果对接服务端，执行文件复制及相关配置（ WIP: 后台接口暂未全量完成，部分接口还是使用mock ）
     createServerSync(answers);
   }
@@ -414,7 +505,7 @@ export const installDependencies = (answers: ProjectInfo) => {
     console.log(
       chalk.green(
         `${chalk.yellow(
-          serverFramework === ServerFrameworks.SpringCloud
+          serverFramework === ServerFrameworks.SpringBoot
             ? `请查看 ${name}/${serverFramework}/README_CN.md `
             : `$ cd ${name}/${serverFramework} && npm run dev`
         )}    # 开启server开发环境`
@@ -447,9 +538,7 @@ export const installDependencies = (answers: ProjectInfo) => {
       '\n-------------------- 技术支持：官方小助手微信opentiny-official --------------------\n'
     )
   );
-};
-
-export default async () => {
+};export default async () => {
   // 拷贝模板到当前目录
   let projectInfo: ProjectInfo;
 
@@ -462,10 +551,5 @@ export default async () => {
     log.error('项目模板创建失败');
     return;
   }
-
-  // 初始化数据库
-  // 初始化不应该在cli做，而是在后端
-
-  // 安装依赖
   log.info('初始化成功，请运行npm i或tiny i 安装依赖');
 };
