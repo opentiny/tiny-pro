@@ -18,7 +18,7 @@ FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
 # 从构建阶段拷贝最终的 jar 包
-COPY --from=build /app/target/TinyPro-1.0-SNAPSHOT.jar app.jar
+COPY --from=build /app/target/SpringBoot-1.0-SNAPSHOT.jar app.jar
 
 # 暴露端口（根据你的 application.properties 中 server.port）
 EXPOSE 3000
