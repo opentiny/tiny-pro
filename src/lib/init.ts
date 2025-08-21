@@ -6,6 +6,7 @@ import chalk from 'chalk';
 import spawn from 'cross-spawn';
 import inquirer, { QuestionCollection } from 'inquirer';
 import { cliConfig, logs, fs } from '@opentiny/cli-devkit';
+import {createEditor} from 'properties-parser';
 import {
   buildCommand,
   buildConfigs,
@@ -180,7 +181,7 @@ const createServerSync = (answers: ProjectInfo) => {
     console.log("springboot的服务端配置")
     // 拷贝 SpringBoot 模板代码到目标目录
     copySync(serverFrom, serverTo);
-  
+
     // ===== 1. 定义统一的配置对象（从用户输入中提取，不写死）=====
     const config = {
       DB_HOST: answers.host ?? 'localhost',
@@ -199,20 +200,17 @@ const createServerSync = (answers: ProjectInfo) => {
       PAGINATION_LIMIT: 10,
       SERVER_PORT: 3000, // 可以改为 answers.serverPort || 3000，如果将来要支持动态端口
     };
-  
+
     // ===== 2. 拷贝模板后，设置 Spring Boot 配置文件路径 =====
     const propertiesFilePath = path.join(
       serverTo,
       'src/main/resources/application.properties'
     );
-  
+
     if (!existsSync(propertiesFilePath)) {
       log.error(`❌ 未找到 Spring Boot 配置文件：${propertiesFilePath}`);
       return;
     }
-  
-  // ===== 3. 使用 properties-parser 的正确方式：通过 createEditor 加载和修改 .properties 文件 =====
-const { createEditor } = require('properties-parser');
 
 if (!existsSync(propertiesFilePath)) {
   log.error(`❌ 未找到 Spring Boot 配置文件：${propertiesFilePath}`);
@@ -434,7 +432,7 @@ const createProjectSync = (answers: ProjectInfo) => {
       log.error(e);
       log.error('配置项目信息创建失败');
     }
-  
+
   }
   // 如果不对接服务端，全部接口采用mock
   if (!serverConfirm) {
@@ -540,9 +538,7 @@ export const installDependencies = (answers: ProjectInfo) => {
       '\n-------------------- 技术支持：官方小助手微信opentiny-official --------------------\n'
     )
   );
-};
-
-export default async () => {
+};export default async () => {
   // 拷贝模板到当前目录
   let projectInfo: ProjectInfo;
 
@@ -555,10 +551,5 @@ export default async () => {
     log.error('项目模板创建失败');
     return;
   }
-
-  // 初始化数据库
-  // 初始化不应该在cli做，而是在后端
-
-  // 安装依赖
   log.info('初始化成功，请运行npm i或tiny i 安装依赖');
 };
