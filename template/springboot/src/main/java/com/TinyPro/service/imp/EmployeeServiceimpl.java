@@ -2,6 +2,7 @@ package com.TinyPro.service.imp;
 
 import com.TinyPro.entity.po.Employee;
 
+import com.TinyPro.exception.BusinessException;
 import com.TinyPro.jpa.IEmployeRepository;
 import com.TinyPro.service.IEmployeeService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -28,9 +29,10 @@ public class EmployeeServiceimpl  implements IEmployeeService {
         Optional<Employee> byId = iEmployeRepository.findById(Long.valueOf(id));
         return byId.get();
     }
+
     @Override
     public void remove(String Id) {
-      Employee employee = iEmployeRepository.findById(Long.valueOf(Id)).get();
-      iEmployeRepository.delete(employee);
+        Employee employee = iEmployeRepository.findById(Long.valueOf(Id)).get();
+        iEmployeRepository.delete(employee);
     }
 }

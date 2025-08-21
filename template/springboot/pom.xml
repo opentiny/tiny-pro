@@ -8,7 +8,7 @@
         <relativePath/>
     </parent>
     <groupId>TinyPro</groupId>
-    <artifactId>TinyPro</artifactId>
+    <artifactId>SpringBoot</artifactId>
     <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
     <name>TinyPro</name>

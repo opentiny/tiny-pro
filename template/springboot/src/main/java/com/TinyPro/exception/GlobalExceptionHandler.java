@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
         );
 
         // 创建自定义的错误响应对象，可以包含错误信息和状态码数值
-        ErrorResponse errorResponse = new ErrorResponse(message, ex.getHttpStatus().value());
+        ErrorResponse errorResponse = new ErrorResponse(new String[]{message}, ex.getHttpStatus().value());
 
         return ResponseEntity
                 .status(ex.getHttpStatus())

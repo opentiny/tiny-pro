@@ -79,15 +79,15 @@ public class UserController {
         // 返回响应实体
         return ResponseEntity.ok(users);
     }
-    @Reject()
     @PatchMapping("/admin/updatePwd")
+    @Reject()
     @PermissionAnnotation("user::password::force-update")
     public ResponseEntity<?> updatePwdAdmin(@RequestBody  @Valid UpdatePwdAdminDto dto) {
         return userService.updatePwdAdmin(dto);
     }
-    @Reject()
     @PatchMapping("/updatePwd")
-    @PermissionAnnotation("user::update")
+    @Reject()
+    @PermissionAnnotation("user::update") // 自定义权限注解
     public ResponseEntity<?> updatePwdUser(@RequestBody @Valid UpdatePwdUserDto dto) {
         userService.updatePwdUser(dto);
         return ResponseEntity.ok().build();

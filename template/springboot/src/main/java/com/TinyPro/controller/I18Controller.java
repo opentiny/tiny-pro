@@ -25,7 +25,7 @@ public class I18Controller {
     @Autowired
     private II18Service i18Service;
 
-    @Reject()
+    @Reject
     @PermissionAnnotation("i18n::add")
     @PostMapping("")
     public ResponseEntity<String> createI18Dto(@Valid @RequestBody CreateI18Dto createI18Dto) {
@@ -56,7 +56,7 @@ public class I18Controller {
     public ResponseEntity<I18Vo> findOne(@PathVariable Integer id) {
         return new ResponseEntity<I18Vo>(i18Service.getI18ById(id), HttpStatus.OK);
     }
-    @Reject()
+
     @PatchMapping("/{id}")
     @PermissionAnnotation("i18n::update")
     public ResponseEntity<I18Vo> update(
