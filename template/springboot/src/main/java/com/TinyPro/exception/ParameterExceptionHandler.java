@@ -1,5 +1,6 @@
 package com.TinyPro.exception;
 
+import com.TinyPro.entity.contants.Contants;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -20,7 +21,7 @@ public class ParameterExceptionHandler {
                 .collect(Collectors.joining(", "));
         // 创建自定义的错误响应对象，可以包含错误信息和状态码数值
         BusinessException e = new BusinessException(errorMsg, HttpStatus.BAD_REQUEST, null);
-        ErrorResponse errorResponse = new ErrorResponse(new String[]{errorMsg}, e.getHttpStatus().value());
+        NoExistErrorResponse errorResponse = new NoExistErrorResponse(new String[]{errorMsg}, e.getHttpStatus().value(), Contants.NO_EXIST_ERROR_RESPONSE);
 
         return ResponseEntity
                 .status(e.getHttpStatus())
