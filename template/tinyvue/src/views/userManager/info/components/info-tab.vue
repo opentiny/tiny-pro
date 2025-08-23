@@ -10,6 +10,7 @@
           >{{ $t('userInfo.modal.title.add') }}
         </tiny-button>
         <tiny-button
+          v-permission="'user::batch-remove'"
           round
           @click="handleBatchDeleteUser"
           >{{ $t('locale.batchRemove') }}

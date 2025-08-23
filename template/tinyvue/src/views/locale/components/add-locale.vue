@@ -1,9 +1,9 @@
 <template>
   <div>
-    <tiny-button show-footer type="primary" @click="onOpen" round>
+    <tiny-button show-footer type="primary" round @click="onOpen">
       {{ $t('locale.add.btn') }}
     </tiny-button>
-    <tiny-button round @click="onBatchRemove">
+    <tiny-button v-permission="'i18n::batch-remove'" round @click="onBatchRemove">
       {{ $t('locale.batchRemove') }}
     </tiny-button>
     <tiny-dialog-box
@@ -68,8 +68,8 @@
           size="small"
           :text="$t('locale.add.btn')"
           type="primary"
-          @click="addLocale"
           round
+          @click="addLocale"
         ></tiny-button>
       </template>
     </tiny-dialog-box>
@@ -123,8 +123,8 @@
   const lang = reactive({ name: '' });
 
   const onBatchRemove = () => {
-    
-    emits('batchRemove') 
+
+    emits('batchRemove')
   }
 
   const rules = {
