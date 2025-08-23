@@ -44,7 +44,7 @@ public class I18Controller {
     public ResponseEntity<PageWrapper<I18Vo>> findAll(@RequestParam(defaultValue = "1") Integer page,
                                                       @RequestParam(defaultValue = "0") Integer limit,
                                                       @RequestParam(required = false) Integer all,
-                                                      @RequestParam(defaultValue = "") List<String> lang, // 或 List<Integer>
+                                                      @RequestParam (required = false)Integer lang,
                                                       @RequestParam(required = false) String key,
                                                       @RequestParam(required = false) String content) {
         boolean allBool = !(all != null && all != 0);
@@ -74,8 +74,8 @@ public class I18Controller {
     }
     @Reject()
     @PostMapping("/batch")
-    @PermissionAnnotation("user:batch-remove")
-    public ResponseEntity<List<I18>> batchRemoveUser(@RequestBody List<Long> ids) {
+    @PermissionAnnotation("i18n::batch-remove")
+    public ResponseEntity<List<I18>> batchRemove(@RequestBody List<Long> ids) {
         return this.i18Service.batchDeleteUser(ids);
     }
 }
