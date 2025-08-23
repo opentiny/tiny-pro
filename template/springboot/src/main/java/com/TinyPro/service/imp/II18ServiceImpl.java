@@ -91,7 +91,7 @@ public class II18ServiceImpl implements II18Service {
             Integer page,
             Integer limit,
             Boolean allBool,
-            Integer lang,
+            List<Integer> lang,
             String key,
             String content
     ) {
@@ -111,7 +111,7 @@ public class II18ServiceImpl implements II18Service {
 
             // 按 lang.name 过滤
             if (lang != null) {
-                predicates.add(cb.equal(root.get("lang").get("id"), lang));
+                predicates.add(cb.in(root.get("lang").get("id")).value(lang));
             }
 
             // 按 content 过滤

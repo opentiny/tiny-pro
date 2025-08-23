@@ -18,7 +18,7 @@ public interface II18Service {
 
     Map<String, Map<String, String>> getFormat(String lang, HttpServletRequest request);
 
-    ResponseEntity<PageWrapper<I18Vo>> findAll(Integer page, Integer limit, Boolean allBool, Integer lang, String key, String content);
+    ResponseEntity<PageWrapper<I18Vo>> findAll(Integer page, Integer limit, Boolean allBool, List<Integer> lang, String key, String content);
 
     ResponseEntity<I18Vo> updateByi18nId(java.lang.Long id, @Valid UpdateI18Dto dto);
 

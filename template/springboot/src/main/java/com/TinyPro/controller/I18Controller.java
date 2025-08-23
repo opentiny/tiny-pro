@@ -44,7 +44,7 @@ public class I18Controller {
     public ResponseEntity<PageWrapper<I18Vo>> findAll(@RequestParam(defaultValue = "1") Integer page,
                                                       @RequestParam(defaultValue = "0") Integer limit,
                                                       @RequestParam(required = false) Integer all,
-                                                      @RequestParam (required = false)Integer lang,
+                                                      @RequestParam (required = false)List<Integer> lang,
                                                       @RequestParam(required = false) String key,
                                                       @RequestParam(required = false) String content) {
         boolean allBool = !(all != null && all != 0);
