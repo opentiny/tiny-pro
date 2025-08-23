@@ -14,4 +14,5 @@ public class Contants {
     public static final Integer USER_STATUS_NO=0;
     //超级权限
     public static final String ADMIN_SUPE_POWER="*";
+    public static final String NO_EXIST_ERROR_RESPONSE = "Bad Request";
 }
