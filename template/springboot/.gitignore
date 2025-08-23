@@ -8,8 +8,11 @@ target/
 .idea/jarRepositories.xml
 .idea/compiler.xml
 .idea/libraries/
-*.iws
+# JetBrains IDE
+.idea/
 *.iml
+out/
+*.iws
 *.ipr
 
 ### Eclipse ###
