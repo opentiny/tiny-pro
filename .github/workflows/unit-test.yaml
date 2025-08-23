@@ -25,6 +25,6 @@ jobs:
           node-version: 20
           cache: 'pnpm'
       - name: Install depend
-        run: pnpm i
+        run: pnpm install --no-frozen-lockfile
       - name: Run Unit Test without coverage
         run: pnpm test
