@@ -177,7 +177,7 @@ const createServerSync = (answers: ProjectInfo) => {
   // 复制服务端相关目录
   const serverFrom = utils.getTemplatePath(`${serverFramework}`);
   const serverTo = utils.getDistPath(`${name}/${serverFramework}`);
-  if (serverFramework == ServerFrameworks.SpringBoot) {
+  if (serverFramework === ServerFrameworks.SpringBoot) {
     console.log("springboot的服务端配置")
     // 拷贝 SpringBoot 模板代码到目标目录
     copySync(serverFrom, serverTo);
@@ -262,7 +262,7 @@ editor.set('spring.data.redis.port', config.REDIS_PORT.toString());
 editor.save(propertiesFilePath);
 
 log.success(`✅ Spring Boot 配置文件已更新：${propertiesFilePath}`);
-  } else if (serverFramework == ServerFrameworks.NestJs) {
+  } else if (serverFramework === ServerFrameworks.NestJs) {
     const config = {
       DATABASE_HOST: answers.dialect && (answers.host ?? 'localhost'),
       DATABASE_PORT: answers.dialect && Number(answers.port ?? 3306),
@@ -416,7 +416,7 @@ const createProjectSync = (answers: ProjectInfo) => {
   const to = utils.getDistPath(serverConfirm ? `${name}/web` : name);
   fs.copyTpl(from, to);
   // 将项目名称、描述写入 package.json中
-  if (serverFramework ==  ServerFrameworks.NestJs) {
+  if (serverFramework ===  ServerFrameworks.NestJs) {
     try {
       const packageJsonPath = path.join(to, 'package.json');
       let packageJson = JSON.parse(
