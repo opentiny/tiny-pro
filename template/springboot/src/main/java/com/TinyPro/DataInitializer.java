@@ -125,11 +125,11 @@ public class DataInitializer implements CommandLineRunner {
 
     private void initPermissions() {
         Map<String, String[]> permissions = new HashMap<>();
-        permissions.put("user", new String[]{"add", "remove", "update", "query", "password::force-update"});
+        permissions.put("user", new String[]{"add", "remove", "update", "query", "password::force-update","batch-remove"});
         permissions.put("permission", new String[]{"add", "remove", "update", "get"});
         permissions.put("role", new String[]{"add", "remove", "update", "query"});
         permissions.put("menu", new String[]{"add", "remove", "update", "query"});
-        permissions.put("i18n", new String[]{"add", "remove", "update", "query"});
+        permissions.put("i18n", new String[]{"add", "remove", "update", "query","batch-remove"});
         permissions.put("lang", new String[]{"add", "remove", "update", "query"});
 
         Permission superPermission = new Permission();

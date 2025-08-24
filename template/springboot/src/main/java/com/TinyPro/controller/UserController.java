@@ -95,7 +95,7 @@ public class UserController {
 
     @Reject()
     @PostMapping("/batch")
-    @PermissionAnnotation("user:batch-remove")
+    @PermissionAnnotation("user::batch-remove")
     public ResponseEntity<List<UserVo>> batchRemoveUser (@RequestBody List<String> emails) {
         return userService.batchDeleteUser(emails);
     }
