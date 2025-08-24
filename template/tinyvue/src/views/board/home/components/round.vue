@@ -1,12 +1,12 @@
 <template>
   <div class="round-box">
-    <div class="round">
-      <div>
-        <img src="@/assets/images/map-background3.png" class="image" />
-        <h3>{{ $t('home.round.title') }}</h3>
-        <tiny-chart-ring id="circled" ref="ringRef" height="100%" :options="options" :extend="chartExtend"></tiny-chart-ring>
-      </div>
-      <div class="round-from">
+    <div class="flex items-start">
+      <img src="@/assets/images/map-background3.png" class="image" />
+      <h3>{{ $t('home.round.title') }}</h3>
+    </div>
+    <div class="round flex w-full max-md:flex-col max-md:items-center">
+      <tiny-chart-ring ref="ringRef" :width="chartWidth" height="40vh" :options="options" :extend="chartExtend"></tiny-chart-ring>
+      <div class="round-from w-[46vw] ml-[5%]  max-md:w-[100%] max-md:ml-[0%] max-md:pt-[5%] max-sm:pt-[10%]">
         <RoundTable></RoundTable>
       </div>
     </div>
@@ -14,7 +14,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, watch, ref, nextTick } from 'vue';
+  import { onMounted, onUnmounted, watch, ref, computed, nextTick } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { TinyHuichartsRing as TinyChartRing } from '@opentiny/vue-huicharts'
   import useLocale from '@/hooks/locale';
@@ -31,62 +31,81 @@
       { value: 580, name: '3G' },
     ]
   })
-  const chartExtend = ref({
-    color: ['#5470c6', '#91cc74', '#fac858', '#ee6666'],
-    tooltip: {
-      trigger: 'item',
-    },
-    legend: {
-      orient: 'vertical',
-      left: 'right',
-      top: 'center',
-      icon: '',
-      align: 'right',
-      itemWidth: 25,
-      itemHeight: 14,
-      itemGap: 10,
-    },
-    series: [
-      {
-        type: 'pie',
-        selectedMode: 'single',
-        radius: ['60%', '80%'],
-        itemStyle: {
-          borderRadius: 10,
-          borderColor: '#fff',
-          borderWidth: 2,
-        },
-        avoidLabelOverlap: true,
-        label: {
-          show: false,
-          position: 'center',
-        },
-        width: '100%',
-        emphasis: {
-          label: {
-            show: true,
-            fontSize: '40',
-            fontWeight: 'bold',
-          },
-        },
-        labelLine: {
-          show: false,
-        }
+  const chartExtend = computed(() => {
+    const isSm = windowWidth.value <= 375
+
+    return {
+      color: ['#5470c6', '#91cc74', '#fac858', '#ee6666'],
+      tooltip: {
+        trigger: 'item',
       },
-    ],
+      legend: {
+        orient: 'horizontal',
+        left: 'center',
+        top: 'bottom',
+        icon: '',
+        align: 'right',
+        itemWidth: 20,
+        itemHeight: 14,
+        itemGap: 10,
+      },
+      series: [
+        {
+          type: 'pie',
+          selectedMode: 'single',
+          radius: ['50%', '65%'],
+          center: ['50%', '55%'],
+          itemStyle: {
+            borderRadius: 10,
+            borderColor: '#fff',
+            borderWidth: 2,
+          },
+          avoidLabelOverlap: true,
+          label: {
+            show: false,
+            position: 'center',
+          },
+          width: '100%',
+          emphasis: {
+            label: {
+              show: true,
+              fontSize: isSm ? 20 : 40,
+              fontWeight: 'bold',
+            },
+          },
+          labelLine: {
+            show: false,
+          }
+        },
+      ],
+    }
   })
 
+  const windowWidth = ref(0)
+  const handleResize = () => {
+    windowWidth.value = window.innerWidth
+  }
+  const onResizeChart = () => {
+    ringRef.value?.resize();
+  };
   onMounted(() => {
-    window.addEventListener('resize', () => {
-      ringRef.value.resize();
-    });
-    nextTick(() => {
-      ringRef.value.resize();
-    });
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('resize', onResizeChart);
+    handleResize();
+    onResizeChart();
+    setTimeout(() => {
+      ringRef.value?.resize();
+    }, 200)
   });
 
+  onUnmounted(() => {
+    window.removeEventListener('resize', handleResize);
+    window.addEventListener('resize', onResizeChart);
+  });
+  const chartWidth = computed(() => windowWidth.value <= 768 ? '80vw' : '30vw')
+
   watch(currentLocale, (newValue, oldValue) => {
-    ringRef.value.resize();
+    ringRef.value?.resize();
   });
 </script>
 
@@ -100,15 +119,8 @@
   }
 
   .round {
-    display: flex;
     justify-content: space-between;
     border-radius: 6px;
-  }
-
-  #circled {
-    width: 32vw !important;
-    height: 350px;
-    margin-left: 2.3%;
   }
 
   .image {
@@ -121,9 +133,7 @@
   }
 
   .round-from {
-    width: 46vw;
     margin-top: 2%;
-    margin-left: 5%;
   }
 
   h3 {

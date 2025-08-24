@@ -10,9 +10,9 @@
       only-check-children
       check-strictly
       menu-collapsible
+      class="h-[calc(100vh-60px)]"
       @current-change="currentChange"
       @collapse-change="collapseChange"
-      class="h-[calc(100vh-60px)]"
     >
       <template #default="slotScope">
         <template v-for="(item, index) in routerTitle" :key="index">
@@ -125,6 +125,9 @@
   const expandeArr = ref<(string | number)[]>([]);
   const tabStore = useTabStore();
   onMounted(() => {
+    if (window.innerWidth <= 768) {
+      document.querySelector('.tiny-tree-menu')?.classList.add('is-collapsed');
+    }
     watch(
       () => tabStore.current,
       () => {

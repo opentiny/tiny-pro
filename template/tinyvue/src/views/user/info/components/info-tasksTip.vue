@@ -1,7 +1,7 @@
 <template>
-  <div class="card">
+  <div class="card flex flex-wrap">
     <transition-fade-down-group>
-      <div v-for="(item, index) in InfoNum" :key="index" class="col">
+      <div v-for="(item, index) in InfoNum" :key="index" class="col flex w-[20%] max-sm:w-[40%]">
         <img :src="item.img" />
         <span>{{ $t(item.text) }}/{{ item.value }}</span>
       </div>
@@ -45,16 +45,13 @@
 
 <style scoped lang="less">
   .card {
-    display: flex;
     justify-content: flex-start;
     padding: 24px 0;
     text-align: center;
 
     .col {
-      display: flex;
       align-items: center;
       justify-content: center;
-      width: 130px;
       height: 36px;
       margin-right: 20px;
       border-radius: 18px;

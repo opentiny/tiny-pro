@@ -14,26 +14,33 @@
           :pager="pagerConfig"
           :edit-config="{ trigger: 'click', mode: 'cell', showStatus: true }" 
           remote-filter
+          :size="gridSize"
+          align="center"
           @edit-closed="handlePermissionUpdateSubmit"
           >
-            <tiny-grid-column field="id" :title="$t('permissionInfo.table.id')">
+            <tiny-grid-column field="id" :title="$t('permissionInfo.table.id')" width="10%">
               <template #default="data">
                 <span>{{ $t(`${data.row.id}`) }}</span>
               </template>
             </tiny-grid-column>
-            <tiny-grid-column field="name" :title="$t('permissionInfo.table.name')" :filter="filter"
+            <tiny-grid-column 
+              field="name" 
+              :title="$t('permissionInfo.table.name')" 
+              :filter="filter"
               :editor="{ component: 'input', autoselect: true }">
               <template #default="data">
                 <span>{{ $t(`${data.row.name}`) }}</span>
               </template>
             </tiny-grid-column>
-            <tiny-grid-column field="desc" :title="$t('permissionInfo.table.desc')"
+            <tiny-grid-column 
+              field="desc" 
+              :title="$t('permissionInfo.table.desc')"
               :editor="{ component: 'input', autoselect: true }">
               <template #default="data">
                 <span>{{ $t(`${data.row.desc}`) }}</span>
               </template>
             </tiny-grid-column>
-            <tiny-grid-column :title="$t('permissionInfo.table.operations')" align="center">
+            <tiny-grid-column :title="$t('permissionInfo.table.operations')">
               <template #default="data">
                 <tiny-popconfirm :title="$t('menuInfo.modal.title.confirm')" type="warning" trigger="click" @confirm="handleDelete(data.row)">
                   <template #reference>
@@ -60,13 +67,20 @@
       :title="$t('permissionInfo.modal.title.add')"
       >
         <template #default>
-          <tiny-form ref="addForm" :model="state.permissionAddData" :rules="rules" label-position="top">
-            <tiny-form-item :label="$t('permissionInfo.modal.input.name')" prop="name">
-              <tiny-input v-model="state.permissionAddData.name"></tiny-input>
-            </tiny-form-item>
-            <tiny-form-item :label="$t('permissionInfo.modal.input.permission')">
-              <tiny-input v-model="state.permissionAddData.desc"></tiny-input>
-            </tiny-form-item>
+          <tiny-form ref="addForm" :model="state.permissionAddData" :rules="rules">
+            <tiny-row>
+              <tiny-col :span="6">
+                <tiny-form-item :label="$t('permissionInfo.modal.input.name')" prop="name">
+                  <tiny-input v-model="state.permissionAddData.name"></tiny-input>
+                </tiny-form-item>
+              </tiny-col>
+              <tiny-col :span="6">
+                <tiny-form-item :label="$t('permissionInfo.modal.input.permission')">
+                  <tiny-input v-model="state.permissionAddData.desc"></tiny-input>
+                </tiny-form-item>
+              </tiny-col>
+            </tiny-row>
+
           </tiny-form>
         </template>
         <template #footer>
@@ -117,12 +131,15 @@ import {
   IPaginationMeta,
   Pager,
 } from '@/types/global';
+import { useResponsiveGrid } from '@/hooks/responsive'
 
 const roleGrid = ref();
 const addForm = ref();
 const iconDel = IconDel();
 
 const { t } = useI18n();
+
+const { gridSize } = useResponsiveGrid()
 
 // 加载效果
 const state = reactive<{
@@ -156,7 +173,7 @@ const pagerConfig = reactive({
   attrs: {
     currentPage: 1,
     pageSize: 10,
-    pageSizes: [5, 10, 15, 20],
+    pageSizes: [10, 20, 50,100],
     total: 10,
     layout: 'sizes,total, prev, pager, next, jumper',
   },
@@ -294,7 +311,7 @@ async function handlePermissionAddCancel() {
 }
 
 .permission-add-btn {
-  padding: 10px 0 10px 10px;
+  padding: 0 0 24px 0;
 }
 
 .table {
@@ -320,8 +337,10 @@ async function handlePermissionAddCancel() {
 .del-icon{
   fill: #1890ff;
   margin-right: 8px;
-  margin-left: 16px;;
   font-size: 16px;
   margin-top: -3px;
+}
+.operation-update:hover{
+  text-decoration: underline;
 }
 </style>

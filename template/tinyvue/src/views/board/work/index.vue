@@ -15,22 +15,20 @@
           </div>
         </div>
         <div class="card">
-          <div class="card-title">{{ $t('work.index.trainees') }}</div>
-          <div class="card-title card-coach">{{ $t('work.index.coachNum') }}</div>
           <div>
             <learncoach></learncoach>
           </div>
         </div>
-        <div class="card-center">
-          <div class="card card-issue">
+        <div class="card-center flex gap-2 max-md:flex-col">
+          <div class="card card-issue flex-3 max-md:w-full">
             <div class="card-title">{{ $t('work.index.formalization') }}</div>
             <learnprobation></learnprobation>
           </div>
-          <div class="card card-home">
+          <div class="card card-home flex-1 max-md:w-full">
             <div class="card-title">{{ $t('work.index.Home') }}</div>
             <div v-for="item in Home" :key="item" class="home-title">
               <span :class="{'dt-icon':true,'is-old':item?.isOld}"></span>
-              <span>{{ $t(item.label) }}</span>
+              <span class="line-clamp-2">{{ $t(item.label) }}</span>
               <span v-if="item.value" class="home-tip">{{ $t(item.value) }}</span>
             </div>
           </div>
@@ -64,12 +62,13 @@ const Home = [
 .container-work {
   width: 100%;
   height: 100%;
+  padding: 24px;
   overflow: auto;
   background: #f6f8f9;
   color: #191919;
 
   .work-image {
-    width: 99%;
+    width: 100%;
     margin: 0 auto;
 
     img {
@@ -110,7 +109,6 @@ const Home = [
         font-size: 16px;
         font-weight: 700;
         margin-bottom: 16px;
-
       }
       .card-coach{
         position: absolute;
@@ -121,9 +119,8 @@ const Home = [
 
     .card-center {
       display: flex;
-      gap: 8px;
+      gap: 24px;
       width: 100%;
-      height: 200px;
       margin-top: 16px;
       border-radius: 8px;
 
@@ -136,6 +133,9 @@ const Home = [
       .card-home {
         margin-top: 0px;
         flex: 1;
+        span:hover{
+          text-decoration: underline;
+        }
       }
     }
   }

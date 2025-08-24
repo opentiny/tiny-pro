@@ -1,7 +1,7 @@
 <template>
-  <div class="card">
+  <div class="card flex flex-wrap gap-4">
     <transition-slide-group>
-      <div v-for="(item, index) in InfoNum" :key="index" class="col">
+      <div v-for="(item, index) in InfoNum" :key="index" class="col flex flex-col gap-6 w-[22%] max-sm:w-full max-sm:flex-row max-sm:items-center max-sm:gap-0">
         <div>
           <img :src="item.img" />
           <span>{{ $t(item.text) }}</span>
@@ -51,17 +51,13 @@
 
 <style scoped lang="less">
   .card {
-    display: flex;
     justify-content: space-between;
     margin: 16px 0;
     text-align: center;
 
     .col {
-      display: flex;
-      flex-direction: column;
       justify-content: space-around;
-      width: 360px;
-      height: 138px;
+      padding: 2% 0;
       background: #eff1f7;
       border-radius: 10px;
       opacity: 1.6;
@@ -95,7 +91,7 @@
 
     .font {
       font-weight: 600;
-      font-size: 48px;
+      font-size: 36px;
       font-family:
         PingFang SC,
         PingFang SC-PingFang SC;
@@ -121,11 +117,6 @@
     .plan-limit {
       color: rgb(255, 8, 0);
       .font();
-    }
-  }
-  @media (max-width: 1800px) {
-    .card .col {
-      width: 260px;
     }
   }
 </style>

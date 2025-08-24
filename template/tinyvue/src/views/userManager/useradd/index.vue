@@ -7,17 +7,18 @@
             ref="setFormRef"
             :model="state.userData"
             :rules="rules"
-            label-width="80"
+            label-width="94px"
             :label-align="true"
             label-position="left"
+            overflow-title
           >
             <tiny-row :flex="true" justify="left">
-              <tiny-col :span="5" label-width="100px">
+              <tiny-col :span="6" label-width="100px">
                 <tiny-form-item :label="$t('userAdd.email')" prop="email">
                   <tiny-input v-model="state.userData.email"></tiny-input>
                 </tiny-form-item>
               </tiny-col>
-              <tiny-col :span="5" label-width="100px">
+              <tiny-col :span="6" label-width="100px">
                 <tiny-form-item :label="$t('userAdd.password')" prop="password">
                   <tiny-input
                     v-model="state.userData.password"
@@ -29,12 +30,12 @@
             </tiny-row>
 
             <tiny-row :flex="true" justify="left">
-              <tiny-col :span="5" label-width="100px">
+              <tiny-col :span="6" label-width="100px">
                 <tiny-form-item :label="$t('userAdd.name')" prop="name">
                   <tiny-input v-model="state.userData.name"></tiny-input>
                 </tiny-form-item>
               </tiny-col>
-              <tiny-col :span="5" label-width="100px">
+              <tiny-col :span="6" label-width="100px">
                 <tiny-form-item :label="$t('userAdd.address')" prop="address">
                   <tiny-input v-model="state.userData.address"></tiny-input>
                 </tiny-form-item>
@@ -42,7 +43,7 @@
             </tiny-row>
 
             <tiny-row :flex="true" justify="left">
-              <tiny-col :span="5" label-width="100px">
+              <tiny-col :span="6" label-width="100px">
                 <tiny-form-item
                   :label="$t('userAdd.department')"
                   prop="department"
@@ -50,7 +51,7 @@
                   <tiny-input v-model="state.userData.department"></tiny-input>
                 </tiny-form-item>
               </tiny-col>
-              <tiny-col :span="5" label-width="100px">
+              <tiny-col :span="6" label-width="100px">
                 <tiny-form-item :label="$t('userAdd.position')" prop="roleIds">
                   <tiny-select
                     v-model="state.userData.roleIds"
@@ -68,7 +69,7 @@
             </tiny-row>
 
             <tiny-row :flex="true" justify="left">
-              <tiny-col :span="5" label-width="100px">
+              <tiny-col :span="6" label-width="100px">
                 <tiny-form-item :label="$t('userAdd.type')" prop="employeeType">
                   <tiny-select
                     v-model="state.userData.employeeType"
@@ -83,7 +84,7 @@
                   </tiny-select>
                 </tiny-form-item>
               </tiny-col>
-              <tiny-col :span="5" label-width="100px">
+              <tiny-col :span="6" label-width="100px">
                 <tiny-form-item
                   :label="$t('userAdd.date')"
                   prop="probationDate"
@@ -101,7 +102,7 @@
             </tiny-row>
 
             <tiny-row :flex="true" justify="left">
-              <tiny-col :span="5" label-width="100px">
+              <tiny-col :span="6" label-width="100px">
                 <tiny-form-item
                   :label="$t('userAdd.during')"
                   prop="probationDuration"
@@ -111,7 +112,7 @@
                   ></tiny-input>
                 </tiny-form-item>
               </tiny-col>
-              <tiny-col :span="5" label-width="100px">
+              <tiny-col :span="6" label-width="100px">
                 <tiny-form-item
                   :label="$t('userAdd.startTime')"
                   prop="protocolStart"
@@ -125,7 +126,7 @@
             </tiny-row>
 
             <tiny-row :flex="true" justify="left">
-              <tiny-col :span="5" label-width="100px">
+              <tiny-col :span="6" label-width="100px">
                 <tiny-form-item
                   :label="$t('userAdd.endTime')"
                   prop="protocolEnd"
@@ -136,7 +137,7 @@
                   ></tiny-date-picker>
                 </tiny-form-item>
               </tiny-col>
-              <tiny-col :span="5" label-width="100px">
+              <tiny-col :span="6" label-width="100px">
                 <tiny-form-item :label="$t('userAdd.status')" prop="status">
                   <tiny-select
                     v-model="state.userData.status"
@@ -157,10 +158,11 @@
 
         <div class="general-btn">
           <tiny-button
-            v-permission="'user::add'"
+            size="small"
             type="primary"
             native-type="submit"
             @click="handleSubmit"
+            round
             >{{ $t('userAdd.save') }}
           </tiny-button>
         </div>
@@ -249,7 +251,6 @@
         newTemp.protocolStart && (newTemp.protocolStart = getSimpleDate(data.protocolStart))
         newTemp.protocolEnd && (newTemp.protocolEnd = getSimpleDate(data.protocolEnd))
         newTemp.status && (newTemp.status = props.statusData.find(item => item.label === data.status).value)
-        console.log('12', newTemp)
 
         try {
           await registerUser(newTemp);
@@ -296,13 +297,11 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    width: 98%;
+    width: 100%;
     height: inherit;
-    margin: 0 auto;
 
     .general-card {
       height: 100%;
-      padding: 10px;
       overflow-x: hidden;
       overflow-y: auto;
       border-radius: 10px;
@@ -322,11 +321,10 @@
         flex-direction: column;
         justify-content: center;
         min-height: 75%;
-        padding: 30px 0 10px 0;
+        padding-bottom: 32px;
 
         .tiny-layout {
           width: 100%;
-          margin-left: 8%;
         }
       }
 
@@ -335,9 +333,7 @@
         margin: 0 auto;
 
         button {
-          width: 100px;
-          height: 36px;
-          border-radius: 4px;
+          width: 96px;
         }
       }
 

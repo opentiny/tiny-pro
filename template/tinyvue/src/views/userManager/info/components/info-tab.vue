@@ -5,13 +5,13 @@
         <tiny-button
           v-permission="'user::add'"
           type="primary"
-          @click="handleAddUser"
           round
+          @click="handleAddUser"
           >{{ $t('userInfo.modal.title.add') }}
         </tiny-button>
         <tiny-button
-          @click="handleBatchDeleteUser"
           round
+          @click="handleBatchDeleteUser"
           >{{ $t('locale.batchRemove') }}
         </tiny-button>
       </div>
@@ -23,9 +23,11 @@
           :auto-resize="true"
           remote-filter
           :edit-config="{ trigger: 'click', mode: 'cell', showStatus: true }"
+          :size="gridSize"
+          align="center"
         >
-          <tiny-grid-column type="selection" width="3%"></tiny-grid-column>
-          <tiny-grid-column type="expand" width="3%">
+          <tiny-grid-column type="selection" width="30px"></tiny-grid-column>
+          <tiny-grid-column type="expand" width="10px">
             <template #default="{ row }">
               <UserDetail
                 :email="row.email"
@@ -38,7 +40,6 @@
             field="id"
             :title="$t('userInfo.table.id')"
             show-overflow="tooltip"
-            width="3%"
           >
             <template #default="data">
               <span>{{ $t(`${data.row.id}`) }}</span>
@@ -49,7 +50,6 @@
             :filter="inputFilter"
             :title="$t('userInfo.table.name')" 
             show-overflow="tooltip"
-            width="10%"
             :editor="{
               component: 'input',
               autofocus: true,
@@ -67,7 +67,6 @@
             field="email"
             :filter="inputFilter"
             :title="$t('userInfo.table.email')"
-            width="9%"
             show-overflow="tooltip"
           >
             <template #default="data">
@@ -78,7 +77,6 @@
             field="department"
             :title="$t('userInfo.table.department')" 
             show-overflow="tooltip"
-            width="6%"
             :editor="{
               component: 'input',
               autofocus: true,
@@ -98,7 +96,6 @@
             field="employeeType"
             :title="$t('userInfo.table.employeeType')"
             show-overflow="tooltip"
-            width="6%"
             :editor="{ 
               component: TinySelect,
               attrs: {
@@ -122,7 +119,6 @@
             :filter="jobFilter"
             :title="$t('userInfo.table.job')" 
             show-overflow="tooltip"
-            width="8%"
             :editor="{ 
               component: TinySelect,
               attrs: {
@@ -143,7 +139,6 @@
             field="probationStart"
             :title="$t('userInfo.table.probationStart')" 
             show-overflow="tooltip"
-            width="9%"
             :editor="{ 
               component: TinyDatePicker,
               attrs: {
@@ -164,7 +159,6 @@
             field="probationEnd"
             :title="$t('userInfo.table.probationEnd')" 
             show-overflow="tooltip"
-            width="9%"
             :editor="{ 
               component: TinyDatePicker,
               attrs: {
@@ -185,7 +179,6 @@
             field="probationDuration"
             :title="$t('userInfo.table.probationDuration')" 
             show-overflow="tooltip"
-            width="6%"
             :editor="{
               component: 'input',
               autofocus: true,
@@ -206,7 +199,6 @@
             field="address"
             :title="$t('userInfo.table.address')" 
             show-overflow="tooltip"
-            width="11%"
             :editor="{
               component: 'input',
               autofocus: true,
@@ -226,7 +218,6 @@
             field="status"
             :title="$t('userInfo.table.status')"
             show-overflow="tooltip"
-            width="6%"
             :editor="{ 
               component: TinySelect,
               attrs: {
@@ -262,9 +253,7 @@
           </tiny-grid-column>
           <tiny-grid-column
             :title="$t('userInfo.table.operations')"
-            align="center" 
             show-overflow="tooltip"
-            width="11%"
           >
             <template #default="data">
               <a
@@ -302,7 +291,7 @@
       v-model="state.isUserAdd"
       :lock-scroll="true"
       height="auto"
-      width="800"
+      width="700"
       :title="$t('userInfo.modal.title.add')"
     >
       <UserAdd
@@ -408,8 +397,11 @@
   import { getSimpleDate } from '@/utils/time';
   import { getAllRole } from '@/api/role';
   import { FilterType } from '@/types/global';
+  import { useResponsiveGrid } from '@/hooks/responsive'
   import UserAdd from '../../useradd/index.vue';
   import UserDetail from '../../user-detail/index.vue';
+
+  const { gridSize } = useResponsiveGrid()
 
   const IconCommission = iconCommission();
   const IconDel = iconDel();
@@ -499,7 +491,7 @@
     attrs: {
       currentPage: 1,
       pageSize: 10,
-      pageSizes: [5, 10, 15, 20],
+      pageSizes: [10, 20, 50, 100],
       total: 10,
       layout: 'total, sizes, prev, pager, next, jumper',
     },
@@ -730,7 +722,7 @@
 
 <style scoped lang="less">
   .user-header-btn {
-    margin: 10px 0 24px 10px;
+    margin: 0px 0px 16px;
 
     .tiny-button {
       margin: 0 8px 0 0;

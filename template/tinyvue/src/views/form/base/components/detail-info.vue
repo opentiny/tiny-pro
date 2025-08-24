@@ -13,6 +13,7 @@
             <tiny-form-item
               :label="$t('baseForm.form.label.culture')"
               prop="culture"
+              class="max-sm:mb-4"
             >
               <div>
                 <tiny-radio v-model="filterOptions.culture" label="1">{{
@@ -25,7 +26,7 @@
             </tiny-form-item>
           </tiny-col>
           <tiny-col :span="12">
-            <tiny-form-item :label="$t('baseForm.form.label.role')" prop="role">
+            <tiny-form-item :label="$t('baseForm.form.label.role')" prop="role" class="max-sm:mb-4">
               <div>
                 <tiny-radio v-model="filterOptions.role" label="1">{{
                   $t('baseForm.form.label.roleone')
@@ -40,6 +41,7 @@
             <tiny-form-item
               :label="$t('baseForm.form.label.condition')"
               prop="condition"
+              class="max-sm:mb-4"
             >
               <div>
                 <tiny-radio v-model="filterOptions.condition" label="1">{{
@@ -61,11 +63,12 @@
             <tiny-form-item
               :label="$t('baseForm.form.label.remark')"
               prop="condition"
+              class="max-sm:mb-4"
             >
               <tiny-input
-                type="textarea"
                 v-model="filterOptions.remark"
-                class="remarks"
+                type="textarea"
+                class="w-1/2 max-md:w-3/4 max-sm:w-full"
                 :placeholder="$t('searchTable.form.input')"
                 show-word-limit
                 :maxlength="1000"
@@ -125,7 +128,4 @@
 </script>
 
 <style scoped lang="less">
-  .remarks {
-    width: 500px;
-  }
 </style>

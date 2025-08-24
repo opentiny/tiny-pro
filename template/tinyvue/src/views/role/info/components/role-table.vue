@@ -14,8 +14,11 @@
   import { ITreeNodeData } from '@/router/guard/menu';
   import { useI18n } from 'vue-i18n';
   import useLoading from '@/hooks/loading';
+  import { useResponsiveGrid } from '@/hooks/responsive'
   import { Pager } from '@/types/global';
   import permissionTable from './permission-table.vue';
+
+  const { gridSize } = useResponsiveGrid()
   
   const props = defineProps<{
     tableData: (Role & { menus: ITreeNodeData[] })[];
@@ -82,7 +85,11 @@
     return permissionDate
   };
   const onUpdate = (args:any) => {
-    updateRole(args.row)
+    const menuIds = args.row.menus.map(menu => menu.id);
+    updateRole({
+      ...args.row,
+      menuIds
+    })
       .then(({ data }) => {
         Modal.message({
           message: t('permissionInfo.edit.success'),
@@ -119,16 +126,18 @@
     :pager="props.pagerConfig"
      :edit-config="{ trigger: 'click', mode: 'cell', showStatus: true }"
     remote-filter
+    :size="gridSize"
+    align="center"
     @edit-closed="onUpdate"
   >
-    <tiny-grid-column type="expand" width="60">
+    <tiny-grid-column type="expand" width="5%">
       <template #default="data">
         <permission-table :permission="data.row.permission" />
       </template>
     </tiny-grid-column>
     <tiny-grid-column
       field="id"
-      width="100"
+      width="20%"
       :title="$t('roleInfo.table.id')"
     ></tiny-grid-column>
     <tiny-grid-column
@@ -138,7 +147,7 @@
       :editor="{ component: 'input', autoselect: true }"
     ></tiny-grid-column>
     <tiny-grid-column
-    field="permissionIds" 
+    field="permissionIds"
     :title="$t('roleInfo.table.desc')"
     show-overflow="tooltip"
     :editor="{
@@ -156,7 +165,7 @@
           {{ getPermission(data.row) }}
       </template>
     </tiny-grid-column>
-    <tiny-grid-column :title="$t('roleInfo.table.operations')" align="center">
+    <tiny-grid-column :title="$t('roleInfo.table.operations')">
       <template #default="data">
         <iconCueL class="del-icon"></iconCueL>
         <a
@@ -203,8 +212,11 @@
   .del-icon{
     fill: #1890ff;
     margin-right: 8px;
-    margin-left: 16px;;
     font-size: 16px;
     margin-top: -3px;
   }
+  .operation-update:hover{
+    text-decoration: underline;
+  }
+
 </style>

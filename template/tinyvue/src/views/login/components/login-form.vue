@@ -40,7 +40,7 @@
   .login-form-language {
     position: absolute;
     top: 10%;
-    left: 93%;
+    left: 90%;
   }
 
   :deep(.tiny-tabs__content) {
@@ -56,9 +56,18 @@
     .login-form-language {
       position: absolute;
       top: 10%;
-      left: 90%;
+      left: 78%;
     }
   }
+
+  @media (max-width: @screen-mm) {
+    .login-form-language {
+      position: absolute;
+      top: 8%;
+      left: 75%;
+    }
+  }
+
   @media (max-width: @screen-ms) {
     .login-form-language {
       position: absolute;
@@ -66,11 +75,5 @@
       left: 72%;
     }
   }
-  @media (min-width: @screen-mm) {
-    .login-form-language {
-      position: absolute;
-      top: 3%;
-      left: 86%;
-    }
-  }
+  
 </style>
