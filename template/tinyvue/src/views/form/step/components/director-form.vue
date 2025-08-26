@@ -9,8 +9,8 @@
       label-position="top"
       class="form-base-info"
     >
-      <tiny-row :flex="true">
-        <tiny-col :span="4" label-width="100px">
+      <tiny-row class="flex flex-wrap">
+        <tiny-col label-width="100px" class="w-1/3 max-md:w-1/2 max-sm:w-full max-sm:mb-4">
           <tiny-form-item
             :label="$t('stepForm.dire.supervisor')"
             prop="director"
@@ -30,7 +30,7 @@
             </tiny-select>
           </tiny-form-item>
         </tiny-col>
-        <tiny-col :span="4" label-width="100px">
+        <tiny-col label-width="100px" class="w-1/3 max-md:w-1/2 max-sm:w-full max-sm:mb-4">
           <tiny-form-item :label="$t('stepForm.dire.remarks')" prop="remark">
             <tiny-input
               v-model="state.filterOptions.remark"
@@ -38,7 +38,7 @@
             ></tiny-input>
           </tiny-form-item>
         </tiny-col>
-        <tiny-col :span="4" label-width="100px">
+        <tiny-col label-width="100px" class="w-1/3 max-md:w-1/2 max-sm:w-full max-sm:mb-4">
           <tiny-form-item
             :label="$t('stepForm.dire.startTime')"
             prop="startTime"
@@ -49,9 +49,7 @@
             ></tiny-date-picker>
           </tiny-form-item>
         </tiny-col>
-      </tiny-row>
-      <tiny-row :flex="true">
-        <tiny-col :span="4" label-width="100px">
+        <tiny-col label-width="100px" class="w-1/3 max-md:w-1/2 max-sm:w-full max-sm:mb-4">
           <tiny-form-item :label="$t('stepForm.dire.endTime')" prop="endTime">
             <tiny-date-picker
               v-model="state.filterOptions.endTime"
@@ -135,10 +133,10 @@
 
   const handleBlur = () => {
     const start = new Date(
-      JSON.parse(JSON.stringify(state.filterOptions.startTime)),
+      state.filterOptions.startTime,
     ).getTime();
     const end = new Date(
-      JSON.parse(JSON.stringify(state.filterOptions.endTime)),
+      state.filterOptions.endTime,
     ).getTime();
     if (end < start) {
       state.filterOptions.endTime = '';
@@ -168,6 +166,8 @@
   defineExpose({
     directorValid,
     directorReset,
+    state,
+    disabled
   });
 </script>
 

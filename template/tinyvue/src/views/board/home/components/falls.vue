@@ -3,7 +3,7 @@
     <div class="falls">
       <img src="@/assets/images/map-background2.png" class="image" />
       <h3>{{ $t('home.falls.line') }}</h3>
-      <tiny-chart-waterfall id="flow" ref="waterFallRef" height="100%" :options="options" :extend="chartExtend" ></tiny-chart-waterfall>
+      <tiny-chart-waterfall id="flow" ref="waterFallRef" width="100%" height="100%" :options="options" :extend="chartExtend" ></tiny-chart-waterfall>
     </div>
   </div>
 </template>
@@ -189,15 +189,15 @@
 
   onMounted(() => {
     window.addEventListener('resize', () => {
-      waterFallRef.value.resize();
+      waterFallRef.value?.resize();
     });
-    nextTick(() => {
-      waterFallRef.value.resize();
-    });
+    setTimeout(() => {
+      waterFallRef.value?.resize();
+    }, 200)
   });
 
   watch(currentLocale, (newValue, oldValue) => {
-    waterFallRef.value.resize();
+    waterFallRef.value?.resize();
   });
 </script>
 

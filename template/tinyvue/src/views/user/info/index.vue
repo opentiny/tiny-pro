@@ -1,12 +1,12 @@
 <template>
   <div class="container">
     <Breadcrumb :items="['menu.user', 'menu.user.info']" />
-    <div class="container-info">
+    <div class="container-info max-md:overflow-auto">
       <div class="general-card">
-        <div class="general-top">
+        <div class="general-top flex justify-around max-sm:flex-col max-sm:items-center max-sm:pb-[10px]">
           <headtop></headtop>
         </div>
-        <div class="general-content">
+        <div class="general-content max-md:overflow-y-visible!">
           <infotab></infotab>
         </div>
       </div>
@@ -27,28 +27,31 @@
 
   .container-info {
     display: flex;
-    flex-direction: column;
+    flex-direction: column; 
     justify-content: space-between;
     width: 100%;
     height: calc(100% - 60px);
     margin: 0 auto;
 
     .general-card {
+      display: flex;
+      flex-direction: column;
       flex: 1 1 auto;
       height: 100%;
       border-radius: 10px;
 
       .general-top {
-        display: flex;
-        justify-content: space-around;
         margin: 10px -10px;
         background-image: url('@/assets/images/step-head.png');
-        background-size: cover;
+        background-size: 100% 100%;
+        flex-shrink: 0;
+        overflow: hidden;
       }
 
       .general-content {
         position: relative;
-        height: calc(100% - 198px);
+        flex: 1 1 auto;
+        overflow-y: auto;
         color: black;
         font-size: medium;
         background-color: #fff;

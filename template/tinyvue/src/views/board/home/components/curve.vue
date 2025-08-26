@@ -1,9 +1,9 @@
 <template>
   <div class="curve-box">
+    <img src="@/assets/images/map-background3.png" class="image" />
+    <h3>{{ $t('home.curve.trend') }}</h3>
     <div class="curve">
-      <img src="@/assets/images/map-background3.png" class="image" />
-      <h3>{{ $t('home.curve.trend') }}</h3>
-      <tiny-chart-histogram ref="chartRef" height="100%" :data-zoom="dataZoom" :options="options" :extend="chartExtend"></tiny-chart-histogram>
+      <tiny-chart-histogram ref="chartRef" width="100%" height="100%" :data-zoom="dataZoom" :options="options" :extend="chartExtend" class="max-sm:pt-[10%]"></tiny-chart-histogram>
     </div>
   </div>
 </template>
@@ -16,6 +16,23 @@
 
   const { t } = useI18n();
   const { currentLocale } = useLocale();
+
+  const getLegendConfig = () => {
+    const isMobile = window.innerWidth < 768;
+    return {
+      data: [t('home.main.down'), t('home.curve.play'), t('home.curve.page')],
+      top: '10',
+      left: 'center',
+      icon: '',
+      itemHeight: 16,
+      itemWidth: isMobile ? 22 : 26,
+      itemGap: isMobile ? 10 : 30,
+      textStyle: {
+        fontSize: isMobile ? 11 : 14
+      },
+    };
+  };
+
   const chartRef = ref()
   const dataZoom = ref([
       {
@@ -74,13 +91,7 @@
     ]
   })
   const chartExtend = ref({
-    legend: {
-      data: [t('home.main.down'), t('home.curve.play'), t('home.curve.page')],
-      top: '10',
-      icon: '',
-      itemHeight: 16,
-      itemWidth: 26,
-    },
+    legend: getLegendConfig(),
     tooltip: {
       trigger: 'axis',
       axisPointer: {
@@ -203,11 +214,11 @@
 
   onMounted(() => {
     window.addEventListener('resize', () => {
-      chartRef.value.resize();
+      chartRef.value?.resize();
     });
-    nextTick(() => {
-      chartRef.value.resize();
-    });
+    setTimeout(() => {
+      chartRef.value?.resize();
+    }, 200)
   });
 
   watch(currentLocale, (newValue, oldValue) => {
@@ -226,7 +237,7 @@
       chartExtend.value.series[1].name = 'Visible on the first screen';
       chartExtend.value.series[2].name = 'Page Onload';
     }
-    chartRef.value.resize();
+    chartRef.value?.resize();
   });
 </script>
 

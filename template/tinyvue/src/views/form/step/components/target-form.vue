@@ -2,8 +2,8 @@
   <div class="contain">
     <tiny-transfer
       ref="targetFormRef"
-      v-model="length"
-      :data="arr"
+      v-model="targetModel"
+      :data="targetData"
       :titles="[$t('stepForm.target.list'), $t('stepForm.target.sure')]"
     ></tiny-transfer>
   </div>
@@ -21,20 +21,20 @@
 
   // 初始化请求数据
   const targetFormRef = ref();
-  const arr: data[] = reactive([]);
+  const targetData: data[] = reactive([]);
   for (let i = 0; i <= 15; i += 1) {
-    arr.push({
+    targetData.push({
       key: i,
       label: `Options ${i}`,
       disabled: false,
     });
   }
 
-  const length = ref([]);
+  const targetModel = ref([]);
 
   const targetSubmit = () => {
-    if (length.value.length > 0) {
-      arr.forEach((item) => {
+    if (targetModel.value?.length) {
+      targetData.forEach((item) => {
         item.disabled = true;
       });
       return true;
@@ -43,12 +43,13 @@
   };
 
   const targetReset = () => {
-    length.value = [];
+    targetModel.value = [];
   };
 
   defineExpose({
     targetReset,
     targetSubmit,
+    targetModel,
   });
 </script>
 

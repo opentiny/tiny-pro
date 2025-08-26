@@ -13,9 +13,12 @@
   import { HwcClientService } from '@/utils/hwcClient.service';
   import { sortTime } from '@/utils/time';
   import { reactive, ref } from 'vue';
+  import { useResponsiveGrid } from '@/hooks/responsive'
   import edit from './components/edit/index.vue';
   import create from './components/create/index.vue';
   import deletes from './components/delete/index.vue';
+
+  const { gridSize } = useResponsiveGrid()
 
   const contractApigInfo: ApigInfo = {
     apigName: 'apig_contract',
@@ -193,8 +196,9 @@
       :auto-load="true"
       :pager="pagerConfig"
       :loading="loading"
-      size="medium"
+      :size="gridSize"
       :auto-resize="true"
+      align="center"
     >
       <template #toolbar>
         <tiny-grid-toolbar>

@@ -1,14 +1,12 @@
 <template>
   <div class="region-box">
-    <div class="region">
-      <div>
-        <div class="region-title">
-          <img src="@/assets/images/map-background3.png" class="image" />
-          <h3>{{ $t('home.region.title') }}</h3>
-        </div>
-        <tiny-chart-map v-if="chartSettings.mapOrigin" id="earth" ref="mapChartsRef" :settings="chartSettings" :data="chartData" :visual-map="visualMap" :legend-visible="legendVisible"></tiny-chart-map>
-      </div>
-      <div class="region-from">
+    <div class="region-title">
+      <img src="@/assets/images/map-background3.png" class="image" />
+      <h3>{{ $t('home.region.title') }}</h3>
+    </div>
+    <div class="region flex w-full max-md:flex-col max-md:items-center">
+      <tiny-chart-map v-if="chartSettings.mapOrigin" ref="mapChartsRef" :width="chartWidth" :settings="chartSettings" :data="chartData" :visual-map="visualMap" :legend-visible="legendVisible"></tiny-chart-map>
+      <div class="region-from w-[46vw] ml-[5%]  max-md:w-[100%] max-md:ml-[0%] max-md:pt-[5%] max-sm:pt-[10%]">
         <RegionTable></RegionTable>
       </div>
     </div>
@@ -16,7 +14,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, ref, nextTick } from 'vue';
+  import { onMounted, onUnmounted, ref, computed, nextTick } from 'vue';
   import { TinyHuichartsMap as TinyChartMap } from '@opentiny/vue-huicharts'
   import chinaData from '@/assets/china.json'
   import RegionTable from './regiontable.vue';
@@ -95,9 +93,8 @@
   const legendVisible = ref(false)
   const visualMap = ref({
     show: true,
-    top: '-5px',
-    x: 'left',
-    y: 'bottom',
+    top: 'bottom',
+    left: 'left',
     realtime: false,
     splitList: [
       { start: 5000, end: 500000 },
@@ -110,14 +107,30 @@
     color: ['#9feaa5', '#5475f5', '#85daef', '#74e2ca', '#e6ac53', '#9fb5ea'],
   })
 
+  const windowWidth = ref(0)
+  const handleResize = () => {
+    windowWidth.value = window.innerWidth
+  }
+  const onResizeChart = () => {
+    mapChartsRef.value?.resize();
+  };
+
   onMounted(() => {
-    window.addEventListener('resize', () => {
-      mapChartsRef.value.resize();
-    });
-    nextTick(() => {
-      mapChartsRef.value.resize();
-    });
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('resize', onResizeChart);
+    handleResize();
+    onResizeChart();
+    setTimeout(() => {
+      mapChartsRef.value?.resize();
+    }, 200)
   });
+
+  onUnmounted(() => {
+    window.removeEventListener('resize', handleResize);
+    window.removeEventListener('resize', onResizeChart);
+  });
+
+  const chartWidth = computed(() => windowWidth.value <= 768 ? '80vw' : '30vw')
 </script>
 
 <style scoped lang="less">
@@ -130,27 +143,20 @@
   }
 
   .region {
-    display: flex;
-    justify-content: space-between;
-
-    .region-title {
-      display: flex;
-    }
-
-    h3 {
-      width: 300px;
-      margin-top: 1.5%;
-      margin-left: 10px;
-      color: #524343;
-      font-weight: 700;
-      font-size: 18px;
-    }
+    justify-content: space-between;    
   }
 
-  #earth {
-    width: 32vw;
-    height: 358px;
-    margin-left: 15%;
+  .region-title {
+    display: flex;
+  }
+
+  h3 {
+    width: 300px;
+    margin-top: 1.5%;
+    margin-left: 10px;
+    color: #524343;
+    font-weight: 700;
+    font-size: 18px;
   }
 
   .image {
@@ -163,9 +169,4 @@
     opacity: 0.6;
   }
 
-  .region-from {
-    width: 46vw;
-    margin-top: 2%;
-    margin-left: 5%;
-  }
 </style>

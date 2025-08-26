@@ -1,8 +1,8 @@
 <template>
   <div class="table">
-    <tiny-grid ref="expandGrid" :data="tableData" :auto-resize="true">
-      <tiny-grid-column type="index" width="60"></tiny-grid-column>
-      <tiny-grid-column type="expand" width="60">
+    <tiny-grid ref="expandGrid" :data="tableData" :auto-resize="true" :size="gridSize" align="center">
+      <tiny-grid-column type="index" width="10%"></tiny-grid-column>
+      <tiny-grid-column type="expand" width="10%">
         <template #default="data">
           <ul>
             <li>
@@ -52,6 +52,9 @@
     GridColumn as TinyGridColumn,
     Grid as TinyGrid,
   } from '@opentiny/vue';
+  import { useResponsiveGrid } from '@/hooks/responsive'
+
+  const { gridSize } = useResponsiveGrid()
 
   const props = defineProps({
     // eslint-disable-next-line vue/require-prop-types

@@ -1,8 +1,8 @@
 <template>
   <div class="mentor-detail">
     <div class="detail-header">{{ $t('baseForm.form.label.mentortitle') }}</div>
-    <tiny-row :flex="true" class="detail-row" noSpace>
-      <tiny-col :span="3">
+    <tiny-row class="flex flex-wrap detail-row" noSpace>
+      <tiny-col class="w-1/4 max-md:w-1/2 max-sm:w-full">
         <div class="title pad-title">
           {{ $t('menu.plan.pool') }}
         </div>

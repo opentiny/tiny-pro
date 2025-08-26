@@ -1,6 +1,6 @@
 <template>
-  <grid :data="permission">
-    <grid-column type="index" width="60"></grid-column>
+  <grid :data="permission" :size="gridSize" align="center">
+    <grid-column type="index" width="10%"></grid-column>
     <grid-column
       field="name"
       :title="$t('roleInfo.permissionTable.name')"
@@ -17,6 +17,9 @@
   import type { Permission } from '@/api/permission';
   import { Grid, GridColumn } from '@opentiny/vue';
   import { toRefs, watch } from 'vue';
+  import { useResponsiveGrid } from '@/hooks/responsive'
+
+  const { gridSize } = useResponsiveGrid()
 
   const props = defineProps<{
     permission: Permission[];
