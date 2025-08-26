@@ -92,7 +92,7 @@ export class UserController {
 
   @Reject()
   @Post('/batch')
-  @Permission('user:batch-remove')
+  @Permission('user::batch-remove')
   async batchRemoveUser(@Body() emails: string[]) {
     return this.userService.batchDeleteUser(emails);
   }
