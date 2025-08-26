@@ -22,7 +22,9 @@ TinyPro 是 TinyCLI 的一个套件，是一个开箱即用、前后端分离的
 
 ## 一行命令初始化一个后台管理模板
 
-请确保您安装了`Node.js`、`NPM`、`TinyCLI`。
+请确保您安装了
+（1）Nestjs后端：`Node.js`、`NPM`、`TinyCLI`
+（2）Springboot后端：`Node.js`、`NPM`、`TinyCLI`，jdk17，maven
 
 ```bash
 tiny init pro
@@ -32,7 +34,7 @@ tiny init pro
 
 ```
 tiny-pro
-  nestJs    # 后端服务
+  nestJs/SpringBoot    # 后端服务
   web       # 前端服务
 ```
 
@@ -44,8 +46,12 @@ tiny-pro
 
 请确保您安装了 `Docker`。
 
-在 `tiny-pro/nestJs` 下执行以下命令，启动后端服务：
+(1)Nestjs:在 `tiny-pro/nestJs` 下执行以下命令，启动后端服务：
 
+```bash
+docker compose up -d
+```
+(2)Springboot:在`tiny-pro/Springboot` 下执行以下命令，启动后端服务
 ```bash
 docker compose up -d
 ```
@@ -61,12 +67,16 @@ docker compose up -d
 - MySQL 中存在 `.env` 文件中 `DATABASE_NAME` 字段定义的数据库，且该数据库为空
 - `.env` 文件中 `DATABASE_SYNCHRONIZE` 为 `true`
 
-完成上述检查后，您可以在 `tiny-pro/nestJs` 下执行以下命令，启动后端服务：
+完成上述检查后，
+（1）Nestjs:您可以在 `tiny-pro/nestJs` 下执行以下命令，启动后端服务：
 
 ```bash
 npm i && npm start
 ```
-
+(2)Springboot:您可以在 `tiny-pro/Springboot` 下执行以下命令，启动后端服务：
+```bash
+java -jar  打包后的jar包路径 可以带加盐参数例如：jwt.secret=0Zi4SA== 是否开始演示模式：reject.start=true
+```
 ## 前端启动
 
 在 `tiny-pro/web` 下依次执行以下命令：
@@ -87,6 +97,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
+
 <table>
   <tbody>
     <tr>
