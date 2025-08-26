@@ -3,6 +3,8 @@ package com.TinyPro.controller;
 import com.TinyPro.entity.po.Employee;
 import com.TinyPro.service.IEmployeeService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +27,7 @@ public class EmployeesController {
     }
 
     @GetMapping("getEmployee/{id}")
-    public ResponseEntity<Employee> findOne(@PathVariable String id) {
+    public ResponseEntity<Employee> findOne(@PathVariable @NotEmpty(message = "{NOT_EMPTY}") String id) {
         return new ResponseEntity<>(employeeService.getById(id), HttpStatus.OK);
     }
 }

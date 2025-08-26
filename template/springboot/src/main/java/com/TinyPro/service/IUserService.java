@@ -17,7 +17,7 @@ public interface IUserService  {
 
     List<Permission> getRoleByUserId(User user);
 
-    ResponseEntity<User> getUserInfo(String email);
+    ResponseEntity<UserVo> getUserInfo(String email);
 
     ResponseEntity<UserVo> removeUserInfo(String email);
 

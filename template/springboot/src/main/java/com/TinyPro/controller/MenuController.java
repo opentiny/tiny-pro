@@ -7,6 +7,8 @@ import com.TinyPro.entity.dto.UpdateMenuDto;
 import com.TinyPro.entity.po.Menu;
 import com.TinyPro.entity.vo.MenuVo;
 import com.TinyPro.service.IMenuService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +23,7 @@ public class MenuController {
     private IMenuService iMenuService;
 
     @GetMapping("/role/{email}")
-    public ResponseEntity<List<MenuVo>> getMenus(@PathVariable String email) {
+    public ResponseEntity<List<MenuVo>> getMenus(@PathVariable @NotEmpty(message = "{NOT_EMPTY}") String email) {
         return iMenuService.getMenubyEmail(email);
     }
 
@@ -34,7 +36,7 @@ public class MenuController {
     @Reject
     @PermissionAnnotation("menu::add")
     @PostMapping
-    public ResponseEntity<Menu> createMenu(@RequestBody CreateMenuDto createMenuDto) {
+    public ResponseEntity<Menu> createMenu(@RequestBody @Valid CreateMenuDto createMenuDto) {
         boolean b = false;
         return iMenuService.createMenu(createMenuDto, b);
     }
@@ -42,14 +44,14 @@ public class MenuController {
     @PatchMapping
     @Reject
     @PermissionAnnotation("menu::update")
-    public ResponseEntity<Boolean> updateMenu(@RequestBody UpdateMenuDto updateMenuDto) {
+    public ResponseEntity<Boolean> updateMenu(@RequestBody @Valid UpdateMenuDto updateMenuDto) {
         return iMenuService.updateMenu(updateMenuDto);
     }
 
     @DeleteMapping
     @Reject
     @PermissionAnnotation("menu::remove")
-    public ResponseEntity<Menu> deleteMenu(@Param("id") Integer id, @Param("parentId") Integer parentId) {
+    public ResponseEntity<Menu> deleteMenu(@RequestParam("id") Integer id, @RequestParam("parentId") Integer parentId) {
         return iMenuService.deleteMenu(id, parentId);
     }
 }

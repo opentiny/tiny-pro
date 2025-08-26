@@ -8,6 +8,7 @@ import com.TinyPro.entity.po.Role;
 import com.TinyPro.entity.vo.RolePMVo;
 import com.TinyPro.entity.vo.RoleSimpleVo;
 import com.TinyPro.service.IRoleService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +25,7 @@ public class RoleController {
     @Reject()
     @PermissionAnnotation("role::add")
     @PostMapping()
-    public ResponseEntity<Role> create(@RequestBody CreateRoleDto createRoleDto) {
+    public ResponseEntity<Role> create(@RequestBody @Valid CreateRoleDto createRoleDto) {
         return this.roleService.createRole(createRoleDto, false);
     }
 
@@ -57,7 +58,7 @@ public class RoleController {
     @PermissionAnnotation("role::update")
     @PatchMapping()
     @Reject
-    public ResponseEntity<Role> updateRole(@RequestBody UpdateRoleDto updateRoleDto) {
+    public ResponseEntity<Role> updateRole(@RequestBody @Valid UpdateRoleDto updateRoleDto) {
        return this.roleService.updateRole(updateRoleDto);
 
     }

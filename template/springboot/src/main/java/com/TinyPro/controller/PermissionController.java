@@ -8,6 +8,8 @@ import com.TinyPro.entity.page.PageWrapper;
 import com.TinyPro.entity.po.Permission;
 import com.TinyPro.entity.vo.PermissionVo;
 import com.TinyPro.service.IPermissionService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +25,7 @@ public class PermissionController {
     @PostMapping()
     @Reject()
     @PermissionAnnotation("permission::add")
-    public ResponseEntity<PermissionVo> create(@RequestBody CreatePermissionDto createPermissionDto) {
+    public ResponseEntity<PermissionVo> create(@RequestBody @Valid CreatePermissionDto createPermissionDto) {
         boolean b = false;
         return iPermissionService.create(createPermissionDto, b);
     }
@@ -31,7 +33,7 @@ public class PermissionController {
     @PatchMapping()
     @Reject
     @PermissionAnnotation("permission::update")
-    public ResponseEntity<PermissionVo> updatePermission(@RequestBody UpdatePermissionDto updatePermissionDto) {
+    public ResponseEntity<PermissionVo> updatePermission(@RequestBody @Valid UpdatePermissionDto updatePermissionDto) {
         return iPermissionService.updatePermission(updatePermissionDto);
     }
 
@@ -51,7 +53,7 @@ public class PermissionController {
     @DeleteMapping("/{id}")
     @Reject()
     @PermissionAnnotation("permission::remove")
-    public ResponseEntity<CreatePermissionDto> del(@PathVariable Integer id) {
+    public ResponseEntity<CreatePermissionDto> del(@PathVariable @NotNull(message = "{NOT_EMPTY}") Integer id) {
         return iPermissionService.delPermission(id);
     }
 }

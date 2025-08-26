@@ -8,7 +8,7 @@ import lombok.Data;
 import java.util.List;
 @Data
 public class CreateRoleDto {
-    @NotBlank
+    @NotBlank(message = "{NOT_EMPTY}")
     private String name;
 
     @NotNull(message = "{NOT_NULL}")

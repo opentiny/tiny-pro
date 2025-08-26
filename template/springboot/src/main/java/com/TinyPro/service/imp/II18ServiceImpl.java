@@ -91,7 +91,7 @@ public class II18ServiceImpl implements II18Service {
             Integer page,
             Integer limit,
             Boolean allBool,
-            List<String> lang,
+            List<Integer> lang,
             String key,
             String content
     ) {
@@ -110,8 +110,8 @@ public class II18ServiceImpl implements II18Service {
             List<Predicate> predicates = new ArrayList<>();
 
             // 按 lang.name 过滤
-            if (lang != null && !lang.isEmpty()) {
-                predicates.add(root.get("lang").get("name").in(lang));
+            if (lang != null) {
+                predicates.add(cb.in(root.get("lang").get("id")).value(lang));
             }
 
             // 按 content 过滤

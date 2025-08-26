@@ -10,6 +10,8 @@ import com.TinyPro.entity.vo.I18Vo;
 import com.TinyPro.service.II18Service;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
@@ -33,7 +35,7 @@ public class I18Controller {
     }
 
     @GetMapping("/format")
-    public ResponseEntity<Map<String, Map<String, String>>> getFormat(@Param("lang") String lang, HttpServletRequest request) {
+    public ResponseEntity<Map<String, Map<String, String>>> getFormat(@RequestParam("lang") String lang, HttpServletRequest request) {
         Map<String, Map<String, String>> result = i18Service.getFormat(lang,request);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
@@ -44,7 +46,7 @@ public class I18Controller {
     public ResponseEntity<PageWrapper<I18Vo>> findAll(@RequestParam(defaultValue = "1") Integer page,
                                                       @RequestParam(defaultValue = "0") Integer limit,
                                                       @RequestParam(required = false) Integer all,
-                                                      @RequestParam(defaultValue = "") List<String> lang, // 或 List<Integer>
+                                                      @RequestParam (required = false)List<Integer> lang,
                                                       @RequestParam(required = false) String key,
                                                       @RequestParam(required = false) String content) {
         boolean allBool = !(all != null && all != 0);
@@ -53,14 +55,14 @@ public class I18Controller {
 
     @PermissionAnnotation("i18n::query")
     @GetMapping("{id}")
-    public ResponseEntity<I18Vo> findOne(@PathVariable Integer id) {
+    public ResponseEntity<I18Vo> findOne(@PathVariable @NotNull(message = "{NOT_EMPTY}") Integer id) {
         return new ResponseEntity<I18Vo>(i18Service.getI18ById(id), HttpStatus.OK);
     }
 
     @PatchMapping("/{id}")
     @PermissionAnnotation("i18n::update")
     public ResponseEntity<I18Vo> update(
-            @PathVariable Long id,
+            @PathVariable @NotNull(message = "{NOT_EMPTY}") Long id,
             @RequestBody @Valid UpdateI18Dto dto) {
         return i18Service.updateByi18nId(id, dto);
     }
@@ -68,14 +70,14 @@ public class I18Controller {
     @Reject()
     @PermissionAnnotation("i18n::remove")
     @DeleteMapping("/{id}")
-    public ResponseEntity<I18> remove(@PathVariable Integer id) {
+    public ResponseEntity<I18> remove(@PathVariable @NotNull(message = "{NOT_EMPTY}") Integer id) {
         I18 result = i18Service.removei18ById(id);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
     @Reject()
     @PostMapping("/batch")
-    @PermissionAnnotation("user:batch-remove")
-    public ResponseEntity<List<I18>> batchRemoveUser(@RequestBody List<Long> ids) {
+    @PermissionAnnotation("i18n::batch-remove")
+    public ResponseEntity<List<I18>> batchRemove(@RequestBody List<Long> ids) {
         return this.i18Service.batchDeleteUser(ids);
     }
 }

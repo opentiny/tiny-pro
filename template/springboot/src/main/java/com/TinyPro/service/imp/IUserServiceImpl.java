@@ -116,13 +116,14 @@ public class IUserServiceImpl implements IUserService {
     }
 
     @Override
-    public ResponseEntity<User> getUserInfo(String email) {
+    public ResponseEntity<UserVo> getUserInfo(String email) {
         Optional<User> byEmail = iUserRepository.findByEmail(email);
         if (byEmail.isEmpty()) {
             throw new BusinessException("exception.common.unauth");
         }
         User user = byEmail.get();
-        return ResponseEntity.ok(user);
+        UserVo userVo = UserVo.fromEntity(user);
+        return ResponseEntity.ok(userVo);
     }
 
     @Override

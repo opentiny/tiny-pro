@@ -16,5 +16,5 @@ public class UpdatePwdAdminDto {
     @JsonProperty("newPassword")
     private String newPassword;
     @JsonProperty("confirmNewPassword")
-    private String confirmNewPassword; // 可选字段
+    private String confirmNewPassword;
 }

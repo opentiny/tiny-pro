@@ -29,5 +29,6 @@ public class Lang implements Serializable {
 
     @OneToMany(mappedBy = "lang", fetch = FetchType.LAZY)
     @JsonBackReference
+    @JsonIgnore
     private List<I18> i18ns;
 }

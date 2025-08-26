@@ -5,6 +5,8 @@ import com.TinyPro.annotation.Reject;
 import com.TinyPro.entity.dto.CreateLangDto;
 import com.TinyPro.entity.po.Lang;
 import com.TinyPro.service.ILangService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +23,7 @@ public class LangController {
     @Reject()
     @PermissionAnnotation("lang::add")
     @PostMapping
-    public ResponseEntity<Lang> createLang(@RequestBody CreateLangDto createLangDto) {
+    public ResponseEntity<Lang> createLang(@RequestBody @Valid CreateLangDto createLangDto) {
         return this.langService.create(createLangDto);
     }
 
@@ -35,8 +37,8 @@ public class LangController {
     @PermissionAnnotation("lang::update")
     @PatchMapping("/{id}")
    public ResponseEntity<Lang> updateLang(
-            @Param("id")Integer id,
-            @RequestBody(required = false) CreateLangDto createLangDto
+            @Param("id") @NotNull(message = "{NOT_EMPTY}") Integer id,
+            @RequestBody(required = false)@Valid CreateLangDto createLangDto
     ) {
         return this.langService.update(id, createLangDto);
     }
@@ -44,7 +46,7 @@ public class LangController {
     @Reject()
     @PermissionAnnotation("lang::remove")
     @DeleteMapping("/{id}")
-     public ResponseEntity<Lang> removeLang(@PathVariable Integer id) {
+     public ResponseEntity<Lang> removeLang(@PathVariable @NotNull(message = "{NOT_EMPTY}") Integer id) {
         return this.langService.remove(id);
     }
 }
