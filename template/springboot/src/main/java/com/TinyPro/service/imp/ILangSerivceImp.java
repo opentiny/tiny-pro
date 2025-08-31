@@ -27,7 +27,10 @@ public class ILangSerivceImp  implements ILangService {
     @Override
     @Transactional
     public ResponseEntity<Lang> create(CreateLangDto createLangDto) {
-        Lang byName = langRepository.findByName(createLangDto.getName()).orElseThrow(() ->  new BusinessException("exception.lang.exists", HttpStatus.CONFLICT, null));
+        Optional<Lang> langOptional = langRepository.findByName(createLangDto.getName());
+        if (langOptional.isPresent()) {
+            throw new BusinessException("exception.lang.exists", HttpStatus.CONFLICT, null);
+        }
         Lang lang = new Lang();
         lang.setName(createLangDto.getName());
         Lang save = langRepository.save(lang);
@@ -42,8 +45,7 @@ public class ILangSerivceImp  implements ILangService {
     @Override
     @Transactional
     public ResponseEntity<Lang> update(Integer id, CreateLangDto createLangDto) {
-        Lang byId = langRepository.findById(Long.valueOf(id)) .orElseThrow(() -> new BusinessException("exception.lang.notExistsCommon", HttpStatus.NOT_FOUND, null));
-        Lang lang = new Lang();
+        Lang lang = langRepository.findById(Long.valueOf(id)) .orElseThrow(() -> new BusinessException("exception.lang.notExistsCommon", HttpStatus.NOT_FOUND, null));
         lang.setName(createLangDto.getName());
         Lang save = langRepository.save(lang);
         return ResponseEntity.ok(save);

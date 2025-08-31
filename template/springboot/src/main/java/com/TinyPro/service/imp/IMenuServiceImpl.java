@@ -98,7 +98,7 @@ import java.util.stream.Collectors;
         }
 
         if (existingMenu.isPresent() && !isInit) {
-            throw new BusinessException("menu.exists", HttpStatus.BAD_REQUEST, null);
+            throw new BusinessException("exception.menu.exists", HttpStatus.BAD_REQUEST, null);
         }
 
         // 创建新菜单

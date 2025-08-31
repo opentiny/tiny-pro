@@ -123,10 +123,14 @@ public class IUserServiceImpl implements IUserService {
     @Override
     @Transactional
     public ResponseEntity<UserVo> removeUserInfo(String email) {
-        User user = iUserRepository.findByEmail(email).orElseThrow(() -> new BusinessException("exception.user.userNumberNull"));
-        iUserRepository.delete(user);
-        UserVo result = UserVo.fromEntity(user);
-        return ResponseEntity.ok(result);
+        try {
+            User user = iUserRepository.findByEmail(email).orElseThrow(() -> new BusinessException("exception.user.userNotFound", HttpStatus.NOT_FOUND, null));
+            iUserRepository.delete(user);
+            UserVo result = UserVo.fromEntity(user);
+            return ResponseEntity.ok(result);
+        } catch (Exception  e) {
+            throw new BusinessException("exception.user.userNumberNull",HttpStatus.BAD_REQUEST,null);
+        }
     }
 
     @Override
@@ -134,7 +138,7 @@ public class IUserServiceImpl implements IUserService {
     public ResponseEntity<UserVo> updateUserInfo(UpdateUserDto updateUserDto) {
         // 1. 获取用户信息并加载角色关联
         User user = iUserRepository.findByEmail(updateUserDto.getEmail())
-                .orElseThrow(() -> new BusinessException("exception.user.userExists",HttpStatus.NOT_FOUND,null));
+                .orElseThrow(() -> new BusinessException("exception.user.userNotFound",HttpStatus.NOT_FOUND,null));
 
         // 2. 获取原有角色ID字符串（用于比较）
         String originalRoleIds = user.getRole().stream()
@@ -249,7 +253,7 @@ public class IUserServiceImpl implements IUserService {
             // 3. 强制登出该用户
             redisUtil.deleteValue(Contants.UserJwtTop + user.getEmail() + Contants.UserJwtbt);
         } else {
-            throw new BusinessException("用户不存在");
+            throw new BusinessException("exception.user.userNotFound",HttpStatus.NOT_FOUND,null);
         }
         return ResponseEntity.ok(null);
     }
@@ -259,7 +263,7 @@ public class IUserServiceImpl implements IUserService {
     public void updatePwdUser(UpdatePwdUserDto dto) {
         // 1. 查询用户（使用投影只获取必要字段）
         User user = iUserRepository.findByEmail(dto.getEmail())
-                .orElseThrow(() -> new BusinessException("exception.user.notFound",HttpStatus.NOT_FOUND,null));
+                .orElseThrow(() -> new BusinessException("exception.user.userNotFound",HttpStatus.NOT_FOUND,null));
 
         // 2. 验证旧密码
         if (!verifyPassword(dto.getOldPassword(), user.getPassword(), user.getSalt())) {
