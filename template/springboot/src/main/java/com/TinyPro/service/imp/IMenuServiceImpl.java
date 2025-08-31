@@ -1,5 +1,6 @@
 package com.TinyPro.service.imp;
 
+import com.TinyPro.entity.contants.Contants;
 import com.TinyPro.entity.dto.CreateMenuDto;
 import com.TinyPro.entity.dto.UpdateMenuDto;
 import com.TinyPro.entity.po.Menu;
@@ -38,7 +39,7 @@ import java.util.stream.Collectors;
     public ResponseEntity<List<MenuVo>> getMenubyEmail(String email) {
         // 1. 通过email获取用户
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new BusinessException("用户不存在"));
+                .orElseThrow(() -> new BusinessException("exception.auth.userNotExists",HttpStatus.NOT_FOUND,null));
 
         // 2. 获取用户的所有角色ID
         Set<Integer> roleIds = user.getRole().stream()
@@ -97,7 +98,7 @@ import java.util.stream.Collectors;
         }
 
         if (existingMenu.isPresent() && !isInit) {
-            throw new BusinessException("exception.menu.exists", HttpStatus.BAD_REQUEST, null);
+            throw new BusinessException("menu.exists", HttpStatus.BAD_REQUEST, null);
         }
 
         // 创建新菜单
@@ -117,7 +118,7 @@ import java.util.stream.Collectors;
     @Override
     public ResponseEntity<Boolean> updateMenu(UpdateMenuDto updateMenuDto) {
         Menu menu = menuRepository.findById(Long.valueOf(updateMenuDto.getId()))
-                .orElseThrow(() -> new BusinessException("Menu not found"));
+                .orElseThrow(() -> new BusinessException("exception.menu.notExists",HttpStatus.NOT_FOUND,null));
 
         menu.setName(updateMenuDto.getName());
         menu.setPath(updateMenuDto.getPath());
@@ -139,7 +140,7 @@ import java.util.stream.Collectors;
             iRoleRepository.deleteByMenuId(id);
             // 查找要删除的菜单
             Menu menu = menuRepository.findById(Long.valueOf(id))
-                    .orElseThrow(() -> new BusinessException("Menu not found with id: " + id));
+                    .orElseThrow(() -> new BusinessException("exception.menu.notExists ",HttpStatus.NOT_FOUND,null));
 
             // 查找所有子菜单
             List<Menu> childMenus = menuRepository.findByParentId(id);
@@ -154,7 +155,7 @@ import java.util.stream.Collectors;
             menuRepository.delete(menu);
             return ResponseEntity.ok(menu);
         } catch (Exception e) {
-            throw new BusinessException("Failed to delete menu");
+            throw new BusinessException(Contants.NOT_FOUND,HttpStatus.NOT_FOUND,null);
         }
     }
 

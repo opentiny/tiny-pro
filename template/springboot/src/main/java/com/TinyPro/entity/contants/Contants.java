@@ -15,4 +15,6 @@ public class Contants {
     //超级权限
     public static final String ADMIN_SUPE_POWER="*";
     public static final String NO_EXIST_ERROR_RESPONSE = "Bad Request";
+    public static final String PUBLIC_ERROR = "内部错误";
+    public static final String NOT_FOUND = "Not Found";
 }

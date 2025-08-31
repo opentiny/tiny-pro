@@ -71,8 +71,8 @@ public class RoleController {
     @PermissionAnnotation("role::remove")
     @DeleteMapping("/{id}")
     @Reject
-    public ResponseEntity<List<Map<String, String>>> deleteRole(@PathVariable Integer id) {
-        return roleService.removeUserRById(id);
+    public ResponseEntity<Map<String,String>> deleteRole(@PathVariable Integer id) {
+        return roleService.removeRoleById(id);
     }
 
     @GetMapping("/info/{id}")

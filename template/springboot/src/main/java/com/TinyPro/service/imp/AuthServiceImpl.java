@@ -40,7 +40,7 @@ public class AuthServiceImpl implements IAuthService {
         wrapper.eq("email", createAuthDto.getEmail());
         Optional<User> optionalUser = userService.findByEmail(createAuthDto.getEmail());
         User user = optionalUser
-                .orElseThrow(() -> new BusinessException("exception.auth.userNotExists", HttpStatus.NOT_FOUND, null));
+                .orElseThrow(() ->  new BusinessException("exception.auth.userNotExists", HttpStatus.NOT_FOUND, null));
         if (!StringUtils.equals(Sha256Utils.encry(createAuthDto.getPassword(), user.getSalt()), user.getPassword())) {
             throw new BusinessException("exception.auth.passwordOrEmailError",HttpStatus.BAD_REQUEST,  null);
         }

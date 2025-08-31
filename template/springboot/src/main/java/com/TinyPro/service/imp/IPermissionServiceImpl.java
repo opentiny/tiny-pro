@@ -72,7 +72,7 @@ public class IPermissionServiceImpl implements IPermissionService {
         String desc = updatePermissionDto.getDesc();
 
         Permission permission = iPermissionRepository.findById(Long.valueOf(id))
-                .orElseThrow(() -> new BusinessException("exception.permission.notExists", HttpStatus.NOT_FOUND, null));
+                .orElseThrow(() ->  new BusinessException("exception.permission.notExists", HttpStatus.NOT_FOUND, null));
 
         permission.setName(name);
         permission.setDesc(desc);
@@ -125,7 +125,7 @@ public class IPermissionServiceImpl implements IPermissionService {
     public ResponseEntity<CreatePermissionDto> delPermission(Integer id) {
         CreatePermissionDto result = new CreatePermissionDto();
         Permission permission = iPermissionRepository.findById(Long.valueOf(id))
-                .orElseThrow(() -> new BusinessException("Permission not found with id: " + id));
+                .orElseThrow(() ->  new BusinessException("exception.permission.notExists",HttpStatus.NOT_FOUND,null));
 
         iPermissionRepository.delete(permission);
         BeanUtils.copyProperties(permission, result);

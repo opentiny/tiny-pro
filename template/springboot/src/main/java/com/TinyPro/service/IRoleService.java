@@ -21,7 +21,7 @@ public interface IRoleService  {
 
     ResponseEntity<Role> updateRole(UpdateRoleDto updateRoleDto);
 
-    ResponseEntity<List<Map<String, String>>> removeUserRById(Integer id);
+    ResponseEntity<Map<String, String>> removeRoleById(Integer id);
 
     ResponseEntity<List<RoleSimpleVo>> findAllRole();
 

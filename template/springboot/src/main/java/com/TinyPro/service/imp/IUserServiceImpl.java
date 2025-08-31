@@ -101,8 +101,7 @@ public class IUserServiceImpl implements IUserService {
 
     @Override
     public List<Permission> getRoleByUserId(User user) {
-        Optional<User> userOpt = iUserRepository.findByIdWithRoles(user.getId());
-        User result = userOpt.get();
+        User result = iUserRepository.findByIdWithRoles(user.getId()).orElseThrow(() -> new BusinessException("exception.user.userExists",HttpStatus.NOT_FOUND,null));
         List<Permission> resultList = new ArrayList<>();
         result.getRole()
                 .stream()
@@ -117,25 +116,16 @@ public class IUserServiceImpl implements IUserService {
 
     @Override
     public ResponseEntity<User> getUserInfo(String email) {
-        Optional<User> byEmail = iUserRepository.findByEmail(email);
-        if (byEmail.isEmpty()) {
-            throw new BusinessException("exception.common.unauth");
-        }
-        User user = byEmail.get();
+        User user = iUserRepository.findByEmail(email).orElseThrow(() -> new BusinessException("exception.common.unauth"));
         return ResponseEntity.ok(user);
     }
 
     @Override
     @Transactional
     public ResponseEntity<UserVo> removeUserInfo(String email) {
-        Optional<User> byEmail = iUserRepository.findByEmail(email);
-        if (byEmail.isEmpty()) {
-            throw new BusinessException("exception.user.userNumberNull");
-        }
-        iUserRepository.delete(byEmail.get());
-        User user = byEmail.get();
+        User user = iUserRepository.findByEmail(email).orElseThrow(() -> new BusinessException("exception.user.userNumberNull"));
+        iUserRepository.delete(user);
         UserVo result = UserVo.fromEntity(user);
-
         return ResponseEntity.ok(result);
     }
 
@@ -144,7 +134,7 @@ public class IUserServiceImpl implements IUserService {
     public ResponseEntity<UserVo> updateUserInfo(UpdateUserDto updateUserDto) {
         // 1. 获取用户信息并加载角色关联
         User user = iUserRepository.findByEmail(updateUserDto.getEmail())
-                .orElseThrow(() -> new BusinessException("User not found"));
+                .orElseThrow(() -> new BusinessException("exception.user.userExists",HttpStatus.NOT_FOUND,null));
 
         // 2. 获取原有角色ID字符串（用于比较）
         String originalRoleIds = user.getRole().stream()
@@ -244,13 +234,13 @@ public class IUserServiceImpl implements IUserService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<?> updatePwdAdmin(UpdatePwdAdminDto dto) {
         // 1. 查询用户
         Optional<User> userOpt = iUserRepository.findByEmail(dto.getEmail()); // 使用投影只查询必要字段
 
         if (userOpt.isPresent()) {
             User user = userOpt.get();
-
             // 2. 更新密码
             String encryptedPwd = encryptPassword(dto.getNewPassword(), user.getSalt());
             user.setPassword(encryptedPwd);
@@ -265,10 +255,11 @@ public class IUserServiceImpl implements IUserService {
     }
 
     @Override
+    @Transactional
     public void updatePwdUser(UpdatePwdUserDto dto) {
         // 1. 查询用户（使用投影只获取必要字段）
         User user = iUserRepository.findByEmail(dto.getEmail())
-                .orElseThrow(() -> new BusinessException("exception.user.notFound"));
+                .orElseThrow(() -> new BusinessException("exception.user.notFound",HttpStatus.NOT_FOUND,null));
 
         // 2. 验证旧密码
         if (!verifyPassword(dto.getOldPassword(), user.getPassword(), user.getSalt())) {

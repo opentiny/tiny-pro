@@ -25,11 +25,9 @@ public class ILangSerivceImp  implements ILangService {
     private I18Repository i18Repository;
 
     @Override
+    @Transactional
     public ResponseEntity<Lang> create(CreateLangDto createLangDto) {
-        Optional<Lang> byName = langRepository.findByName(createLangDto.getName());
-        if (!byName.isEmpty()) {
-            throw new BusinessException("exception.lang.exists", HttpStatus.CONFLICT, null);
-        }
+        Lang byName = langRepository.findByName(createLangDto.getName()).orElseThrow(() ->  new BusinessException("exception.lang.exists", HttpStatus.CONFLICT, null));
         Lang lang = new Lang();
         lang.setName(createLangDto.getName());
         Lang save = langRepository.save(lang);
@@ -42,11 +40,9 @@ public class ILangSerivceImp  implements ILangService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<Lang> update(Integer id, CreateLangDto createLangDto) {
-        Optional<Lang> byId = langRepository.findById(Long.valueOf(id));
-        if (byId.isEmpty()) {
-            throw new BusinessException("exception.lang.notExistsCommon", HttpStatus.NOT_FOUND, null);
-        }
+        Lang byId = langRepository.findById(Long.valueOf(id)) .orElseThrow(() -> new BusinessException("exception.lang.notExistsCommon", HttpStatus.NOT_FOUND, null));
         Lang lang = new Lang();
         lang.setName(createLangDto.getName());
         Lang save = langRepository.save(lang);
@@ -56,8 +52,7 @@ public class ILangSerivceImp  implements ILangService {
     @Override
     @Transactional
     public ResponseEntity<Lang> remove(Integer id) {
-        Optional<Lang> byId = langRepository.findById(Long.valueOf(id));
-        Lang lang = byId.orElseThrow(() -> new BusinessException("exception.lang.notExistsCommon", HttpStatus.NOT_FOUND, null));
+        Lang lang = langRepository.findById(Long.valueOf(id)).orElseThrow(() -> new BusinessException("exception.lang.notExistsCommon", HttpStatus.NOT_FOUND, null));
         i18Repository.deleteByLangId(lang.getId());
         langRepository.deleteById(Long.valueOf(id));
         return ResponseEntity.ok(lang);
