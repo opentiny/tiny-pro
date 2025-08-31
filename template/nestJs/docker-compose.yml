@@ -9,6 +9,8 @@ services:
       MYSQL_DATABASE: demo_tiny_pro
     ports:
       - "3306:3306"
+    command:
+      - --mysql-native-password=ON
   redis:
     image: redis
     ports:
