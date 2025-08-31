@@ -24,6 +24,7 @@ export type Pager = {
   layout: string;
   total: number;
   pageSize: number;
+  align?: 'left' | 'center' | 'right'
 };
 
 export interface AnyObject {

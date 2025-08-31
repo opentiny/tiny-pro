@@ -60,16 +60,15 @@
     permissions.value = data;
   });
   const pagerConfig = ref<{
-    component: any;
-    attrs: Pager;
+    attrs:Pager,
   }>({
-    component: TinyPager,
     attrs: {
       currentPage: 1,
       pageSize: 5,
-      pageSizes: [10, 20, 50, 100],
+      pageSizes: [5, 10, 20, 50, 100],
       total: 0,
-      layout: 'sizes, total, prev, pager, next, jumper',
+      align: 'right',
+      layout: 'total, sizes, prev, pager, next, jumper'
     },
   });
   const roleTableRef = ref();
@@ -99,7 +98,7 @@
             data.roleInfo.items.forEach((item,index) => {
                 tableData.value[index].permissionIds = [];
                 item.permission.forEach((item1) => {
-                  tableData.value[index].permissionIds.push(item1.id) 
+                  tableData.value[index].permissionIds.push(item1.id)
                 });
             });
             resolve({
