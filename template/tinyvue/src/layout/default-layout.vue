@@ -20,13 +20,12 @@
     <div v-if="disTheme">
       <tiny-modal
         v-model="disTheme"
-        :lock-scroll="true"
         show-header
         show-footer
         :title="$t('theme.title.main')"
         mask-closable="true"
-        height="922"
-        width="748"
+        height="auto"
+        :width=modalSize
       >
         <template #default>
           <Theme />
@@ -60,8 +59,11 @@
   import Menu from '@/components/menu/index.vue';
   import { useRouter } from 'vue-router';
   import { useTheme } from '@/hooks/useTheme';
+  import { useResponsiveSize } from '@/hooks/responsive'
   import locale from '@opentiny/vue-locale';
   import PageLayout from './page-layout.vue';
+
+  const { modalSize } = useResponsiveSize()
 
   // 动态切换
   const router = useRouter();

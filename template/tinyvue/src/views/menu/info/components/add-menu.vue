@@ -4,18 +4,18 @@
     :rules="rules"
     :model="menuInfo"
   >
-    <tiny-row>
-      <tiny-col :span="6">
+    <tiny-row class="flex flex-wrap">
+      <tiny-col class="w-1/2 max-sm:w-full">
         <tiny-form-item :label="$t('menuInfo.table.name')" prop="name">
           <tiny-input v-model="menuInfo.name"></tiny-input>
         </tiny-form-item>
       </tiny-col>
-      <tiny-col :span="6">
+      <tiny-col class="w-1/2 max-sm:w-full">
         <tiny-form-item :label="$t('menuInfo.table.order')" prop="order">
           <tiny-input v-model="menuInfo.order"></tiny-input>
         </tiny-form-item>
       </tiny-col>
-      <tiny-col :span="6">
+      <tiny-col class="w-1/2 max-sm:w-full">
         <tiny-form-item :label="$t('menuInfo.table.parentId')" prop="parentId">
           <tiny-select
             v-model="menuInfo.parentId"
@@ -29,7 +29,7 @@
           </tiny-select>
         </tiny-form-item>
       </tiny-col>
-      <tiny-col :span="6">
+      <tiny-col class="w-1/2 max-sm:w-full">
         <tiny-form-item :label="$t('menuInfo.table.icon')" prop="icon">
           <tiny-select
             v-model="menuInfo.icon"
@@ -41,17 +41,17 @@
           ></tiny-select>
         </tiny-form-item>
       </tiny-col>
-      <tiny-col :span="6">
+      <tiny-col class="w-1/2 max-sm:w-full">
         <tiny-form-item :label="$t('menuInfo.table.component')" prop="component">
           <tiny-input v-model="menuInfo.component"></tiny-input>
         </tiny-form-item>
       </tiny-col>
-      <tiny-col :span="6">
+      <tiny-col class="w-1/2 max-sm:w-full">
         <tiny-form-item :label="$t('menuInfo.table.path')" prop="path">
           <tiny-input v-model="menuInfo.path"></tiny-input>
         </tiny-form-item>
       </tiny-col>
-      <tiny-col :span="6">
+      <tiny-col class="w-1/2 max-sm:w-full">
         <tiny-form-item :label="$t('menuInfo.table.locale')" prop="locale">
           <tiny-select
             v-model="menuInfo.locale"

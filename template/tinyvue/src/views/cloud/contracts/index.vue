@@ -13,12 +13,12 @@
   import { HwcClientService } from '@/utils/hwcClient.service';
   import { sortTime } from '@/utils/time';
   import { reactive, ref } from 'vue';
-  import { useResponsiveGrid } from '@/hooks/responsive'
+  import { useResponsiveSize } from '@/hooks/responsive'
   import edit from './components/edit/index.vue';
   import create from './components/create/index.vue';
   import deletes from './components/delete/index.vue';
 
-  const { gridSize } = useResponsiveGrid()
+  const { gridSize, modalSize } = useResponsiveSize()
 
   const contractApigInfo: ApigInfo = {
     apigName: 'apig_contract',
@@ -266,8 +266,8 @@
         :show-footer="false"
         type="confirm"
         mask-closable="true"
-        :height="modalHeight"
-        width="589"
+        height="auto"
+        :width="modalSize"
         @confirm="confirmClick"
         @close="closeClick"
       >

@@ -62,19 +62,19 @@
       :lock-scroll="true" 
       show-header 
       show-footer 
-      width="700"  
+      :width="modalSize"  
       height="auto" 
       :title="$t('permissionInfo.modal.title.add')"
       >
         <template #default>
-          <tiny-form ref="addForm" :model="state.permissionAddData" :rules="rules">
-            <tiny-row>
-              <tiny-col :span="6">
+          <tiny-form ref="addForm" :model="state.permissionAddData" :rules="rules" label-width="90px">
+            <tiny-row class="flex flex-wrap">
+              <tiny-col class="w-1/2 max-sm:w-full">
                 <tiny-form-item :label="$t('permissionInfo.modal.input.name')" prop="name">
                   <tiny-input v-model="state.permissionAddData.name"></tiny-input>
                 </tiny-form-item>
               </tiny-col>
-              <tiny-col :span="6">
+              <tiny-col class="w-1/2 max-sm:w-full">
                 <tiny-form-item :label="$t('permissionInfo.modal.input.permission')">
                   <tiny-input v-model="state.permissionAddData.desc"></tiny-input>
                 </tiny-form-item>
@@ -131,7 +131,7 @@ import {
   IPaginationMeta,
   Pager,
 } from '@/types/global';
-import { useResponsiveGrid } from '@/hooks/responsive'
+import { useResponsiveSize } from '@/hooks/responsive'
 
 const roleGrid = ref();
 const addForm = ref();
@@ -139,7 +139,7 @@ const iconDel = IconDel();
 
 const { t } = useI18n();
 
-const { gridSize } = useResponsiveGrid()
+const { gridSize, modalSize } = useResponsiveSize()
 
 // 加载效果
 const state = reactive<{

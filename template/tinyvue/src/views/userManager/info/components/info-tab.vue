@@ -289,9 +289,8 @@
   <div v-if="state.isUserAdd">
     <tiny-modal
       v-model="state.isUserAdd"
-      :lock-scroll="true"
       height="auto"
-      width="700"
+      :width="modalSize"
       :title="$t('userInfo.modal.title.add')"
     >
       <UserAdd
@@ -309,7 +308,7 @@
       show-footer
       mask-closable="true"
       height="auto"
-      width="600"
+      :width="modalSize"
       :title="$t('userInfo.modal.title.pwdUpdate')"
     >
       <template #default>
@@ -317,19 +316,18 @@
           <tiny-form
             :model="state.pwdData"
             :rules="rules"
-            label-width="150px"
             :label-align="true"
             label-position="left"
           >
-            <tiny-row :flex="true" justify="left">
-              <tiny-col :span="10" label-width="100px">
+            <tiny-row flex justify="left">
+              <tiny-col class="w-full" label-width="100px">
                 <tiny-form-item :label="$t('userInfo.table.email')">
                   <label>{{ state.pwdData.email }}</label>
                 </tiny-form-item>
               </tiny-col>
             </tiny-row>
-            <tiny-row :flex="true" justify="left">
-              <tiny-col :span="10" label-width="100px">
+            <tiny-row flex justify="left">
+              <tiny-col class="w-full" label-width="100px">
                 <tiny-form-item
                   :label="$t('userInfo.modal.input.newPassword')"
                   prop="newPassword"
@@ -343,8 +341,8 @@
               </tiny-col>
             </tiny-row>
 
-            <tiny-row :flex="true" justify="left">
-              <tiny-col :span="10" label-width="100px">
+            <tiny-row flex justify="left">
+              <tiny-col class="w-full" label-width="100px">
                 <tiny-form-item
                   :label="$t('userInfo.modal.input.confirmNewPassword')"
                   prop="confirmNewPassword"
@@ -397,11 +395,11 @@
   import { getSimpleDate } from '@/utils/time';
   import { getAllRole } from '@/api/role';
   import { FilterType } from '@/types/global';
-  import { useResponsiveGrid } from '@/hooks/responsive'
+  import { useResponsiveSize } from '@/hooks/responsive'
   import UserAdd from '../../useradd/index.vue';
   import UserDetail from '../../user-detail/index.vue';
 
-  const { gridSize } = useResponsiveGrid()
+  const { gridSize, modalSize } = useResponsiveSize()
 
   const IconCommission = iconCommission();
   const IconDel = iconDel();
@@ -725,6 +723,7 @@
     margin: 0px 0px 16px;
 
     .tiny-button {
+      width: 96px;
       margin: 0 8px 0 0;
     }
   }

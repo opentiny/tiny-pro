@@ -19,12 +19,15 @@
   } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useDeepClone } from '@/hooks/useDeepClone';
+  import { useResponsiveSize } from '@/hooks/responsive'
   import { useMenuStore } from '@/store/modules/router';
   import { useRouter } from 'vue-router';
   import { useTabStore } from '@/store';
   import menuTree, { Node } from './menu-tree.vue';
   import UpdateForm from './update-form.vue';
   import AddMenu from './add-menu.vue';
+
+  const { modalSize } = useResponsiveSize()
 
   const { t } = useI18n();
   const vLoading = Loading.directive;
@@ -268,8 +271,8 @@
         v-model="addModal"
         show-footer
         resize
-        width="700"  
-        height="auto" 
+        :width="modalSize"
+        height="auto"
         :title="$t('menuInfo.modal.title.add')"
         @close="onAddMenuClose"
       >
@@ -297,7 +300,8 @@
         v-model="updateModal"
         show-footer
         :mask-closable="true"
-        width="700"
+        :width="modalSize"
+        height="auto"
         resize
         :title="$t('menuInfo.modal.title.update')"
         @close="onClose"
