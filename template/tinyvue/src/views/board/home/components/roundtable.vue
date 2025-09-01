@@ -34,10 +34,10 @@
     Grid as TinyGrid,
     GridColumn as TinyGridColumn,
   } from '@opentiny/vue';
-  import { useResponsiveGrid } from '@/hooks/responsive'
+  import { useResponsiveSize } from '@/hooks/responsive'
 
   const { t } = useI18n();
-  const { gridSize } = useResponsiveGrid()
+  const { gridSize } = useResponsiveSize()
 
   const pagerConfig = reactive({
     component: Pager,

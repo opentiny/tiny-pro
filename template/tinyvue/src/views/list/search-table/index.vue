@@ -259,13 +259,13 @@
   import * as XLSX from 'xlsx';
   import { t } from '@opentiny/vue-locale';
   import TransitionFadeSlideGroup from '@/components/transition/transition-fade-slide-group.vue';
-  import { useResponsiveGrid } from '@/hooks/responsive'
+  import { useResponsiveSize } from '@/hooks/responsive'
 
   const IconEditor = iconEditor();
   const IconDel = iconDel();
   const IconRefresh = iconRefresh()
   const IconSetting = iconSetting()
-  const { gridSize } = useResponsiveGrid()
+  const { gridSize } = useResponsiveSize()
   // 初始化请求数据
   interface FilterOptions {
     id: string;

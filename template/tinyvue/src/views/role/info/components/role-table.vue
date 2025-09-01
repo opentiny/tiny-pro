@@ -14,11 +14,11 @@
   import { ITreeNodeData } from '@/router/guard/menu';
   import { useI18n } from 'vue-i18n';
   import useLoading from '@/hooks/loading';
-  import { useResponsiveGrid } from '@/hooks/responsive'
+  import { useResponsiveSize } from '@/hooks/responsive'
   import { Pager } from '@/types/global';
   import permissionTable from './permission-table.vue';
 
-  const { gridSize } = useResponsiveGrid()
+  const { gridSize } = useResponsiveSize()
   
   const props = defineProps<{
     tableData: (Role & { menus: ITreeNodeData[] })[];

@@ -1,57 +1,39 @@
-import { ref, computed, onMounted, onBeforeMount, onBeforeUnmount, onUnmounted } from 'vue';
-import { useDebounceFn } from '@vueuse/core';
-import { useAppStore } from '@/store';
-import { addEventListen, removeEventListen } from '@/utils/event';
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 
-const WIDTH = 992;
+export function useResponsive(breakpoints = { md: 768, sm: 375 }) {
+  const md = ref(false)
+  const sm = ref(false)
 
-function queryDevice() {
-  const rect = document.body.getBoundingClientRect();
-  return rect.width - 1 < WIDTH;
-}
-
-export default function useResponsive(immediate?: boolean) {
-  const appStore = useAppStore();
-  function resizeHandler() {
-    if (!document.hidden) {
-      const isMobile = queryDevice();
-      appStore.toggleDevice(isMobile ? 'mobile' : 'desktop');
-      appStore.toggleMenu(isMobile);
-    }
+  const update = () => {
+    if (typeof window === 'undefined') return
+    md.value = window.innerWidth <= breakpoints.md
+    sm.value = window.innerWidth <= breakpoints.sm
   }
-  const debounceFn = useDebounceFn(resizeHandler, 100);
+
   onMounted(() => {
-    if (immediate) debounceFn();
-  });
-  onBeforeMount(() => {
-    addEventListen(window, 'resize', debounceFn);
-  });
-  onBeforeUnmount(() => {
-    removeEventListen(window, 'resize', debounceFn);
-  });
+    update()
+    window.addEventListener('resize', update)
+  })
+
+  onUnmounted(() => {
+    window.removeEventListener('resize', update)
+  })
+
+  return { sm, md }
 }
 
-// responsive gridSize
-const globalMd = ref(window.innerWidth <= 768)
-const globalSm = ref(window.innerWidth <= 375)
-let isInitialized = false
+export function useResponsiveSize() {
+  const { md } = useResponsive()
 
-function initGlobalResize() {
-  if (isInitialized) return
-  const onResize = () => {
-    globalMd.value = window.innerWidth <= 768
-    globalSm.value = window.innerWidth <= 375
-  }
-  window.addEventListener('resize', onResize)
-  isInitialized = true
-}
+  const gridSize = computed(() => {
+    if (md.value) return 'mini'
+    return 'medium'
+  })
 
-export function useResponsiveGrid() {
-  initGlobalResize()
-  const gridSize = computed(() => (globalMd.value ? 'mini' : 'medium'))
-  return {
-    md: globalMd,
-    sm: globalSm,
-    gridSize
-  }
+  const modalSize = computed(() => {
+    if (md.value) return '100%'
+    return '768px'
+  })
+
+  return { gridSize, modalSize }
 }

@@ -62,9 +62,9 @@
   import { IconDel, IconEdit } from '@opentiny/vue-icon';
   import { ITreeNodeData } from '@/router/guard/menu';
   import { TinyGrid, TinyGridColumn ,TinyPopconfirm  } from '@opentiny/vue';
-  import { useResponsiveGrid } from '@/hooks/responsive'
+  import { useResponsiveSize } from '@/hooks/responsive'
 
-  const { gridSize } = useResponsiveGrid()
+  const { gridSize } = useResponsiveSize()
   
   export type Node = {
     data: ITreeNodeData;
