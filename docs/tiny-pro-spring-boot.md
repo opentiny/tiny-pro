@@ -246,7 +246,7 @@ public class LangController {
     @Autowired
     private ILangService langService;
 
-    @GetMapping("/list`")
+    @GetMapping("/list")
     public ResponseEntity<Lang> createLang(@RequestBody @Valid CreateLangDto createLangDto) {
         return this.langService.create(createLangDto);
     }
@@ -262,7 +262,7 @@ public class LangController {
     @Autowired
     private ILangService langService;
 
-    @GetMapping("/list`")
+    @GetMapping("/list")
      @PermissionAnnotation("policy::get::list")
     public ResponseEntity<Lang> createLang(@RequestBody @Valid CreateLangDto createLangDto) {
         return this.langService.create(createLangDto);
@@ -282,8 +282,8 @@ public class LangController {
     @Autowired
     private ILangService langService;
 
-    @GetMapping("/list`")
-    @PermissionAnnotation("`policy::get::list`")
+    @GetMapping("/list")
+    @PermissionAnnotation("policy::get::list")
     public ResponseEntity<Lang> createLang(@RequestBody @Valid CreateLangDto createLangDto) {
         return this.langService.create(createLangDto);
     }
@@ -306,8 +306,8 @@ public class LangController {
     @Autowired
     private ILangService langService;
 
-    @GetMapping("/list`")
-    @PermissionAnnotation("`policy::get::list`")
+    @GetMapping("/list")
+    @PermissionAnnotation("policy::get::list")
     public ResponseEntity<Lang> createLang(@RequestBody @Valid CreateLangDto createLangDto) {
         return this.langService.create(createLangDto);
     }
@@ -325,7 +325,7 @@ public class LangController {
 
 2.搜索File Encodings(选择对应的选项)
 
-<img src=".\images\image-20250901190522736.png" alt="image-20250901190522736" style="zoom: 50%;" />
+<img src=".\images\image-20250901210454281.png" alt="image-20250901190522736" style="zoom: 50%;" />
 
 ## 遇到困难?
 
