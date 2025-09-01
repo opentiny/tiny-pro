@@ -321,11 +321,11 @@ public class LangController {
 
 （1）点击Settings
 
-<img src="C:\Users\周泽龙\AppData\Roaming\Typora\typora-user-images\image-20250901190434427.png" alt="image-20250901190434427" style="zoom:50%;" />
+<img src=".\images\image-20250901183132738.png" alt="image-20250901190434427" style="zoom:50%;" />
 
 （2）搜索File Encodings(选择对应的选项)
 
-<img src="C:\Users\周泽龙\AppData\Roaming\Typora\typora-user-images\image-20250901190522736.png" alt="image-20250901190522736" style="zoom: 50%;" />
+<img src=".\images\image-20250901190522736.png" alt="image-20250901190522736" style="zoom: 50%;" />
 
 ## 遇到困难?
 
