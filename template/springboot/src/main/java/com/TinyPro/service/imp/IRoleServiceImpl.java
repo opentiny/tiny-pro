@@ -54,6 +54,7 @@ public class IRoleServiceImpl implements IRoleService {
     private EntityManager entityManager;
 
     @Override
+    @Transactional
     public ResponseEntity<Role> createRole(CreateRoleDto createRoleDto, boolean isInit) {
         // 检查角色是否已存在
         Optional<Role> existingRole = iRoleRepository.findByName(createRoleDto.getName());
@@ -115,7 +116,6 @@ public class IRoleServiceImpl implements IRoleService {
 
     private MenuTreeVo convertToTree(List<Menu> menus) {
         if (menus == null || menus.isEmpty()) {
-            log.warn("菜单列表为空");
             return null;
         }
 
@@ -159,13 +159,10 @@ public class IRoleServiceImpl implements IRoleService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<Role> updateRole(UpdateRoleDto updateRoleDto) {
         // 查询角色
-        Optional<Role> roleOptional = iRoleRepository.findById(Long.valueOf(updateRoleDto.getId()));
-        if (roleOptional.isEmpty()) {
-            throw new BusinessException("exception.role.notExists", HttpStatus.BAD_REQUEST, null);
-        }
-        Role role = roleOptional.get();
+        Role role = iRoleRepository.findById(Long.valueOf(updateRoleDto.getId())) .orElseThrow(() -> new BusinessException("exception.role.notExists", HttpStatus.BAD_REQUEST, null));
         if (updateRoleDto.getPermissionIds() != null) {
             List<Permission> permissionList = permissionService.findAllById(updateRoleDto.getPermissionIds());
             role.setPermission(permissionList.stream().collect(Collectors.toSet()));
@@ -181,9 +178,10 @@ public class IRoleServiceImpl implements IRoleService {
     }
 
     @Override
-    public ResponseEntity<List<Map<String, String>>> removeUserRById(Integer id) {
+    @Transactional
+    public ResponseEntity<Map<String, String>> removeRoleById(Integer id) {
         // 1. 获取角色
-        Role role = iRoleRepository.findById(Long.valueOf(id)).get();
+        Role role = iRoleRepository.findById(Long.valueOf(id)).orElseThrow(() ->  new BusinessException("exception.role.notExists",HttpStatus.NOT_FOUND,null));
 
         // 2. 获取所有关联该角色的用户
         List<User> usersWithRole = iUserRepository.findByRoleId(Long.valueOf(id));
@@ -191,16 +189,10 @@ public class IRoleServiceImpl implements IRoleService {
             throw new BusinessException("exception.role.conflict",HttpStatus.CONFLICT,null);
         }
 
-        // 3. 从这些用户中移除该角色
-        usersWithRole.forEach(user -> user.getRole().removeIf(r -> r.getId().equals(id)));
-        iUserRepository.saveAll(usersWithRole);
-
-        // 4. 删除角色
+        // 3. 删除角色
         iRoleRepository.delete(role);
-        List<Map<String, String>> result = new ArrayList<>();
-        Map<String, String> roleMap = new HashMap<>();
-        roleMap.put("name", "测试员");
-        result.add(roleMap);
+        Map<String, String> result = new HashMap<>();
+        result.put("name",role.getName());
         return ResponseEntity.ok(result);
     }
 
@@ -215,25 +207,10 @@ public class IRoleServiceImpl implements IRoleService {
 
     @Override
     public ResponseEntity<Role> findOne(Integer id) {
-        Optional<Role> role = iRoleRepository.findById(Long.valueOf(id));
-        if (role.isEmpty()) {
-            throw new BusinessException("exception.role.notExists", HttpStatus.NOT_FOUND, null);
-        }
-        return ResponseEntity.ok(role.get());
+        Role role = iRoleRepository.findById(Long.valueOf(id)).orElseThrow(() -> new BusinessException("exception.role.notExists", HttpStatus.NOT_FOUND, null));
+        return ResponseEntity.ok(role);
     }
 
-    @Transactional
-    public void deleteRoleWithRelations(Long roleId) {
-        // 先删除关联记录
-        entityManager.createNativeQuery("DELETE FROM user_role WHERE role_id = :roleId")
-                .setParameter("roleId", roleId)
-                .executeUpdate();
-
-        // 再删除角色
-        entityManager.createQuery("DELETE FROM Role r WHERE r.id = :roleId")
-                .setParameter("roleId", roleId)
-                .executeUpdate();
-    }
     private Predicate buildLikePredicate(Root<Role> root, CriteriaBuilder cb, String field, String input) {
         if (input.contains("%")) {
             if (input.startsWith("%") && input.endsWith("%")) {

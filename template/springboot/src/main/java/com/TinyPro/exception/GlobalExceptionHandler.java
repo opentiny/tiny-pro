@@ -2,6 +2,7 @@ package com.TinyPro.exception;
 
 import com.TinyPro.entity.contants.Contants;
 import com.TinyPro.utils.LocaleUntil;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
@@ -41,7 +42,7 @@ public class GlobalExceptionHandler {
             return ResponseEntity
                     .status(exception.getHttpStatus())
                     .body(errorResponse);
-        } else if (ex instanceof MethodArgumentNotValidException) {
+        } else if (ex instanceof MethodArgumentNotValidException || ex instanceof ConstraintViolationException) {
             MethodArgumentNotValidException exception= (MethodArgumentNotValidException) ex;
             String errorMsg = exception.getBindingResult()
                     .getFieldErrors()
@@ -56,9 +57,10 @@ public class GlobalExceptionHandler {
                     .status(e.getHttpStatus())
                     .body(errorResponse);
         } else {
+            ErrorResponse errorResponse = new ErrorResponse(Contants.PUBLIC_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.value());
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("内部错误");
+                    .body(errorResponse);
         }
     }
 }

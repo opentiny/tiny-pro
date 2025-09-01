@@ -61,7 +61,7 @@ public class I18Controller {
     @PermissionAnnotation("i18n::update")
     public ResponseEntity<I18Vo> update(
             @PathVariable Long id,
-            @RequestBody @Valid UpdateI18Dto dto) {
+            @RequestBody  UpdateI18Dto dto) {
         return i18Service.updateByi18nId(id, dto);
     }
 
