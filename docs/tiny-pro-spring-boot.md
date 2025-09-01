@@ -139,9 +139,9 @@ reject.start=true
 
 ## 初始化数据
 
-有些时候我们需要自动初始化一些数据(比如前端的默认国际化字段). 这些逻辑**均需**写在DateInitializer类里面。
+有些时候我们需要自动初始化一些数据(比如前端的默认国际化字段). 这些逻辑**均需**写在DataInitializer类里面。
 
-```
+```java
 // 初始化国际化信息
 initI18n();
 
@@ -168,7 +168,7 @@ Files.createFile(lockFile.toPath());
 
 > 这里的国际化指的是报错信息的国际化
 
-后端采用的是`nestjs-i18n`依赖库。国际化词条放在`resources/i18n/messages_zh_CN或者en_US.properties`下
+后端采用的是`spring-context`依赖库。国际化词条放在`resources/i18n/messages_zh_CN或者en_US.properties`下
 
 ```
 resources
@@ -193,7 +193,7 @@ policy.exists = Policy已存在
 
 ```
 
-```ts
+```java
 package com.TinyPro.service.imp;
 
 import com.TinyPro.entity.po.Employee;
@@ -239,7 +239,7 @@ public class PolicyService  implements IPolicyService {
 
 例如
 
-```ts
+```java
 @RestController
 @RequestMapping("/policy")
 public class LangController {
@@ -255,7 +255,7 @@ public class LangController {
 
 上述代码中`GET /policy/list`是一个不公开，不受保护的接口。我们可以使用`PermissionAnnotation`修饰器对他进行权限认证，当且仅当用户角色存在`policy::get::list`权限时才放行
 
-```ts
+```java
 @RestController
 @RequestMapping("/policy")
 public class LangController {
@@ -275,7 +275,7 @@ public class LangController {
 
 所以我们可以添加如下
 
-```ts
+```java
 @RestController
 @RequestMapping("/policy")
 public class LangController {
@@ -298,7 +298,7 @@ public class LangController {
 
 如果未来的某一天，我们需要让`/policy/*`都允许未登录的用户访问，那么我们可以这么写
 
-```ts
+```java
 @IsPublic()
 @RestController
 @RequestMapping("/policy")
@@ -319,11 +319,11 @@ public class LangController {
 
 点击File -> settings -> File Encodings -> 选择UTF-8和with BOM under Windows, with no BOM otherwise这个选项，做到全局的UTF-8的配置
 
-（1）点击Settings
+1.点击Settings
 
 <img src=".\images\image-20250901183132738.png" alt="image-20250901190434427" style="zoom:50%;" />
 
-（2）搜索File Encodings(选择对应的选项)
+2.搜索File Encodings(选择对应的选项)
 
 <img src=".\images\image-20250901190522736.png" alt="image-20250901190522736" style="zoom: 50%;" />
 
@@ -335,4 +335,4 @@ public class LangController {
 
 ### 提示 `Lock file exists, if you want init agin, please remove dist or dist/lock`
 
-为了避免重复初始化，系统会在第一次初始化的时候在`date`目录下新建`lock`文件，如果您需要再次初始化，那么请您删除`date/lock`或者直接删除`date`文件夹
+为了避免重复初始化，系统会在第一次初始化的时候在`data`目录下新建`lock`文件，如果您需要再次初始化，那么请您删除`data/lock`或者直接删除`data`文件夹
