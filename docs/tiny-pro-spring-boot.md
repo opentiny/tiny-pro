@@ -2,7 +2,7 @@
 
 # TinyPro 后端开发指南
 
-在阅读本指南前，我们假设您已经阅读过[Nest.js官方文档](https://docs.nestjs.com/)并能够独立本机启动`MySQL`与`Redis`的能力。
+在阅读本指南前，我们假设您已经阅读过[Springboot官方文档]([Spring Boot](https://spring.io/projects/spring-boot))并能够独立本机启动`MySQL`与`Redis`的能力。
 
 ## 项目初始化
 
@@ -121,7 +121,7 @@ reject.start=true
 - [ ] 后端项目已被初始化
 - [ ] `application.properties`文件中`server.port`**是开发环境**
 - [ ] `application.properties`文件中`spring.datasource`为开发库的配置
-- [ ] application.properties文件中`REDIS_HOST`**是开发环境**
+- [ ] application.properties文件中`spring.data.redis`**是开发环境**
 - [ ] MySQL服务可以正常访问
 - [ ] Redis服务可以正常访问
 - [ ] `data`目录被删除 (可选,如果你不需要测试初始化数据的话)
@@ -314,6 +314,18 @@ public class LangController {
 ```
 
 这样一来，所有的policy接口都可以被未登录的用户访问了
+
+## 当出现messages_zh_CN.properties(编码问题)
+
+点击File -> settings -> File Encodings -> 选择UTF-8和with BOM under Windows, with no BOM otherwise这个选项，做到全局的UTF-8的配置
+
+（1）点击Settings
+
+<img src="C:\Users\周泽龙\AppData\Roaming\Typora\typora-user-images\image-20250901190434427.png" alt="image-20250901190434427" style="zoom:50%;" />
+
+（2）搜索File Encodings(选择对应的选项)
+
+<img src="C:\Users\周泽龙\AppData\Roaming\Typora\typora-user-images\image-20250901190522736.png" alt="image-20250901190522736" style="zoom: 50%;" />
 
 ## 遇到困难?
 
