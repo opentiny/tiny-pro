@@ -539,10 +539,14 @@
       background: 'rgba(0, 0, 0, 0.7)',
     });
     try {
+
       const { data } = await getAllUser(
         params.pageIndex,
         params.pageSize,
-        filters,
+        Array.isArray(filters) ? filters : {
+          ...filters,
+          role: filters.roleIds
+        }
       );
       const total = data.meta.totalItems;
       return {
