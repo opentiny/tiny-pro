@@ -34,7 +34,7 @@
             :pager="pagerConfig"
             :loading="loading"
             size="medium"
-            :height="640"
+            :height="540"
             :auto-resize="true"
           >
             <tiny-grid-column type="selection" width="60"></tiny-grid-column>

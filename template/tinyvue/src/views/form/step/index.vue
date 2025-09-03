@@ -1,7 +1,8 @@
 <template>
   <div class="container-form">
-    <div class="container-header">{{ $t('menu.form.step') }}</div>
-
+    <div class="container-header">
+      <Breadcrumb :items="['menu.form', 'menu.form.step']" />
+    </div>
     <div class="base-body">
       <transition-fade-slide-group>
         <div class="form-card">
