@@ -137,6 +137,50 @@ reject.start=true
 
 ```
 
+### Docker启动配置
+
+1. 首先要编辑.env（将自己的服务的地址和端口以及一些具体参数的配置写到里面)
+
+```properties
+#数据库的链接地址和库
+SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/tinypro_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+#数据库用户
+SPRING_DATASOURCE_USERNAME=root
+#数据库密码
+SPRING_DATASOURCE_PASSWORD=123456
+#redis的地址
+SPRING_DATA_REDIS_HOST=redis
+#redis的密码
+SPRING_DATA_REDIS_PORT=6379
+#加密密钥
+jwt.secret=0Zi4SA==
+#JWT存活时间单位是小时
+EXPIRES_IN=1
+```
+
+######  对照这个进行配置和使用然后就会覆盖application.properties的以下参数（可以根据自己的环境进行配置.env覆盖）
+
+```properties
+#数据库的链接地址和库
+spring.datasource.url=${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/login?allowMultiQueries=true&serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=utf8&autoReconnect=true&allowMultiQueries=true&allowPublicKeyRetrieval=true&useSSL=false}
+#数据库用户
+spring.datasource.username=${SPRING_DATASOURCE_USERNAME:root}
+#数据库密码
+spring.datasource.password=${SPRING_DATASOURCE_PASSWORD:111111}
+#jwt的密钥覆盖
+jwt.secret=0Zi4SA==
+#redis的地址默认localhost
+spring.data.redis.host=${SPRING_DATA_REDIS_HOST:localhost}
+#redis的端口
+spring.data.redis.port=${SPRING_DATA_REDIS_PORT:6379}
+#默认的jwt时间
+EXPIRES_IN=1
+```
+
+#### 最后的如何启动过程可以看这个快速部署文档
+
+#### [Docker 最全的Docker-compose快速部署](https://developer.aliyun.com/article/914404)
+
 ## 初始化数据
 
 有些时候我们需要自动初始化一些数据(比如前端的默认国际化字段). 这些逻辑**均需**写在DataInitializer类里面。
@@ -319,11 +363,11 @@ public class LangController {
 
 点击File -> settings -> File Encodings -> 选择UTF-8和with BOM under Windows, with no BOM otherwise这个选项，做到全局的UTF-8的配置
 
-1.点击Settings
+1. 点击Settings
 
 <img src=".\images\image-20250901183132738.png" alt="image-20250901190434427" style="zoom:50%;" />
 
-2.搜索File Encodings(选择对应的选项)
+2. 搜索File Encodings(选择对应的选项)
 
 <img src=".\images\image-20250901210454281.png" alt="image-20250901190522736" style="zoom: 50%;" />
 
