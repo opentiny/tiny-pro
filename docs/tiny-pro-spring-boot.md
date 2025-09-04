@@ -232,7 +232,7 @@ resources
 3. 使用该词条
 
 ```json
-// messages_zh_CN.properties``
+// messages_zh_CN.properties
 policy.exists = Policy已存在
 
 ```
