@@ -13,12 +13,13 @@
   import { HwcClientService } from '@/utils/hwcClient.service';
   import { sortTime } from '@/utils/time';
   import { reactive, ref } from 'vue';
-  import { useResponsiveSize } from '@/hooks/responsive'
+  import { useResponsive, useResponsiveSize } from '@/hooks/responsive'
   import edit from './components/edit/index.vue';
   import create from './components/create/index.vue';
   import deletes from './components/delete/index.vue';
 
   const { gridSize, modalSize } = useResponsiveSize()
+  const { sm } = useResponsive()
 
   const contractApigInfo: ApigInfo = {
     apigName: 'apig_contract',
@@ -87,16 +88,14 @@
       modalHeight.value = '536';
     }
   };
-  const pagerConfig = reactive({
+  const pagerConfigSm = {
     component: TinyPager,
-    attrs: {
-      currentPage: 1,
-      pageSize: 10,
-      pageSizes: [10, 20],
-      total: 10,
-      layout: 'total, prev, pager, next, jumper, sizes',
-    },
-  });
+    attrs: { currentPage:1, pageSize:10, pageSizes:[10,20,50,100], total:10, layout:'total, prev, pager, next' }
+  }
+  const pagerConfigLg = {
+    component: TinyPager,
+    attrs: { currentPage:1, pageSize:10, pageSizes:[10,20,50,100], total:10, layout:'sizes, total, prev, pager, next, jumper' }
+  }
   async function delContracts(params: { id: string }) {
     return HwcClientService.apiRequest('delContract', params, contractApigInfo);
   }
@@ -191,10 +190,11 @@
 <template>
   <general-layout :breadcrumb="['menu.cloud', 'menu.cloud.contracts']">
     <tiny-grid
+      :key="sm ? 'sm' : 'lg'"
       :ref="taskGrid"
       :fetch-data="fetchDataOption"
       :auto-load="true"
-      :pager="pagerConfig"
+      :pager="sm ? pagerConfigSm : pagerConfigLg"
       :loading="loading"
       :size="gridSize"
       :auto-resize="true"

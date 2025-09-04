@@ -17,9 +17,10 @@
       </div>
       <div class="table">
         <tiny-grid
+          :key="sm ? 'sm' : 'lg'"
           ref="grid"
           :fetch-data="fetchDataOption"
-          :pager="pagerConfig"
+          :pager="sm ? pagerConfigSm : pagerConfigLg"
           :auto-resize="true"
           remote-filter
           :edit-config="{ trigger: 'click', mode: 'cell', showStatus: true }"
@@ -395,11 +396,12 @@
   import { getSimpleDate } from '@/utils/time';
   import { getAllRole } from '@/api/role';
   import { FilterType } from '@/types/global';
-  import { useResponsiveSize } from '@/hooks/responsive'
+  import { useResponsive, useResponsiveSize } from '@/hooks/responsive'
   import UserAdd from '../../useradd/index.vue';
   import UserDetail from '../../user-detail/index.vue';
 
   const { gridSize, modalSize } = useResponsiveSize()
+  const { sm } = useResponsive()
 
   const IconCommission = iconCommission();
   const IconDel = iconDel();
@@ -484,16 +486,14 @@
     }),
   });
 
-  const pagerConfig = reactive({
+  const pagerConfigSm = {
     component: TinyPager,
-    attrs: {
-      currentPage: 1,
-      pageSize: 10,
-      pageSizes: [10, 20, 50, 100],
-      total: 10,
-      layout: 'total, sizes, prev, pager, next, jumper',
-    },
-  });
+    attrs: { currentPage:1, pageSize:10, pageSizes:[10,20,50,100], total:10, layout:'total, prev, pager, next' }
+  }
+  const pagerConfigLg = {
+    component: TinyPager,
+    attrs: { currentPage:1, pageSize:10, pageSizes:[10,20,50,100], total:10, layout:'sizes, total, prev, pager, next, jumper' }
+  }
 
   // 校验规则
   const rulesType = {

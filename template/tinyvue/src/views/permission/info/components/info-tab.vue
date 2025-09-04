@@ -8,10 +8,11 @@
         </div>
         <div class="table">
           <tiny-grid 
+          :key="sm ? 'sm' : 'lg'"
           ref="roleGrid" 
           :auto-resize="true" 
           :fetch-data="fetchOption" 
-          :pager="pagerConfig"
+          :pager="sm ? pagerConfigSm : pagerConfigLg"
           :edit-config="{ trigger: 'click', mode: 'cell', showStatus: true }" 
           remote-filter
           :size="gridSize"
@@ -131,7 +132,7 @@ import {
   IPaginationMeta,
   Pager,
 } from '@/types/global';
-import { useResponsiveSize } from '@/hooks/responsive'
+import { useResponsive, useResponsiveSize } from '@/hooks/responsive'
 
 const roleGrid = ref();
 const addForm = ref();
@@ -140,6 +141,7 @@ const iconDel = IconDel();
 const { t } = useI18n();
 
 const { gridSize, modalSize } = useResponsiveSize()
+const { sm } = useResponsive()
 
 // 加载效果
 const state = reactive<{
@@ -167,17 +169,14 @@ const filter = {
   inputFilter: true,
 };
 
-
-const pagerConfig = reactive({
+const pagerConfigSm = {
   component: TinyPager,
-  attrs: {
-    currentPage: 1,
-    pageSize: 10,
-    pageSizes: [10, 20, 50,100],
-    total: 10,
-    layout: 'sizes,total, prev, pager, next, jumper',
-  },
-});
+  attrs: { currentPage:1, pageSize:10, pageSizes:[10,20,50,100], total:10, layout:'total, prev, pager, next' }
+}
+const pagerConfigLg = {
+  component: TinyPager,
+  attrs: { currentPage:1, pageSize:10, pageSizes:[10,20,50,100], total:10, layout:'sizes, total, prev, pager, next, jumper' }
+}
 
 const fetchOption = {
   api: ({ page, filters }: { page: Pager; filters: FilterType }) => {

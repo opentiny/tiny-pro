@@ -30,9 +30,10 @@
             </transition-fade-down-group>
           </div>
           <tiny-grid
+            :key="sm ? 'sm' : 'lg'"
             ref="taskGrid"
             :fetch-data="fetchDataOption"
-            :pager="pagerConfig"
+            :pager="sm ? pagerConfigSm : pagerConfigLg"
             :loading="loading"
             :size="gridSize"
             :height="640"
@@ -259,13 +260,14 @@
   import * as XLSX from 'xlsx';
   import { t } from '@opentiny/vue-locale';
   import TransitionFadeSlideGroup from '@/components/transition/transition-fade-slide-group.vue';
-  import { useResponsiveSize } from '@/hooks/responsive'
+  import { useResponsive, useResponsiveSize } from '@/hooks/responsive'
 
   const IconEditor = iconEditor();
   const IconDel = iconDel();
   const IconRefresh = iconRefresh()
   const IconSetting = iconSetting()
   const { gridSize } = useResponsiveSize()
+  const { sm } = useResponsive()
   // 初始化请求数据
   interface FilterOptions {
     id: string;
@@ -294,16 +296,14 @@
     updateVisibility: false,
   });
 
-  const pagerConfig = reactive({
+  const pagerConfigSm = {
     component: TinyPager,
-    attrs: {
-      currentPage: 1,
-      pageSize: 10,
-      pageSizes: [10, 20, 50, 100],
-      total: 10,
-      layout: 'total, sizes, prev, pager, next, jumper',
-    },
-  });
+    attrs: { currentPage:1, pageSize:10, pageSizes:[10,20,50,100], total:10, layout:'total, prev, pager, next' }
+  }
+  const pagerConfigLg = {
+    component: TinyPager,
+    attrs: { currentPage:1, pageSize:10, pageSizes:[10,20,50,100], total:10, layout:'sizes, total, prev, pager, next, jumper' }
+  }
 
   let tableData = ref([]);
   const taskGrid = ref();
