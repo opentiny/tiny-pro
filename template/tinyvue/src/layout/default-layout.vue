@@ -14,6 +14,7 @@
             v-model="currentTabName"
             with-close
             size="small"
+            class="!pt-4"
             @click="onClick"
             @close="onClose"
           >
