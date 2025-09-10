@@ -59,6 +59,10 @@ export function getAllUser(page?: number, limit?: number, filter?: FilterType) {
   for (let i = 0; i < keys.length; i += 1) {
     const key = keys[i];
     const value = filter[key];
+    if (value === undefined) {
+      // eslint-disable-next-line no-continue
+      continue;
+    }
     if (value.type === 'enum') {
       if (Array.isArray(value.value) && value.value.length) {
         params.set(key, value.value.toString());
