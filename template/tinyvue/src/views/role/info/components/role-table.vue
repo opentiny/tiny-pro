@@ -24,7 +24,6 @@
     };
     permissions: Permission[];
     pagerConfig: {
-      component: any;
       attrs: Pager;
     };
     filter: any;
