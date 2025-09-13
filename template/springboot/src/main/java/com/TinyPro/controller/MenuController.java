@@ -49,7 +49,7 @@ public class MenuController {
     @DeleteMapping
     @Reject
     @PermissionAnnotation("menu::remove")
-    public ResponseEntity<Menu> deleteMenu(@RequestParam ("id") ("id") Integer id, @RequestParam ("parentId") Integer parentId) {
+    public ResponseEntity<Menu> deleteMenu(@RequestParam ("id")Integer id, @RequestParam ("parentId") Integer parentId) {
         return iMenuService.deleteMenu(id, parentId);
     }
 }
