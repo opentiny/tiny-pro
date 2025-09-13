@@ -63,11 +63,8 @@ public class II18ServiceImpl implements II18Service {
     }
 
     @Override
-    public Map<String, Map<String, String>> getFormat(String lang, HttpServletRequest request) {
-        if (StringUtils.isEmpty(lang)) {
-            lang = request.getHeader("x-lang");
-        }
-
+    public Map<String, Map<String, String>> getFormat(HttpServletRequest request) {
+        String lang = request.getHeader("X-lang");
         Map<String, Map<String, String>> result = new HashMap<>();
         Lang langData = langRepository.findByName(lang).orElseThrow(() -> new BusinessException("exception.lang.notExists", HttpStatus.NOT_FOUND, null));
 
