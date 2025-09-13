@@ -52,7 +52,7 @@ public class II18ServiceImpl implements II18Service {
         if (i18Repository.findByKeyAndLang_Id(createI18Dto.getKey(), Long.valueOf(lang.getId())).isPresent()) {
             throw new BusinessException("exception.i18.exists", HttpStatus.BAD_REQUEST, null);
         }
-
+        lang.setI18ns(null);
         I18 i18 = new I18();
         i18.setLang(lang);
         i18.setKey(createI18Dto.getKey());
@@ -63,8 +63,8 @@ public class II18ServiceImpl implements II18Service {
     }
 
     @Override
-    public Map<String, Map<String, String>> getFormat(HttpServletRequest request) {
-        String lang = request.getHeader("X-lang");
+    public Map<String, Map<String, String>> getFormat( HttpServletRequest request) {
+        String lang = request.getHeader("x-lang");
         Map<String, Map<String, String>> result = new HashMap<>();
         Lang langData = langRepository.findByName(lang).orElseThrow(() -> new BusinessException("exception.lang.notExists", HttpStatus.NOT_FOUND, null));
 

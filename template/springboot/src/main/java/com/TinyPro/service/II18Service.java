@@ -16,7 +16,7 @@ public interface II18Service {
 
     ResponseEntity<String>  create(CreateI18Dto createI18Dto);
 
-    Map<String, Map<String, String>> getFormat(HttpServletRequest request);
+    Map<String, Map<String, String>> getFormat( HttpServletRequest request);
 
     ResponseEntity<PageWrapper<I18Vo>> findAll(Integer page, Integer limit, Boolean allBool, List<Integer> lang, String key, String content);
 

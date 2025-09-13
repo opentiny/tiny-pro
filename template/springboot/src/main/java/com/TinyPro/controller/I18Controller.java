@@ -33,8 +33,8 @@ public class I18Controller {
     }
 
     @GetMapping("/format")
-    public ResponseEntity<Map<String, Map<String, String>>> getFormat(@Param("lang") String lang, HttpServletRequest request) {
-        Map<String, Map<String, String>> result = i18Service.getFormat(lang,request);
+    public ResponseEntity<Map<String, Map<String, String>>> getFormat(HttpServletRequest request) {
+        Map<String, Map<String, String>> result = i18Service.getFormat(request);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
