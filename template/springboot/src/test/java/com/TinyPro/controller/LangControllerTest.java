@@ -3,9 +3,14 @@ package com.TinyPro.controller;
 import com.TinyPro.controller.contants.Contants;
 import com.TinyPro.entity.dto.CreateLangDto;
 import com.TinyPro.entity.po.Lang;
+import com.TinyPro.redis.RedisUtil;
 import com.TinyPro.service.ILangService;
+import com.TinyPro.service.imp.PermissionCheckService;
+import com.TinyPro.utils.JwtUtil;
+import io.jsonwebtoken.Claims;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,8 +25,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -36,14 +42,35 @@ public class LangControllerTest {
     private ILangService langService;
 
     private CreateLangDto createLangDto;
+    @MockBean
+    private JwtUtil jwtUtil;
+    @MockBean
+    private RedisUtil redisUtil;
+    @MockBean
+    private PermissionCheckService permissionCheckService;
 
     @BeforeEach
     public void setUp() {
         createLangDto = new CreateLangDto();
         createLangDto.setName("zhCN");
+        // ========== Mock JWT ==========
+        Claims mockClaims = Mockito.mock(Claims.class);
+        when(mockClaims.get("email", String.class)).thenReturn("test@example.com");
+        when(jwtUtil.parseJwt(anyString())).thenReturn(mockClaims);
+
+        // ========== Mock Redis ==========
+        String fakeUserJson = """
+            {
+                "id": 1,
+                "email": "test@example.com",
+                "name": "Test User"
+            }
+        """;
+        when(redisUtil.getValue(anyString())).thenReturn(fakeUserJson);
+
+        doNothing().when(permissionCheckService).check(any(), any(), any());
     }
 
-    // ===================== testCreateLang_Success =====================
     @Test
     public void testCreateLang_Success() throws Exception {
         // 模拟一个返回的 Lang 对象
@@ -61,7 +88,7 @@ public class LangControllerTest {
                                   "name": "zhCN"
                                 }
                                 """)
-                        .header("Authorization", Contants.TOKEN))
+                        .header("Authorization", "Bearer "+Contants.TOKEN))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("zhCN"));
@@ -87,7 +114,7 @@ public class LangControllerTest {
 
         // 模拟 GET 请求
         mockMvc.perform(MockMvcRequestBuilders.get("/lang")
-                        .header("Authorization", Contants.TOKEN)
+                        .header("Authorization","Bearer "+ Contants.TOKEN)
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
@@ -117,7 +144,7 @@ public class LangControllerTest {
                                   "name": "zhCN-Updated"
                                 }
                                 """)
-                        .header("Authorization", Contants.TOKEN)
+                        .header("Authorization", "Bearer "+Contants.TOKEN)
                 )
                 .andExpect(status().isOk())
                 .andDo(result -> {
@@ -140,7 +167,7 @@ public class LangControllerTest {
                 .thenReturn(ResponseEntity.ok(removedLang));
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/lang/{id}", id)
-                        .header("Authorization", Contants.TOKEN)
+                        .header("Authorization", "Bearer "+Contants.TOKEN)
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))

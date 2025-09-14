@@ -3,9 +3,14 @@ package com.TinyPro.controller;
 import com.TinyPro.controller.contants.Contants;
 import com.TinyPro.entity.po.Menu;
 import com.TinyPro.entity.vo.MenuVo;
+import com.TinyPro.redis.RedisUtil;
 import com.TinyPro.service.IMenuService;
+import com.TinyPro.service.imp.PermissionCheckService;
+import com.TinyPro.utils.JwtUtil;
+import io.jsonwebtoken.Claims;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -32,6 +38,12 @@ public class MenuControllerTest {
 
     @MockBean
     private IMenuService iMenuService;
+    @MockBean
+    private JwtUtil jwtUtil;
+    @MockBean
+    private RedisUtil redisUtil;
+    @MockBean
+    private PermissionCheckService permissionCheckService;
 
     private MenuVo mockMenuVo;
     private Menu mockMenu;
@@ -60,6 +72,23 @@ public class MenuControllerTest {
 
         // 模拟返回的菜单列表
         mockMenuVoList = Arrays.asList(mockMenuVo);
+        // ========== Mock JWT ==========
+        Claims mockClaims = Mockito.mock(Claims.class);
+        when(mockClaims.get("email", String.class)).thenReturn("test@example.com");
+        when(jwtUtil.parseJwt(anyString())).thenReturn(mockClaims);
+
+        // ========== Mock Redis ==========
+        String fakeUserJson = """
+            {
+                "id": 1,
+                "email": "test@example.com",
+                "name": "Test User"
+            }
+        """;
+        when(redisUtil.getValue(anyString())).thenReturn(fakeUserJson);
+
+        // ========== Mock 权限校验（如果有） ==========
+        doNothing().when(permissionCheckService).check(any(), any(), any());
     }
 
     // ===================== testGetMenusByEmail =====================
@@ -71,7 +100,7 @@ public class MenuControllerTest {
 
         // 模拟请求
         mockMvc.perform(get("/menu/role/admin@example.com")
-                        .header("Authorization", Contants.TOKEN)
+                        .header("Authorization", "Bearer "+Contants.TOKEN)
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
@@ -86,7 +115,7 @@ public class MenuControllerTest {
                 .thenReturn(ResponseEntity.ok(mockMenuVoList));
 
         mockMvc.perform(get("/menu")
-                        .header("Authorization", Contants.TOKEN)
+                        .header("Authorization", "Bearer "+Contants.TOKEN)
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
@@ -100,7 +129,7 @@ public class MenuControllerTest {
                 .thenReturn(ResponseEntity.ok(mockMenu));
 
         mockMvc.perform(post("/menu")
-                        .header("Authorization", Contants.TOKEN)
+                        .header("Authorization", "Bearer "+Contants.TOKEN)
                         .contentType("application/json")
                         .content("""
                                 {
@@ -126,7 +155,7 @@ public class MenuControllerTest {
                 .thenReturn(ResponseEntity.ok(true));
 
         mockMvc.perform(patch("/menu")
-                        .header("Authorization", Contants.TOKEN)
+                        .header("Authorization", "Bearer "+Contants.TOKEN)
                         .contentType("application/json")
                         .content("""
                                 {
@@ -151,8 +180,10 @@ public class MenuControllerTest {
         when(iMenuService.deleteMenu(anyInt(), anyInt()))
                 .thenReturn(ResponseEntity.ok(mockMenu));
 
-        mockMvc.perform(delete("/menu/1/0")
-                        .header("Authorization", Contants.TOKEN)
+        mockMvc.perform(delete("/menu")
+                        .param("id","1")
+                        .param("parentId","0")
+                        .header("Authorization", "Bearer "+Contants.TOKEN)
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))

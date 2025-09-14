@@ -3,9 +3,14 @@ package com.TinyPro.controller;
 import com.TinyPro.controller.contants.Contants;
 import com.TinyPro.entity.po.Permission;
 import com.TinyPro.entity.vo.PermissionVo;
+import com.TinyPro.redis.RedisUtil;
 import com.TinyPro.service.IPermissionService;
+import com.TinyPro.service.imp.PermissionCheckService;
+import com.TinyPro.utils.JwtUtil;
+import io.jsonwebtoken.Claims;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -32,6 +38,12 @@ public class PermissionControllerTest {
 
     @MockBean
     private IPermissionService iPermissionService;
+    @MockBean
+    private JwtUtil jwtUtil;
+    @MockBean
+    private RedisUtil redisUtil;
+    @MockBean
+    private PermissionCheckService permissionCheckService;
 
     private PermissionVo mockPermissionVo;
     private PermissionVo updatePermissionVo;
@@ -71,6 +83,23 @@ public class PermissionControllerTest {
                 permission1,
                 permission2
         );
+        // ========== Mock JWT ==========
+        Claims mockClaims = Mockito.mock(Claims.class);
+        when(mockClaims.get("email", String.class)).thenReturn("test@example.com");
+        when(jwtUtil.parseJwt(anyString())).thenReturn(mockClaims);
+
+        // ========== Mock Redis ==========
+        String fakeUserJson = """
+            {
+                "id": 1,
+                "email": "test@example.com",
+                "name": "Test User"
+            }
+        """;
+        when(redisUtil.getValue(anyString())).thenReturn(fakeUserJson);
+
+        // ========== Mock 权限校验（如果有） ==========
+        doNothing().when(permissionCheckService).check(any(), any(), any());
     }
 
     // ===================== testCreatePermission =====================
@@ -87,7 +116,7 @@ public class PermissionControllerTest {
                                   "desc": "user:create"
                                 }
                                 """)
-                        .header("Authorization", Contants.TOKEN)
+                        .header("Authorization", "Bearer "+Contants.TOKEN)
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
@@ -110,7 +139,7 @@ public class PermissionControllerTest {
                                   "desc": "用户添加"
                                 }
                                 """)
-                        .header("Authorization", Contants.TOKEN)
+                        .header("Authorization", "Bearer "+Contants.TOKEN)
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
@@ -125,7 +154,7 @@ public class PermissionControllerTest {
                 .thenReturn(mockPermissionList);
 
         mockMvc.perform(get("/permission")
-                        .header("Authorization", Contants.TOKEN)
+                        .header("Authorization", "Bearer "+Contants.TOKEN)
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
@@ -147,7 +176,7 @@ public class PermissionControllerTest {
                         .param("page", "1")
                         .param("limit", "10")
                         .param("name", "user")
-                        .header("Authorization", Contants.TOKEN)
+                        .header("Authorization", "Bearer "+Contants.TOKEN)
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
@@ -161,7 +190,7 @@ public class PermissionControllerTest {
                 .thenAnswer(item ->ResponseEntity.ok(mockPermission));
 
         mockMvc.perform(delete("/permission/1")
-                        .header("Authorization", Contants.TOKEN)
+                        .header("Authorization", "Bearer "+Contants.TOKEN)
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))

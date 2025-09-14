@@ -116,7 +116,7 @@ public class IUserServiceImpl implements IUserService {
 
     @Override
     public ResponseEntity<User> getUserInfo(String email) {
-        User user = iUserRepository.findByEmail(email).orElseThrow(() -> new BusinessException("exception.common.unauth"));
+        User user = iUserRepository.findByEmail(email).orElseThrow(() -> new BusinessException("exception.common.unauth",HttpStatus.NOT_FOUND,null));
         return ResponseEntity.ok(user);
     }
 
@@ -267,7 +267,7 @@ public class IUserServiceImpl implements IUserService {
 
         // 2. 验证旧密码
         if (!verifyPassword(dto.getOldPassword(), user.getPassword(), user.getSalt())) {
-            throw new BusinessException("exception.user.oldPasswordError");
+            throw new BusinessException("exception.user.oldPasswordError",HttpStatus.BAD_REQUEST,null);
         }
 
         // 3. 更新密码
@@ -299,11 +299,10 @@ public class IUserServiceImpl implements IUserService {
     }
 
     private String encryptPassword(String rawPassword, String salt) {
-        // 实现与TypeScript相同的加密逻辑
         try {
             return Sha256Utils.encry(rawPassword, salt);
         } catch (Exception e) {
-            throw new BusinessException("加密错误");
+            throw new BusinessException("exception.user.oldPasswordError",HttpStatus.BAD_REQUEST,null);
         }
     }
 

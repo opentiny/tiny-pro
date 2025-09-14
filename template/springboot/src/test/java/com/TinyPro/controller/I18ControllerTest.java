@@ -1,5 +1,6 @@
 package com.TinyPro.controller;
 
+import com.TinyPro.aspect.PermissionAspect;
 import com.TinyPro.controller.contants.Contants;
 import com.TinyPro.entity.dto.CreateI18Dto;
 import com.TinyPro.entity.dto.UpdateI18Dto;
@@ -8,9 +9,14 @@ import com.TinyPro.entity.po.I18;
 import com.TinyPro.entity.po.Lang;
 import com.TinyPro.entity.vo.I18Vo;
 import com.TinyPro.entity.vo.LangVo;
+import com.TinyPro.redis.RedisUtil;
 import com.TinyPro.service.II18Service;
+import com.TinyPro.service.imp.PermissionCheckService;
+import com.TinyPro.utils.JwtUtil;
+import io.jsonwebtoken.Claims;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,7 +36,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -39,9 +45,14 @@ public class I18ControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
     @MockBean
     private II18Service i18Service;
+    @MockBean
+    private JwtUtil jwtUtil;
+    @MockBean
+    private RedisUtil redisUtil;
+    @MockBean
+    private PermissionCheckService permissionCheckService;
 
     private CreateI18Dto createI18Dto;
     private UpdateI18Dto updateI18Dto;
@@ -52,7 +63,23 @@ public class I18ControllerTest {
         createI18Dto.setLang(1);
         createI18Dto.setKey("test.key");
         createI18Dto.setContent("test content");
+        // ========== Mock JWT ==========
+        Claims mockClaims = Mockito.mock(Claims.class);
+        when(mockClaims.get("email", String.class)).thenReturn("test@example.com");
+        when(jwtUtil.parseJwt(anyString())).thenReturn(mockClaims);
 
+        // ========== Mock Redis ==========
+        String fakeUserJson = """
+            {
+                "id": 1,
+                "email": "test@example.com",
+                "name": "Test User"
+            }
+        """;
+        when(redisUtil.getValue(anyString())).thenReturn(fakeUserJson);
+
+        // ========== Mock 权限校验（如果有） ==========
+        doNothing().when(permissionCheckService).check(any(), any(), any());
         updateI18Dto = new UpdateI18Dto();
     }
 
@@ -68,13 +95,12 @@ public class I18ControllerTest {
         mockLang.setId(1);
         mockLang.setName("zhCN");
         mockI18.setLang(mockLang);
-
         when(i18Service.create(any(CreateI18Dto.class)))
                 .thenAnswer(item ->ResponseEntity.ok(mockI18));
 
         mockMvc.perform(MockMvcRequestBuilders.post("/i18")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", Contants.TOKEN)
+                        .header("Authorization", "Bearer "+Contants.TOKEN)
                         .content("{\"lang\": 1, \"key\": \"vali.NOT_EMPTY\", \"content\": \"该不能为空\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1285))
@@ -83,7 +109,6 @@ public class I18ControllerTest {
                 .andExpect(jsonPath("$.lang").exists());
     }
 
-    // ===================== getFormat - GET /i18/format =====================
     @Test
     public void testGetFormat_Success() throws Exception {
         Map<String, Map<String, String>> mockResult = new HashMap<>();
@@ -95,7 +120,7 @@ public class I18ControllerTest {
                 .thenReturn(mockResult);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/i18/format")
-                        .header("Authorization", Contants.TOKEN)
+                        .header("Authorization", "Bearer "+Contants.TOKEN)
                 )
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
@@ -129,7 +154,7 @@ public class I18ControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/i18")
                         .param("page", "1")
                         .param("limit", "10")
-                        .header("Authorization", Contants.TOKEN)
+                        .header("Authorization", "Bearer "+Contants.TOKEN)
                 )
                 .andExpect(status().isOk());
     }
@@ -139,7 +164,7 @@ public class I18ControllerTest {
         when(i18Service.getI18ById(anyInt()))
                 .thenAnswer(item ->mockVo);
         mockMvc.perform(MockMvcRequestBuilders.get("/i18/1")
-                        .header("Authorization", Contants.TOKEN)
+                        .header("Authorization", "Bearer "+Contants.TOKEN)
                 )
                 .andExpect(status().isOk());
     }
@@ -150,7 +175,7 @@ public class I18ControllerTest {
                 .thenAnswer(item ->new ResponseEntity<>(new I18Vo(1285,"vali.NOT_EMPTY","该不能为空",new LangVo(1,"zhCN")), HttpStatus.OK));
 
         mockMvc.perform(MockMvcRequestBuilders.patch("/i18/1")
-                        .header("Authorization", Contants.TOKEN)
+                        .header("Authorization", "Bearer "+Contants.TOKEN)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{}"))
                 .andExpect(status().isOk());
@@ -164,7 +189,7 @@ public class I18ControllerTest {
                 .thenAnswer(item ->mockI18);
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/i18/1")
-                        .header("Authorization", Contants.TOKEN)
+                        .header("Authorization", "Bearer "+Contants.TOKEN)
                         .content("{}")
                 )
                 .andExpect(status().isOk());
@@ -178,7 +203,7 @@ public class I18ControllerTest {
 
         mockMvc.perform(MockMvcRequestBuilders.post("/i18/batch")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", Contants.TOKEN)
+                        .header("Authorization", "Bearer "+Contants.TOKEN)
                         .content("[1, 2, 3]"))
                 .andExpect(status().isOk());
     }

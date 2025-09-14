@@ -7,7 +7,9 @@ import com.TinyPro.entity.page.PageWrapper;
 import com.TinyPro.entity.po.User;
 import com.TinyPro.entity.vo.RoleSimpleVo;
 import com.TinyPro.entity.vo.UserVo;
+import com.TinyPro.redis.RedisUtil;
 import com.TinyPro.service.IUserService;
+import com.TinyPro.service.imp.PermissionCheckService;
 import com.TinyPro.utils.JwtUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
@@ -15,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -44,11 +47,14 @@ class UserControllerTest {
     @MockBean
     private IUserService userService;
 
-    @MockBean
-    private JwtUtil jwtUtil;
-
     @InjectMocks
     private UserController userController;
+    @MockBean
+    private JwtUtil jwtUtil;
+    @MockBean
+    private RedisUtil redisUtil;
+    @MockBean
+    private PermissionCheckService permissionCheckService;
 
     @BeforeEach
     void setUp() {
@@ -70,7 +76,7 @@ class UserControllerTest {
                 .thenReturn(ResponseEntity.ok(vo));
         mockMvc.perform(post("/user/reg")
                         .contentType("application/json")
-                        .header("Authorization", Contants.TOKEN)
+                        .header("Authorization", "Bearer "+Contants.TOKEN)
                         .content("""
                                 {
                                     "email": "register@example.com",
@@ -81,6 +87,23 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value("register@example.com"))
                 .andExpect(jsonPath("$.name").value("Test Register"));
+        // ========== Mock JWT ==========
+        Claims mockClaims = Mockito.mock(Claims.class);
+        when(mockClaims.get("email", String.class)).thenReturn("test@example.com");
+        when(jwtUtil.parseJwt(anyString())).thenReturn(mockClaims);
+
+        // ========== Mock Redis ==========
+        String fakeUserJson = """
+            {
+                "id": 1,
+                "email": "test@example.com",
+                "name": "Test User"
+            }
+        """;
+        when(redisUtil.getValue(anyString())).thenReturn(fakeUserJson);
+
+        // ========== Mock 权限校验（如果有） ==========
+        doNothing().when(permissionCheckService).check(any(), any(), any());
     }
 
     // ==================== GET /user/info【获取用户信息】====================
@@ -98,7 +121,7 @@ class UserControllerTest {
                 .thenReturn(new ResponseEntity<>(user, HttpStatus.OK));
 
         mockMvc.perform(get("/user/info")
-                        .header("Authorization", Contants.TOKEN))
+                        .header("Authorization", "Bearer "+Contants.TOKEN))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value("admin@no-reply.com"))
                 .andExpect(jsonPath("$.name").value("Info User"));
@@ -114,7 +137,7 @@ class UserControllerTest {
                 .thenReturn(new ResponseEntity<>(vo, HttpStatus.OK));
 
         mockMvc.perform(delete("/user/delete@example.com")
-                        . header("Authorization", Contants.TOKEN))
+                        . header("Authorization", "Bearer "+Contants.TOKEN))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value("delete@example.com"));
     }
@@ -167,7 +190,7 @@ class UserControllerTest {
 
         mockMvc.perform(patch("/user/update")
                         .contentType("application/json")
-                        .header("Authorization", Contants.TOKEN)
+                        .header("Authorization", "Bearer "+Contants.TOKEN)
                         .content(requestBodyJson))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").exists())
@@ -210,7 +233,7 @@ class UserControllerTest {
                         .param("name", "test")       // 可选查询参数
                         .param("role", "1")          // 可选角色ID
                         .param("email", "user@example.com")  // 可选邮箱筛选
-                        .header("Authorization", Contants.TOKEN))  // 模拟鉴权头
+                        .header("Authorization", "Bearer "+Contants.TOKEN))  // 模拟鉴权头
                 .andExpect(status().isOk())         // 期望 HTTP 200
                 .andExpect(jsonPath("$.items.length()").value(2))     // ✅ 注意字段名是 data 还是 items
                 .andExpect(jsonPath("$.items[0].email").value("user1@example.com"))
@@ -228,7 +251,7 @@ class UserControllerTest {
 
         mockMvc.perform(patch("/user/admin/updatePwd")
                         .contentType("application/json")
-                        .header("Authorization", Contants.TOKEN)
+                        .header("Authorization", "Bearer "+Contants.TOKEN)
                         .content("""
                                 {
                                     "email": "adminpwd@example.com",
@@ -246,7 +269,7 @@ class UserControllerTest {
 
         mockMvc.perform(patch("/user/updatePwd")
                         .contentType("application/json")
-                        .header("Authorization", Contants.TOKEN)
+                        .header("Authorization", "Bearer "+Contants.TOKEN)
                         .content("""
                                 {
                                     "email": "admin@no-reply.com",
@@ -268,7 +291,7 @@ class UserControllerTest {
 
         mockMvc.perform(post("/user/batch")
                         .contentType("application/json")
-                        .header("Authorization", Contants.TOKEN)
+                        .header("Authorization", "Bearer "+Contants.TOKEN)
                         .content("""
                                 ["batch1@example.com", "batch2@example.com"]
                                 """))

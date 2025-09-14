@@ -1,6 +1,13 @@
 package com.TinyPro.controller.contants;
 
+import com.TinyPro.utils.JwtUtil;
+
 public class Contants {
-    public static final String TOKEN ="Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6ImFkbWluQG5vLXJlcGx5LmNvbSIsInN1YiI6ImFkbWluQG5vLXJlcGx5LmNvbSIsImlhdCI6MTc1NzY5MTUyMiwiZXhwIjoxNzU3Njk4NzIyfQ.nGQnMaM3lIF_8-wsnXzB5u7QJpfcm658HNJMmLk78Nw";
+    private static JwtUtil jwtUtil = new JwtUtil("0Zi4SA==");
+    static {
+         String token  = jwtUtil.generateJwt("admin@no-reply.com",999 * 365 * 24 * 60 * 60);
+    }
+    public final static  String TOKEN = "1ZHA_8oEAOkna5Sdm9Z_OIFEfwzq4kU" ;
+    public final static String TRUE_TOKEN = "";
 }
 
