@@ -11,19 +11,24 @@ import com.TinyPro.entity.po.Role;
 import com.TinyPro.entity.vo.MenuTreeVo;
 import com.TinyPro.entity.vo.RolePMVo;
 import com.TinyPro.entity.vo.RoleSimpleVo;
+import com.TinyPro.filter.RejectInterceptor;
 import com.TinyPro.redis.RedisUtil;
 import com.TinyPro.service.IRoleService;
-import com.TinyPro.service.imp.PermissionCheckService;
+import com.TinyPro.service.PermissionCheckService;
 import com.TinyPro.utils.JwtUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
@@ -58,6 +63,19 @@ public class RoleControllerTest {
     private Map<String, String> mockDeleteResult;
     private Role mockRole;
     private UpdateRoleDto updateRoleDto;
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        public RejectInterceptor rejectInterceptor() {
+            return new RejectInterceptor() {
+                @Override
+                public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+                    // 直接放行，不进行拦截
+                    return true;
+                }
+            };
+        }
+    }
 
     @BeforeEach
     public void setUp() {
@@ -117,7 +135,7 @@ public class RoleControllerTest {
         when(redisUtil.getValue(anyString())).thenReturn(fakeUserJson);
 
         // ========== Mock 权限校验（如果有） ==========
-        doNothing().when(permissionCheckService).check(any(), any(), any());
+        doNothing().when(permissionCheckService).checkPermission(any(), any(), any(),any());
     }
 
     // ===================== testCreateRole =====================

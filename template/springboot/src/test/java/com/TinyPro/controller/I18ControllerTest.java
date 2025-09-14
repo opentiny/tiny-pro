@@ -9,18 +9,23 @@ import com.TinyPro.entity.po.I18;
 import com.TinyPro.entity.po.Lang;
 import com.TinyPro.entity.vo.I18Vo;
 import com.TinyPro.entity.vo.LangVo;
+import com.TinyPro.filter.RejectInterceptor;
 import com.TinyPro.redis.RedisUtil;
 import com.TinyPro.service.II18Service;
-import com.TinyPro.service.imp.PermissionCheckService;
+import com.TinyPro.service.PermissionCheckService;
 import com.TinyPro.utils.JwtUtil;
 import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -46,16 +51,29 @@ public class I18ControllerTest {
     @Autowired
     private MockMvc mockMvc;
     @MockBean
+    private PermissionCheckService permissionCheckService;
+    @MockBean
     private II18Service i18Service;
     @MockBean
     private JwtUtil jwtUtil;
     @MockBean
     private RedisUtil redisUtil;
-    @MockBean
-    private PermissionCheckService permissionCheckService;
 
     private CreateI18Dto createI18Dto;
     private UpdateI18Dto updateI18Dto;
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        public RejectInterceptor rejectInterceptor() {
+            return new RejectInterceptor() {
+                @Override
+                public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+                    // 直接放行，不进行拦截
+                    return true;
+                }
+            };
+        }
+    }
 
     @BeforeEach
     public void setUp() {
@@ -79,7 +97,7 @@ public class I18ControllerTest {
         when(redisUtil.getValue(anyString())).thenReturn(fakeUserJson);
 
         // ========== Mock 权限校验（如果有） ==========
-        doNothing().when(permissionCheckService).check(any(), any(), any());
+        doNothing().when(permissionCheckService).checkPermission(any(), any(), any(),any());
         updateI18Dto = new UpdateI18Dto();
     }
 

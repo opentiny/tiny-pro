@@ -3,18 +3,23 @@ package com.TinyPro.controller;
 import com.TinyPro.controller.contants.Contants;
 import com.TinyPro.entity.dto.CreateLangDto;
 import com.TinyPro.entity.po.Lang;
+import com.TinyPro.filter.RejectInterceptor;
 import com.TinyPro.redis.RedisUtil;
 import com.TinyPro.service.ILangService;
-import com.TinyPro.service.imp.PermissionCheckService;
+import com.TinyPro.service.PermissionCheckService;
 import com.TinyPro.utils.JwtUtil;
 import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -48,6 +53,19 @@ public class LangControllerTest {
     private RedisUtil redisUtil;
     @MockBean
     private PermissionCheckService permissionCheckService;
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        public RejectInterceptor rejectInterceptor() {
+            return new RejectInterceptor() {
+                @Override
+                public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+                    // 直接放行，不进行拦截
+                    return true;
+                }
+            };
+        }
+    }
 
     @BeforeEach
     public void setUp() {
@@ -68,7 +86,7 @@ public class LangControllerTest {
         """;
         when(redisUtil.getValue(anyString())).thenReturn(fakeUserJson);
 
-        doNothing().when(permissionCheckService).check(any(), any(), any());
+        doNothing().when(permissionCheckService).checkPermission(any(), any(), any(),any());
     }
 
     @Test

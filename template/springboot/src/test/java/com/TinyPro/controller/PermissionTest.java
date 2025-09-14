@@ -1,17 +1,21 @@
-﻿package com.TinyPro.controller;
+package com.TinyPro.controller;
 
 import com.TinyPro.controller.contants.Contants;
 import com.TinyPro.entity.dto.CreateAuthDto;
 import com.TinyPro.entity.dto.LogoutAuthDto;
+import com.TinyPro.filter.RejectInterceptor;
 import com.TinyPro.service.IAuthService;
-import com.TinyPro.service.imp.PermissionCheckService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -29,6 +33,19 @@ public class PermissionTest {
     private static final String LOGOUT_ENDPOINT = "/auth/logout";
     @Autowired
     private ObjectMapper objectMapper;
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        public RejectInterceptor rejectInterceptor() {
+            return new RejectInterceptor() {
+                @Override
+                public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+                    // 直接放行，不进行拦截
+                    return true;
+                }
+            };
+        }
+    }
 
     private LogoutAuthDto validLogoutDto;
     @BeforeEach
