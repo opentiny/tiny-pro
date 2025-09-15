@@ -35,7 +35,7 @@ public class LangController {
     @PermissionAnnotation("lang::update")
     @PatchMapping("/{id}")
    public ResponseEntity<Lang> updateLang(
-            @Param("id")Integer id,
+            @PathVariable("id")Integer id,
             @RequestBody(required = false) CreateLangDto createLangDto
     ) {
         return this.langService.update(id, createLangDto);
