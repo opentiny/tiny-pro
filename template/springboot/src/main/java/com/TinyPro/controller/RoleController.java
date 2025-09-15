@@ -65,7 +65,7 @@ public class RoleController {
     /**
      * 更具id删除角色
      *
-     * @param id
+     * @PathVariable id
      * @return
      */
     @PermissionAnnotation("role::remove")
