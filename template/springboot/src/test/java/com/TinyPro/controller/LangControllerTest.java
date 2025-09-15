@@ -53,6 +53,7 @@ public class LangControllerTest {
     private RedisUtil redisUtil;
     @MockBean
     private PermissionCheckService permissionCheckService;
+    private Lang updatedLang = new Lang();
     @TestConfiguration
     static class TestConfig {
         @Bean
@@ -69,6 +70,10 @@ public class LangControllerTest {
 
     @BeforeEach
     public void setUp() {
+        Integer id = 1;
+        updatedLang.setId(id);
+        updatedLang.setName("zhCN-Updated");
+
         createLangDto = new CreateLangDto();
         createLangDto.setName("zhCN");
         // ========== Mock JWT ==========
@@ -146,15 +151,9 @@ public class LangControllerTest {
     @Test
     public void testUpdateLang_Success() throws Exception {
         Integer id = 1;
-        Lang updatedLang = new Lang();
-        updatedLang.setId(id);
-        updatedLang.setName("zhCN-Updated");
-
-        // 模拟 service 返回
         when(langService.update(anyInt(), any(CreateLangDto.class)))
                 .thenReturn(ResponseEntity.ok(updatedLang));
 
-        // 模拟 PATCH 请求
         mockMvc.perform(MockMvcRequestBuilders.patch("/lang/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -168,7 +167,7 @@ public class LangControllerTest {
                 .andDo(result -> {
                     System.out.println("Response Body: " + result.getResponse().getContentAsString());
                 })
-                .andExpect(jsonPath("$.id").value("1"))
+                .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("zhCN-Updated"));
     }
 

@@ -55,7 +55,7 @@ public class PermissionTest {
     }
     //真的token测试
     @Test
-    public void testLogout_Success() throws Exception {
+    public void testPermission_Success() throws Exception {
         when(authService.logout(anyString()))
                 .thenReturn("redirect:/login");
 
@@ -67,10 +67,9 @@ public class PermissionTest {
     }
     //假的token测试
     @Test
-    public void testLogout_FLASE() throws Exception {
+    public void testPermission_Faile() throws Exception {
         when(authService.logout(anyString()))
                 .thenReturn("redirect:/login");
-
         mockMvc.perform(post(LOGOUT_ENDPOINT)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization" ,"Bearer "+ Contants.TRUE_TOKEN)

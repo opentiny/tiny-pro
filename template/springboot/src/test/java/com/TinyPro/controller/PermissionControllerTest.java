@@ -106,7 +106,6 @@ public class PermissionControllerTest {
         when(mockClaims.get("email", String.class)).thenReturn("test@example.com");
         when(jwtUtil.parseJwt(anyString())).thenReturn(mockClaims);
 
-        // ========== Mock Redis ==========
         String fakeUserJson = """
             {
                 "id": 1,
