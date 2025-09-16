@@ -121,12 +121,12 @@ public class IPermissionServiceImpl implements IPermissionService {
         return ResponseEntity.ok(PageWrapper.of(result));
     }
 
-    @Override
+       @Override
     public ResponseEntity<CreatePermissionDto> delPermission(Integer id) {
         CreatePermissionDto result = new CreatePermissionDto();
         Permission permission = iPermissionRepository.findById(Long.valueOf(id))
                 .orElseThrow(() ->  new BusinessException("exception.permission.notExists",HttpStatus.NOT_FOUND,null));
-
+        iPermissionRepository.deleteRolePermissionByPermissionId(permission.getId().longValue());
         iPermissionRepository.delete(permission);
         BeanUtils.copyProperties(permission, result);
         return ResponseEntity.ok(result);
