@@ -9,7 +9,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, watch, ref, nextTick } from 'vue';
+  import { onMounted, onUnmounted,watch, ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { TinyHuichartsWaterfall as TinyChartWaterfall } from '@opentiny/vue-huicharts'
   import useLocale from '@/hooks/locale';
@@ -191,6 +191,14 @@
     window.addEventListener('resize', () => {
       waterFallRef.value?.resize();
     });
+    
+    const el = waterFallRef.value?.$el || waterFallRef.value;
+    if (el) {
+      const observer = new ResizeObserver(() => waterFallRef.value?.resize());
+      observer.observe(el);
+      onUnmounted(() => observer.disconnect());
+    }
+
     setTimeout(() => {
       waterFallRef.value?.resize();
     }, 200)

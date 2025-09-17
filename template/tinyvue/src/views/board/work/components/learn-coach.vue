@@ -14,7 +14,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, nextTick, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import transitionFadeSlideGroup from '@/components/transition/transition-fade-slide-group.vue';
 import { TinyHuichartsBar as TinyChartBar, TinyHuichartsLine as TinyChartLine } from '@opentiny/vue-huicharts'
 
@@ -196,6 +196,19 @@ onMounted(() => {
       barRef.value?.resize()
       lineRef.value?.resize()
     }, 200)
+
+    const observer = new ResizeObserver(() => {
+      barRef.value?.resize();
+      lineRef.value?.resize();
+    });
+
+    const el1 = barRef.value?.$el || barRef.value;
+    const el2 = lineRef.value?.$el || lineRef.value;
+
+    if (el1) observer.observe(el1);
+    if (el2) observer.observe(el2);
+
+    onUnmounted(() => observer.disconnect());
 })
 
 </script>

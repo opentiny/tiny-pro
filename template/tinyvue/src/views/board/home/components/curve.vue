@@ -3,13 +3,13 @@
     <img src="@/assets/images/map-background3.png" class="image" />
     <h3>{{ $t('home.curve.trend') }}</h3>
     <div class="curve">
-      <tiny-chart-histogram ref="chartRef" width="100%" height="100%" :data-zoom="dataZoom" :options="options" :extend="chartExtend" class="max-sm:pt-[10%]"></tiny-chart-histogram>
+      <tiny-chart-histogram ref="chartRef" width="100%" height="100%" :data-zoom="dataZoom" :options="options" :extend="chartExtend" class="max-md:pt-[26px]"></tiny-chart-histogram>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, watch, ref, nextTick } from 'vue';
+  import { onMounted, onUnmounted, watch, ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { TinyHuichartsHistogram as TinyChartHistogram } from '@opentiny/vue-huicharts'
   import useLocale from '@/hooks/locale';
@@ -26,7 +26,7 @@
       icon: '',
       itemHeight: 16,
       itemWidth: isMobile ? 22 : 26,
-      itemGap: isMobile ? 10 : 30,
+      itemGap: isMobile ? 5 : 30,
       textStyle: {
         fontSize: isMobile ? 11 : 14
       },
@@ -213,12 +213,17 @@
   })
 
   onMounted(() => {
-    window.addEventListener('resize', () => {
-      chartRef.value?.resize();
-    });
-    setTimeout(() => {
-      chartRef.value?.resize();
-    }, 200)
+    const onWindowResize = () => chartRef.value?.resize();
+    window.addEventListener('resize', onWindowResize);
+
+    const el = chartRef.value?.$el || chartRef.value;
+    if (el) {
+      const observer = new ResizeObserver(() => chartRef.value?.resize());
+      observer.observe(el);
+      onUnmounted(() => observer.disconnect());
+    }
+
+    setTimeout(() => chartRef.value?.resize(), 200);
   });
 
   watch(currentLocale, (newValue, oldValue) => {
