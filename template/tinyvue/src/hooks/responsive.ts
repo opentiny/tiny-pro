@@ -1,13 +1,15 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 
-export function useResponsive(breakpoints = { md: 768, sm: 375 }) {
-  const md = ref(false)
+export function useResponsive(breakpoints = { sm: 640, md: 768, lg: 1024 }) {
   const sm = ref(false)
+  const md = ref(false)
+  const lg = ref(false)
 
   const update = () => {
     if (typeof window === 'undefined') return
-    md.value = window.innerWidth <= breakpoints.md
     sm.value = window.innerWidth <= breakpoints.sm
+    md.value = window.innerWidth <= breakpoints.md
+    lg.value = window.innerWidth <= breakpoints.lg
   }
 
   onMounted(() => {
@@ -19,19 +21,19 @@ export function useResponsive(breakpoints = { md: 768, sm: 375 }) {
     window.removeEventListener('resize', update)
   })
 
-  return { sm, md }
+  return { sm, md, lg }
 }
 
 export function useResponsiveSize() {
-  const { md } = useResponsive()
+  const { lg } = useResponsive()
 
   const gridSize = computed(() => {
-    if (md.value) return 'mini'
+    if (lg.value) return 'mini'
     return 'medium'
   })
 
   const modalSize = computed(() => {
-    if (md.value) return '100%'
+    if (lg.value) return '100%'
     return '768px'
   })
 

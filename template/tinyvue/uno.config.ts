@@ -1,7 +1,7 @@
 import { defineConfig, presetMini, presetAttributify } from 'unocss'
 
 const breakpoints = {
-  sm: '376px',     // 手机（小屏，iPhone SE、Mini 等）
+  sm: '641px',     // 手机（小屏，iPhone SE、Mini 等）
   md: '769px',     // 平板（竖屏，iPad Mini、iPad）
   lg: '1025px',    // 平板横屏 / 小型笔记本（iPad 横屏、Surface Go）
   xl: '1367px',    // 笔记本主流分辨率（MacBook Air、13寸笔记本）
