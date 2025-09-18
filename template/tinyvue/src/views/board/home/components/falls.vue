@@ -13,6 +13,7 @@
   import { useI18n } from 'vue-i18n';
   import { TinyHuichartsWaterfall as TinyChartWaterfall } from '@opentiny/vue-huicharts'
   import useLocale from '@/hooks/locale';
+  import { debounce } from  '@/hooks/responsive'
 
   const { t } = useI18n();
   const { currentLocale } = useLocale();
@@ -188,20 +189,24 @@
   });
 
   onMounted(() => {
-    window.addEventListener('resize', () => {
-      waterFallRef.value?.resize();
-    });
+    const resizeHandler = debounce(() => waterFallRef.value?.resize(), 200);
+    window.addEventListener('resize', resizeHandler);
     
     const el = waterFallRef.value?.$el || waterFallRef.value;
+    let observer: ResizeObserver | null = null;
     if (el) {
-      const observer = new ResizeObserver(() => waterFallRef.value?.resize());
+      observer = new ResizeObserver(() => waterFallRef.value?.resize());
       observer.observe(el);
-      onUnmounted(() => observer.disconnect());
     }
 
     setTimeout(() => {
       waterFallRef.value?.resize();
     }, 200)
+
+    onUnmounted(() => {
+      window.removeEventListener('resize', resizeHandler);
+      observer?.disconnect();
+    });
   });
 
   watch(currentLocale, (newValue, oldValue) => {

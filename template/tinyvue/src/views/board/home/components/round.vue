@@ -18,6 +18,7 @@
   import { useI18n } from 'vue-i18n';
   import { TinyHuichartsRing as TinyChartRing } from '@opentiny/vue-huicharts'
   import useLocale from '@/hooks/locale';
+  import { debounce } from  '@/hooks/responsive'
   import RoundTable from './roundtable.vue';
 
   const { t } = useI18n();
@@ -82,26 +83,32 @@
   })
 
   const windowWidth = ref(0)
-  const handleResize = () => {
-    windowWidth.value = window.innerWidth
-  }
-  const onResizeChart = () => {
-    ringRef.value?.resize();
-  };
+
   onMounted(() => {
-    window.addEventListener('resize', handleResize);
-    window.addEventListener('resize', onResizeChart);
-    handleResize();
-    onResizeChart();
+    const resizeHandler = debounce(() => {
+      windowWidth.value = window.innerWidth;
+      ringRef.value?.resize();
+    }, 200);
+
+    window.addEventListener('resize', resizeHandler);
+
+    const el = ringRef.value?.$el || ringRef.value;
+    let observer: ResizeObserver | null = null;
+    if (el) {
+      observer = new ResizeObserver(() => ringRef.value?.resize());
+      observer.observe(el);
+    }
+  
+    resizeHandler();
     setTimeout(() => {
       ringRef.value?.resize();
     }, 200)
-  });
 
-  onUnmounted(() => {
-    window.removeEventListener('resize', handleResize);
-    window.addEventListener('resize', onResizeChart);
+    onUnmounted(() => {
+      window.removeEventListener('resize', resizeHandler);
+    });
   });
+  
   const chartWidth = computed(() => windowWidth.value <= 768 ? '80vw' : '30vw')
 
   watch(currentLocale, (newValue, oldValue) => {

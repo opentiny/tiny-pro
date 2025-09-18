@@ -13,6 +13,7 @@
   import { useI18n } from 'vue-i18n';
   import { TinyHuichartsHistogram as TinyChartHistogram } from '@opentiny/vue-huicharts'
   import useLocale from '@/hooks/locale';
+  import { debounce } from  '@/hooks/responsive'
 
   const { t } = useI18n();
   const { currentLocale } = useLocale();
@@ -213,17 +214,27 @@
   })
 
   onMounted(() => {
-    const onWindowResize = () => chartRef.value?.resize();
-    window.addEventListener('resize', onWindowResize);
+    const resizeHandler = debounce(() => {
+      chartExtend.value.legend = getLegendConfig();
+      chartRef.value?.resize();
+      chartRef.value?.setOption({ legend: chartExtend.value.legend });
+    }, 200);
+
+    window.addEventListener('resize', resizeHandler);
 
     const el = chartRef.value?.$el || chartRef.value;
+    let observer: ResizeObserver | null = null;
     if (el) {
-      const observer = new ResizeObserver(() => chartRef.value?.resize());
+      observer = new ResizeObserver(() => chartRef.value?.resize());
       observer.observe(el);
-      onUnmounted(() => observer.disconnect());
     }
 
     setTimeout(() => chartRef.value?.resize(), 200);
+
+    onUnmounted(() => {
+      window.removeEventListener('resize', resizeHandler);
+      observer?.disconnect();
+    });
   });
 
   watch(currentLocale, (newValue, oldValue) => {

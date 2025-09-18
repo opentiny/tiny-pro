@@ -1,5 +1,18 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 
+export function debounce(fn: (...args: any[]) => void, delay = 200) {
+  let timer: number | null = null
+  return (...args: any[]) => {
+    if (timer !== null) {
+      clearTimeout(timer)
+    }
+    timer = window.setTimeout(() => {
+      fn(...args)
+      timer = null
+    }, delay)
+  }
+}
+
 export function useResponsive(breakpoints = { sm: 640, md: 768, lg: 1024 }) {
   const sm = ref(false)
   const md = ref(false)
@@ -12,13 +25,15 @@ export function useResponsive(breakpoints = { sm: 640, md: 768, lg: 1024 }) {
     lg.value = window.innerWidth <= breakpoints.lg
   }
 
+  const resizeHandler = debounce(update, 200)
+
   onMounted(() => {
     update()
-    window.addEventListener('resize', update)
+    window.addEventListener('resize', resizeHandler)
   })
 
   onUnmounted(() => {
-    window.removeEventListener('resize', update)
+    window.removeEventListener('resize', resizeHandler)
   })
 
   return { sm, md, lg }
