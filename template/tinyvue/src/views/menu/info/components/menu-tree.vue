@@ -3,6 +3,7 @@
     ref="grid" 
     :data="menuList" 
     :tree-config="{ children: 'children' }"
+    :auto-resize="true" 
     align="center"
     :size="gridSize"
     >

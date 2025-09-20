@@ -9,6 +9,7 @@
         : undefined
     "
     :loading="loading"
+    :auto-resize="true"
     remote-filter
     refresh
     :size="gridSize"

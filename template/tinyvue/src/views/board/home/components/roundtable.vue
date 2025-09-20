@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <tiny-grid ref="grid" :fetch-data="fetchDataOption" :pager="pagerConfig" :size="gridSize" align="center">
+    <tiny-grid ref="grid" :fetch-data="fetchDataOption" :pager="pagerConfig" :size="gridSize" :auto-resize="true" align="center">
       <tiny-grid-column
         field="id"
         :title="$t('home.roundtable.index')"

@@ -60,4 +60,8 @@
     padding-left: 14px;
     padding-bottom: 24px;
   }
+
+  :deep(.tiny-transfer__button) {
+    width: auto;
+  }
 </style>
