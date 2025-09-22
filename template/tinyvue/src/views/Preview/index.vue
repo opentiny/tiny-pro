@@ -50,7 +50,7 @@
       </tiny-layout>
     </div>
     <div class="preview-table">
-      <tiny-grid ref="grid" :fetch-data="fetchDataOption" :pager="pagerConfig">
+      <tiny-grid ref="grid" :fetch-data="fetchDataOption" :pager="pagerConfig" :auto-resize="true">
         <tiny-grid-column
           field="id"
           :title="$t('home.roundtable.index')"

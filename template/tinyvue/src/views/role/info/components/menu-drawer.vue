@@ -1,7 +1,7 @@
 <template>
   <tiny-modal 
   v-model="visible"
-   width="700"  
+   :width="modalSize"  
    height="auto" 
    :title="$t('roleInfo.table.bind')" 
    show-footer @close="() => emits('close')">
@@ -34,6 +34,9 @@
   import { Modal as TinyModal, TinyTree , Button as TinyButton,TinyInput } from '@opentiny/vue';
   import { onMounted, ref, toRefs, watch } from 'vue';
   import { iconExpand ,iconPutAway } from '@opentiny/vue-icon'
+  import { useResponsiveSize } from '@/hooks/responsive'
+
+  const { modalSize } = useResponsiveSize()
 
   const props = defineProps<{
     visible: boolean;

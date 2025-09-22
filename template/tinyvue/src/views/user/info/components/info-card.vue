@@ -1,7 +1,7 @@
 <template>
-  <div class="card flex flex-wrap gap-4">
+  <div class="card grid grid-cols-4 gap-4 max-md:grid-cols-2 max-sm:grid-cols-1">
     <transition-slide-group>
-      <div v-for="(item, index) in InfoNum" :key="index" class="col flex flex-col gap-6 w-[22%] max-sm:w-full max-sm:flex-row max-sm:items-center max-sm:gap-0">
+      <div v-for="(item, index) in InfoNum" :key="index" class="col flex flex-col gap-6 max-sm:flex-row max-sm:items-center max-sm:gap-0">
         <div>
           <img :src="item.img" />
           <span>{{ $t(item.text) }}</span>

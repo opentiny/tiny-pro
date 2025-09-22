@@ -59,9 +59,10 @@
     GridColumn as TinyGridColumn,
     Pager as TinyPager,
   } from '@opentiny/vue';
-  import { useResponsiveGrid } from '@/hooks/responsive'
+  import { useResponsive, useResponsiveSize } from '@/hooks/responsive'
 
-  const { sm, gridSize } = useResponsiveGrid()
+  const { gridSize } = useResponsiveSize()
+  const { sm } = useResponsive()
    
   const pagerLayout = computed(() =>
     sm.value ? 'total, prev, pager, next' : 'total, sizes, prev, pager, next, jumper'

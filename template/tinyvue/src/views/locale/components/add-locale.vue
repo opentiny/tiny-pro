@@ -1,6 +1,6 @@
 <template>
   <div>
-    <tiny-button show-footer type="primary" @click="onOpen" round>
+    <tiny-button show-footer type="primary" round @click="onOpen">
       {{ $t('locale.add.btn') }}
     </tiny-button>
     <tiny-button round @click="onBatchRemove">
@@ -36,7 +36,7 @@
           </tiny-select>
           <tiny-popover v-model="langPopoverOpen" trigger="manual">
             <div>
-              <tiny-form ref="langForm" :model="lang" :rules="langRule">
+              <tiny-form ref="langForm" :model="lang" :rules="langRule" label-width="90px">
                 <tiny-form-item :label="$t('lang.add.title')" prop="name">
                   <tiny-input v-model="lang.name" />
                 </tiny-form-item>
@@ -50,12 +50,14 @@
                 v-permission="'lang::add'"
                 type="text"
                 :text="$t('locale.add.lang.btn')"
+                class="max-sm:w-unset!"
                 @click="langPopoverOpen = !langPopoverOpen"
               ></tiny-button>
               <tiny-button
                 v-permission="'lang::update'"
                 type="text"
                 :text="$t('lang.manage.btn')"
+                class="max-sm:w-unset!"
                 @click="setLangTableOpen"
               ></tiny-button>
             </template>
@@ -68,8 +70,8 @@
           size="small"
           :text="$t('locale.add.btn')"
           type="primary"
-          @click="addLocale"
           round
+          @click="addLocale"
         ></tiny-button>
       </template>
     </tiny-dialog-box>
@@ -218,7 +220,6 @@
 
 <style scoped lang="less">
 .locale-dialog-box :deep(.tiny-dialog-box .tiny-dialog-box__body) {
-  padding-right: 110px;
   padding-top: 0px;
   padding-bottom: 0px;
 }

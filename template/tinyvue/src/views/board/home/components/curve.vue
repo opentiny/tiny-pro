@@ -3,16 +3,17 @@
     <img src="@/assets/images/map-background3.png" class="image" />
     <h3>{{ $t('home.curve.trend') }}</h3>
     <div class="curve">
-      <tiny-chart-histogram ref="chartRef" width="100%" height="100%" :data-zoom="dataZoom" :options="options" :extend="chartExtend" class="max-sm:pt-[10%]"></tiny-chart-histogram>
+      <tiny-chart-histogram ref="chartRef" width="100%" height="100%" :data-zoom="dataZoom" :options="options" :extend="chartExtend" class="max-md:pt-[26px]"></tiny-chart-histogram>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, watch, ref, nextTick } from 'vue';
+  import { onMounted, onUnmounted, watch, ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { TinyHuichartsHistogram as TinyChartHistogram } from '@opentiny/vue-huicharts'
   import useLocale from '@/hooks/locale';
+  import { debounce } from  '@/hooks/responsive'
 
   const { t } = useI18n();
   const { currentLocale } = useLocale();
@@ -26,7 +27,7 @@
       icon: '',
       itemHeight: 16,
       itemWidth: isMobile ? 22 : 26,
-      itemGap: isMobile ? 10 : 30,
+      itemGap: isMobile ? 5 : 30,
       textStyle: {
         fontSize: isMobile ? 11 : 14
       },
@@ -213,12 +214,27 @@
   })
 
   onMounted(() => {
-    window.addEventListener('resize', () => {
+    const resizeHandler = debounce(() => {
+      chartExtend.value.legend = getLegendConfig();
       chartRef.value?.resize();
+      chartRef.value?.setOption({ legend: chartExtend.value.legend });
+    }, 200);
+
+    window.addEventListener('resize', resizeHandler);
+
+    const el = chartRef.value?.$el || chartRef.value;
+    let observer: ResizeObserver | null = null;
+    if (el) {
+      observer = new ResizeObserver(() => chartRef.value?.resize());
+      observer.observe(el);
+    }
+
+    setTimeout(() => chartRef.value?.resize(), 200);
+
+    onUnmounted(() => {
+      window.removeEventListener('resize', resizeHandler);
+      observer?.disconnect();
     });
-    setTimeout(() => {
-      chartRef.value?.resize();
-    }, 200)
   });
 
   watch(currentLocale, (newValue, oldValue) => {

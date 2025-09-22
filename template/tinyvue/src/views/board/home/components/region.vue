@@ -17,6 +17,7 @@
   import { onMounted, onUnmounted, ref, computed, nextTick } from 'vue';
   import { TinyHuichartsMap as TinyChartMap } from '@opentiny/vue-huicharts'
   import chinaData from '@/assets/china.json'
+  import { debounce } from  '@/hooks/responsive'
   import RegionTable from './regiontable.vue';
 
   const data = [
@@ -108,26 +109,31 @@
   })
 
   const windowWidth = ref(0)
-  const handleResize = () => {
-    windowWidth.value = window.innerWidth
-  }
-  const onResizeChart = () => {
-    mapChartsRef.value?.resize();
-  };
 
   onMounted(() => {
-    window.addEventListener('resize', handleResize);
-    window.addEventListener('resize', onResizeChart);
-    handleResize();
-    onResizeChart();
+    const resizeHandler = debounce(() => {
+      windowWidth.value = window.innerWidth;
+      mapChartsRef.value?.resize();
+    }, 200);
+
+    window.addEventListener('resize', resizeHandler);
+
+    const el = mapChartsRef.value?.$el || mapChartsRef.value;
+    let observer: ResizeObserver | null = null;
+    if (el) {
+      observer = new ResizeObserver(() => mapChartsRef.value?.resize());
+      observer.observe(el);
+    }
+
+    resizeHandler();
     setTimeout(() => {
       mapChartsRef.value?.resize();
     }, 200)
-  });
 
-  onUnmounted(() => {
-    window.removeEventListener('resize', handleResize);
-    window.removeEventListener('resize', onResizeChart);
+    onUnmounted(() => {
+      window.removeEventListener('resize', resizeHandler);
+      observer?.disconnect();
+    });
   });
 
   const chartWidth = computed(() => windowWidth.value <= 768 ? '80vw' : '30vw')

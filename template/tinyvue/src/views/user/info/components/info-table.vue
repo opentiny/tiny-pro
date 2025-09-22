@@ -52,9 +52,9 @@
     GridColumn as TinyGridColumn,
     Grid as TinyGrid,
   } from '@opentiny/vue';
-  import { useResponsiveGrid } from '@/hooks/responsive'
+  import { useResponsiveSize } from '@/hooks/responsive'
 
-  const { gridSize } = useResponsiveGrid()
+  const { gridSize } = useResponsiveSize()
 
   const props = defineProps({
     // eslint-disable-next-line vue/require-prop-types

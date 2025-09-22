@@ -17,9 +17,10 @@
       </div>
       <div class="table">
         <tiny-grid
+          :key="sm ? 'sm' : 'lg'"
           ref="grid"
           :fetch-data="fetchDataOption"
-          :pager="pagerConfig"
+          :pager="sm ? pagerConfigSm : pagerConfigLg"
           :auto-resize="true"
           remote-filter
           :edit-config="{ trigger: 'click', mode: 'cell', showStatus: true }"
@@ -289,9 +290,8 @@
   <div v-if="state.isUserAdd">
     <tiny-modal
       v-model="state.isUserAdd"
-      :lock-scroll="true"
       height="auto"
-      width="700"
+      :width="modalSize"
       :title="$t('userInfo.modal.title.add')"
     >
       <UserAdd
@@ -309,7 +309,7 @@
       show-footer
       mask-closable="true"
       height="auto"
-      width="600"
+      :width="modalSize"
       :title="$t('userInfo.modal.title.pwdUpdate')"
     >
       <template #default>
@@ -317,19 +317,18 @@
           <tiny-form
             :model="state.pwdData"
             :rules="rules"
-            label-width="150px"
             :label-align="true"
             label-position="left"
           >
-            <tiny-row :flex="true" justify="left">
-              <tiny-col :span="10" label-width="100px">
+            <tiny-row flex justify="left">
+              <tiny-col class="w-full" label-width="100px">
                 <tiny-form-item :label="$t('userInfo.table.email')">
                   <label>{{ state.pwdData.email }}</label>
                 </tiny-form-item>
               </tiny-col>
             </tiny-row>
-            <tiny-row :flex="true" justify="left">
-              <tiny-col :span="10" label-width="100px">
+            <tiny-row flex justify="left">
+              <tiny-col class="w-full" label-width="100px">
                 <tiny-form-item
                   :label="$t('userInfo.modal.input.newPassword')"
                   prop="newPassword"
@@ -343,8 +342,8 @@
               </tiny-col>
             </tiny-row>
 
-            <tiny-row :flex="true" justify="left">
-              <tiny-col :span="10" label-width="100px">
+            <tiny-row flex justify="left">
+              <tiny-col class="w-full" label-width="100px">
                 <tiny-form-item
                   :label="$t('userInfo.modal.input.confirmNewPassword')"
                   prop="confirmNewPassword"
@@ -397,11 +396,12 @@
   import { getSimpleDate } from '@/utils/time';
   import { getAllRole } from '@/api/role';
   import { FilterType } from '@/types/global';
-  import { useResponsiveGrid } from '@/hooks/responsive'
+  import { useResponsive, useResponsiveSize } from '@/hooks/responsive'
   import UserAdd from '../../useradd/index.vue';
   import UserDetail from '../../user-detail/index.vue';
 
-  const { gridSize } = useResponsiveGrid()
+  const { gridSize, modalSize } = useResponsiveSize()
+  const { sm } = useResponsive()
 
   const IconCommission = iconCommission();
   const IconDel = iconDel();
@@ -486,16 +486,14 @@
     }),
   });
 
-  const pagerConfig = reactive({
+  const pagerConfigSm = {
     component: TinyPager,
-    attrs: {
-      currentPage: 1,
-      pageSize: 10,
-      pageSizes: [10, 20, 50, 100],
-      total: 10,
-      layout: 'total, sizes, prev, pager, next, jumper',
-    },
-  });
+    attrs: { currentPage:1, pageSize:10, pageSizes:[10,20,50,100], total:10, layout:'total, prev, pager, next' }
+  }
+  const pagerConfigLg = {
+    component: TinyPager,
+    attrs: { currentPage:1, pageSize:10, pageSizes:[10,20,50,100], total:10, layout:'sizes, total, prev, pager, next, jumper' }
+  }
 
   // 校验规则
   const rulesType = {
@@ -725,6 +723,7 @@
     margin: 0px 0px 16px;
 
     .tiny-button {
+      width: 96px;
       margin: 0 8px 0 0;
     }
   }

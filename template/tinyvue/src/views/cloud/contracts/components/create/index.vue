@@ -178,7 +178,7 @@
   }
 
   .contain {
-    width: 90%;
+    width: 100%;
     margin-top: 10%;
     color: var(--tv-common-color-text-secondary);
     font-size: var(--tv-default-font-size);
@@ -190,12 +190,17 @@
     }
 
     .btn {
+      display: flex;
+      justify-content: center;
       margin-top: 6%;
 
       :deep(.tiny-button) {
         width: 100px;
         height: 36px;
         border-radius: 4px;
+      }
+      :deep(.tiny-form-item__content) {
+        margin-left: 0 !important;
       }
     }
 

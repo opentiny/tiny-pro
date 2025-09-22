@@ -10,7 +10,7 @@ import App from './App.vue';
 import '@/api/interceptor';
 import '@/assets/style/global.less';
 import config from '../hwc-exports.json';
-import '@opentiny/vue-search-box/index.css';
+import '@opentiny/vue-search-box/dist/index.css';
 import 'virtual:uno.css';
 import "@opentiny/icons/style/all.css";
 
@@ -30,20 +30,7 @@ app.use(globalComponents);
 app.use(directive);
 app.use(TinySearchBox);
 
-// 检测设备类型
-const detectDevice = () => {
-  const width = window.innerWidth;
-  if (width < 768) {
-    app.config.globalProperties.tiny_mode = { value: 'mobile' };
-    app.config.globalProperties.isMobile = true;
-  } else {
-    app.config.globalProperties.tiny_mode = { value: 'pc' };
-    app.config.globalProperties.isMobile = false;
-  }
-};
-
-detectDevice();
-
-window.addEventListener('resize', detectDevice);
+app.config.globalProperties.tiny_mode = { value: 'pc' };
+app.config.globalProperties.isMobile = false;
 
 app.mount('#app');

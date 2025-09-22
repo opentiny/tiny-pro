@@ -9,6 +9,7 @@
         : undefined
     "
     :loading="loading"
+    :auto-resize="true"
     remote-filter
     refresh
     :size="gridSize"
@@ -76,9 +77,9 @@
     TinyModal,
   } from '@opentiny/vue';
   import { iconDel } from '@opentiny/vue-icon';
-  import { useResponsiveGrid } from '@/hooks/responsive'
+  import { useResponsiveSize } from '@/hooks/responsive'
 
-  const { gridSize } = useResponsiveGrid()
+  const { gridSize } = useResponsiveSize()
 
   const IconDel = iconDel();
   const { t } = useI18n();

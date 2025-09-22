@@ -126,7 +126,8 @@
   const tabStore = useTabStore();
   onMounted(() => {
     if (window.innerWidth <= 768) {
-      document.querySelector('.tiny-tree-menu')?.classList.add('is-collapsed');
+      const collapseBtn = document.querySelector('.tiny-tree-menu__toggle-button')
+      collapseBtn?.dispatchEvent(new Event('click'))
     }
     watch(
       () => tabStore.current,

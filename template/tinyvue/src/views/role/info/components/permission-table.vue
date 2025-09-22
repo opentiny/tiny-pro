@@ -17,9 +17,9 @@
   import type { Permission } from '@/api/permission';
   import { Grid, GridColumn } from '@opentiny/vue';
   import { toRefs, watch } from 'vue';
-  import { useResponsiveGrid } from '@/hooks/responsive'
+  import { useResponsiveSize } from '@/hooks/responsive'
 
-  const { gridSize } = useResponsiveGrid()
+  const { gridSize } = useResponsiveSize()
 
   const props = defineProps<{
     permission: Permission[];
