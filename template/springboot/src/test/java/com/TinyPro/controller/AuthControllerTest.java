@@ -5,7 +5,7 @@ import com.TinyPro.entity.dto.CreateAuthDto;
 import com.TinyPro.entity.dto.LogoutAuthDto;
 import com.TinyPro.filter.RejectInterceptor;
 import com.TinyPro.redis.RedisUtil;
-import com.TinyPro.service.IAuthService;
+import com.TinyPro.service.IAuthService; 
 import com.TinyPro.service.PermissionCheckService;
 import com.TinyPro.utils.JwtUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
