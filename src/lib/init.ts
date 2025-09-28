@@ -12,6 +12,7 @@ import {
   BuildTool,
   devCommand,
   devDependencies,
+  LowcodeEngine,
   ProjectInfo,
   removedCommand,
   removeDependencies,
@@ -65,6 +66,18 @@ const getProjectInfo = (): Promise<ProjectInfo> => {
         { name: '暂不配置', value: ServerFrameworks.Skip },
       ],
       default: ServerFrameworks.NestJs,
+      prefix: '*',
+      when: (answers) => answers.framework === VUE_TEMPLATE_PATH,
+    },
+    {
+      type: 'list',
+      name: 'lowcodeEngine',
+      message: '是否集成低代码设计器：',
+      choices: [
+        { name: '是，集成低代码设计器', value: LowcodeEngine.Include },
+        { name: '否，暂不集成', value: LowcodeEngine.Skip },
+      ],
+      default: LowcodeEngine.Skip,
       prefix: '*',
       when: (answers) => answers.framework === VUE_TEMPLATE_PATH,
     },
@@ -164,6 +177,24 @@ const getProjectInfo = (): Promise<ProjectInfo> => {
     },
   ];
   return inquirer.prompt(question);
+};
+
+/**
+ * 同步创建低代码设计器项目文件目录、文件
+ * @answers 询问客户端问题的选择值
+ */
+const createLowcodeDesignerSync = (answers: ProjectInfo) => {
+  const { name, lowcodeEngine } = answers;
+  if (lowcodeEngine !== LowcodeEngine.Include) {
+    return;
+  }
+
+  // 复制低代码设计器相关目录
+  const lowcodeFrom = utils.getTemplatePath(lowcodeEngine);
+  const lowcodeTo = utils.getDistPath(`${name}/${lowcodeEngine}`);
+
+  copySync(lowcodeFrom, lowcodeTo);
+  log.success('低代码设计器模板复制成功');
 };
 
 /**
@@ -320,7 +351,8 @@ const packageJsonProcess = (
  * @dbAnswers  询问服务端配置的选择值
  */
 const createProjectSync = (answers: ProjectInfo) => {
-  const { description, name, serverConfirm, buildTool } = answers;
+  const { description, name, serverConfirm, buildTool, lowcodeEngine } =
+    answers;
   const templatePath = VueVersion.Vue3;
   // 模板来源目录
   const from = utils.getTemplatePath(templatePath);
@@ -344,33 +376,49 @@ const createProjectSync = (answers: ProjectInfo) => {
     log.error('配置项目信息创建失败');
   }
 
-  // 如果不对接服务端，全部接口采用mock
-  if (!serverConfirm) {
-    try {
-      const envPath = path.join(to, '.env');
-      const envConfig = dotenv.parse(
-        fs.readFileSync(envPath, { encoding: 'utf8' })
-      );
+  // 配置环境变量
+  try {
+    const envPath = path.join(to, 'dev.env');
+    const envContent = fs.readFileSync(envPath, { encoding: 'utf8' });
+    let updatedEnvContent = envContent;
+
+    // 如果不对接服务端，删除VITE_MOCK_IGNORE配置
+    if (!serverConfirm) {
+      const envConfig = dotenv.parse(envContent);
       delete envConfig.VITE_MOCK_IGNORE;
-      const config = Object.keys(envConfig)
+      updatedEnvContent = Object.keys(envConfig)
         .map((key) => `${key} = ${envConfig[key]}`)
         .join('\n');
-      fs.writeFileSync(envPath, config);
-    } catch (e) {
-      log.error(e);
-      log.error('开启mock模式失败');
-      log.info('请手动配置env信息');
     }
-  } else {
+
+    // 根据用户选择设置低代码设计器环境变量
+    const lowcodeEnabled = lowcodeEngine === LowcodeEngine.Include;
+    updatedEnvContent = updatedEnvContent.replace(
+      /VITE_LOWCODE_DESIGNER_ENABLED=false/,
+      `VITE_LOWCODE_DESIGNER_ENABLED=${lowcodeEnabled}`
+    );
+
+    fs.writeFileSync(envPath, updatedEnvContent);
+    log.success(`低代码设计器环境变量已设置为: ${lowcodeEnabled}`);
+  } catch (e) {
+    log.error(e);
+    log.error('配置环境变量失败');
+    log.info('请手动配置env信息');
+  }
+
+  if (serverConfirm) {
     // 如果对接服务端，执行文件复制及相关配置（ WIP: 后台接口暂未全量完成，部分接口还是使用mock ）
     createServerSync(answers);
   }
+
+  // 如果选择了低代码设计器，复制低代码设计器模板
+  createLowcodeDesignerSync(answers);
 };
 
 // 安装依赖
 export const installDependencies = (answers: ProjectInfo) => {
   const prefix = cliConfig.getBinName();
-  const { name, serverFramework, serverConfirm } = answers;
+  const { name, serverFramework, serverConfirm, lowcodeEngine } = answers;
   // egg服务端 安装依赖并启动
   if (serverConfirm && serverFramework === ServerFrameworks.EggJs) {
     log.info('正在安装服务端 npm 依赖，安装过程需要几十秒，请耐心等待...');
@@ -394,6 +442,22 @@ export const installDependencies = (answers: ProjectInfo) => {
     log.success('客户端 npm 依赖安装成功');
   } else {
     throw new Error(installClientResult.error);
+  }
+
+  // 低代码设计器依赖安装
+  if (lowcodeEngine && lowcodeEngine === LowcodeEngine.Include) {
+    log.info(
+      '正在安装低代码设计器 npm 依赖，安装过程需要几十秒，请耐心等待...'
+    );
+    const installLowcodeResult = spawn.sync('npm', ['install'], {
+      cwd: `${name}/${lowcodeEngine}/`,
+      stdio: 'inherit',
+    });
+    if (installLowcodeResult.status === 0) {
+      log.success('低代码设计器 npm 依赖安装成功');
+    } else {
+      throw new Error(installLowcodeResult.error);
+    }
   }
 
   /* prettier-ignore-start */
@@ -426,6 +490,17 @@ export const installDependencies = (answers: ProjectInfo) => {
         `${chalk.yellow(
           `$ cd ${name} && ${prefix} start`
         )}         # 可一键开启项目开发环境`
+      )
+    );
+  }
+
+  // 低代码设计器启动提示
+  if (lowcodeEngine && lowcodeEngine === LowcodeEngine.Include) {
+    console.log(
+      chalk.green(
+        `${chalk.yellow(
+          `$ cd ${name}/${lowcodeEngine} && npm run dev`
+        )}  # 开启低代码设计器开发环境`
       )
     );
   }
