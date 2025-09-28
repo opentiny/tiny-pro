@@ -40,7 +40,7 @@ export function useResponsive(breakpoints = { sm: 640, md: 768, lg: 1024 }) {
 }
 
 export function useResponsiveSize() {
-  const { lg } = useResponsive()
+  const { md, lg } = useResponsive()
 
   const gridSize = computed(() => {
     if (lg.value) return 'mini'
@@ -48,7 +48,7 @@ export function useResponsiveSize() {
   })
 
   const modalSize = computed(() => {
-    if (lg.value) return '100%'
+    if (md.value) return '100%'
     return '768px'
   })
 

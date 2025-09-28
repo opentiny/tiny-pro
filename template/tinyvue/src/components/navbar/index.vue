@@ -523,9 +523,8 @@
   }
 
   // 移动端显示折叠按钮，隐藏右侧菜单
-  // 移动端显示折叠按钮，隐藏右侧菜单
-  @media (max-width: 769px) {
-    // 汉堡按钮
+  @media (max-width: 768px) {
+    // 折叠按钮
     .menu-toggle {
       display: block;
       font-size: 20px;

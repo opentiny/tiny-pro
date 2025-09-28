@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <Breadcrumb :items="['menu.user', 'menu.user.info']" />
-    <div class="container-info max-md:overflow-auto">
+    <div class="container-info max-md:overflow-y-auto">
       <div class="general-card">
         <div class="general-top flex justify-around max-sm:flex-col max-sm:items-center max-sm:pb-[10px]">
           <headtop></headtop>
@@ -32,6 +32,7 @@
     width: 100%;
     height: calc(100% - 60px);
     margin: 0 auto;
+    overflow-x: hidden;
 
     .general-card {
       display: flex;

@@ -1,7 +1,8 @@
 <template>
   <tiny-grid
+    :key="sm ? 'sm' : 'lg'"
     ref="grid"
-    :pager="pagerConfig"
+    :pager="sm ? pagerConfigSm : pagerConfigLg"
     :fetch-data="fetchData"
     :edit-config="
       rolePermission.includes('i18n::update')
@@ -77,9 +78,10 @@
     TinyModal,
   } from '@opentiny/vue';
   import { iconDel } from '@opentiny/vue-icon';
-  import { useResponsiveSize } from '@/hooks/responsive'
+  import { useResponsive, useResponsiveSize } from '@/hooks/responsive'
 
   const { gridSize } = useResponsiveSize()
+  const { sm } = useResponsive()
 
   const IconDel = iconDel();
   const { t } = useI18n();
@@ -113,7 +115,18 @@
       );
     },
   };
-  const pagerConfig = ref({
+  
+  const pagerConfigSm = ref({
+    attrs: {
+      currentPage: 1,
+      pageSize: 10,
+      pageSizes: [10, 20, 50, 100],
+      total: 0,
+      align: 'right',
+      layout: 'total, prev, pager, next',
+    },
+  });
+  const pagerConfigLg = ref({
     attrs: {
       currentPage: 1,
       pageSize: 10,
