@@ -45,6 +45,9 @@
       <li>
         <span @click="setVisible">{{ $t('settings.title') }}</span>
       </li>
+      <li v-if="isLowcodeDesignerEnabled">
+        <span @click="openLowCodeDesigner">设计器</span>
+      </li>
       <li class="navbar-user">
         <tiny-user-head type="icon" round min>
           <div class="user-image">
@@ -191,6 +194,11 @@
   const iconEdit = IconEdit();
   const lan = ref(false);
 
+  // 检查是否启用低代码设计器
+  const isLowcodeDesignerEnabled = computed(() => {
+    return import.meta.env.VITE_LOWCODE_DESIGNER_ENABLED === 'true';
+  });
+
   const appStore = useAppStore();
   const userStore = useUserStore();
   const { logout } = useUser();
@@ -218,6 +226,11 @@
   // 设置页面显示
   const setVisible = () => {
     appStore.updateSettings({ Settings: true });
+  };
+
+  // 设计器
+  const openLowCodeDesigner = () => {
+    window.open(`http://localhost:8090/?type=app&id=1&tenant=1&pageid=1`, '_blank');
   };
 
   // 用户设置

@@ -2,6 +2,8 @@ import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { LogoutAuthDto } from './dto/logout-auth.dto';
+import { CreateApiTokenDto } from './dto/create-api-token.dto';
+import { RevokeApiTokenDto } from './dto/revoke-api-token.dto';
 import { Public } from '../public/public.decorator';
 import { Permission } from '../public/permission.decorator';
 import { AuthGuard } from './auth.guard';
@@ -20,5 +22,19 @@ export class AuthController {
   @UseGuards(AuthGuard)
   async logout(@Body() body: LogoutAuthDto) {
     return this.authService.logout(body.token);
+  }
+
+  // 生成API Token，用于外部系统调用
+  @Public()
+  @Post('api-token')
+  async generateApiToken(@Body() body: CreateApiTokenDto) {
+    return this.authService.generateApiToken(body, body.tokenName);
+  }
+
+  // 撤销API Token
+  @Post('revoke-api-token')
+  @UseGuards(AuthGuard)
+  async revokeApiToken(@Body() body: RevokeApiTokenDto) {
+    return this.authService.revokeApiToken(body.email, body.tokenId);
   }
 }
