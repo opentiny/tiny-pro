@@ -20,6 +20,14 @@ export enum ServerFrameworks {
   Skip = '',
 }
 
+/**
+ * 低代码引擎选项
+ */
+export enum LowcodeEngine {
+  Include = 'lowcode-designer',
+  Skip = '',
+}
+
 export enum BuildTool {
   Vite = 'vite',
   Webpack = 'webpack',
@@ -118,6 +126,7 @@ export interface ProjectInfo {
   framework: string;
   name: string;
   serverFramework: ServerFrameworks;
+  lowcodeEngine?: LowcodeEngine;
   serverConfirm?: boolean;
   dialect?: string;
   host?: string;
