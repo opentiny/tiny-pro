@@ -1,8 +1,6 @@
-# tiny-pro-spring-boot.md
-
 # TinyPro 后端开发指南
 
-在阅读本指南前，我们假设您已经阅读过[Springboot官方文档]([Spring Boot](https://spring.io/projects/spring-boot))并能够独立本机启动`MySQL`与`Redis`的能力。
+在阅读本指南前，我们假设您已经阅读过[Springboot官方文档]((https://spring.io/projects/spring-boot))并能够独立本机启动`MySQL`与`Redis`的能力。
 
 ## 项目初始化
 
@@ -139,45 +137,11 @@ reject.start=true
 
 ### Docker启动配置
 
-1. 首先要编辑.env（将自己的服务的地址和端口以及一些具体参数的配置写到里面)
+##### 在docker中, 可以通过修改 environment 项来覆盖 application.yaml 中的参数.
 
-```properties
-#数据库的链接地址和库
-SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/tinypro_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-#数据库用户
-SPRING_DATASOURCE_USERNAME=root
-#数据库密码
-SPRING_DATASOURCE_PASSWORD=123456
-#redis的地址
-SPRING_DATA_REDIS_HOST=redis
-#redis的密码
-SPRING_DATA_REDIS_PORT=6379
-#加密密钥
-jwt.secret=0Zi4SA==
-#JWT存活时间单位是小时
-EXPIRES_IN=1
-```
+##### 在一些企业中, 数据库可能不会部署在容器中. 这个时候我们可以通过 environment 来覆盖 spring.datasource.url 参数. 现在我们假设数据库地址是 「mysql://node-a:3306/tiny-pro」
 
-######  对照这个进行配置和使用然后就会覆盖application.properties的以下参数（可以根据自己的环境进行配置.env覆盖）
-
-```properties
-#数据库的链接地址和库
-spring.datasource.url=${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/login?allowMultiQueries=true&serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=utf8&autoReconnect=true&allowMultiQueries=true&allowPublicKeyRetrieval=true&useSSL=false}
-#数据库用户
-spring.datasource.username=${SPRING_DATASOURCE_USERNAME:root}
-#数据库密码
-spring.datasource.password=${SPRING_DATASOURCE_PASSWORD:111111}
-#jwt的密钥覆盖
-jwt.secret=0Zi4SA==
-#redis的地址默认localhost
-spring.data.redis.host=${SPRING_DATA_REDIS_HOST:localhost}
-#redis的端口
-spring.data.redis.port=${SPRING_DATA_REDIS_PORT:6379}
-#默认的jwt时间
-EXPIRES_IN=1
-```
-
-#### 最后的如何启动过程可以看这个快速部署文档
+##### 那么我们可以把 docker-compose 中 environment 下的 SPRING_DATASOURCE_URL 参数填写为 「jdbc:mysql://node-a:3306/tiny-pro?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC」
 
 #### [Docker 最全的Docker-compose快速部署](https://developer.aliyun.com/article/914404)
 
