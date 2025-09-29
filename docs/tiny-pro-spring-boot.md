@@ -137,11 +137,13 @@ reject.start=true
 
 ### Docker启动配置
 
-##### 在docker中, 可以通过修改 environment 项来覆盖 application.yaml 中的参数.
+在docker中, 可以通过修改 environment 项来覆盖 application.yaml 中的参数.
 
-##### 在一些企业中, 数据库可能不会部署在容器中. 这个时候我们可以通过 environment 来覆盖 spring.datasource.url 参数. 现在我们假设数据库地址是 「mysql://node-a:3306/tiny-pro」
+在一些企业中, 数据库可能不会部署在容器中. 这个时候我们可以通过 environment 来覆盖 spring.datasource.url 参数. 现在我们假设数据库地址是 「mysql://node-a:3306/tiny-pro」
 
-##### 那么我们可以把 docker-compose 中 environment 下的 SPRING_DATASOURCE_URL 参数填写为 「jdbc:mysql://node-a:3306/tiny-pro?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC」
+那么我们可以把 docker-compose 中 environment 下的 SPRING_DATASOURCE_URL 参数填写为 「jdbc:mysql://node-a:3306/tiny-pro?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC」
+
+理论上所有在 `application.yaml` 中出现的配置项都可以在 `environment ` 中覆盖，只是需要将 「.」 转为 「_」
 
 #### [Docker 最全的Docker-compose快速部署](https://developer.aliyun.com/article/914404)
 
