@@ -297,6 +297,7 @@
         v-model="updateModal"
         show-footer
         :mask-closable="true"
+        width="700"
         resize
         :title="$t('menuInfo.modal.title.update')"
         @close="onClose"
@@ -353,7 +354,7 @@
   }
 
   .menu-add-btn {
-    padding: 10px 0 10px 10px;
+    padding: 0px 0 24px 0;
   }
 
   .table {

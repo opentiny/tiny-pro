@@ -5,13 +5,14 @@
         <tiny-button
           v-permission="'user::add'"
           type="primary"
-          @click="handleAddUser"
           round
+          @click="handleAddUser"
           >{{ $t('userInfo.modal.title.add') }}
         </tiny-button>
         <tiny-button
-          @click="handleBatchDeleteUser"
+          v-permission="'user::batch-remove'"
           round
+          @click="handleBatchDeleteUser"
           >{{ $t('locale.batchRemove') }}
         </tiny-button>
       </div>
@@ -47,14 +48,14 @@
           <tiny-grid-column
             field="name"
             :filter="inputFilter"
-            :title="$t('userInfo.table.name')" 
+            :title="$t('userInfo.table.name')"
             show-overflow="tooltip"
             width="10%"
             :editor="{
               component: 'input',
               autofocus: true,
-              events: { 
-                blur: handleUpdate, 
+              events: {
+                blur: handleUpdate,
                 keyup:  handleKeyup
               }
             }"
@@ -76,14 +77,14 @@
           </tiny-grid-column>
           <tiny-grid-column
             field="department"
-            :title="$t('userInfo.table.department')" 
+            :title="$t('userInfo.table.department')"
             show-overflow="tooltip"
             width="6%"
             :editor="{
               component: 'input',
               autofocus: true,
-              events: { 
-                blur: handleUpdate, 
+              events: {
+                blur: handleUpdate,
                 keyup:  handleKeyup
               }
             }"
@@ -99,7 +100,7 @@
             :title="$t('userInfo.table.employeeType')"
             show-overflow="tooltip"
             width="6%"
-            :editor="{ 
+            :editor="{
               component: TinySelect,
               attrs: {
                 options: projectData,
@@ -107,8 +108,9 @@
                 valueField: 'label'
               },
               events: {
-                keyup:  handleKeyup
-              } 
+                keyup:  handleKeyup,
+                change: handleSelectChange
+              }
             }"
           >
             <template #default="data">
@@ -118,21 +120,28 @@
             </template>
           </tiny-grid-column>
           <tiny-grid-column
-            field="role"
+            field="roleIds"
             :filter="jobFilter"
-            :title="$t('userInfo.table.job')" 
+            :title="$t('userInfo.table.job')"
             show-overflow="tooltip"
             width="8%"
-            :editor="{ 
+            format-text="enum"
+            :format-config="{
+              data: state.roleData,
+              label: 'name',
+              value: 'id'
+            }"
+            :editor="{
               component: TinySelect,
               attrs: {
                 options: state.roleData,
                 textField: 'name',
-                valueField: 'id'
+                valueField: 'id',
               },
               events: {
-                keyup:  handleKeyup
-              } 
+                keyup:  handleKeyup,
+                change: handleSelectChange,
+              }
             }"
           >
             <template #default="data">
@@ -141,17 +150,17 @@
           </tiny-grid-column>
           <tiny-grid-column
             field="probationStart"
-            :title="$t('userInfo.table.probationStart')" 
+            :title="$t('userInfo.table.probationStart')"
             show-overflow="tooltip"
             width="9%"
-            :editor="{ 
+            :editor="{
               component: TinyDatePicker,
               attrs: {
                 valueFormat: 'yyyy-MM-dd'
               },
               events: {
                 blur:  handleDatePickerBlur
-              } 
+              }
             }"
           >
             <template #default="data">
@@ -162,17 +171,17 @@
           </tiny-grid-column>
           <tiny-grid-column
             field="probationEnd"
-            :title="$t('userInfo.table.probationEnd')" 
+            :title="$t('userInfo.table.probationEnd')"
             show-overflow="tooltip"
             width="9%"
-            :editor="{ 
+            :editor="{
               component: TinyDatePicker,
               attrs: {
                 valueFormat: 'yyyy-MM-dd'
               },
               events: {
                 blur:  handleDatePickerBlur
-              } 
+              }
             }"
           >
             <template #default="data">
@@ -183,14 +192,14 @@
           </tiny-grid-column>
           <tiny-grid-column
             field="probationDuration"
-            :title="$t('userInfo.table.probationDuration')" 
+            :title="$t('userInfo.table.probationDuration')"
             show-overflow="tooltip"
             width="6%"
             :editor="{
               component: 'input',
               autofocus: true,
-              events: { 
-                blur: handleUpdate, 
+              events: {
+                blur: handleUpdate,
                 keyup:  handleKeyup
               }
             }"
@@ -204,14 +213,14 @@
           </tiny-grid-column>
           <tiny-grid-column
             field="address"
-            :title="$t('userInfo.table.address')" 
+            :title="$t('userInfo.table.address')"
             show-overflow="tooltip"
             width="11%"
             :editor="{
               component: 'input',
               autofocus: true,
-              events: { 
-                blur: handleUpdate, 
+              events: {
+                blur: handleUpdate,
                 keyup:  handleKeyup
               }
             }"
@@ -227,7 +236,7 @@
             :title="$t('userInfo.table.status')"
             show-overflow="tooltip"
             width="6%"
-            :editor="{ 
+            :editor="{
               component: TinySelect,
               attrs: {
                 options: statusData,
@@ -235,8 +244,9 @@
                 valueField: 'value'
               },
               events: {
-                keyup:  handleKeyup
-              } 
+                keyup: handleKeyup,
+                change: handleSelectChange
+              }
             }"
           >
             <template #default="data">
@@ -262,7 +272,6 @@
           </tiny-grid-column>
           <tiny-grid-column
             :title="$t('userInfo.table.operations')"
-            align="center" 
             show-overflow="tooltip"
             width="11%"
           >
@@ -302,7 +311,7 @@
       v-model="state.isUserAdd"
       :lock-scroll="true"
       height="auto"
-      width="800"
+      width="700"
       :title="$t('userInfo.modal.title.add')"
     >
       <UserAdd
@@ -408,6 +417,7 @@
   import { getSimpleDate } from '@/utils/time';
   import { getAllRole } from '@/api/role';
   import { FilterType } from '@/types/global';
+  import { isUndefined } from '@/utils/is';
   import UserAdd from '../../useradd/index.vue';
   import UserDetail from '../../user-detail/index.vue';
 
@@ -499,7 +509,7 @@
     attrs: {
       currentPage: 1,
       pageSize: 10,
-      pageSizes: [5, 10, 15, 20],
+      pageSizes: [10, 20, 50, 100],
       total: 10,
       layout: 'total, sizes, prev, pager, next, jumper',
     },
@@ -529,10 +539,14 @@
       background: 'rgba(0, 0, 0, 0.7)',
     });
     try {
+
       const { data } = await getAllUser(
         params.pageIndex,
         params.pageSize,
-        filters,
+        Array.isArray(filters) ? filters : {
+          ...filters,
+          role: filters.roleIds
+        }
       );
       const total = data.meta.totalItems;
       return {
@@ -619,7 +633,7 @@
               status: 'success',
             });
             // 可以根据需求更新数据
-            grid.value.handleFetch(); 
+            grid.value.handleFetch();
           })
           .catch((error) => {
             if (error.response && error.response.data) {
@@ -666,7 +680,9 @@
       }
     }
   }
-
+  const handleSelectChange = (table: any, value) => {
+    handleUpdate(table, {target: {value}});
+  }
   const handleKeyup = (table: any, event: KeyboardEvent) => {
     if (event.key === 'Enter') {
       handleUpdate(table, event);
@@ -676,7 +692,7 @@
   const handleDatePickerBlur = (table, vm) => {
     handleUpdate(table, { target: { value: vm.modelValue } });
   };
-  
+
   // 处理提交
   const handleUpdate = async ({ row, column }, { target: { value } }) => {
     const { property } = column;
@@ -687,7 +703,7 @@
         name: data.name,
         address: data.address,
         department: data.department,
-        roleIds: [data.role[0]?.id],
+        roleIds: isUndefined(data.role[0]?.id) ? [] : [data.role[0]?.id],
         employeeType: data.employeeType,
         probationDuration: data.probationDuration,
         probationStart: data.probationStart,
@@ -696,9 +712,8 @@
         protocolEnd: data.protocolEnd,
         status: data.status,
       };
-
-      if(property === 'role') {
-        const roleIds = [state.roleData.find((item) => item.name === value).id];
+      if(property === 'roleIds') {
+        const roleIds = [value ?? newTemp.roleIds[0]];
         newTemp.roleIds = roleIds;
       } else if(property !== 'status'){
         newTemp[property] = value;
@@ -710,7 +725,7 @@
           message: t('baseForm.form.submit.success'),
           status: 'success',
         });
-        
+
         grid.value.handleFetch();
       } catch (error) {
         if (error.response && error.response.data) {
@@ -730,7 +745,7 @@
 
 <style scoped lang="less">
   .user-header-btn {
-    margin: 10px 0 24px 10px;
+    margin: 0px 0px 16px;
 
     .tiny-button {
       margin: 0 8px 0 0;
@@ -770,12 +785,12 @@
     align-items: center;
     font-size: 14px;
     line-height: 22px;
-    
+
     img {
       width: 14px;
       height: 14px;
       margin-right: 9px;
     }
-  }  
- 
+  }
+
 </style>

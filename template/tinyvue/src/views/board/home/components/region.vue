@@ -112,11 +112,11 @@
 
   onMounted(() => {
     window.addEventListener('resize', () => {
-      mapChartsRef.value.resize();
+      mapChartsRef.value?.resize();
     });
-    nextTick(() => {
-      mapChartsRef.value.resize();
-    });
+    setTimeout(() => {
+      mapChartsRef.value?.resize();
+    }, 200)
   });
 </script>
 

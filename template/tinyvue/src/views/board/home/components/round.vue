@@ -78,15 +78,15 @@
 
   onMounted(() => {
     window.addEventListener('resize', () => {
-      ringRef.value.resize();
+      ringRef.value?.resize();
     });
-    nextTick(() => {
-      ringRef.value.resize();
-    });
+    setTimeout(() => {
+      ringRef.value?.resize();
+    }, 200)
   });
 
   watch(currentLocale, (newValue, oldValue) => {
-    ringRef.value.resize();
+    ringRef.value?.resize();
   });
 </script>
 
@@ -108,6 +108,7 @@
   #circled {
     width: 32vw !important;
     height: 350px;
+    margin-top: 70px;
     margin-left: 2.3%;
   }
 

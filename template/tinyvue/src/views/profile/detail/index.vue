@@ -1,6 +1,8 @@
 <template>
   <div class="container-detail">
-    <div class="container-header">{{ $t('menu.profile.detail') }}</div>
+    <div class="container-header">
+      <Breadcrumb :items="['menu.profile', 'menu.profile.detail']" />
+    </div>
     <div class="base-body">
       <div class="detail-card">
         <planDetail></planDetail>

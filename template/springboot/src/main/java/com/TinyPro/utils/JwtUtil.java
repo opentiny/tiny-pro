@@ -21,8 +21,6 @@ public class JwtUtil {
 
     @Value("${jwt.secret}")
     private String secretString;
-    @Value("${EXPIRES_IN}")
-    private Integer expires_in;
 
     public JwtUtil(@Value("${jwt.secret}") String secretString) {
         try {
@@ -54,7 +52,7 @@ public class JwtUtil {
                 .setClaims(claims)
                 .setSubject(email) // 使用 email 作为主题
                 .setIssuedAt(now)
-                .setExpiration(new Date(System.currentTimeMillis() + expires_in*3600*1000))
+                .setExpiration(new Date(System.currentTimeMillis() +expiration *1000))
                 .signWith(secretKey)
                 .compact();
     }

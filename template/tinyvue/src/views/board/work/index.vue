@@ -64,12 +64,13 @@ const Home = [
 .container-work {
   width: 100%;
   height: 100%;
+  padding: 24px;
   overflow: auto;
   background: #f6f8f9;
   color: #191919;
 
   .work-image {
-    width: 99%;
+    width: 100%;
     margin: 0 auto;
 
     img {
@@ -110,7 +111,6 @@ const Home = [
         font-size: 16px;
         font-weight: 700;
         margin-bottom: 16px;
-
       }
       .card-coach{
         position: absolute;
@@ -121,7 +121,7 @@ const Home = [
 
     .card-center {
       display: flex;
-      gap: 8px;
+      gap: 24px;
       width: 100%;
       height: 200px;
       margin-top: 16px;
@@ -136,6 +136,9 @@ const Home = [
       .card-home {
         margin-top: 0px;
         flex: 1;
+        span:hover{
+          text-decoration: underline;
+        }
       }
     }
   }

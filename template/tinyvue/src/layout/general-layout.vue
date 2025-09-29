@@ -53,12 +53,12 @@
         position: relative;
         flex-grow: 1;
         height: 100%;
-        padding: 16px;
+        padding: 24px;
         overflow-y: auto;
         color: black;
         font-size: medium;
         background-color: #fff;
-        border-radius: 10px;
+        border-radius: 8px;
         box-shadow: 0 0 8px 8px rgba(169, 174, 184, 0.05);
       }
     }

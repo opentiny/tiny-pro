@@ -39,6 +39,11 @@
   background: #f5f5f5;
   border-radius: 8px;
 
+  &:hover{
+    background: #fff;
+    box-shadow: 0 4px 16px 0 rgba(0,0,0,0.08);
+  }
+
   .font-pass {
     margin-left: 24px;
     font-size: 14px;
