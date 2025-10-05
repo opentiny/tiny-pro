@@ -24,7 +24,8 @@ services:
       JWYT_SECRET: 0Zi4SA==
       command: >
         sh -c "sleep 10 && java -jar app.jar"
-
+    volumes:
+      - ./app/data:/app/data
   # ======================
   # MySQL 数据库
   # ======================
