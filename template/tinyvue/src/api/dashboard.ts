@@ -6,7 +6,7 @@ export interface ContentDataRecord {
 }
 
 export function queryContentData() {
-  return axios.get<ContentDataRecord[]>('/api/content-data');
+  return axios.get<ContentDataRecord[]>(`${import.meta.env.VITE_BASE_API}/content-data`);
 }
 
 export interface PopularRecord {
@@ -45,23 +45,23 @@ export interface QueryVisitDetailParmas {
 }
 
 export function queryPopularList(params: { type: string }) {
-  return axios.get<PopularRecord[]>('/api/popular/list', { params });
+  return axios.get<PopularRecord[]>(`${import.meta.env.VITE_BASE_API}/popular/list`, { params });
 }
 
 export function queryDataOverview(key: string) {
-  return axios.get<DataOverviewRecord>(`/api/dashboard/data-overview/${key}`);
+  return axios.get<DataOverviewRecord>(`${import.meta.env.VITE_BASE_API}/dashboard/data-overview/${key}`);
 }
 
 export function queryVisitData(params: { days: string }) {
-  return axios.get<VisitRecord>('/api/dashboard/visit', { params });
+  return axios.get<VisitRecord>(`${import.meta.env.VITE_BASE_API}/dashboard/visit`, { params });
 }
 
 export function queryPeriodVisits() {
-  return axios.get<PeriodVisitsRecord[]>('/api/dashboard/period-visits');
+  return axios.get<PeriodVisitsRecord[]>(`${import.meta.env.VITE_BASE_API}/dashboard/period-visits`);
 }
 
 export function queryVisitsDetail(params: QueryVisitDetailParmas) {
-  return axios.get('/api/dashboard/visits-detail', {
+  return axios.get(`${import.meta.env.VITE_BASE_API}/dashboard/visits-detail`, {
     params,
   });
 }

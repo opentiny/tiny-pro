@@ -38,7 +38,7 @@ export interface CreateLocalReturn {
 type DeleteLocaleRet = Omit<CreateLocalReturn, 'id'>;
 
 export const getLocalTable = (lang?: string) => {
-  return axios.get<I18Table>('/api/i18/format', { params: { lang } });
+  return axios.get<I18Table>(`${import.meta.env.VITE_BASE_API}/i18/format`, { params: { lang } });
 };
 
 export const getAllLocalItems = (
@@ -49,22 +49,22 @@ export const getAllLocalItems = (
     [x: string]: number[] | string;
   },
 ) => {
-  return axios.get<Locals>('/api/i18', {
+  return axios.get<Locals>(`${import.meta.env.VITE_BASE_API}/i18`, {
     params: { page, limit, all, ...filters },
   });
 };
 
 export const createLocalItem = (data: CreateLocal) => {
-  return axios.post<CreateLocalReturn>('/api/i18', data);
+  return axios.post<CreateLocalReturn>(`${import.meta.env.VITE_BASE_API}/i18`, data);
 };
 export const deleteLocale = (id: number) => {
-  return axios.delete<DeleteLocaleRet>(`/api/i18/${id}`);
+  return axios.delete<DeleteLocaleRet>(`${import.meta.env.VITE_BASE_API}/i18/${id}`);
 };
 
 export const patchLocal = (id: number, data: Partial<CreateLocal>) => {
-  return axios.patch(`/api/i18/${id}`, data);
+  return axios.patch(`${import.meta.env.VITE_BASE_API}/i18/${id}`, data);
 };
 
 export const batchDeleteLocal = (ids: string[]) => {
-  return axios.post('/api/i18/batch', ids)
+  return axios.post(`${import.meta.env.VITE_BASE_API}/i18/batch`, ids)
 }
