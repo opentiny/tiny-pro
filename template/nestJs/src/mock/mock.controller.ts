@@ -19,7 +19,7 @@ export class MockController {
 
   @Get('*')
   async getMock(@Req() req: Request) {
-    const path = req.path.replace('/mock', '');
+    const path = req.path.replace(process.env.MOCK_REGEX || '/mock', '');
     const item = data.filter(
       (dataItem) => dataItem.method === 'get' && dataItem.url === path
     );
@@ -31,7 +31,7 @@ export class MockController {
 
   @Post('*')
   async postMock(@Req() req: Request) {
-    const path = req.path.replace('/mock', '');
+    const path = req.path.replace(process.env.MOCK_REGEX || '/mock', '');
     const item = data.filter(
       (dataItem) => dataItem.method === 'post' && dataItem.url === path
     );

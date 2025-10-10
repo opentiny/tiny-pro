@@ -1,6 +1,6 @@
 {
   "name": "@opentiny/tiny-toolkit-pro",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "TinyPro Vue：开箱即用、前后端分离的 Vue 后台管理模板",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -32,6 +32,8 @@
   "repository": "https://github.com/opentiny/tiny-pro",
   "homepage": "https://opentiny.design/pro/",
   "scripts": {
+    "dev": "pnpm -F tiny-pro-vue start",
+    "dev:backend": "pnpm -F tiny-pro-nestjs start",
     "describe": "npm-scripts-info",
     "build": "run-s build:*",
     "build:main": "tsc -p tsconfig.json",

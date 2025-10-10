@@ -20,10 +20,10 @@ export class PermissionService {
     const permissionInfo = this.permission.findOne({
       where: { name },
     });
-    if (isInit == true && (await permissionInfo)) {
+    if (isInit === true && (await permissionInfo)) {
       return permissionInfo;
     }
-    if ((await permissionInfo) && isInit == false) {
+    if ((await permissionInfo) && isInit === false) {
       throw new HttpException(
         this.i18n.t('exception.permission.exists', {
           args: { name },
