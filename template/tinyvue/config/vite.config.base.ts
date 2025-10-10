@@ -1,5 +1,5 @@
 import { resolve } from 'path';
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import vueJsx from '@vitejs/plugin-vue-jsx';
 import svgLoader from 'vite-svg-loader';
@@ -15,7 +15,7 @@ const config = {
     UnoCSS(),
   ],
   build: {
-    outDir: resolve(__dirname, '../dist'),
+    outDir: resolve(__dirname, loadEnv('', process.cwd()).VITE_OUT_DIR || '../dist'),
     commonjsOptions: {
       transformMixedEsModules: true,
     },

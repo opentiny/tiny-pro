@@ -40,14 +40,14 @@ export interface UserData {
 }
 
 export function login(data: LoginData) {
-  return axios.post<LoginRes>('/api/auth/login', data);
+  return axios.post<LoginRes>(`${import.meta.env.VITE_BASE_API}/auth/login`, data);
 }
 export function loginMail(data: LoginDataMail) {
-  return axios.post<LoginRes>('/api/mail/login', data);
+  return axios.post<LoginRes>(`${import.meta.env.VITE_BASE_API}/mail/login`, data);
 }
 
 export function logout(data: LogoutData) {
-  return axios.post<LoginRes>('/api/auth/logout', data);
+  return axios.post<LoginRes>(`${import.meta.env.VITE_BASE_API}/auth/logout`, data);
 }
 
 // 获取全部用户
@@ -73,41 +73,41 @@ export function getAllUser(page?: number, limit?: number, filter?: FilterType) {
       params.set(key, sql);
     }
   }
-  return axios.get<UserInfo>(`/api/user?${params.toString()}`);
+  return axios.get<UserInfo>(`${import.meta.env.VITE_BASE_API}/user?${params.toString()}`);
 }
 
 // 获取单个用户
 export function getUserInfo(email?: string) {
-  return axios.get<UserInfo>(`/api/user/info/${email ?? ''}`);
+  return axios.get<UserInfo>(`${import.meta.env.VITE_BASE_API}/user/info/${email ?? ''}`);
 }
 
 export function deleteUser(email: string) {
-  return axios.delete<UserInfo>(`/api/user/${email}`);
+  return axios.delete<UserInfo>(`${import.meta.env.VITE_BASE_API}/user/${email}`);
 }
 
 export function updateUserInfo(data: any) {
-  return axios.patch('/api/user/update', data);
+  return axios.patch(`${import.meta.env.VITE_BASE_API}/user/update`, data);
 }
 
 export function getUserData(data?: UserData) {
   return axios.post<UserRes>(
-    `${import.meta.env.VITE_MOCK_SERVER_HOST}/api/user/data`,
+    `${import.meta.env.VITE_MOCK_SERVER_HOST}${import.meta.env.VITE_BASE_API}/user/data`,
     data,
   );
 }
 
 export function registerUser(data: any) {
-  return axios.post<UserInfo>('/api/user/reg', data);
+  return axios.post<UserInfo>(`${import.meta.env.VITE_BASE_API}/user/reg`, data);
 }
 
 export function updatePwdAdmin(data: any) {
-  return axios.patch('/api/user/admin/updatePwd', data);
+  return axios.patch(`${import.meta.env.VITE_BASE_API}/user/admin/updatePwd`, data);
 }
 
 export function updatePwdUser(data: any) {
-  return axios.patch('/api/user/updatePwd', data);
+  return axios.patch(`${import.meta.env.VITE_BASE_API}/user/updatePwd`, data);
 }
 
 export const batchDeleteUsers = (emails: string[]) => {
-  return axios.post('/api/user/batch', emails)
+  return axios.post(`${import.meta.env.VITE_BASE_API}/user/batch`, emails)
 }
