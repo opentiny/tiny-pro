@@ -29,7 +29,7 @@ export class RoleService {
         name,
       },
     });
-    if (isInit == true && (await roleInfo)) {
+    if (isInit === true && (await roleInfo)) {
       return roleInfo;
     }
     if (await roleInfo) {

@@ -76,6 +76,21 @@ npm i && npm start
 
 更详细的文档请参考 TinyPro 官网：[https://opentiny.design/vue-pro](https://opentiny.design/vue-pro)
 
+## 本地启动
+
+如果你有意愿参与本项目的贡献，可以通过以下方式启动前后端（前提是 MySQL/Redis 服务已成功启动），并进行项目开发和调试。
+
+```shell
+# 安装依赖
+pnpm i
+
+# 启动后端
+pnpm dev:backend
+
+# 启动前端
+pnpm dev
+```
+
 ## 维护者
 
 添加官方小助手微信：opentiny-official，加入我们的技术交流群。

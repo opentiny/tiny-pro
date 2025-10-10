@@ -155,10 +155,10 @@ export class MenuService {
     const menuInfo = this.menu.findOne({
       where: { name, order, menuType, parentId, path, icon, component, locale },
     });
-    if (isInit == true && (await menuInfo)) {
+    if (isInit === true && (await menuInfo)) {
       return menuInfo;
     }
-    if ((await menuInfo) && isInit == false) {
+    if ((await menuInfo) && isInit === false) {
       throw new HttpException(
         this.i18n.t('exception.menu.exists', {
           args: { name },

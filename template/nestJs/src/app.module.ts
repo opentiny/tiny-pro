@@ -34,6 +34,7 @@ import {
 } from 'nestjs-i18n';
 import { MockModule } from './mock/mock.module';
 import { RejectRequestGuard } from './public/reject.guard';
+import { HealthCheckController } from './health-check.controller';
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import { RejectRequestGuard } from './public/reject.guard';
     }),
     MockModule,
   ],
+  controllers: [HealthCheckController],
   providers: [
     {
       provide: APP_GUARD,
@@ -91,7 +93,7 @@ export class AppModule implements OnModuleInit {
     const LOCK_FILE = join(data, 'lock');
     if (existsSync(LOCK_FILE)) {
       Logger.warn(
-        'Lock file exists, if you want init agin, please remove dist or dist/lock'
+        'Lock file exists, if you want init again, please remove dist or dist/lock'
       );
       return;
     }

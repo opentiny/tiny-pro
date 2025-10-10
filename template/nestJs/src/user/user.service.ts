@@ -53,7 +53,7 @@ export class UserService {
     }
 
     const userInfo = this.getUserInfo(email);
-    if (isInit == true && (await userInfo)) {
+    if (isInit === true && (await userInfo)) {
       return userInfo;
     }
     if (await userInfo) {
