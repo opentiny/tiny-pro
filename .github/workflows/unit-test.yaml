@@ -27,4 +27,4 @@ jobs:
       - name: Install depend
         run: pnpm i
       - name: Run Unit Test without coverage
-        run: pnpm test
+        run: pnpm test:unit
