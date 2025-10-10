@@ -33,7 +33,6 @@ jobs:
           cd template/nestJs
           cp .env.example .env
           docker compose up -d
-          cd ../..
       - name: Wait for Backend Services
         run: |
           echo "Waiting for Backend Services to start..."
@@ -42,5 +41,6 @@ jobs:
             sleep 3
           done'
           echo "Backend Services are ready!"
+          cd template/nestJs && docker compose ps
       - name: Run E2E tests
         run: pnpm test:e2e

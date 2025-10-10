@@ -21,6 +21,9 @@ services:
       dockerfile: dockerfile
     env_file:
       - .env
+    environment:
+      DATABASE_HOST: mysql
+      REDIS_HOST: redis
     ports:
       - "3000:3000"
     depends_on:
