@@ -1,0 +1,50 @@
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+    <!-- 本地仓库位置（可选，默认是 ~/.m2/repository） -->
+    <!--
+    <localRepository>/path/to/your/local/repo</localRepository>
+    -->
+
+    <!-- 配置镜像：使用阿里云 Maven 镜像 -->
+    <mirrors>
+        <mirror>
+            <id>aliyunmaven</id>
+            <mirrorOf>*</mirrorOf>  <!-- 表示所有仓库请求都走这个镜像 -->
+            <name>阿里云公共仓库</name>
+            <url>https://maven.aliyun.com/repository/public</url>
+        </mirror>
+    </mirrors>
+
+    <!-- 可选的：配置阿里云的其它仓库（比如 Spring Boot 官方库也在阿里云镜像中）-->
+    <!-- 一般上面的 public 镜像已经足够，无需额外配置 -->
+
+    <!-- 如果你在公司有私服，可以在这里添加 server 认证 -->
+    <!--
+    <servers>
+        <server>
+            <id>your-private-repo</id>
+            <username>your-username</username>
+            <password>your-password</password>
+        </server>
+    </servers>
+    -->
+
+    <!-- 如果你处于需要代理的网络环境，可以配置代理，一般不需要 -->
+    <!--
+    <proxies>
+        <proxy>
+            <id>example-proxy</id>
+            <active>true</active>
+            <protocol>http</protocol>
+            <host>proxy.example.com</host>
+            <port>8080</port>
+            <username>proxyuser</username>
+            <password>somepassword</password>
+            <nonProxyHosts>www.google.com|*.example.com</nonProxyHosts>
+        </proxy>
+    </proxies>
+    -->
+
+</settings>

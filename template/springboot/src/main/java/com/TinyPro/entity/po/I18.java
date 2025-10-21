@@ -1,0 +1,33 @@
+package com.TinyPro.entity.po;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
+
+import java.io.Serializable;
+
+@Data
+@Entity
+@TableName("i18")
+@DynamicUpdate
+public class I18 implements Serializable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+    @Column(name = "`key`")
+    private String key;
+
+    @Column(name = "content",length = 65535)
+    private String content;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "lang_id")
+    private Lang lang;
+}
