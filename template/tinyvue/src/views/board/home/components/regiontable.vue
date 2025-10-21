@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <tiny-grid ref="grid" :fetch-data="fetchDataOption" :pager="pagerConfig" :size="gridSize" :auto-resize="true" align="center">
+    <tiny-grid :key="sm ? 'sm' : 'lg'" ref="grid" :fetch-data="fetchDataOption" :pager="sm ? pagerConfigSm : pagerConfigLg" :size="gridSize" :auto-resize="true" align="center">
       <tiny-grid-column
         field="id"
         :title="$t('home.roundtable.index')"
@@ -30,9 +30,10 @@
     Grid as TinyGrid,
     GridColumn as TinyGridColumn,
   } from '@opentiny/vue';
-  import { useResponsiveSize } from '@/hooks/responsive'
+  import { useResponsive, useResponsiveSize } from '@/hooks/responsive'
 
   const { t } = useI18n();
+  const { sm } = useResponsive()
   const { gridSize } = useResponsiveSize()
 
   const tableData = [
@@ -80,7 +81,17 @@
     },
   ];
 
-  const pagerConfig = reactive({
+  const pagerConfigSm = reactive({
+    component: Pager,
+    attrs: {
+      currentPage: 1,
+      pageSize: 10,
+      pageSizes: [10, 20, 50, 100],
+      total: 0,
+      layout: 'total, prev, pager, next',
+    },
+  });
+  const pagerConfigLg = reactive({
     component: Pager,
     attrs: {
       currentPage: 1,
