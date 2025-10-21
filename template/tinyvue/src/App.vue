@@ -10,7 +10,6 @@
 
 <script lang="ts" setup>
   import { provide } from 'vue';
-  import * as echarts from 'echarts';
   import { TinyConfigProvider } from '@opentiny/vue';
   import GlobalSetting from '@/components/global-setting/index.vue';
   import TinyThemeTool from '@opentiny/vue-theme/theme-tool';
