@@ -1,0 +1,62 @@
+package com.TinyPro.service.imp;
+
+import com.TinyPro.entity.dto.CreateLangDto;
+import com.TinyPro.entity.po.I18;
+import com.TinyPro.entity.po.Lang;
+import com.TinyPro.exception.BusinessException;
+;
+import com.TinyPro.service.ILangService;
+import com.TinyPro.jpa.I18Repository;
+import com.TinyPro.jpa.LangRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class ILangSerivceImp  implements ILangService {
+    @Autowired
+    private LangRepository langRepository;
+    @Autowired
+    private I18Repository i18Repository;
+
+    @Override
+    @Transactional
+    public ResponseEntity<Lang> create(CreateLangDto createLangDto) {
+        Optional<Lang> langOptional = langRepository.findByName(createLangDto.getName());
+        if (langOptional.isPresent()) {
+            throw new BusinessException("exception.lang.exists", HttpStatus.CONFLICT, null);
+        }
+        Lang lang = new Lang();
+        lang.setName(createLangDto.getName());
+        Lang save = langRepository.save(lang);
+        return ResponseEntity.ok(save);
+    }
+
+    @Override
+    public ResponseEntity<List<Lang>> findAll() {
+        return ResponseEntity.ok(langRepository.findAll());
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<Lang> update(Integer id, CreateLangDto createLangDto) {
+        Lang lang = langRepository.findById(Long.valueOf(id)) .orElseThrow(() -> new BusinessException("exception.lang.notExistsCommon", HttpStatus.NOT_FOUND, null));
+        lang.setName(createLangDto.getName());
+        Lang save = langRepository.save(lang);
+        return ResponseEntity.ok(save);
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<Lang> remove(Integer id) {
+        Lang lang = langRepository.findById(Long.valueOf(id)).orElseThrow(() -> new BusinessException("exception.lang.notExistsCommon", HttpStatus.NOT_FOUND, null));
+        i18Repository.deleteByLangId(lang.getId());
+        langRepository.deleteById(Long.valueOf(id));
+        return ResponseEntity.ok(lang);
+    }
+}

@@ -32,6 +32,9 @@ importers:
       open:
         specifier: ^8.4.0
         version: 8.4.2
+      properties-parser:
+        specifier: ^0.6.0
+        version: 0.6.0
       yaml:
         specifier: ^2.6.1
         version: 2.7.1
@@ -9309,6 +9312,10 @@ packages:
   prompts@2.4.2:
     resolution: {integrity: sha512-NxNv/kLguCA7p3jE8oL2aEBsrJWgAakBpgmgK6lpPWV+WuOmY6r2/zbAVnP+T8bQlA0nzHXSJSJW0Hq7ylaD2Q==}
     engines: {node: '>= 6'}
+
+  properties-parser@0.6.0:
+    resolution: {integrity: sha512-qvr2cSmoA0dln0MARAKwBzPkkXn7FqwX+RVVNpMdMJc7rt9mqO2cXwluxtux9fHrLhjnPFaQkS8BM0kFrTCnSw==}
+    engines: {node: '>= 0.3.1'}
 
   protochain@1.0.5:
     resolution: {integrity: sha512-4hDwFSX50C4NE6f/6zg8EPr/WLPTkFPUtG0ulWZu6bwzV2hmb50fpdQLr0HiKBAUehapaFpItzWoCLjraLJhUA==}
@@ -23964,6 +23971,8 @@ snapshots:
     dependencies:
       kleur: 3.0.3
       sisteransi: 1.0.5
+
+  properties-parser@0.6.0: {}
 
   protochain@1.0.5: {}
 
