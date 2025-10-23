@@ -3,16 +3,16 @@
     <Breadcrumb :items="['menu.list', 'menu.list.searchTable']" />
 
     <div class="search-table-container">
-      <div class="button-group">
-        <tiny-button>{{ $t('userInfo.table.operations.delete') }}</tiny-button>
-        <tiny-file-upload action="#" accept=".xls,.xlsx" @change="importExcel">
-          <tiny-button >{{ $t('userInfo.table.import') }}</tiny-button>
-        </tiny-file-upload>
-        <tiny-button @click="toCsvEvent">{{ $t('userInfo.table.export') }}</tiny-button>
+      <div class="button-group flex-wrap gap-4 max-sm:gap-[3%]">
+        <tiny-button class="max-sm:w-[30%]">{{ $t('userInfo.table.operations.delete') }}</tiny-button>
+          <tiny-file-upload class="max-sm:w-[30%]" action="#" accept=".xls,.xlsx" @change="importExcel">
+            <tiny-button class="max-sm:w-full">{{ $t('userInfo.table.import') }}</tiny-button>
+          </tiny-file-upload>
+        <tiny-button class="max-sm:w-[30%]" @click="toCsvEvent">{{ $t('userInfo.table.export') }}</tiny-button>
       </div>
       <div class="tiny-fullscreen-scroll">
         <div class="tiny-fullscreen-wrapper">
-          <div class="btn">
+          <div class="btn max-sm:flex-wrap">
             <transition-fade-down-group>
               <div class="search-box-container">
                 <tiny-search-box
@@ -29,13 +29,15 @@
             </transition-fade-down-group>
           </div>
           <tiny-grid
+            :key="sm ? 'sm' : 'lg'"
             ref="taskGrid"
             :fetch-data="fetchDataOption"
-            :pager="pagerConfig"
+            :pager="sm ? pagerConfigSm : pagerConfigLg"
             :loading="loading"
-            size="medium"
-            :height="540"
+            :size="gridSize"
+            :height="640"
             :auto-resize="true"
+            align="center"
           >
             <tiny-grid-column type="selection" width="60"></tiny-grid-column>
             <tiny-grid-column
@@ -257,11 +259,14 @@
   import * as XLSX from 'xlsx';
   import { t } from '@opentiny/vue-locale';
   import TransitionFadeSlideGroup from '@/components/transition/transition-fade-slide-group.vue';
+  import { useResponsive, useResponsiveSize } from '@/hooks/responsive'
 
   const IconEditor = iconEditor();
   const IconDel = iconDel();
   const IconRefresh = iconRefresh()
   const IconSetting = iconSetting()
+  const { gridSize } = useResponsiveSize()
+  const { sm } = useResponsive()
   // 初始化请求数据
   interface FilterOptions {
     id: string;
@@ -290,16 +295,14 @@
     updateVisibility: false,
   });
 
-  const pagerConfig = reactive({
+  const pagerConfigSm = {
     component: TinyPager,
-    attrs: {
-      currentPage: 1,
-      pageSize: 10,
-      pageSizes: [10, 20, 50, 100],
-      total: 10,
-      layout: 'total, sizes, prev, pager, next, jumper',
-    },
-  });
+    attrs: { currentPage:1, pageSize:10, pageSizes:[10,20,50,100], total:10, layout:'total, prev, pager, next' }
+  }
+  const pagerConfigLg = {
+    component: TinyPager,
+    attrs: { currentPage:1, pageSize:10, pageSizes:[10,20,50,100], total:10, layout:'sizes, total, prev, pager, next, jumper' }
+  }
 
   let tableData = ref([]);
   const taskGrid = ref();

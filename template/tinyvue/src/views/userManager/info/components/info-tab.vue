@@ -18,15 +18,18 @@
       </div>
       <div class="table">
         <tiny-grid
+          :key="sm ? 'sm' : 'lg'"
           ref="grid"
           :fetch-data="fetchDataOption"
-          :pager="pagerConfig"
+          :pager="sm ? pagerConfigSm : pagerConfigLg"
           :auto-resize="true"
           remote-filter
           :edit-config="{ trigger: 'click', mode: 'cell', showStatus: true }"
+          :size="gridSize"
+          align="center"
         >
-          <tiny-grid-column type="selection" width="3%"></tiny-grid-column>
-          <tiny-grid-column type="expand" width="3%">
+          <tiny-grid-column type="selection" width="30px"></tiny-grid-column>
+          <tiny-grid-column type="expand" width="10px">
             <template #default="{ row }">
               <UserDetail
                 :email="row.email"
@@ -39,7 +42,6 @@
             field="id"
             :title="$t('userInfo.table.id')"
             show-overflow="tooltip"
-            width="3%"
           >
             <template #default="data">
               <span>{{ $t(`${data.row.id}`) }}</span>
@@ -50,7 +52,6 @@
             :filter="inputFilter"
             :title="$t('userInfo.table.name')"
             show-overflow="tooltip"
-            width="10%"
             :editor="{
               component: 'input',
               autofocus: true,
@@ -68,7 +69,6 @@
             field="email"
             :filter="inputFilter"
             :title="$t('userInfo.table.email')"
-            width="9%"
             show-overflow="tooltip"
           >
             <template #default="data">
@@ -79,7 +79,6 @@
             field="department"
             :title="$t('userInfo.table.department')"
             show-overflow="tooltip"
-            width="6%"
             :editor="{
               component: 'input',
               autofocus: true,
@@ -99,8 +98,7 @@
             field="employeeType"
             :title="$t('userInfo.table.employeeType')"
             show-overflow="tooltip"
-            width="6%"
-            :editor="{
+            :editor="{ 
               component: TinySelect,
               attrs: {
                 options: projectData,
@@ -124,7 +122,6 @@
             :filter="jobFilter"
             :title="$t('userInfo.table.job')"
             show-overflow="tooltip"
-            width="8%"
             format-text="enum"
             :format-config="{
               data: state.roleData,
@@ -152,8 +149,7 @@
             field="probationStart"
             :title="$t('userInfo.table.probationStart')"
             show-overflow="tooltip"
-            width="9%"
-            :editor="{
+            :editor="{ 
               component: TinyDatePicker,
               attrs: {
                 valueFormat: 'yyyy-MM-dd'
@@ -173,8 +169,7 @@
             field="probationEnd"
             :title="$t('userInfo.table.probationEnd')"
             show-overflow="tooltip"
-            width="9%"
-            :editor="{
+            :editor="{ 
               component: TinyDatePicker,
               attrs: {
                 valueFormat: 'yyyy-MM-dd'
@@ -194,7 +189,6 @@
             field="probationDuration"
             :title="$t('userInfo.table.probationDuration')"
             show-overflow="tooltip"
-            width="6%"
             :editor="{
               component: 'input',
               autofocus: true,
@@ -215,7 +209,6 @@
             field="address"
             :title="$t('userInfo.table.address')"
             show-overflow="tooltip"
-            width="11%"
             :editor="{
               component: 'input',
               autofocus: true,
@@ -235,8 +228,7 @@
             field="status"
             :title="$t('userInfo.table.status')"
             show-overflow="tooltip"
-            width="6%"
-            :editor="{
+            :editor="{ 
               component: TinySelect,
               attrs: {
                 options: statusData,
@@ -273,7 +265,6 @@
           <tiny-grid-column
             :title="$t('userInfo.table.operations')"
             show-overflow="tooltip"
-            width="11%"
           >
             <template #default="data">
               <a
@@ -309,9 +300,8 @@
   <div v-if="state.isUserAdd">
     <tiny-modal
       v-model="state.isUserAdd"
-      :lock-scroll="true"
       height="auto"
-      width="700"
+      :width="modalSize"
       :title="$t('userInfo.modal.title.add')"
     >
       <UserAdd
@@ -329,7 +319,7 @@
       show-footer
       mask-closable="true"
       height="auto"
-      width="600"
+      :width="modalSize"
       :title="$t('userInfo.modal.title.pwdUpdate')"
     >
       <template #default>
@@ -337,19 +327,18 @@
           <tiny-form
             :model="state.pwdData"
             :rules="rules"
-            label-width="150px"
             :label-align="true"
             label-position="left"
           >
-            <tiny-row :flex="true" justify="left">
-              <tiny-col :span="10" label-width="100px">
+            <tiny-row flex justify="left">
+              <tiny-col class="w-full" label-width="100px">
                 <tiny-form-item :label="$t('userInfo.table.email')">
                   <label>{{ state.pwdData.email }}</label>
                 </tiny-form-item>
               </tiny-col>
             </tiny-row>
-            <tiny-row :flex="true" justify="left">
-              <tiny-col :span="10" label-width="100px">
+            <tiny-row flex justify="left">
+              <tiny-col class="w-full" label-width="100px">
                 <tiny-form-item
                   :label="$t('userInfo.modal.input.newPassword')"
                   prop="newPassword"
@@ -363,8 +352,8 @@
               </tiny-col>
             </tiny-row>
 
-            <tiny-row :flex="true" justify="left">
-              <tiny-col :span="10" label-width="100px">
+            <tiny-row flex justify="left">
+              <tiny-col class="w-full" label-width="100px">
                 <tiny-form-item
                   :label="$t('userInfo.modal.input.confirmNewPassword')"
                   prop="confirmNewPassword"
@@ -418,8 +407,12 @@
   import { getAllRole } from '@/api/role';
   import { FilterType } from '@/types/global';
   import { isUndefined } from '@/utils/is';
+  import { useResponsive, useResponsiveSize } from '@/hooks/responsive'
   import UserAdd from '../../useradd/index.vue';
   import UserDetail from '../../user-detail/index.vue';
+
+  const { gridSize, modalSize } = useResponsiveSize()
+  const { sm } = useResponsive()
 
   const IconCommission = iconCommission();
   const IconDel = iconDel();
@@ -504,16 +497,14 @@
     }),
   });
 
-  const pagerConfig = reactive({
+  const pagerConfigSm = {
     component: TinyPager,
-    attrs: {
-      currentPage: 1,
-      pageSize: 10,
-      pageSizes: [10, 20, 50, 100],
-      total: 10,
-      layout: 'total, sizes, prev, pager, next, jumper',
-    },
-  });
+    attrs: { currentPage:1, pageSize:10, pageSizes:[10, 20, 50, 100], total:10, layout:'total, prev, pager, next' }
+  }
+  const pagerConfigLg = {
+    component: TinyPager,
+    attrs: { currentPage:1, pageSize:10, pageSizes:[10, 20, 50, 100], total:10, layout:'sizes, total, prev, pager, next, jumper' }
+  }
 
   // 校验规则
   const rulesType = {
@@ -748,6 +739,7 @@
     margin: 0px 0px 16px;
 
     .tiny-button {
+      width: 96px;
       margin: 0 8px 0 0;
     }
   }

@@ -2,8 +2,8 @@
   <div class="target-detail">
     <div class="detail-header">{{ $t('baseForm.form.label.Objectives') }}</div>
 
-    <tiny-row :flex="true" class="detail-row" noSpace>
-      <tiny-col :span="3">
+    <tiny-row class="flex flex-wrap detail-row" noSpace>
+      <tiny-col class="w-1/4 max-md:w-1/2 max-sm:w-full">
         <div class="title pad-title">
           {{ $t('menu.plan.develop') }}
         </div>
@@ -11,7 +11,7 @@
           {{ $t('menu.plan.yes') }}
         </div>
       </tiny-col>
-      <tiny-col :span="3">
+      <tiny-col class="w-1/4 max-md:w-1/2 max-sm:w-full">
         <div class="title pad-title">
           {{ $t('menu.plan.role') }}
         </div>
@@ -19,7 +19,7 @@
           {{ $t('menu.plan.mentor') }}
         </div>
       </tiny-col>
-      <tiny-col :span="3">
+      <tiny-col class="w-1/4 max-md:w-1/2 max-sm:w-full">
         <div class="title pad-title">
           {{ $t('menu.plan.condition') }}
         </div>

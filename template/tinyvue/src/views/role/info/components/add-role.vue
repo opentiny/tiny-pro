@@ -12,6 +12,9 @@
     TinyCol
   } from '@opentiny/vue';
   import { computed, reactive, ref, unref, watch } from 'vue';
+  import { useResponsiveSize } from '@/hooks/responsive'
+
+  const { modalSize } = useResponsiveSize()
 
   export type RoleAddData = {
     name: string;
@@ -72,18 +75,18 @@
     show-header
     show-footer
     height="auto"
-    width="700"  
+    :width="modalSize"  
     :title="$t('roleInfo.modal.title.add')"
   >
 
     <tiny-form ref="form" :model="data" :rules="rules">
-      <tiny-row>
-        <tiny-col :span="6">
+      <tiny-row class="flex flex-wrap">
+        <tiny-col class="w-1/2 max-sm:w-full">
           <tiny-form-item :label="$t('roleInfo.modal.input.name')" prop="name">
             <tiny-input v-model="data.name" />
           </tiny-form-item>
         </tiny-col>
-        <tiny-col :span="6">
+        <tiny-col class="w-1/2 max-sm:w-full">
           <tiny-form-item
           :label="$t('roleInfo.modal.input.desc')"
           prop="permissionIds"

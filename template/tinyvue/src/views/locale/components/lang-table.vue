@@ -1,5 +1,5 @@
 <template>
-  <tiny-grid ref="grid" :loading="loading" :data="lang">
+  <tiny-grid ref="grid" :loading="loading" :data="lang" :auto-resize="true">
     <tiny-grid-column title="id" field="id" />
     <tiny-grid-column title="name" field="name" />
     <tiny-grid-column>

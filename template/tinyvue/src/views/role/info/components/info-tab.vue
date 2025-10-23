@@ -16,6 +16,7 @@
   import { ITreeNodeData, toRoutes } from '@/router/guard/menu';
   import { useI18nMenu } from '@/hooks/useI18nMenu';
   import { useMenuId } from '@/hooks/useMenuId';
+  import { useResponsive } from '@/hooks/responsive'
   import { useRouter } from 'vue-router';
   import constant from '@/router/constant';
   import { useMenuStore } from '@/store/modules/router';
@@ -26,6 +27,7 @@
   import menuDrawer from './menu-drawer.vue';
   import addRole, { RoleAddData } from './add-role.vue';
 
+  const { sm } = useResponsive()
   const { t } = useI18n();
   const tableData = ref<any[]>([]);
   const menuDatas = ref<ITreeNodeData[]>([]);
@@ -59,18 +61,14 @@
   getAllPermission().then(({ data }) => {
     permissions.value = data;
   });
-  const pagerConfig = ref<{
-    attrs:Pager,
-  }>({
-    attrs: {
-      currentPage: 1,
-      pageSize: 10,
-      pageSizes: [10, 20, 50, 100],
-      total: 0,
-      align: 'right',
-      layout: 'total, sizes, prev, pager, next, jumper'
-    },
-  });
+  const pagerConfigSm = {
+    component: TinyPager,
+    attrs: { currentPage:1, pageSize:10, pageSizes:[10,20,50,100], total:10, layout:'total, prev, pager, next' }
+  }
+  const pagerConfigLg = {
+    component: TinyPager,
+    attrs: { currentPage:1, pageSize:10, pageSizes:[10,20,50,100], total:10, layout:'sizes, total, prev, pager, next, jumper' }
+  }
   const roleTableRef = ref();
   const allFilter = {
     inputFilter: {
@@ -217,10 +215,11 @@
         </div>
         <div class="table">
           <role-table
+            :key="sm ? 'sm' : 'lg'"
             ref="roleTableRef"
             :table-data="tableData"
             :fetch-option="fetchOption"
-            :pager-config="pagerConfig"
+            :pager-config="sm ? pagerConfigSm : pagerConfigLg"
             :permissions="permissions"
             :filter="allFilter"
             @menu-update="onMenuUpdate"
