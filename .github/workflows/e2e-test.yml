@@ -36,11 +36,11 @@ jobs:
       - name: Wait for Backend Services
         run: |
           echo "Waiting for Backend Services to start..."
-          timeout 120s bash -c 'until nc -z localhost 3000; do
-            echo "Backend Services are starting..."
+          cd template/nestJs
+          timeout 120s bash -c 'until curl -f http://localhost:3000/healthCheck 2>/dev/null; do
+            echo "Backend API not ready yet..."
             sleep 3
           done'
           echo "Backend Services are ready!"
-          cd template/nestJs && docker compose ps
       - name: Run E2E tests
         run: pnpm test:e2e

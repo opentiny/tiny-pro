@@ -41,7 +41,7 @@
     "fix:prettier": "prettier \"src/**/*.ts\" --write",
     "fix:tslint": "tslint --fix --project .",
     "test:unit": "run-s build test:lint test:unit:backend test:cov:backend",
-    "test:all": "run-s build test:**",
+    "test": "run-s build test:**",
     "test:lint": "tslint --project . && prettier \"src/**/*.ts\" --list-different",
     "test:unit:backend": "pnpm -F tiny-pro-nestjs test",
     "test:cov:backend": "pnpm -F tiny-pro-nestjs test:cov",

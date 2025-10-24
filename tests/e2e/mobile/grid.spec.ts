@@ -7,9 +7,11 @@ test('移动端表格横向滚动', async ({ page }) => {
   await page.getByTitle('List').click();
   await page.getByTitle('Table').click();
   await page.locator('.tiny-tree-menu__toggle-button').click();
-  await expect(page.locator(".tiny-grid__body")).toBeVisible();
+  await expect(page.locator('.tiny-grid__body-wrapper .tiny-grid__body').first()).toBeVisible();
 
-  const bodyWrapper = page.locator('.tiny-grid__body-wrapper')
+  const bodyWrapper = page.locator('.tiny-grid__body-wrapper').first();
+  await page.waitForLoadState('networkidle');
+  await page.waitForTimeout(300);
   const initialScrollLeft = await bodyWrapper.evaluate(el => el.scrollLeft)
   await bodyWrapper.evaluate(el => { el.scrollLeft += 700 })
   await page.waitForTimeout(300)
