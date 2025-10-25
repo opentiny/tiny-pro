@@ -12,6 +12,8 @@
         "
         seq-serial
         auto-resize
+        :size="gridSize"
+        align="center"
       >
         <tiny-grid-column
           :title="$t('home.roundtable.index')"
@@ -33,7 +35,7 @@
         <tiny-grid-column
           field="time"
           :title="$t('menu.plan.time')"
-          show-overflow
+          show-overflow="false"
         ></tiny-grid-column>
       </tiny-grid>
       <tiny-pager
@@ -41,7 +43,7 @@
         :page-size="custPager.pageSize"
         :total="tableData.length"
         :page-sizes="[10, 20, 50, 100]"
-        layout="total, sizes, prev, pager, next, jumper"
+        :layout="pagerLayout"
         @current-change="currentChange"
         @size-change="sizeChange"
       ></tiny-pager>
@@ -50,13 +52,21 @@
 </template>
 
 <script lang="ts" setup>
-  import { defineProps, ref, toRefs } from 'vue';
+  import { defineProps, ref, toRefs, computed, onMounted, onBeforeUnmount } from 'vue';
   import {
     Row as TinyRow,
     Grid as TinyGrid,
     GridColumn as TinyGridColumn,
     Pager as TinyPager,
   } from '@opentiny/vue';
+  import { useResponsive, useResponsiveSize } from '@/hooks/responsive'
+
+  const { gridSize } = useResponsiveSize()
+  const { sm } = useResponsive()
+   
+  const pagerLayout = computed(() =>
+    sm.value ? 'total, prev, pager, next' : 'total, sizes, prev, pager, next, jumper'
+  )
 
   // 父组件传值
   const props = defineProps({

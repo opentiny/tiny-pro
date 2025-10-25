@@ -3,16 +3,17 @@
     <div class="falls">
       <img src="@/assets/images/map-background2.png" class="image" />
       <h3>{{ $t('home.falls.line') }}</h3>
-      <tiny-chart-waterfall id="flow" ref="waterFallRef" height="100%" :options="options" :extend="chartExtend" ></tiny-chart-waterfall>
+      <tiny-chart-waterfall id="flow" ref="waterFallRef" width="100%" height="100%" :options="options" :extend="chartExtend" ></tiny-chart-waterfall>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, watch, ref, nextTick } from 'vue';
+  import { onMounted, onUnmounted,watch, ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { TinyHuichartsWaterfall as TinyChartWaterfall } from '@opentiny/vue-huicharts'
   import useLocale from '@/hooks/locale';
+  import { debounce } from  '@/hooks/responsive'
 
   const { t } = useI18n();
   const { currentLocale } = useLocale();
@@ -188,8 +189,23 @@
   });
 
   onMounted(() => {
-    window.addEventListener('resize', () => {
+    const resizeHandler = debounce(() => waterFallRef.value?.resize(), 200);
+    window.addEventListener('resize', resizeHandler);
+    
+    const el = waterFallRef.value?.$el || waterFallRef.value;
+    let observer: ResizeObserver | null = null;
+    if (el) {
+      observer = new ResizeObserver(() => waterFallRef.value?.resize());
+      observer.observe(el);
+    }
+
+    setTimeout(() => {
       waterFallRef.value?.resize();
+    }, 200)
+
+    onUnmounted(() => {
+      window.removeEventListener('resize', resizeHandler);
+      observer?.disconnect();
     });
     setTimeout(() => {
       waterFallRef.value?.resize();

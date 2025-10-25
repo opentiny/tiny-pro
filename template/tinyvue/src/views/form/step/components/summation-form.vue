@@ -8,8 +8,8 @@
       :label-align="true"
       label-position="top"
     >
-      <tiny-row :flex="true">
-        <tiny-col :span="6" label-width="100px">
+      <tiny-row class="flex">
+        <tiny-col label-width="100px" class="w-1/2 max-sm:w-full">
           <tiny-form-item :label="$t('stepForm.sum.self')" prop="summarize">
             <tiny-input
               v-model="state.filterOptions.summarize"

@@ -1,7 +1,8 @@
 <template>
   <tiny-grid
+    :key="sm ? 'sm' : 'lg'"
     ref="grid"
-    :pager="pagerConfig"
+    :pager="sm ? pagerConfigSm : pagerConfigLg"
     :fetch-data="fetchData"
     :edit-config="
       rolePermission.includes('i18n::update')
@@ -9,25 +10,26 @@
         : undefined
     "
     :loading="loading"
+    :auto-resize="true"
     remote-filter
     refresh
+    :size="gridSize"
+    align="center"
     @edit-closed="onEditClosed"
   >
-    <tiny-grid-column type="selection" width="3%"></tiny-grid-column>
-    <tiny-grid-column field="id" title="ID" width="16%"></tiny-grid-column>
+    <tiny-grid-column type="selection" width="30px"></tiny-grid-column>
+    <tiny-grid-column field="id" title="ID"></tiny-grid-column>
     <tiny-grid-column
       field="key"
       title="key"
       :editor="{ component: 'input', autoselect: true }"
       :filter="keyFilter"
-      width="23%"
     ></tiny-grid-column>
     <tiny-grid-column
       field="content"
       title="content"
       :editor="{ component: 'input' }"
       :filter="contentFilter"
-      width="21%"
     ></tiny-grid-column>
     <tiny-grid-column
       field="lang"
@@ -35,7 +37,6 @@
       :editor="{ component: 'select', options }"
       :format-config="{ async: true, data: options, type: 'enum' }"
       :filter="langFilter"
-      width="23%"
     ></tiny-grid-column>
     <tiny-grid-column :title="$t('searchTable.columns.operations')" width="14%">
       <template #default="data">
@@ -77,6 +78,10 @@
     TinyModal,
   } from '@opentiny/vue';
   import { iconDel } from '@opentiny/vue-icon';
+  import { useResponsive, useResponsiveSize } from '@/hooks/responsive'
+
+  const { gridSize } = useResponsiveSize()
+  const { sm } = useResponsive()
 
   const IconDel = iconDel();
   const { t } = useI18n();
@@ -110,7 +115,18 @@
       );
     },
   };
-  const pagerConfig = ref({
+  
+  const pagerConfigSm = ref({
+    attrs: {
+      currentPage: 1,
+      pageSize: 10,
+      pageSizes: [10, 20, 50, 100],
+      total: 0,
+      align: 'right',
+      layout: 'total, prev, pager, next',
+    },
+  });
+  const pagerConfigLg = ref({
     attrs: {
       currentPage: 1,
       pageSize: 10,
