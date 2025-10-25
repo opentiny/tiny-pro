@@ -42,22 +42,41 @@ export class AuthGuard implements CanActivate {
       await this.jwt.verify(token);
       const payload = await this.jwt.decode(token);
       req['user'] = payload;
-      const cacheToken = await this.authService.getToken(payload.email);
-      if (!cacheToken) {
-        throw new HttpException(
-          i18n.t('exception.common.tokenExpire', {
-            lang: I18nContext.current().lang,
-          }),
-          HttpStatus.UNAUTHORIZED
+
+      // 检查是否是API token
+      if (payload.type === 'api') {
+        // 验证API token
+        const isValidApiToken = await this.authService.validateApiToken(
+          payload.email,
+          token
         );
-      }
-      if (cacheToken !== token) {
-        throw new HttpException(
-          i18n.t('exception.common.tokenError', {
-            lang: I18nContext.current().lang,
-          }),
-          HttpStatus.UNAUTHORIZED
-        );
+        if (!isValidApiToken) {
+          throw new HttpException(
+            i18n.t('exception.common.tokenExpire', {
+              lang: I18nContext.current().lang,
+            }),
+            HttpStatus.UNAUTHORIZED
+          );
+        }
+      } else {
+        // 原有的登录token验证逻辑
+        const cacheToken = await this.authService.getToken(payload.email);
+        if (!cacheToken) {
+          throw new HttpException(
+            i18n.t('exception.common.tokenExpire', {
+              lang: I18nContext.current().lang,
+            }),
+            HttpStatus.UNAUTHORIZED
+          );
+        }
+        if (cacheToken !== token) {
+          throw new HttpException(
+            i18n.t('exception.common.tokenError', {
+              lang: I18nContext.current().lang,
+            }),
+            HttpStatus.UNAUTHORIZED
+          );
+        }
       }
       return true;
     } catch (err) {
