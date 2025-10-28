@@ -9,19 +9,18 @@
  * A PARTICULAR PURPOSE. SEE THE APPLICABLE LICENSES FOR MORE DETAILS.
  *
  */
-import { META_SERVICE, META_APP } from "@opentiny/tiny-engine-meta-register";
-import engineConfig from "./engine.config";
-import { HttpService } from "./src/composable";
-import TinyProGenerateCode from "tiny-engine-generate-code-tinypro";
-import "tiny-engine-generate-code-tinypro/style.css";
+import { META_SERVICE, META_APP } from '@opentiny/tiny-engine-meta-register';
+import engineConfig from './engine.config';
+import { HttpService } from './src/composable';
+import { TinyProGenerateCodePlugin } from '@opentiny/tiny-engine-generate-code-tinypro';
 
 export default {
   [META_SERVICE.Http]: HttpService,
-  "engine.config": {
+  'engine.config': {
     ...engineConfig,
   },
   // 使用 TinyPro 版本的 generate-code 插件
-  [META_APP.GenerateCode]: TinyProGenerateCode,
+  [META_APP.GenerateCode]: TinyProGenerateCodePlugin,
   // 调整插件顺序示例:
   [META_APP.Layout]: {
     options: {
