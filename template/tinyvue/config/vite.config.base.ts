@@ -38,6 +38,10 @@ const config = {
         find: 'vue',
         replacement: 'vue/dist/vue.esm-bundler.js', // compile template
       },
+      {
+        find: '@opentiny/vue-icon',
+        replacement: resolve('node_modules/@opentiny/vue-icon'), // compile template
+      },
     ],
     extensions: ['.ts', '.js'],
   },
