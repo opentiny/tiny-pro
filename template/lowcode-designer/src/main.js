@@ -9,19 +9,20 @@
  * A PARTICULAR PURPOSE. SEE THE APPLICABLE LICENSES FOR MORE DETAILS.
  *
  */
-import { configurators } from './configurators/'
-import 'virtual:svg-icons-register'
+import { configurators } from './configurators/';
+import 'virtual:svg-icons-register';
+import '@opentiny/tiny-engine-generate-code-tinypro/style.css';
 
 async function startApp() {
-  const registry = await import('../registry')
-  const { init } = await import('@opentiny/tiny-engine')
+  const registry = await import('../registry');
+  const { init } = await import('@opentiny/tiny-engine');
 
   init({
     // 合并多个注册表
     registry: [registry.default],
     configurators,
-    createAppSignal: ['global_service_init_finish']
-  })
+    createAppSignal: ['global_service_init_finish'],
+  });
 }
 
-startApp()
+startApp();
