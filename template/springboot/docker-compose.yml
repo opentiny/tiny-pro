@@ -21,10 +21,11 @@ services:
       SPRING_DATASOURCE_PASSWORD: 123456
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
-       jwt_secret: 0Zi4SA==
+      JWT_SECRET: 0Zi4SA==
       command: >
         sh -c "sleep 10 && java -jar app.jar"
-
+    volumes:
+      - ./app/data:/app/data
   # ======================
   # MySQL 数据库
   # ======================
