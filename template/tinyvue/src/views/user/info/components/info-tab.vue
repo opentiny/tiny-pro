@@ -3,6 +3,30 @@
     <tiny-tabs v-model="activeName">
       <tiny-tab-item :title="$t('userInfo.tab.one')" name="1">
         <infocard></infocard>
+        <div v-if="md" class="contentFilter">
+          <transition-slide-group>
+            <div class="left" @click="changeSort">
+              {{ $t('userInfo.filter.sort') }}
+              <ChevronDown></ChevronDown>
+              <div v-show="Sort" class="sort" @click.stop>
+                <li
+                  v-for="(item, index) in timeList"
+                  :key="index"
+                  :value="item.value"
+                  @click="changeTime(timeList[index].value)"
+                  >{{ $t(item.label) }}</li
+                >
+              </div>
+            </div>
+            <div class="right" @click="changeFilter">
+              <img src="@/assets/images/filter.png" />
+              <div v-show="Filter" class="filter" @click.stop>
+                <infofilter ref="filterInfo" :active-name="activeName"></infofilter>
+              </div>
+            </div>
+          </transition-slide-group>
+        </div>
+        
         <infotable :table-data="state.tableData"></infotable>
       </tiny-tab-item>
       <tiny-tab-item :title="$t('userInfo.tab.two')" name="2">
@@ -13,28 +37,28 @@
       </tiny-tab-item>
     </tiny-tabs>
   </div>
-  <div class="contentFilter">
+  <div v-if="!md" class="contentFilter">
     <transition-slide-group>
       <div class="left" @click="changeSort">
         {{ $t('userInfo.filter.sort') }}
         <ChevronDown></ChevronDown>
+        <div v-show="Sort" class="sort">
+          <li
+            v-for="(item, index) in timeList"
+            :key="index"
+            :value="item.value"
+            @click="changeTime(timeList[index].value)"
+            >{{ $t(item.label) }}</li
+          >
+        </div>
       </div>
       <div class="right" @click="changeFilter">
         <img src="@/assets/images/filter.png" />
+        <div v-show="Filter" class="filter">
+          <infofilter ref="filterInfo" :active-name="activeName"></infofilter>
+        </div>
       </div>
     </transition-slide-group>
-  </div>
-  <div v-show="Sort" class="sort">
-    <li
-      v-for="(item, index) in timeList"
-      :key="index"
-      :value="item.value"
-      @click="changeTime(timeList[index].value)"
-      >{{ $t(item.label) }}</li
-    >
-  </div>
-  <div v-show="Filter" class="filter">
-    <infofilter ref="filterInfo" :active-name="activeName"></infofilter>
   </div>
 </template>
 
@@ -48,11 +72,14 @@
   import { IconChevronDown } from '@opentiny/vue-icon';
   import { useUserStore } from '@/store';
   import { getUserData } from '@/api/user';
+  import { useResponsive } from '@/hooks/responsive';
   import infofilter from './info-filter.vue';
   import infocard from './info-card.vue';
   import infotable from './info-table.vue';
   import infochart from './info-chart.vue';
   import infoTasksTip from './info-tasksTip.vue';
+
+  const { md } = useResponsive()
 
   // 加载效果
   const state = reactive<{
@@ -143,31 +170,33 @@
     display: flex;
     height: 30px;
     cursor: pointer;
-  }
 
-  .filter {
-    z-index: 99;
-  }
+    @media (max-width: 768px) {
+      position: relative;   // 移动端时进入正常文档流
+      top: auto;
+      right: auto;
+      margin: 10px 0;
+      width: 100%;
+      justify-content: flex-end;
+    }
 
-  .contentFilter {
-    .left {
-      width: 122px;
+    .left,
+    .right {
+      position: relative;
       height: 34px;
-      font-size: 14px;
-      line-height: 32px;
+      line-height: 34px;
       text-align: center;
       background: #eff1f7;
       border-radius: 17px;
     }
 
+    .left {
+      width: 122px;
+    }
+
     .right {
       width: 60px;
-      height: 34px;
       margin: 0 15px;
-      line-height: 34px;
-      text-align: center;
-      background: #eff1f7;
-      border-radius: 17px;
     }
 
     img {
@@ -178,8 +207,8 @@
 
   .sort {
     position: absolute;
-    top: 44px;
-    right: 100px;
+    top: 100%;
+    right: 0;
     z-index: 99;
     width: 150px;
     margin-top: 10px;
@@ -211,8 +240,8 @@
 
   .filter {
     position: absolute;
-    top: 55px;
-    right: 1%;
+    top: 100%;
+    right: 0;
     z-index: 99;
     width: 522px;
     padding: 30px;

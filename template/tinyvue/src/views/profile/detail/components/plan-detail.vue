@@ -1,8 +1,8 @@
 <template>
   <div class="plan-detail">
     <div class="detail-header">{{ $t('baseForm.form.label.people') }}</div>
-    <tiny-row :flex="true" class="detail-row" noSpace>
-      <tiny-col :span="3">
+    <tiny-row class="flex flex-wrap detail-row" noSpace>
+      <tiny-col class="w-1/4 max-md:w-1/2 max-sm:w-full">
         <div class="title pad-title">
           {{ $t('baseForm.form.project') }}
         </div>
@@ -10,7 +10,7 @@
           {{ $t('work.mock.centralized') }}
         </div>
       </tiny-col>
-      <tiny-col :span="3">
+      <tiny-col class="w-1/4 max-md:w-1/2 max-sm:w-full">
         <div class="title pad-title">
           {{ $t('menu.plan.department') }}
         </div>
@@ -18,21 +18,19 @@
           {{ $t('menu.plan.resource') }}
         </div>
       </tiny-col>
-      <tiny-col :span="3">
+      <tiny-col class="w-1/4 max-md:w-1/2 max-sm:w-full">
         <div class="title pad-title">
           {{ $t('menu.plan.job') }}
         </div>
         <div class="content pad-title"> IT </div>
       </tiny-col>
-      <tiny-col :span="3">
+      <tiny-col class="w-1/4 max-md:w-1/2 max-sm:w-full">
         <div class="title pad-title">
           {{ $t('menu.plan.person') }}
         </div>
         <div class="content pad-title"> All </div>
       </tiny-col>
-    </tiny-row>
-    <tiny-row :flex="true" class="detail-row mart_8" noSpace>
-      <tiny-col :span="3">
+      <tiny-col class="w-1/4 max-md:w-1/2 max-sm:w-full">
         <div class="title pad-title">
           {{ $t('menu.plan.attribute') }}
         </div>

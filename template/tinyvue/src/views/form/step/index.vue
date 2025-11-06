@@ -83,14 +83,7 @@
     padding: 24px 14px;
   }
 
-  :deep(.enUS-line) {
-    .tiny-steps-normal.text-bottom {
-      margin-left: -45px;
-    }
-  }
-  :deep(.zhCN-line) {
-    .tiny-steps-normal.text-bottom {
-      margin-left: -58px;
-    }
+  .form-scroll {
+    overflow: auto;
   }
 </style>

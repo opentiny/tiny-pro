@@ -9,9 +9,9 @@
       label-position="top"
       class="form-base-info"
     >
-      <tiny-row :flex="true">
+      <tiny-row class="flex flex-wrap">
         <transition-fade-down-group>
-          <tiny-col :span="4">
+          <tiny-col class="w-1/3 max-md:w-1/2 max-sm:w-full max-sm:mb-4">
             <tiny-form-item :label="$t('stepForm.coach.culture')" prop="sector">
               <tiny-input
                 v-model="state.filterOptions.sector"
@@ -20,7 +20,7 @@
               ></tiny-input>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="4">
+          <tiny-col class="w-1/3 max-md:w-1/2 max-sm:w-full max-sm:mb-4">
             <tiny-form-item
               :label="$t('stepForm.coach.position')"
               prop="position"
@@ -40,7 +40,7 @@
               </tiny-select>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="4">
+          <tiny-col class="w-1/3 max-md:w-1/2 max-sm:w-full max-sm:mb-4">
             <tiny-form-item label="HR" prop="hr">
               <tiny-select
                 v-model="state.filterOptions.hr"
@@ -57,12 +57,7 @@
               </tiny-select>
             </tiny-form-item>
           </tiny-col>
-        </transition-fade-down-group>
-      </tiny-row>
-
-      <tiny-row :flex="true">
-        <transition-fade-down-group>
-          <tiny-col :span="4">
+          <tiny-col class="w-1/3 max-md:w-1/2 max-sm:w-full max-sm:mb-4">
             <tiny-form-item :label="$t('stepForm.coach.mentor')" prop="teacher">
               <tiny-select
                 v-model="state.filterOptions.teacher"
@@ -79,7 +74,7 @@
               </tiny-select>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="4">
+          <tiny-col class="w-1/3 max-md:w-1/2 max-sm:w-full max-sm:mb-4">
             <tiny-form-item
               :label="$t('stepForm.coach.startTime')"
               prop="startTime"
@@ -91,7 +86,7 @@
               ></tiny-date-picker>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="4">
+          <tiny-col class="w-1/3 max-md:w-1/2 max-sm:w-full max-sm:mb-4">
             <tiny-form-item
               :label="$t('stepForm.coach.endTime')"
               prop="endTime"
@@ -106,6 +101,7 @@
           </tiny-col>
         </transition-fade-down-group>
       </tiny-row>
+
     </tiny-form>
   </tiny-layout>
 </template>

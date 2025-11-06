@@ -45,6 +45,9 @@ importers:
       '@istanbuljs/nyc-config-typescript':
         specifier: ^1.0.2
         version: 1.0.2(nyc@17.1.0)
+      '@playwright/test':
+        specifier: ^1.55.0
+        version: 1.56.1
       '@types/fs-extra':
         specifier: ^11.0.4
         version: 11.0.4
@@ -104,10 +107,10 @@ importers:
         version: 0.1.4
       '@opentiny/tiny-engine':
         specifier: ^2.7.0
-        version: 2.8.2(@opentiny/vue-design-smb@3.20.0)(@opentiny/vue-icon@3.20.0)(@opentiny/vue-locale@3.20.0)(@opentiny/vue-renderless@3.20.3)(@opentiny/vue-runtime@3.26.0)(@opentiny/vue-theme@3.20.2)(@opentiny/vue@3.20.0(echarts@5.4.1))(@vue/babel-plugin-jsx@1.5.0(@babel/core@7.23.9))(@vue/compiler-sfc@3.5.22)(echarts@5.4.1)(eslint@8.42.0)(typescript@5.1.6)(vite@5.4.21(@types/node@18.19.130)(less@4.4.2)(sugarss@2.0.0)(terser@5.44.0))(vue@3.5.22(typescript@5.1.6))
+        version: 2.8.2(@opentiny/vue-design-smb@3.20.0)(@opentiny/vue-icon@3.20.0)(@opentiny/vue-locale@3.20.0)(@opentiny/vue-renderless@3.20.3)(@opentiny/vue-runtime@3.26.0)(@opentiny/vue-theme@3.20.2)(@opentiny/vue@3.20.0(echarts@5.4.1))(@vue/babel-plugin-jsx@1.5.0(@babel/core@7.23.9))(@vue/compiler-sfc@3.5.22)(eslint@8.42.0)(typescript@5.1.6)(vite@5.4.21(@types/node@18.19.130)(less@4.4.2)(sugarss@2.0.0)(terser@5.44.0))(vue@3.5.22(typescript@5.1.6))
       '@opentiny/tiny-engine-generate-code-tinypro':
         specifier: 0.0.1-alpha.2
-        version: 0.0.1-alpha.2(@opentiny/icons@0.1.4)(@opentiny/tiny-engine-meta-register@2.8.2(@opentiny/vue-renderless@3.20.3)(typescript@5.1.6))(@opentiny/tiny-engine-utils@2.8.2(@opentiny/vue-renderless@3.20.3)(vue@3.5.22(typescript@5.1.6)))(@opentiny/tiny-engine@2.8.2(@opentiny/vue-design-smb@3.20.0)(@opentiny/vue-icon@3.20.0)(@opentiny/vue-locale@3.20.0)(@opentiny/vue-renderless@3.20.3)(@opentiny/vue-runtime@3.26.0)(@opentiny/vue-theme@3.20.2)(@opentiny/vue@3.20.0(echarts@5.4.1))(@vue/babel-plugin-jsx@1.5.0(@babel/core@7.23.9))(@vue/compiler-sfc@3.5.22)(echarts@5.4.1)(eslint@8.42.0)(typescript@5.1.6)(vite@5.4.21(@types/node@18.19.130)(less@4.4.2)(sugarss@2.0.0)(terser@5.44.0))(vue@3.5.22(typescript@5.1.6)))(@opentiny/vue@3.20.0(echarts@5.4.1))(@vueuse/core@9.13.0(vue@3.5.22(typescript@5.1.6)))(vue@3.5.22(typescript@5.1.6))
+        version: 0.0.1-alpha.2(@opentiny/icons@0.1.4)(@opentiny/tiny-engine-meta-register@2.8.2(@opentiny/vue-renderless@3.20.3)(typescript@5.1.6))(@opentiny/tiny-engine-utils@2.8.2(@opentiny/vue-renderless@3.20.3)(vue@3.5.22(typescript@5.1.6)))(@opentiny/tiny-engine@2.8.2(@opentiny/vue-design-smb@3.20.0)(@opentiny/vue-icon@3.20.0)(@opentiny/vue-locale@3.20.0)(@opentiny/vue-renderless@3.20.3)(@opentiny/vue-runtime@3.26.0)(@opentiny/vue-theme@3.20.2)(@opentiny/vue@3.20.0(echarts@5.4.1))(@vue/babel-plugin-jsx@1.5.0(@babel/core@7.23.9))(@vue/compiler-sfc@3.5.22)(eslint@8.42.0)(typescript@5.1.6)(vite@5.4.21(@types/node@18.19.130)(less@4.4.2)(sugarss@2.0.0)(terser@5.44.0))(vue@3.5.22(typescript@5.1.6)))(@opentiny/vue@3.20.0(echarts@5.4.1))(@vueuse/core@9.13.0(vue@3.5.22(typescript@5.1.6)))(vue@3.5.22(typescript@5.1.6))
       '@opentiny/tiny-engine-meta-register':
         specifier: ^2.7.0
         version: 2.8.2(@opentiny/vue-renderless@3.20.3)(typescript@5.1.6)
@@ -135,9 +138,6 @@ importers:
       '@vueuse/core':
         specifier: ^9.6.0
         version: 9.13.0(vue@3.5.22(typescript@5.1.6))
-      tiny-engine-generate-code-tinypro:
-        specifier: 0.0.1-alpha.7
-        version: 0.0.1-alpha.7(@opentiny/icons@0.1.4)(@opentiny/tiny-engine-meta-register@2.8.2(@opentiny/vue-renderless@3.20.3)(typescript@5.1.6))(@opentiny/tiny-engine-utils@2.8.2(@opentiny/vue-renderless@3.20.3)(vue@3.5.22(typescript@5.1.6)))(@opentiny/tiny-engine@2.8.2(@opentiny/vue-design-smb@3.20.0)(@opentiny/vue-icon@3.20.0)(@opentiny/vue-locale@3.20.0)(@opentiny/vue-renderless@3.20.3)(@opentiny/vue-runtime@3.26.0)(@opentiny/vue-theme@3.20.2)(@opentiny/vue@3.20.0(echarts@5.4.1))(@vue/babel-plugin-jsx@1.5.0(@babel/core@7.23.9))(@vue/compiler-sfc@3.5.22)(echarts@5.4.1)(eslint@8.42.0)(typescript@5.1.6)(vite@5.4.21(@types/node@18.19.130)(less@4.4.2)(sugarss@2.0.0)(terser@5.44.0))(vue@3.5.22(typescript@5.1.6)))(@opentiny/vue@3.20.0(echarts@5.4.1))(@vueuse/core@9.13.0(vue@3.5.22(typescript@5.1.6)))(vue@3.5.22(typescript@5.1.6))
       vue:
         specifier: ^3.4.21
         version: 3.5.22(typescript@5.1.6)
@@ -330,7 +330,7 @@ importers:
         specifier: ^0.1.3
         version: 0.1.4
       '@opentiny/vue':
-        specifier: ^3.21.0
+        specifier: ^3.26.0
         version: 3.26.0
       '@opentiny/vue-huicharts':
         specifier: ^3.22.0
@@ -4198,6 +4198,11 @@ packages:
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
     engines: {node: '>=14'}
 
+  '@playwright/test@1.56.1':
+    resolution: {integrity: sha512-vSMYtL/zOcFpvJCW71Q/OEGQb7KYBPAdKh35WNSkaZA75JlAO8ED8UN6GUNTm3drWomcbcqRPFqQbLae8yBTdg==}
+    engines: {node: '>=18'}
+    hasBin: true
+
   '@polka/url@1.0.0-next.29':
     resolution: {integrity: sha512-wwQAWhWSuHaag8c4q/KN/vCoeOJYshAIvMQwD4GpSb3OiZklFfvAgmj0VCBBImRpuF/aFgIRzllXlVX93Jevww==}
 
@@ -7971,6 +7976,11 @@ packages:
   fs.realpath@1.0.0:
     resolution: {integrity: sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==}
 
+  fsevents@2.3.2:
+    resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
+    engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
+    os: [darwin]
+
   fsevents@2.3.3:
     resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
@@ -10964,6 +10974,16 @@ packages:
   pkg-types@2.3.0:
     resolution: {integrity: sha512-SIqCzDRg0s9npO5XQ3tNZioRY1uK06lA41ynBC1YmFTmnY6FjUjVt6s4LoADmwoig1qqD0oK8h1p/8mlMx8Oig==}
 
+  playwright-core@1.56.1:
+    resolution: {integrity: sha512-hutraynyn31F+Bifme+Ps9Vq59hKuUCz7H1kDOcBs+2oGguKkWTU50bBWrtz34OUWmIwpBTWDxaRPXrIXkgvmQ==}
+    engines: {node: '>=18'}
+    hasBin: true
+
+  playwright@1.56.1:
+    resolution: {integrity: sha512-aFi5B0WovBHTEvpM3DzXTUaeN6eN0qWnTkKx4NQaH4Wvcmc153PdaY2UBdSYKaGYw+UyWXSVyxDUg5DoPEttjw==}
+    engines: {node: '>=18'}
+    hasBin: true
+
   please-upgrade-node@3.2.0:
     resolution: {integrity: sha512-gQR3WpIgNIKwBMVLkpMUeR3e1/E1y42bqDQZfql+kDeXd8COYfM8PQA4X6y7a8u9Ua9FHmsrrmirW2vHs45hWg==}
 
@@ -12588,17 +12608,6 @@ packages:
 
   tiny-emitter@2.1.0:
     resolution: {integrity: sha512-NB6Dk1A9xgQPMoGqC5CVXn123gWyte215ONT5Pp5a0yt4nlEoO1ZWeCwpncaekPHXO60i47ihFnZPiRPjRMq4Q==}
-
-  tiny-engine-generate-code-tinypro@0.0.1-alpha.7:
-    resolution: {integrity: sha512-dGh5F1SIimI8UeFkZWew5KBgEu0zVtlER1BEdwqEwgYO2hh+42SDNgLfArHsK8FomiLfN3KNGH14rcxCFPDxgA==}
-    peerDependencies:
-      '@opentiny/icons': ^0.1.4
-      '@opentiny/tiny-engine': ^2.7.0
-      '@opentiny/tiny-engine-meta-register': ^2.7.0
-      '@opentiny/tiny-engine-utils': ^2.7.0
-      '@opentiny/vue': ~3.20.0
-      '@vueuse/core': ^9.6.0
-      vue: ^3.4.21
 
   tinyexec@1.0.1:
     resolution: {integrity: sha512-5uC6DDlmeqiOwCPmK9jMSdOuZTh8bU39Ys6yidB+UTt5hfZUPGAypSgFRiEp+jbi9qH40BLDvy85jIU88wKSqw==}
@@ -16554,10 +16563,10 @@ snapshots:
       - typescript
       - vite
 
-  '@opentiny/tiny-engine-generate-code-tinypro@0.0.1-alpha.2(@opentiny/icons@0.1.4)(@opentiny/tiny-engine-meta-register@2.8.2(@opentiny/vue-renderless@3.20.3)(typescript@5.1.6))(@opentiny/tiny-engine-utils@2.8.2(@opentiny/vue-renderless@3.20.3)(vue@3.5.22(typescript@5.1.6)))(@opentiny/tiny-engine@2.8.2(@opentiny/vue-design-smb@3.20.0)(@opentiny/vue-icon@3.20.0)(@opentiny/vue-locale@3.20.0)(@opentiny/vue-renderless@3.20.3)(@opentiny/vue-runtime@3.26.0)(@opentiny/vue-theme@3.20.2)(@opentiny/vue@3.20.0(echarts@5.4.1))(@vue/babel-plugin-jsx@1.5.0(@babel/core@7.23.9))(@vue/compiler-sfc@3.5.22)(echarts@5.4.1)(eslint@8.42.0)(typescript@5.1.6)(vite@5.4.21(@types/node@18.19.130)(less@4.4.2)(sugarss@2.0.0)(terser@5.44.0))(vue@3.5.22(typescript@5.1.6)))(@opentiny/vue@3.20.0(echarts@5.4.1))(@vueuse/core@9.13.0(vue@3.5.22(typescript@5.1.6)))(vue@3.5.22(typescript@5.1.6))':
+  '@opentiny/tiny-engine-generate-code-tinypro@0.0.1-alpha.2(@opentiny/icons@0.1.4)(@opentiny/tiny-engine-meta-register@2.8.2(@opentiny/vue-renderless@3.20.3)(typescript@5.1.6))(@opentiny/tiny-engine-utils@2.8.2(@opentiny/vue-renderless@3.20.3)(vue@3.5.22(typescript@5.1.6)))(@opentiny/tiny-engine@2.8.2(@opentiny/vue-design-smb@3.20.0)(@opentiny/vue-icon@3.20.0)(@opentiny/vue-locale@3.20.0)(@opentiny/vue-renderless@3.20.3)(@opentiny/vue-runtime@3.26.0)(@opentiny/vue-theme@3.20.2)(@opentiny/vue@3.20.0(echarts@5.4.1))(@vue/babel-plugin-jsx@1.5.0(@babel/core@7.23.9))(@vue/compiler-sfc@3.5.22)(eslint@8.42.0)(typescript@5.1.6)(vite@5.4.21(@types/node@18.19.130)(less@4.4.2)(sugarss@2.0.0)(terser@5.44.0))(vue@3.5.22(typescript@5.1.6)))(@opentiny/vue@3.20.0(echarts@5.4.1))(@vueuse/core@9.13.0(vue@3.5.22(typescript@5.1.6)))(vue@3.5.22(typescript@5.1.6))':
     dependencies:
       '@opentiny/icons': 0.1.4
-      '@opentiny/tiny-engine': 2.8.2(@opentiny/vue-design-smb@3.20.0)(@opentiny/vue-icon@3.20.0)(@opentiny/vue-locale@3.20.0)(@opentiny/vue-renderless@3.20.3)(@opentiny/vue-runtime@3.26.0)(@opentiny/vue-theme@3.20.2)(@opentiny/vue@3.20.0(echarts@5.4.1))(@vue/babel-plugin-jsx@1.5.0(@babel/core@7.23.9))(@vue/compiler-sfc@3.5.22)(echarts@5.4.1)(eslint@8.42.0)(typescript@5.1.6)(vite@5.4.21(@types/node@18.19.130)(less@4.4.2)(sugarss@2.0.0)(terser@5.44.0))(vue@3.5.22(typescript@5.1.6))
+      '@opentiny/tiny-engine': 2.8.2(@opentiny/vue-design-smb@3.20.0)(@opentiny/vue-icon@3.20.0)(@opentiny/vue-locale@3.20.0)(@opentiny/vue-renderless@3.20.3)(@opentiny/vue-runtime@3.26.0)(@opentiny/vue-theme@3.20.2)(@opentiny/vue@3.20.0(echarts@5.4.1))(@vue/babel-plugin-jsx@1.5.0(@babel/core@7.23.9))(@vue/compiler-sfc@3.5.22)(eslint@8.42.0)(typescript@5.1.6)(vite@5.4.21(@types/node@18.19.130)(less@4.4.2)(sugarss@2.0.0)(terser@5.44.0))(vue@3.5.22(typescript@5.1.6))
       '@opentiny/tiny-engine-meta-register': 2.8.2(@opentiny/vue-renderless@3.20.3)(typescript@5.1.6)
       '@opentiny/tiny-engine-utils': 2.8.2(@opentiny/vue-renderless@3.20.3)(vue@3.5.22(typescript@5.1.6))
       '@opentiny/vue': 3.20.0(echarts@5.4.1)
@@ -16763,10 +16772,10 @@ snapshots:
       - vite
       - vue-i18n
 
-  '@opentiny/tiny-engine-plugin-robot@2.8.2(@opentiny/vue-icon@3.20.0)(@opentiny/vue-renderless@3.20.3)(@opentiny/vue@3.20.0(echarts@5.4.1))(echarts@5.4.1)(typescript@5.1.6)(vue@3.5.22(typescript@5.1.6))':
+  '@opentiny/tiny-engine-plugin-robot@2.8.2(@opentiny/vue-icon@3.20.0)(@opentiny/vue-renderless@3.20.3)(@opentiny/vue@3.20.0(echarts@5.4.1))(typescript@5.1.6)(vue@3.5.22(typescript@5.1.6))':
     dependencies:
       '@opentiny/tiny-engine-meta-register': 2.8.2(@opentiny/vue-renderless@3.20.3)(typescript@5.1.6)
-      '@opentiny/tiny-robot': 0.3.0-rc.0(echarts@5.4.1)(vue@3.5.22(typescript@5.1.6))
+      '@opentiny/tiny-robot': 0.3.0-rc.0(vue@3.5.22(typescript@5.1.6))
       '@opentiny/tiny-robot-kit': 0.3.0-rc.0(vue@3.5.22(typescript@5.1.6))
       '@opentiny/tiny-robot-svgs': 0.3.0-rc.0(vue@3.5.22(typescript@5.1.6))
       '@opentiny/vue': 3.20.0(echarts@5.4.1)
@@ -16777,7 +16786,6 @@ snapshots:
       markdown-it: 14.1.0
       vue: 3.5.22(typescript@5.1.6)
     transitivePeerDependencies:
-      - echarts
       - typescript
 
   '@opentiny/tiny-engine-plugin-schema@2.8.2(@opentiny/vue-icon@3.20.0)(@opentiny/vue-locale@3.20.0)(@opentiny/vue-renderless@3.20.3)(@opentiny/vue@3.20.0(echarts@5.4.1))(eslint@8.42.0)(sortablejs@1.15.6)(typescript@5.1.6)(vite@5.4.21(@types/node@18.19.130)(less@4.4.2)(sugarss@2.0.0)(terser@5.44.0))(vue-i18n@9.14.5(vue@3.5.22(typescript@5.1.6)))(vue@3.5.22(typescript@5.1.6))':
@@ -17350,7 +17358,7 @@ snapshots:
 
   '@opentiny/tiny-engine-vite-plugin-meta-comments@2.8.2': {}
 
-  '@opentiny/tiny-engine@2.8.2(@opentiny/vue-design-smb@3.20.0)(@opentiny/vue-icon@3.20.0)(@opentiny/vue-locale@3.20.0)(@opentiny/vue-renderless@3.20.3)(@opentiny/vue-runtime@3.26.0)(@opentiny/vue-theme@3.20.2)(@opentiny/vue@3.20.0(echarts@5.4.1))(@vue/babel-plugin-jsx@1.5.0(@babel/core@7.23.9))(@vue/compiler-sfc@3.5.22)(echarts@5.4.1)(eslint@8.42.0)(typescript@5.1.6)(vite@5.4.21(@types/node@18.19.130)(less@4.4.2)(sugarss@2.0.0)(terser@5.44.0))(vue@3.5.22(typescript@5.1.6))':
+  '@opentiny/tiny-engine@2.8.2(@opentiny/vue-design-smb@3.20.0)(@opentiny/vue-icon@3.20.0)(@opentiny/vue-locale@3.20.0)(@opentiny/vue-renderless@3.20.3)(@opentiny/vue-runtime@3.26.0)(@opentiny/vue-theme@3.20.2)(@opentiny/vue@3.20.0(echarts@5.4.1))(@vue/babel-plugin-jsx@1.5.0(@babel/core@7.23.9))(@vue/compiler-sfc@3.5.22)(eslint@8.42.0)(typescript@5.1.6)(vite@5.4.21(@types/node@18.19.130)(less@4.4.2)(sugarss@2.0.0)(terser@5.44.0))(vue@3.5.22(typescript@5.1.6))':
     dependencies:
       '@babel/core': 7.23.9
       '@babel/generator': 7.23.6
@@ -17369,7 +17377,7 @@ snapshots:
       '@opentiny/tiny-engine-plugin-i18n': 2.8.2(@opentiny/vue-icon@3.20.0)(@opentiny/vue-locale@3.20.0)(@opentiny/vue-renderless@3.20.3)(@opentiny/vue@3.20.0(echarts@5.4.1))(eslint@8.42.0)(sortablejs@1.15.6)(typescript@5.1.6)(vite@5.4.21(@types/node@18.19.130)(less@4.4.2)(sugarss@2.0.0)(terser@5.44.0))(vue-i18n@9.14.5(vue@3.5.22(typescript@5.1.6)))(vue@3.5.22(typescript@5.1.6))
       '@opentiny/tiny-engine-plugin-materials': 2.8.2(@babel/core@7.23.9)(@opentiny/vue-icon@3.20.0)(@opentiny/vue-locale@3.20.0)(@opentiny/vue-renderless@3.20.3)(@opentiny/vue@3.20.0(echarts@5.4.1))(@vue/babel-plugin-jsx@1.5.0(@babel/core@7.23.9))(@vue/compiler-sfc@3.5.22)(eslint@8.42.0)(sortablejs@1.15.6)(typescript@5.1.6)(vite@5.4.21(@types/node@18.19.130)(less@4.4.2)(sugarss@2.0.0)(terser@5.44.0))(vue-i18n@9.14.5(vue@3.5.22(typescript@5.1.6)))(vue@3.5.22(typescript@5.1.6))
       '@opentiny/tiny-engine-plugin-page': 2.8.2(@opentiny/vue-icon@3.20.0)(@opentiny/vue-locale@3.20.0)(@opentiny/vue-renderless@3.20.3)(@opentiny/vue@3.20.0(echarts@5.4.1))(eslint@8.42.0)(sortablejs@1.15.6)(typescript@5.1.6)(vite@5.4.21(@types/node@18.19.130)(less@4.4.2)(sugarss@2.0.0)(terser@5.44.0))(vue-i18n@9.14.5(vue@3.5.22(typescript@5.1.6)))(vue@3.5.22(typescript@5.1.6))
-      '@opentiny/tiny-engine-plugin-robot': 2.8.2(@opentiny/vue-icon@3.20.0)(@opentiny/vue-renderless@3.20.3)(@opentiny/vue@3.20.0(echarts@5.4.1))(echarts@5.4.1)(typescript@5.1.6)(vue@3.5.22(typescript@5.1.6))
+      '@opentiny/tiny-engine-plugin-robot': 2.8.2(@opentiny/vue-icon@3.20.0)(@opentiny/vue-renderless@3.20.3)(@opentiny/vue@3.20.0(echarts@5.4.1))(typescript@5.1.6)(vue@3.5.22(typescript@5.1.6))
       '@opentiny/tiny-engine-plugin-schema': 2.8.2(@opentiny/vue-icon@3.20.0)(@opentiny/vue-locale@3.20.0)(@opentiny/vue-renderless@3.20.3)(@opentiny/vue@3.20.0(echarts@5.4.1))(eslint@8.42.0)(sortablejs@1.15.6)(typescript@5.1.6)(vite@5.4.21(@types/node@18.19.130)(less@4.4.2)(sugarss@2.0.0)(terser@5.44.0))(vue-i18n@9.14.5(vue@3.5.22(typescript@5.1.6)))(vue@3.5.22(typescript@5.1.6))
       '@opentiny/tiny-engine-plugin-script': 2.8.2(@opentiny/vue-icon@3.20.0)(@opentiny/vue-locale@3.20.0)(@opentiny/vue-renderless@3.20.3)(@opentiny/vue@3.20.0(echarts@5.4.1))(eslint@8.42.0)(sortablejs@1.15.6)(typescript@5.1.6)(vite@5.4.21(@types/node@18.19.130)(less@4.4.2)(sugarss@2.0.0)(terser@5.44.0))(vue-i18n@9.14.5(vue@3.5.22(typescript@5.1.6)))(vue@3.5.22(typescript@5.1.6))
       '@opentiny/tiny-engine-plugin-state': 2.8.2(@opentiny/vue-icon@3.20.0)(@opentiny/vue-locale@3.20.0)(@opentiny/vue-renderless@3.20.3)(@opentiny/vue@3.20.0(echarts@5.4.1))(eslint@8.42.0)(sortablejs@1.15.6)(typescript@5.1.6)(vite@5.4.21(@types/node@18.19.130)(less@4.4.2)(sugarss@2.0.0)(terser@5.44.0))(vue-i18n@9.14.5(vue@3.5.22(typescript@5.1.6)))(vue@3.5.22(typescript@5.1.6))
@@ -17423,7 +17431,6 @@ snapshots:
       - '@vue/compiler-sfc'
       - '@vue/composition-api'
       - debug
-      - echarts
       - eslint
       - supports-color
       - typescript
@@ -17437,16 +17444,14 @@ snapshots:
     dependencies:
       vue: 3.5.22(typescript@5.1.6)
 
-  '@opentiny/tiny-robot@0.3.0-rc.0(echarts@5.4.1)(vue@3.5.22(typescript@5.1.6))':
+  '@opentiny/tiny-robot@0.3.0-rc.0(vue@3.5.22(typescript@5.1.6))':
     dependencies:
       '@opentiny/tiny-robot-svgs': 0.3.0-rc.0(vue@3.5.22(typescript@5.1.6))
-      '@opentiny/vue': 3.20.0(echarts@5.4.1)
+      '@opentiny/vue': 3.26.0
       '@vueuse/core': 13.9.0(vue@3.5.22(typescript@5.1.6))
       dompurify: 3.3.0
       markdown-it: 14.1.0
       vue: 3.5.22(typescript@5.1.6)
-    transitivePeerDependencies:
-      - echarts
 
   '@opentiny/utils@3.26.0':
     dependencies:
@@ -21812,6 +21817,10 @@ snapshots:
 
   '@pkgjs/parseargs@0.11.0':
     optional: true
+
+  '@playwright/test@1.56.1':
+    dependencies:
+      playwright: 1.56.1
 
   '@polka/url@1.0.0-next.29': {}
 
@@ -26541,6 +26550,9 @@ snapshots:
 
   fs.realpath@1.0.0: {}
 
+  fsevents@2.3.2:
+    optional: true
+
   fsevents@2.3.3:
     optional: true
 
@@ -30118,6 +30130,14 @@ snapshots:
       exsolve: 1.0.7
       pathe: 2.0.3
 
+  playwright-core@1.56.1: {}
+
+  playwright@1.56.1:
+    dependencies:
+      playwright-core: 1.56.1
+    optionalDependencies:
+      fsevents: 2.3.2
+
   please-upgrade-node@3.2.0:
     dependencies:
       semver-compare: 1.0.0
@@ -32045,16 +32065,6 @@ snapshots:
   time-zone@1.0.0: {}
 
   tiny-emitter@2.1.0: {}
-
-  tiny-engine-generate-code-tinypro@0.0.1-alpha.7(@opentiny/icons@0.1.4)(@opentiny/tiny-engine-meta-register@2.8.2(@opentiny/vue-renderless@3.20.3)(typescript@5.1.6))(@opentiny/tiny-engine-utils@2.8.2(@opentiny/vue-renderless@3.20.3)(vue@3.5.22(typescript@5.1.6)))(@opentiny/tiny-engine@2.8.2(@opentiny/vue-design-smb@3.20.0)(@opentiny/vue-icon@3.20.0)(@opentiny/vue-locale@3.20.0)(@opentiny/vue-renderless@3.20.3)(@opentiny/vue-runtime@3.26.0)(@opentiny/vue-theme@3.20.2)(@opentiny/vue@3.20.0(echarts@5.4.1))(@vue/babel-plugin-jsx@1.5.0(@babel/core@7.23.9))(@vue/compiler-sfc@3.5.22)(echarts@5.4.1)(eslint@8.42.0)(typescript@5.1.6)(vite@5.4.21(@types/node@18.19.130)(less@4.4.2)(sugarss@2.0.0)(terser@5.44.0))(vue@3.5.22(typescript@5.1.6)))(@opentiny/vue@3.20.0(echarts@5.4.1))(@vueuse/core@9.13.0(vue@3.5.22(typescript@5.1.6)))(vue@3.5.22(typescript@5.1.6)):
-    dependencies:
-      '@opentiny/icons': 0.1.4
-      '@opentiny/tiny-engine': 2.8.2(@opentiny/vue-design-smb@3.20.0)(@opentiny/vue-icon@3.20.0)(@opentiny/vue-locale@3.20.0)(@opentiny/vue-renderless@3.20.3)(@opentiny/vue-runtime@3.26.0)(@opentiny/vue-theme@3.20.2)(@opentiny/vue@3.20.0(echarts@5.4.1))(@vue/babel-plugin-jsx@1.5.0(@babel/core@7.23.9))(@vue/compiler-sfc@3.5.22)(echarts@5.4.1)(eslint@8.42.0)(typescript@5.1.6)(vite@5.4.21(@types/node@18.19.130)(less@4.4.2)(sugarss@2.0.0)(terser@5.44.0))(vue@3.5.22(typescript@5.1.6))
-      '@opentiny/tiny-engine-meta-register': 2.8.2(@opentiny/vue-renderless@3.20.3)(typescript@5.1.6)
-      '@opentiny/tiny-engine-utils': 2.8.2(@opentiny/vue-renderless@3.20.3)(vue@3.5.22(typescript@5.1.6))
-      '@opentiny/vue': 3.20.0(echarts@5.4.1)
-      '@vueuse/core': 9.13.0(vue@3.5.22(typescript@5.1.6))
-      vue: 3.5.22(typescript@5.1.6)
 
   tinyexec@1.0.1: {}
 

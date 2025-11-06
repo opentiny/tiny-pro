@@ -27,4 +27,4 @@ jobs:
       - name: Install depend
         run: pnpm install --no-frozen-lockfile
       - name: Run Unit Test without coverage
-        run: pnpm test
+        run: pnpm test:unit

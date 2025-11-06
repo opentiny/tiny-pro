@@ -3,72 +3,79 @@
     <div class="left-side">
       <div style="display: flex; align-items: center">
         <img
+          class="max-lg:w-[38px]"
           src="@/assets/images/opentiny-logo.png"
           alt="logo"
           @click="jumpUrl"
         />
         <h5 @click="jumpUrl">OpenTiny</h5>
-        <div class="divider"></div>
-        <img class="vue-icon" alt="logo" src="@/assets/images/pro.png" />
-        <h4>TinyPro of Vue</h4>
+        <div v-if="!lg" class="divider"></div>
+        <img v-if="!lg" class="vue-icon" alt="logo" src="@/assets/images/pro.png" />
+        <h4 v-if="!lg">TinyPro of Vue</h4>
       </div>
     </div>
-    <ul class="right-side">
-      <li>
-        <input
-          id="navbar-search"
-          class="input-icon"
-          :placeholder="$t('setting.input.search')"
-        />
-      </li>
-      <li>
-        <div class="divider"></div>
-      </li>
-      <li @click="changeLan">
-        <span v-if="i18.locale.value === 'zhCN'">中文</span>
-        <span v-else>English</span>
-        <img src="@/assets/images/lan.png" alt="lan" class="navbar-lan" />
-        <div v-if="lan" class="trigger-lan">
-          <li
-            v-for="(item, index) in locales"
-            :key="index"
-            :value="item.value"
-            @click="changeLocale(locales[index].value)"
-            >{{ item.label }}</li
-          >
-        </div>
-      </li>
+    <div class="navbar-right">
+      <button class="menu-toggle" @click="toggleMenu">
+        ☰
+      </button>
 
-      <li>
-        <span @click="help">{{ $t('settings.navbar.help') }}</span>
-      </li>
-      <li>
-        <span @click="setVisible">{{ $t('settings.title') }}</span>
-      </li>
-      <li v-if="isLowcodeDesignerEnabled">
-        <span @click="openLowCodeDesigner">设计器</span>
-      </li>
-      <li class="navbar-user">
-        <tiny-user-head type="icon" round min>
-          <div class="user-image">
-            <img src="@/assets/images/avatar.png" alt="user" />
+      <ul class="right-side" :class="{ 'open': menuOpen }">
+        <li>
+          <input
+            id="navbar-search"
+            class="input-icon"
+            :placeholder="$t('setting.input.search')"
+          />
+        </li>
+        <li v-if="!lg">
+          <div class="divider"></div>
+        </li>
+        <li class="lan-item" @click="changeLan">
+          <span v-if="i18.locale.value === 'zhCN'">中文</span>
+          <span v-else>English</span>
+          <img src="@/assets/images/lan.png" alt="lan" class="navbar-lan" />
+          <div v-if="lan" class="trigger-lan">
+            <li
+              v-for="(item, index) in locales"
+              :key="index"
+              :value="item.value"
+              @click="changeLocale(locales[index].value)"
+              >{{ item.label }}</li
+            >
           </div>
-        </tiny-user-head>
-        <div class="trigger-user">
-          <li
-            v-for="(item, index) in userlist"
-            :key="index"
-            :value="item.label"
-            @click="switchUser(item.value)"
-          >
-            <iconUser v-if="item.value === 1"></iconUser>
-            <iconCheckOut v-if="item.value === 2"></iconCheckOut>
-            <iconEdit v-if="item.value === 3"></iconEdit>
-            {{ $t(item.label) }}
-          </li>
-        </div>
-      </li>
-    </ul>
+        </li>
+
+        <li>
+          <span @click="help">{{ $t('settings.navbar.help') }}</span>
+        </li>
+        <li>
+          <span @click="setVisible">{{ $t('settings.title') }}</span>
+        </li>
+        <li v-if="isLowcodeDesignerEnabled">
+          <span @click="openLowCodeDesigner">设计器</span>
+        </li>
+        <li class="navbar-user">
+          <tiny-user-head type="icon" round min>
+            <div class="user-image">
+              <img src="@/assets/images/avatar.png" alt="user" />
+            </div>
+          </tiny-user-head>
+          <div class="trigger-user">
+            <li
+              v-for="(item, index) in userlist"
+              :key="index"
+              :value="item.label"
+              @click="switchUser(item.value)"
+            >
+              <iconUser v-if="item.value === 1"></iconUser>
+              <iconCheckOut v-if="item.value === 2"></iconCheckOut>
+              <iconEdit v-if="item.value === 3"></iconEdit>
+              {{ $t(item.label) }}
+            </li>
+          </div>
+        </li>
+      </ul>
+    </div>
   </div>
   <div v-if="state.isPwdUpdate">
     <tiny-modal
@@ -78,7 +85,7 @@
       show-footer
       mask-closable="true"
       height="auto"
-      width="600"
+      :width="modalSize"
       :title="$t('userInfo.modal.title.pwdUpdate')"
     >
       <template #default>
@@ -86,7 +93,7 @@
           <tiny-form
             :model="state.pwdData"
             :rules="rules"
-            label-width="150px"
+            label-width="120px"
             :label-align="true"
             label-position="left"
           >
@@ -184,6 +191,7 @@
   import useUser from '@/hooks/user';
   import { getToken } from '@/utils/auth';
   import { updatePwdUser } from '@/api/user';
+  import { useResponsive, useResponsiveSize } from '@/hooks/responsive'
 
   const i18 = useI18n();
   const { t } = useI18n();
@@ -204,6 +212,14 @@
   const { logout } = useUser();
   const { changeLocale } = useLocale();
   const locales = [...LOCALE_OPTIONS];
+  const { lg } = useResponsive();
+  const { modalSize } = useResponsiveSize()
+
+  const menuOpen = ref(false)
+
+  function toggleMenu() {
+    menuOpen.value = !menuOpen.value
+  }
 
   // 加载效果
   const state = reactive<{
@@ -397,8 +413,21 @@
     }
   }
 
+  .navbar-right {
+    position: relative;
+  }
+
+  .menu-toggle {
+    display: none;
+    width: 60px;
+    height: 60px;
+    background: none;
+    border: none;
+  }
+
   .right-side {
     display: flex;
+    height: 60px;
     padding-right: 20px;
     list-style: none;
 
@@ -505,31 +534,90 @@
       }
     }
   }
-</style>
 
-<style lang="less" scoped>
-  // responsive
-  @media (max-width: @screen-ms) {
-    .left-side {
-      img {
-        width: 38px;
+  // 移动端显示折叠按钮，隐藏右侧菜单
+  @media (max-width: 768px) {
+    // 折叠按钮
+    .menu-toggle {
+      display: block;
+      font-size: 20px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      margin-left: auto;
+    }
+
+    .navbar-user {
+      position: relative;
+
+      &:hover {
+        .trigger-user {
+          display: block; // 保持 hover 时显示
+        }
+      }
+
+      .trigger-user {
+        position: absolute;
+        top: 100%;   // 相对父元素定位
+        left: 0;
+        display: none;
+        width: 120px;
+        background-color: #fff;
+        box-shadow: 0 0 2px 2px var(--tv-common-color-bg-normal);
+        border-radius: 6px;
+        z-index: 1000;
       }
     }
 
     .right-side {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      flex-direction: column;
+      height: auto;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      padding: 10px;
       display: none;
-    }
-  }
+      z-index: 999;
 
-  @media (max-width: @screen-mm) {
-    .left-side {
-      img {
-        width: 38px;
+      &.open {
+        display: flex;
+      }
+
+      > li {
+        margin: 8px 0;
+
+        &.lan-item {
+          position: relative;
+
+          // 下拉菜单
+          .trigger-lan {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 6px 0;
+            min-width: 100px;
+            z-index: 1000;
+
+            li {
+              padding: 6px 12px;
+              cursor: pointer;
+
+              &:hover {
+                background: #f5f5f5;
+              }
+            }
+          }
+        }
       }
     }
-
-    .right-side {
-      display: none;
-    }
   }
+
 </style>

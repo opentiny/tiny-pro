@@ -1,11 +1,11 @@
 <template>
   <div class="theme-content">
     <div class="theme-container">
-      <div class="theme-recommend">
+      <div class="theme-recommend pl-[40px] max-sm:pl-0">
         <h1>{{ $t('theme-title-recommend') }}</h1>
         <template v-for="(item, index) in themeTitle" :key="index">
           <div class="theme-contain">
-            <div :class="item.color" @click="change(item)">
+            <div :class="item.color" class="w-[436px] max-sm:w-full" @click="change(item)">
               <h4>{{ $t(item.title) }}</h4>
               <span>{{ $t(item.content) }}</span>
               <div class="theme-tip">
@@ -21,11 +21,11 @@
           </div>
         </template>
       </div>
-      <div class="theme-person">
+      <div class="theme-person pl-[40px] max-sm:pl-0">
         <h1>{{ $t('theme.title.customization') }}</h1>
         <div>
           <span>{{ $t('theme.title.light') }}</span>
-          <div class="theme-line">
+          <div class="theme-line flex max-sm:grid max-sm:grid-cols-4 max-sm:gap-2">
             <div
               v-for="item in SwitchlightColor"
               :key="item.value"
@@ -46,7 +46,7 @@
         </div>
         <div>
           <span>{{ $t('theme.title.deep') }}</span>
-          <div class="theme-line">
+          <div class="theme-line flex max-sm:grid max-sm:grid-cols-4 max-sm:gap-2">
             <div
               v-for="item in SwitchdarkColor"
               :key="item.value"
@@ -218,7 +218,6 @@
 
     .theme-recommend {
       height: 60%;
-      padding-left: 40px;
 
       .theme-tip {
         position: relative;
@@ -242,14 +241,13 @@
       }
 
       .theme-contain {
-        width: 69%;
+        width: 100%;
         cursor: pointer;
       }
     }
 
     .theme-person {
       height: 40%;
-      padding-left: 40px;
 
       span {
         height: 20px;
@@ -272,7 +270,6 @@
   }
 
   .theme-line {
-    display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 12px 0;
@@ -317,7 +314,6 @@
   }
 
   .card {
-    width: 436px;
     height: 64px;
     border-radius: 8px;
     box-shadow: 2px 2px 15px 3px rgba(85, 105, 173, 0.06);
