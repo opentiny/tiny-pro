@@ -13,7 +13,7 @@
   "dependencies": {
     "@opentiny/icons": "^0.1.4",
     "@opentiny/tiny-engine": "^2.7.0",
-    "@opentiny/tiny-engine-generate-code-tinypro": "0.0.1-alpha.2",
+    "@opentiny/tiny-engine-generate-code-tinypro": "^0.1.0",
     "@opentiny/tiny-engine-meta-register": "^2.7.0",
     "@opentiny/tiny-engine-utils": "^2.7.0",
     "@opentiny/vue": "~3.20.0",
