@@ -182,6 +182,22 @@ const userName = computed(() => userStore.name);
 
 加官方小助手微信 opentiny-official，加入技术交流群
 
+## 环境变量
+
+所有的环境变量应当以`VITE_`作为前缀. 例如 `VITE_XXX`
+
+|名称|类型|简介|状态
+|:--|:--|:--|:--:|
+|VITE_CONTEXT|String|路由前缀|启用中
+|VITE_BASE_API|String|axios请求api时所携带的前缀, 主要用于解决浏览器跨域问题.|启用中
+|VITE_SERVER_HOST|String|开发时, Vite反代到哪个后端|启用中
+|VITE_MOCK_HOST|String|Mock服务|废弃
+|VITE_USE_MOCK|Boolean|是否启用Mock服务|启用中
+|VITE_MOCK_IGNORE|String|使用英文逗号分隔, 标明哪些api不被mock|启用中
+|VITE_MOCK_SERVER_HOST|String|追加在`VITE_BASE_API`后面, Mock服务被集成到了后端,以`${VITE_BASE_API}${VITE_MOCK_SERVER_HOST}`开头的请求都会被发送到后端的mock服务|启用中
+|VITE_OUT_DIR|String|产物最终输出位置, 相对于命令执行目录|启用中
+
+
 ## 常见问题
 
 ### 前端跨域问题如何解决
