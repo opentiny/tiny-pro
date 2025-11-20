@@ -80,16 +80,62 @@ npm i && npm start
 
 如果你有意愿参与本项目的贡献，可以通过以下方式启动前后端（前提是 MySQL/Redis 服务已成功启动），并进行项目开发和调试。
 
+1. 创建一个空的 MySQL 数据库 `demo_tiny_pro`
+
+```shell
+# 连接 MySQL 数据库
+mysql -u root -p
+
+# 创建 demo_tiny_pro 数据库
+create database demo_tiny_pro;
+
+# 查看数据库是否创建成功
+show databases;
+```
+
+2. 启动 Redis，并配置环境变量
+
+Redis 不需要安装，只需要点击 `redis-server.exe` 即可启动。
+
+在系统环境变量的 Path 中配置 Redis 目录，比如：`C:\Program Files\Redis\`。
+
+验证 Redis 是否连接成功：
+
+在命令行终端输入：
+
+```shell
+redis-cli
+```
+
+在可交互终端中输入：`ping`，如果 Redis 连接成功的话，应该返回：`PONG`。
+
+```shell
+$ redis-cli
+127.0.0.1:6379> ping
+PONG
+```
+
+3. 复制 NestJS 环境变量
+
+```shell
+cd template/nestJs
+cp .env.example .env
+```
+
+4. 安装依赖并启动前后端
+
 ```shell
 # 安装依赖
 pnpm i
 
-# 启动后端
+# 启动后端，执行该命令之后，会初始化 MySQL 数据库 demo_tiny_pro 的表结构，并填充表数据
 pnpm dev:backend
 
 # 启动前端
 pnpm dev
 ```
+
+启动成功之后，会自动打开浏览器，并访问：[http://localhost:3031/](http://localhost:3031/)。
 
 ## 维护者
 
