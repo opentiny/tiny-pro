@@ -12,7 +12,7 @@
         <div class="flex flex-wrap gap-2">
           <div class="search-box-container">
             <tiny-search
-              v-model="filterDataModel.keyWords"
+              v-model="filterDataModel.keywords"
               :placeholder="$t('searchTable.form.placeholder')"
               @change="handleRefresh"
             ></tiny-search>
@@ -71,11 +71,11 @@
   const IconSetting = iconSetting();
   const serviceOptions = reactive([
     { text: t(`cardList.options.all`), value: 'all' },
-    { text: t(`cardList.options.services`), value: 'service' },
+    { text: t(`cardList.options.services`), value: 'dev' },
     { text: t(`cardList.options.design`), value: 'design' },
   ]);
   const filterDataModel = reactive({
-    keyWords: '',
+    keywords: '',
     classify: 'all',
   });
   let cards = ref([]);
@@ -113,8 +113,8 @@
 
   async function fetchData() {
     const queryParmas = {
-      pageIndex: pager.value.currentPage,
-      pageSize: pager.value.pageSize,
+      page: pager.value.currentPage,
+      limit: pager.value.pageSize,
       ...filterDataModel,
     };
 
