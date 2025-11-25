@@ -23,7 +23,7 @@
         </div>
       </div>
 
-      <div class="flex gap-2 flex-wrap">
+      <div id="card-list" class="flex gap-2 flex-wrap">
         <tiny-card v-for="card in cards" :key="card.id">
           <Image :src="card.icon" />
           <div class="header mt2 mb-2">{{ card.name }}</div>
@@ -61,6 +61,7 @@
     TinyCard,
     TinyTag,
     TinyPager,
+    TinyLoading,
   } from '@opentiny/vue';
   import { iconRefresh, iconSetting } from '@opentiny/vue-icon';
   import { getServicesList } from '@/api/card';
@@ -78,6 +79,7 @@
     classify: 'all',
   });
   let cards = ref([]);
+  let cardLoadingState = ref(null);
 
   let pager = ref({
     currentPage: 1,
@@ -117,11 +119,14 @@
     };
 
     try {
+      cardLoadingState.value = TinyLoading.service({
+        target: document.getElementById('card-list'),
+      });
       const { data } = await getServicesList(queryParmas);
       cards.value = data.data;
       pager.value.total = data.total;
     } finally {
-      console.log('LL');
+      cardLoadingState.value.close();
     }
   }
 </script>

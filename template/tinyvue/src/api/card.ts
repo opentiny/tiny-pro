@@ -7,8 +7,7 @@ export interface QueryTaskParmas {
 }
 
 export function getServicesList(params: QueryTaskParmas) {
-  return axios.post(
-    `${import.meta.env.VITE_MOCK_SERVER_HOST}/api/service-application`,
+  return axios.get(`${import.meta.env.VITE_BASE_API}/application`, {
     params,
-  );
+  });
 }

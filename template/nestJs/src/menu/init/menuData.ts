@@ -50,16 +50,6 @@ export const menuData = [
     locale: 'menu.list.searchTable',
   },
   {
-    name: 'Card',
-    order: 2,
-    parentId: null,
-    menuType: 'normal',
-    icon: '',
-    component: 'list/card-list/index',
-    path: 'card',
-    locale: 'menu.list.cardList',
-  },
-  {
     name: 'Form',
     order: 3,
     parentId: null,
@@ -288,5 +278,15 @@ export const menuData = [
     component: 'locale/index',
     path: 'locale',
     locale: 'menu.i18n',
+  },
+  {
+    name: 'Card',
+    order: 2,
+    parentId: null,
+    menuType: 'normal',
+    icon: '',
+    component: 'list/card-list/index',
+    path: 'card',
+    locale: 'menu.list.cardList',
   },
 ];
