@@ -17,9 +17,9 @@
               @change="handleRefresh"
             ></tiny-search>
           </div>
-          <tiny-button class="ml-2" :icon="IconRefresh" @click="handleRefresh">
+          <tiny-button :icon="IconRefresh" @click="handleRefresh">
           </tiny-button>
-          <tiny-button :icon="IconSetting"> </tiny-button>
+          <tiny-button class="button-reset" :icon="IconSetting"> </tiny-button>
         </div>
       </div>
 
@@ -151,5 +151,9 @@
 
   .search-box-container {
     width: 300px;
+  }
+
+  .button-reset {
+    margin-left: 0px !important;
   }
 </style>

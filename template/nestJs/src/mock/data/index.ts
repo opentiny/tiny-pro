@@ -3,7 +3,7 @@ import forms from './forms';
 import list from './list';
 import profile from './profile';
 import user from './user';
-import card from './application';
+import application from './application';
 
 export default [
   ...board,
@@ -11,5 +11,5 @@ export default [
   ...profile,
   ...user,
   ...forms,
-  ...card,
+  ...application,
 ] as const;

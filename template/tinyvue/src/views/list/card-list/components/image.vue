@@ -4,9 +4,12 @@
 <script lang="ts" setup>
   import { computed, defineProps } from 'vue';
 
-  const props = defineProps({ src: {
-    type:String,
-    default:'card-list-application-default.png'} });
+  const props = defineProps({
+    src: {
+      type: String,
+      default: 'card-list-application-default.png',
+    },
+  });
 
   const url = computed(() => `/src/assets/images/${props.src}`);
 </script>
