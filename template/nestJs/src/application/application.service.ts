@@ -36,11 +36,10 @@ export class ApplicationService {
       .take(limit)
       .getManyAndCount();
 
-    console.log(data);
     return {
       data: data.map((item) => ({
         ...item,
-        tag: JSON.parse(item.tag),
+        tag: this.parseTagSafely(item.tag),
       })),
       total,
     };
@@ -67,5 +66,13 @@ export class ApplicationService {
       icon,
       classify,
     });
+  }
+
+  private parseTagSafely(tag: string): unknown {
+    try {
+      return JSON.parse(tag);
+    } catch {
+      return [];
+    }
   }
 }

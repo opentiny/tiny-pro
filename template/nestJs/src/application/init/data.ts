@@ -1,4 +1,4 @@
-export const applicaitonData = [
+export const applicationData = [
   {
     name: 'Tiny Design 设计体系',
     description:

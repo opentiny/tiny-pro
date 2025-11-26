@@ -37,7 +37,7 @@ import { RejectRequestGuard } from './public/reject.guard';
 import { HealthCheckController } from './health-check.controller';
 import { ApplicationModule } from './application/application.module';
 import { ApplicationService } from './application/application.service';
-import { applicaitonData } from './application/init/data';
+import { applicationData } from './application/init/data';
 
 @Module({
   imports: [
@@ -87,7 +87,7 @@ export class AppModule implements OnModuleInit {
     private menu: MenuService,
     private lang: I18LangService,
     private i18: I18Service,
-    private applicaiton: ApplicationService
+    private application: ApplicationService
   ) {}
   async onModuleInit() {
     const ROOT = __dirname;
@@ -182,8 +182,8 @@ export class AppModule implements OnModuleInit {
 
     // applicaion
     try {
-      for (const item of applicaitonData) {
-        await this.applicaiton.createApplication(item, isInit);
+      for (const item of applicationData) {
+        await this.application.createApplication(item, isInit);
       }
     } catch (e) {
       const err = e as HttpException;

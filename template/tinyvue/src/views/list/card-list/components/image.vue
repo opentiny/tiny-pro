@@ -1,5 +1,5 @@
 <template>
-  <img :src="url" class="img" />
+  <img :src="url" class="img" alt="" />
 </template>
 <script lang="ts" setup>
   import { computed, defineProps } from 'vue';
@@ -11,7 +11,9 @@
     },
   });
 
-  const url = computed(() => `/src/assets/images/${props.src}`);
+  const url = computed(
+    () => new URL(`../../../../assets/images/${props.src}`, import.meta.url).href,
+  );
 </script>
 <style scoped lang="less">
   .img {

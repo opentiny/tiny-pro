@@ -2,7 +2,7 @@
   <div>
     <Breadcrumb :items="['menu.list', 'menu.list.cardList']" />
     <div class="content">
-      <div class="header mb-4">{{ $t('cardList.tiltle') }}</div>
+      <div class="header mb-4">{{ $t('cardList.title') }}</div>
       <div class="flex flex-wrap gap-2 justify-between mb-4">
         <tiny-button-group
           v-model="filterDataModel.classify"
@@ -111,7 +111,7 @@
   }
 
   async function fetchData() {
-    const queryParmas = {
+    const queryParams = {
       page: pager.value.currentPage,
       limit: pager.value.pageSize,
       ...filterDataModel,
@@ -121,9 +121,11 @@
       cardLoadingState.value = TinyLoading.service({
         target: document.getElementById('card-list'),
       });
-      const { data } = await getServicesList(queryParmas);
+      const { data } = await getServicesList(queryParams);
       cards.value = data.data;
       pager.value.total = data.total;
+    } catch (error) {
+      +console.error('Failed to fetch card list:', error);
     } finally {
       cardLoadingState.value.close();
     }
