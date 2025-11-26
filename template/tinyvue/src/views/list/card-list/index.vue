@@ -35,6 +35,7 @@
               :key="index"
               :type="item.type"
               :value="item.value"
+              effect="light"
             ></tiny-tag>
           </div>
         </tiny-card>

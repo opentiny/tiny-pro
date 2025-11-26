@@ -17,15 +17,14 @@ export class ApplicationService {
   async findAllApplication(searchInfo: PaginationQueryDto) {
     const { page, limit, keywords, classify } = searchInfo;
     const skip = (page - 1) * limit;
-    console.log(page, limit, skip);
 
     const queryBuilder = this.applicationRep.createQueryBuilder('application');
     if (keywords) {
-      const field = ['name', 'description', 'tag', 'classify'];
+      const field = ['name', 'description', 'tag'];
       const conditions = field
         .map((item) => `application.${item} LIKE :keywords`)
         .join(' OR ');
-      queryBuilder.where(`(${conditions})`, { keywords: `%${keywords}` });
+      queryBuilder.where(`(${conditions})`, { keywords: `%${keywords}%` });
     }
 
     if (classify !== 'all') {
