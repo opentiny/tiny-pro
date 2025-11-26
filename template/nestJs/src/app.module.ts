@@ -180,7 +180,7 @@ export class AppModule implements OnModuleInit {
       process.exit(-1);
     }
 
-    // applicaion
+    // application
     try {
       for (const item of applicationData) {
         await this.application.createApplication(item, isInit);

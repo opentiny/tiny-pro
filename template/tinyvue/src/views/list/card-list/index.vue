@@ -125,7 +125,7 @@
       cards.value = data.data;
       pager.value.total = data.total;
     } catch (error) {
-      +console.error('Failed to fetch card list:', error);
+      console.error('Failed to fetch card list:', error);
     } finally {
       cardLoadingState.value.close();
     }
