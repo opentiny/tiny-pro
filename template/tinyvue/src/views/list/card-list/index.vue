@@ -19,7 +19,6 @@
           </div>
           <tiny-button :icon="IconRefresh" @click="handleRefresh">
           </tiny-button>
-          <tiny-button class="button-reset" :icon="IconSetting"> </tiny-button>
         </div>
       </div>
 
@@ -64,12 +63,11 @@
     TinyPager,
     TinyLoading,
   } from '@opentiny/vue';
-  import { iconRefresh, iconSetting } from '@opentiny/vue-icon';
+  import { iconRefresh } from '@opentiny/vue-icon';
   import { getServicesList } from '@/api/card';
   import Image from './components/image.vue';
 
   const IconRefresh = iconRefresh();
-  const IconSetting = iconSetting();
   const serviceOptions = reactive([
     { text: t(`cardList.options.all`), value: 'all' },
     { text: t(`cardList.options.services`), value: 'dev' },
@@ -151,9 +149,5 @@
 
   .search-box-container {
     width: 300px;
-  }
-
-  .button-reset {
-    margin-left: 0px !important;
   }
 </style>
