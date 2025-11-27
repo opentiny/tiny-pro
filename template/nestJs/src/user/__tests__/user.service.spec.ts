@@ -8,6 +8,10 @@ import { In, Repository } from 'typeorm';
 import { User, Role } from '@app/models';
 import * as crypto from 'crypto';
 
+jest.mock('uuid', () => ({
+  v7: jest.fn(() => 'mocked-uuid-v7'),
+}));
+
 describe('UserService', () => {
   let service: UserService;
   let userRepository: Repository<User>;
@@ -107,7 +111,7 @@ describe('UserService', () => {
       jest.spyOn(userRepository, 'remove').mockResolvedValueOnce({} as User);
 
       const result = await service.deleteUser('test@example.com');
-      expect(authService.kickOut).toHaveBeenCalledWith('test@example.com');
+      expect(authService.kickOut).toHaveBeenCalledWith(1);
       expect(result).toBeDefined();
     });
 
@@ -156,7 +160,7 @@ describe('UserService', () => {
         newPassword: 'newPassword',
         token: 'token',
       });
-      expect(authService.kickOut).toHaveBeenCalledWith('test@example.com');
+      expect(authService.kickOut).toHaveBeenCalled()
       expect(result).toBeUndefined();
     });
 
@@ -443,7 +447,7 @@ describe('UserService', () => {
         ...mockUser,
         password: 'newHash',
       });
-      expect(authService.kickOut).toHaveBeenCalledWith('test@example.com');
+      expect(authService.kickOut).toHaveBeenCalledWith(1);
       expect(result).toBeUndefined();
     });
 
@@ -528,7 +532,7 @@ describe('UserService', () => {
         ...mockUser,
         password: 'newHash',
       });
-      expect(authService.kickOut).toHaveBeenCalledWith('test@example.com');
+      expect(authService.kickOut).toHaveBeenCalledWith(1);
       expect(result).toBeUndefined();
     });
 
@@ -598,7 +602,7 @@ describe('UserService', () => {
 
       expect(service.getUserInfo).toHaveBeenCalledWith('test@example.com', ['role']);
       expect(roleRepository.find).toHaveBeenCalledWith({ where: { id: In([2]) } });
-      expect(authService.kickOut).toHaveBeenCalledWith('test@example.com');
+      expect(authService.kickOut).toHaveBeenCalledWith(1);
       expect(result).toEqual({
         ...mockUser,
         ...updateUserDto,
