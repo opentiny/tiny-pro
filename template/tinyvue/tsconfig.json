@@ -14,8 +14,8 @@
     },
     "lib": ["es2020", "dom"],
     "skipLibCheck": true,
-    "types": ["vite/client"]
+    "types": ["vite/client", "resize-observer-browser"]
   },
   "include": ["src/**/*", "src/**/*.vue"],
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules"]
 }

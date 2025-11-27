@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container-list">
     <Breadcrumb :items="['menu.list', 'menu.list.cardList']" />
     <div class="content">
       <div class="header mb-4">{{ $t('cardList.title') }}</div>
@@ -9,21 +9,20 @@
           :data="serviceOptions"
           @change="classifyChange"
         ></tiny-button-group>
-        <div class="flex flex-wrap gap-2">
-          <div class="search-box-container">
-            <tiny-search
-              v-model="filterDataModel.keywords"
-              :placeholder="$t('searchTable.form.placeholder')"
-              @change="handleRefresh"
-            ></tiny-search>
-          </div>
+        <div class="flex gap-2 search-box-container">
+          <tiny-search
+            v-model="filterDataModel.keywords"
+            class="flex-1"
+            :placeholder="$t('searchTable.form.placeholder')"
+            @change="handleRefresh"
+          ></tiny-search>
           <tiny-button :icon="IconRefresh" @click="handleRefresh">
           </tiny-button>
         </div>
       </div>
 
-      <div id="card-list" class="flex gap-2 flex-wrap">
-        <tiny-card v-for="card in cards" :key="card.id">
+      <div id="card-list" class="card-container">
+        <tiny-card v-for="card in cards" :key="card.id" class="card-item">
           <Image :src="card.icon" />
           <div class="header mt2 mb-2">{{ card.name }}</div>
           <div class="line-clamp-2">{{ card.description }}</div>
@@ -40,19 +39,22 @@
         </tiny-card>
       </div>
       <tiny-pager
+        ref="pagerRef"
         :current-page="pager.currentPage"
         :total="pager.total"
         :page-size="pager.pageSize"
         :page-sizes="pager.pageSizes"
+        :layout="pager.layout"
+        :auto-resize="true"
         @current-change="currentChange"
         @size-change="sizeChange"
-        layout="total, sizes, pre, pager, next, jumper"
       ></tiny-pager>
     </div>
   </div>
 </template>
+
 <script lang="ts" setup>
-  import { onMounted, reactive, ref } from 'vue';
+  import { onMounted, onUnmounted, reactive, ref } from 'vue';
   import { t } from '@opentiny/vue-locale';
   import {
     TinyButton,
@@ -85,11 +87,38 @@
     pageSize: 10,
     total: 2,
     pageSizes: [10, 20, 50],
+    layout: 'total, sizes, pre, pager, next, jumper',
   });
 
+  let pagerRef = ref(null);
+  let observer = null;
+
   onMounted(() => {
+    handleResizePager();
     fetchData();
   });
+
+  onUnmounted(() => {
+    observer?.disconnect();
+  });
+
+  function handleResizePager() {
+    let resizeTimer = null;
+    const handleResize = (entries) => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        entries.forEach((entry) => {
+          const { width } = entry?.contentRect;
+          pager.value.layout =
+            width < 600
+              ? 'total, pre, pager, next'
+              : 'total, sizes, pre, pager, next, jumper';
+        });
+      }, 150);
+    };
+    observer = new ResizeObserver(handleResize);
+    observer.observe(pagerRef.value.$el);
+  }
 
   function handleRefresh() {
     fetchData();
@@ -97,6 +126,7 @@
 
   function classifyChange(val) {
     filterDataModel.classify = val;
+    pager.value.currentPage = 1;
     fetchData();
   }
 
@@ -131,7 +161,15 @@
     }
   }
 </script>
+
 <style scoped lang="less">
+  .container-list {
+    flex: 1 1 auto;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
   .content {
     display: flex;
     flex-direction: column;
@@ -150,6 +188,19 @@
   }
 
   .search-box-container {
-    width: 300px;
+    flex: 1;
+    max-width: 330px;
+    min-width: 130px;
+  }
+
+  .card-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 12px;
+    row-gap: 12px;
+  }
+
+  .card-item {
+    width: auto;
   }
 </style>
