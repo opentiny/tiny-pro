@@ -30,8 +30,8 @@
           <div class="mt2">
             <tiny-tag
               v-for="(item, index) in card.tag"
-              class="mr-1"
               :key="index"
+              class="mr-1"
               :type="item.type"
               :value="item.value"
               effect="light"
@@ -127,7 +127,7 @@
     } catch (error) {
       console.error('Failed to fetch card list:', error);
     } finally {
-      cardLoadingState.value.close();
+      cardLoadingState.value?.close();
     }
   }
 </script>
