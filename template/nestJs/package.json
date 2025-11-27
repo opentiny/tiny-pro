@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@nestjs/common": "10.0.3",
-    "@nestjs/config": "^3.2.3",
+    "@nestjs/config": "^3.3.0",
     "@nestjs/core": "10.0.3",
     "@nestjs/jwt": "^10.2.0",
     "@nestjs/mapped-types": "*",
@@ -47,6 +47,7 @@
     "sequelize-typescript": "2.1.5",
     "typeorm": "^0.3.22",
     "typescript": "5.1.6",
+    "uuid": "^13.0.0",
     "winston": "^3.17.0",
     "winston-daily-rotate-file": "^5.0.0"
   },

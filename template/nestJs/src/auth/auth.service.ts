@@ -7,6 +7,9 @@ import { JwtService } from '@nestjs/jwt';
 import { RedisService } from '../../libs/redis/redis.service';
 import { I18nTranslations } from '../.generate/i18n.generated';
 import { I18nContext, I18nService } from 'nestjs-i18n';
+import { TokenService } from './token.service';
+import { AccessTokenPayload } from './entity/token';
+import { pick } from '../../libs/utils/pick';
 
 @Injectable()
 export class AuthService {
@@ -15,22 +18,25 @@ export class AuthService {
     private user: Repository<User>,
     private jwtService: JwtService,
     private readonly redisService: RedisService,
-    private readonly i18n: I18nService<I18nTranslations>
+    private readonly i18n: I18nService<I18nTranslations>,
+    private tokenService: TokenService,
   ) {}
 
   async getToken(userId: string): Promise<string | null> {
     return this.redisService.getUserToken(`user:${userId}:token`);
   }
 
-  async kickOut(email: string) {
-    await this.redisService.delUserToken(`user:${email}:token`);
+  async kickOut(id: number) {
+    await this.tokenService.revokeByUid(id);
+    // await this.redisService.delUserToken(`user:${email}:token`);
   }
 
   async logout(token: string): Promise<void> {
     //通过token解析email
-    const decoded = await this.jwtService.verify(token);
+    const decoded = this.jwtService.verify<AccessTokenPayload>(token);
+    await this.tokenService.revokeByUid(decoded.id)
     //退出登录后，将token从Redis删除
-    await this.redisService.delUserToken(`user:${decoded.email}:token`);
+    // await this.redisService.delUserToken(`user:${decoded.email}:token`);
     return;
   }
 
@@ -56,17 +62,21 @@ export class AuthService {
     }
     const payload = {
       email,
+      id: userInfo.id
     };
-    const token = this.jwtService.signAsync(payload);
-    //将token设置到Redis中，有效期2h
-    await this.redisService.setUserToken(
-      `user:${email}:token`,
-      await token,
-      await parseInt(process.env.REDIS_SECONDS)
-    );
-    return {
-      token: await token,
-    };
+    const token = this.tokenService.createToken(payload.id, payload.email);
+    await this.tokenService.issueToken(payload.id, token);
+    return pick(token, ['accessToken', 'accessTokenTTL', 'refreshToken', 'refreshTokenTTL'])
+    // const token = this.jwtService.signAsync(payload);
+    // //将token设置到Redis中，有效期2h
+    // await this.redisService.setUserToken(
+    //   `user:${email}:token`,
+    //   await token,
+    //   await parseInt(process.env.REDIS_SECONDS)
+    // );
+    // return {
+    //   token: await token,
+    // };
   }
 
   // 生成API Token，不覆盖原有登录token

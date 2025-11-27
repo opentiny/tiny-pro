@@ -7,11 +7,12 @@ import { JwtModule } from '@nestjs/jwt';
 import { UserModule } from '../user/user.module';
 import { RedisService } from '../../libs/redis/redis.service';
 import { RedisModule } from '../../libs/redis/redis.module';
+import { TokenService } from './token.service';
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService, RedisService],
-  exports: [AuthService],
+  providers: [AuthService, RedisService, TokenService],
+  exports: [AuthService, TokenService],
   imports: [
     TypeOrmModule.forFeature([User]),
     JwtModule.registerAsync({
