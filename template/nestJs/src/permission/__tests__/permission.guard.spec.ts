@@ -5,6 +5,10 @@ import { UserService } from "../../user/user.service";
 import { I18nContext } from "nestjs-i18n";
 import { ExecutionContext, HttpException, HttpStatus } from "@nestjs/common";
 
+jest.mock('uuid', () => ({
+  v7: jest.fn(() => 'mocked-uuid-v7'),
+}));
+
 describe('Permission Guard', ()=>{
   let guard: PermissionGuard;
   const ref = {
