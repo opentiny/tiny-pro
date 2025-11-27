@@ -6,6 +6,11 @@ import { I18nContext, I18nService } from 'nestjs-i18n';
 import { encry, User } from '@app/models';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { HttpException } from '@nestjs/common';
+import { TokenService } from '../token.service';
+
+jest.mock('uuid', () => ({
+  v7: jest.fn(() => 'mocked-uuid-v7'),
+}));
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -24,6 +29,15 @@ describe('AuthService', () => {
   const i18nService = {
     translate: jest.fn(),
   };
+  const tokenService = {
+    revokeToken: jest.fn(),
+    revokeByUid: jest.fn(),
+    createToken: jest.fn(),
+    getLastToken: jest.fn(),
+    accessTokenAlive: jest.fn(),
+    issueToken: jest.fn(),
+    getUserTokenCount: jest.fn(),
+  }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -45,6 +59,10 @@ describe('AuthService', () => {
           provide: I18nService,
           useValue: i18nService,
         },
+        {
+          provide: TokenService,
+          useValue: tokenService
+        }
       ],
     }).compile();
     jest.spyOn(I18nContext, 'current').mockReturnValue({
@@ -69,8 +87,8 @@ describe('AuthService', () => {
   describe('kickOut', () => {
     it('should delete a token from Redis', async () => {
       jest.spyOn(redisService, 'delUserToken').mockResolvedValue(true);
-      await service.kickOut('test@example.com');
-      expect(redisService.delUserToken).toHaveBeenCalledWith('user:test@example.com:token');
+      await service.kickOut(1);
+      expect(tokenService.revokeByUid).toHaveBeenCalledWith(1);
     });
   });
 
@@ -80,7 +98,8 @@ describe('AuthService', () => {
       jest.spyOn(redisService, 'delUserToken').mockResolvedValue(true);
       await service.logout('test-token');
       expect(jwtService.verify).toHaveBeenCalledWith('test-token');
-      expect(redisService.delUserToken).toHaveBeenCalledWith('user:test@example.com:token');
+      expect(tokenService.revokeByUid).toHaveBeenCalled();
+      // expect(redisService.delUserToken).toHaveBeenCalledWith('user:test@example.com:token');
     });
   });
 
@@ -112,7 +131,7 @@ describe('AuthService', () => {
 
     it('should return a token if login is successful', async () => {
       userRepository.findOne.mockResolvedValue({
-
+        id: 1,
         email: 'test@example.com',
         password: encry('hashed-password', 'salt'),
         salt: 'salt',
@@ -121,13 +140,8 @@ describe('AuthService', () => {
       jest.spyOn(jwtService, 'signAsync').mockResolvedValue('test-token');
       jest.spyOn(redisService, 'setUserToken').mockResolvedValue(true);
 
-      const result = await service.login({ email: 'test@example.com', password: 'hashed-password' });
-      expect(result).toEqual({ token: 'test-token' });
-      expect(redisService.setUserToken).toHaveBeenCalledWith(
-        'user:test@example.com:token',
-        'test-token',
-        parseInt(process.env.REDIS_SECONDS)
-      );
+      await service.login({ email: 'test@example.com', password: 'hashed-password' });
+      expect(tokenService.createToken).toHaveBeenCalledWith(1, 'test@example.com');
     });
   });
 });
