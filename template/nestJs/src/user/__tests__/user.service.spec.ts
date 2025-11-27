@@ -1,13 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserService } from '../user.service';
-import { HttpException, HttpStatus } from '@nestjs/common';
+import { HttpException } from '@nestjs/common';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { AuthService } from '../../auth/auth.service';
 import { I18nContext, I18nService } from 'nestjs-i18n';
-import { In, Like, Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { User, Role } from '@app/models';
 import * as crypto from 'crypto';
-import { paginate } from 'nestjs-typeorm-paginate';
 
 describe('UserService', () => {
   let service: UserService;

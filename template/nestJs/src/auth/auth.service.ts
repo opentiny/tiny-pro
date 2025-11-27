@@ -28,15 +28,11 @@ export class AuthService {
 
   async kickOut(id: number) {
     await this.tokenService.revokeByUid(id);
-    // await this.redisService.delUserToken(`user:${email}:token`);
   }
 
   async logout(token: string): Promise<void> {
-    //通过token解析email
     const decoded = this.jwtService.verify<AccessTokenPayload>(token);
     await this.tokenService.revokeByUid(decoded.id)
-    //退出登录后，将token从Redis删除
-    // await this.redisService.delUserToken(`user:${decoded.email}:token`);
     return;
   }
 
@@ -67,16 +63,6 @@ export class AuthService {
     const token = this.tokenService.createToken(payload.id, payload.email);
     await this.tokenService.issueToken(payload.id, token);
     return pick(token, ['accessToken', 'accessTokenTTL', 'refreshToken', 'refreshTokenTTL'])
-    // const token = this.jwtService.signAsync(payload);
-    // //将token设置到Redis中，有效期2h
-    // await this.redisService.setUserToken(
-    //   `user:${email}:token`,
-    //   await token,
-    //   await parseInt(process.env.REDIS_SECONDS)
-    // );
-    // return {
-    //   token: await token,
-    // };
   }
 
   // 生成API Token，不覆盖原有登录token
