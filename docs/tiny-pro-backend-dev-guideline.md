@@ -38,6 +38,10 @@ EXPIRES_IN = '2h'
 PAGINATION_PAGE = 1
 # 分页默认大小
 PAGINATION_LIMIT = 10
+# 刷新令牌有效时间
+REFRESH_TOKEN_TTL = 604800000
+# 至多有多少个设备可以同时在线
+DEVICE_LIMIT=1
 ```
 
 ### 开发前检查清单
