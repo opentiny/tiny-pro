@@ -174,7 +174,7 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    height: 100%;
+    height: calc(100% - 53px); // 53px is the height of breadcrumb
     overflow: auto;
     background: #fff;
     border-radius: 10px;
