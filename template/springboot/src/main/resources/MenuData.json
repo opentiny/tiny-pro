@@ -45,6 +45,16 @@
         "component": "list/search-table/index",
         "path": "table",
         "locale": "menu.list.searchTable"
+      },
+      {
+        "name": "Card",
+        "order": 2,
+        "parentId": null,
+        "menuType": "normal",
+        "icon": "",
+        "component": "list/card-list/index",
+        "path": "card",
+        "locale": "menu.list.cardList"
       }
     ]
   },

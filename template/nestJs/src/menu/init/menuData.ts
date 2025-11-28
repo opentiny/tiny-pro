@@ -279,4 +279,14 @@ export const menuData = [
     path: 'locale',
     locale: 'menu.i18n',
   },
+  {
+    name: 'Card',
+    order: 2,
+    parentId: null,
+    menuType: 'normal',
+    icon: '',
+    component: 'list/card-list/index',
+    path: 'card',
+    locale: 'menu.list.cardList',
+  },
 ];

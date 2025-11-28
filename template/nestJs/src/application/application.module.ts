@@ -1,0 +1,13 @@
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Module } from '@nestjs/common';
+import { Application } from '@app/models';
+import { ApplicationController } from './application.controller';
+import { ApplicationService } from './application.service';
+
+@Module({
+  imports: [TypeOrmModule.forFeature([Application])],
+  controllers: [ApplicationController],
+  providers: [ApplicationService],
+  exports: [ApplicationService],
+})
+export class ApplicationModule {}

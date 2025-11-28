@@ -25,5 +25,17 @@ export default {
         roles: [RoleType.admin, RoleType.user],
       },
     },
+    {
+      path: 'card', // The midline path complies with SEO specifications
+      name: 'Card',
+      id: 'Card',
+      label: 'Card',
+      component: () => import('@/views/list/card-list/index.vue'),
+      meta: {
+        locale: 'menu.list.cardList',
+        requiresAuth: true,
+        roles: [RoleType.admin, RoleType.user],
+      },
+    },
   ],
 };

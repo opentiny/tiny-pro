@@ -35,6 +35,9 @@ import {
 import { MockModule } from './mock/mock.module';
 import { RejectRequestGuard } from './public/reject.guard';
 import { HealthCheckController } from './health-check.controller';
+import { ApplicationModule } from './application/application.module';
+import { ApplicationService } from './application/application.service';
+import { applicationData } from './application/init/data';
 
 @Module({
   imports: [
@@ -44,6 +47,7 @@ import { HealthCheckController } from './health-check.controller';
     AuthModule,
     RoleModule,
     MenuModule,
+    ApplicationModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
@@ -82,7 +86,8 @@ export class AppModule implements OnModuleInit {
     private permission: PermissionService,
     private menu: MenuService,
     private lang: I18LangService,
-    private i18: I18Service
+    private i18: I18Service,
+    private application: ApplicationService
   ) {}
   async onModuleInit() {
     const ROOT = __dirname;
@@ -119,7 +124,14 @@ export class AppModule implements OnModuleInit {
       }
     }
     const permissions = {
-      user: ['add', 'remove', 'update', 'query', 'password::force-update', 'batch-remove'],
+      user: [
+        'add',
+        'remove',
+        'update',
+        'query',
+        'password::force-update',
+        'batch-remove',
+      ],
       permission: ['add', 'remove', 'update', 'get'],
       role: ['add', 'remove', 'update', 'query'],
       menu: ['add', 'remove', 'update', 'query'],
@@ -167,6 +179,19 @@ export class AppModule implements OnModuleInit {
       Logger.error(`Please clear the database and try again`);
       process.exit(-1);
     }
+
+    // application
+    try {
+      for (const item of applicationData) {
+        await this.application.createApplication(item, isInit);
+      }
+    } catch (e) {
+      const err = e as HttpException;
+      Logger.error(err.message);
+      Logger.error(`Please clear the database and try again`);
+      process.exit(-1);
+    }
+
     const status = Promise.allSettled(tasks);
     const statusData = await status;
     const hasFail = statusData.some((data) => data.status === 'rejected');
