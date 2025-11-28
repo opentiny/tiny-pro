@@ -23,7 +23,7 @@ export interface UserInfo {
   protocolEnd?: string;
   address?: string;
   status?: string;
-  role: RoleType;
+  role: Role[];
   updateTime?: any;
   createTime?: any;
   roleId?: number;

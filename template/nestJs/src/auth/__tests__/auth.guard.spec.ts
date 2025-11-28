@@ -1,11 +1,15 @@
-import { ExecutionContext, HttpException, HttpStatus } from '@nestjs/common';
+import { HttpException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { JwtService, JwtVerifyOptions } from '@nestjs/jwt';
+import { JwtService } from '@app/jwt';
 import { AuthGuard } from '../auth.guard';
 import { AuthService } from '../auth.service';
 import { I18nContext } from 'nestjs-i18n';
-import { Test, TestingModule } from '@nestjs/testing';
-import { CreateAuthDto } from '../dto/create-auth.dto';
+import { Test } from '@nestjs/testing';
+import { TokenService } from '../token.service';
+
+jest.mock('uuid', () => ({
+  v7: jest.fn(() => 'mocked-uuid-v7'), // Always return this fixed value
+}));
 
 describe('AuthGuard', () => {
   let authGuard: AuthGuard;
@@ -22,7 +26,16 @@ describe('AuthGuard', () => {
     logout: jest.fn(),
     login: jest.fn()
   }
-  const i18n=  {
+  const tokenService = {
+    revokeToken: jest.fn(),
+    revokeByUid: jest.fn(),
+    createToken: jest.fn(),
+    getLastToken: jest.fn(),
+    accessTokenAlive: jest.fn(),
+    issueToken: jest.fn(),
+    getUserTokenCount: jest.fn(),
+  }
+  const i18n = {
     lang: '',
     t: jest.fn()
   }
@@ -41,6 +54,10 @@ describe('AuthGuard', () => {
         {
           provide: AuthService,
           useValue: authService
+        },
+        {
+          provide: TokenService,
+          useValue: tokenService
         }
       ]
     })
@@ -191,6 +208,7 @@ describe('AuthGuard', () => {
     jwt.verify.mockResolvedValue({});
     jwt.decode.mockReturnValue({ email: 'test@example.com' });
     authService.getToken.mockResolvedValue('validToken');
+    tokenService.accessTokenAlive.mockResolvedValue(true)
     const mockRequest = {
       headers: {
         authorization: 'Bearer validToken',

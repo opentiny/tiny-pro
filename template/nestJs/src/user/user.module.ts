@@ -5,11 +5,12 @@ import { Permission, Role, User } from '@app/models';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthService } from '../auth/auth.service';
 import { RedisService } from '../../libs/redis/redis.service';
+import { TokenService } from '../auth/token.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User, Permission, Role])],
   controllers: [UserController],
-  providers: [UserService, AuthService, RedisService],
+  providers: [UserService, AuthService, RedisService, TokenService],
   exports: [UserService],
 })
 export class UserModule {}
