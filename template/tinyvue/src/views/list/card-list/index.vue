@@ -6,6 +6,7 @@
       <div class="flex flex-wrap gap-2 justify-between mb-4">
         <tiny-button-group
           v-model="filterDataModel.classify"
+          class="card-list-button-group"
           :data="serviceOptions"
           @change="classifyChange"
         ></tiny-button-group>
@@ -211,5 +212,11 @@
 
   .card-item {
     width: auto;
+  }
+
+  @media (max-width: @screen-mm) {
+    :deep(.card-list-button-group.tiny-button-group .tiny-group-item li button) {
+      padding: 0 20px;
+    }
   }
 </style>
