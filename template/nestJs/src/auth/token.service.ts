@@ -33,12 +33,37 @@ export class TokenService {
     await redis.lrem(`user:${uid}:at`, 0, jti)
   }
 
+  async revokeExpiredToken(uid: number){
+    const redis = this.redisService.getRedis();
+
+    const allRefreshTokenJti = await redis.lrange(`user:${uid}:rt`, 0, -1);
+    const allAccessTokenJti = await redis.lrange(`user:${uid}:at`, 0, -1);
+    const expiredRefreshTokenJti = [];
+    const expiredAccessTokenJti = [];
+    for (const refreshTokenJti of allRefreshTokenJti) {
+      if (await redis.exists(`rt:${uid}:${refreshTokenJti}`)) {
+        continue;
+      }
+      expiredRefreshTokenJti.push(refreshTokenJti);
+    }
+    for (const accessTokenJti of allAccessTokenJti) {
+      if (await redis.exists(`at:${uid}:${accessTokenJti}`)) {
+        continue;
+      }
+      expiredAccessTokenJti.push(accessTokenJti);
+    }
+    for (const accessJti of expiredAccessTokenJti) {
+      await redis.lrem(`user:${uid}:at`, 0, accessJti);
+    }
+    for (const refresJti of expiredRefreshTokenJti) {
+      await redis.lrem(`user:${uid}:rt`, 0, refresJti);
+    }
+  }
+
   async revokeByUid(uid: number){
     const redis = this.redisService.getRedis();
-    const userRTTotal = await redis.llen(`user:${uid}:rt`);
-    const userATTotal = await redis.llen(`user:${uid}:at`);
-    const userRTJTI = await redis.lrange(`user:${uid}:rt`, 0, userRTTotal);
-    const userATJTI = await redis.lrange(`user:${uid}:at`, 0, userATTotal);
+    const userRTJTI = await redis.lrange(`user:${uid}:rt`, 0, -1);
+    const userATJTI = await redis.lrange(`user:${uid}:at`, 0, -1);
     const multi = redis.multi();
     if (userATJTI.length) {
       multi.del(`user:${uid}:at`)
@@ -57,7 +82,7 @@ export class TokenService {
 
   createToken(id: number, email: string): TokenData{
     const accessTokenTTLSeconds = this.cfg.get('REDIS_SECONDS') ?? 7200;
-    const refreshTokenTTL = this.cfg.get('REFRESH_TOKEN_TTL');
+    const refreshTokenTTL = this.cfg.get('REFRESH_TOKEN_TTL') // ms;
     const accessTokenTTL = accessTokenTTLSeconds * 1000;
     const accessTokenJTI = v7();
     const refreshTokenJTI = v7();
@@ -125,14 +150,17 @@ export class TokenService {
     let userTokenCount = await this.getUserTokenCount(uid);
     const limit = Number.parseInt(this.cfg.get<string>('DEVICE_LIMIT'));
     if (limit > 0 && userTokenCount >= limit) {
+      // 先尝试吊销所有过期的Token (无法通过jti找到token都被视作过期的token)
+      await this.revokeExpiredToken(uid);
       while (
         userTokenCount >= limit
       ) {
         const lastToken = await this.getLastToken(uid);
-        if (lastToken) {
-          await this.revokeToken(lastToken.accessToken)
-          userTokenCount -= 1;
+        if (!lastToken) {
+          break;
         }
+        await this.revokeToken(lastToken.accessToken)
+        userTokenCount -= 1;
       }
     }
     const multi = redis.multi();
