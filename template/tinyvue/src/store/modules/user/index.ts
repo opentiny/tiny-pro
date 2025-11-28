@@ -33,7 +33,7 @@ const useUserStore = defineStore('user', {
     protocolEnd: '2024-04-19',
     address: '',
     status: '',
-    role: '',
+    role: [],
     sort: 1,
     startTime: '',
     endTime: '',
@@ -85,8 +85,8 @@ const useUserStore = defineStore('user', {
     async login(loginForm: LoginData) {
       try {
         const res = await userLogin(loginForm);
-        const { token } = res.data;
-        setToken(token);
+        const { accessToken } = res.data;
+        setToken(accessToken);
         const userRes = await getUserInfo(loginForm.email)
         const userInfo = {
           id: userRes.data.id,

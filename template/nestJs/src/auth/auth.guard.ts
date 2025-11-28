@@ -6,18 +6,21 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { JwtService } from '@nestjs/jwt';
+import { JwtService } from '@app/jwt';
 import { Request } from 'express';
 import { AuthService } from './auth.service';
 import { I18nContext } from 'nestjs-i18n';
 import { I18nTranslations } from '../.generate/i18n.generated';
+import { TokenService } from './token.service';
+import { TokenPayload } from './entity/token';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
     private readonly jwt: JwtService,
     private readonly reflector: Reflector,
-    private readonly authService: AuthService
+    private readonly authService: AuthService,
+    private readonly tokenService: TokenService
   ) {}
   async canActivate(ctx: ExecutionContext): Promise<boolean> {
     const i18n = I18nContext.current<I18nTranslations>();
@@ -40,11 +43,11 @@ export class AuthGuard implements CanActivate {
     }
     try {
       await this.jwt.verify(token);
-      const payload = await this.jwt.decode(token);
+      const payload = this.jwt.decode<TokenPayload>(token);
       req['user'] = payload;
 
       // 检查是否是API token
-      if (payload.type === 'api') {
+      if ('type' in payload && payload.type === 'api') {
         // 验证API token
         const isValidApiToken = await this.authService.validateApiToken(
           payload.email,
@@ -60,18 +63,9 @@ export class AuthGuard implements CanActivate {
         }
       } else {
         // 原有的登录token验证逻辑
-        const cacheToken = await this.authService.getToken(payload.email);
-        if (!cacheToken) {
+        if (!await this.tokenService.accessTokenAlive(token)){
           throw new HttpException(
             i18n.t('exception.common.tokenExpire', {
-              lang: I18nContext.current().lang,
-            }),
-            HttpStatus.UNAUTHORIZED
-          );
-        }
-        if (cacheToken !== token) {
-          throw new HttpException(
-            i18n.t('exception.common.tokenError', {
               lang: I18nContext.current().lang,
             }),
             HttpStatus.UNAUTHORIZED
