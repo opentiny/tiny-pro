@@ -13,8 +13,8 @@
           <tiny-search
             v-model="filterDataModel.keywords"
             class="flex-1"
-            :placeholder="$t('searchTable.form.placeholder')"
-            @change="handleRefresh"
+            :placeholder="$t('cardList.search.placeholder')"
+            @change="search"
           ></tiny-search>
           <tiny-button :icon="IconRefresh" @click="handleRefresh">
           </tiny-button>
@@ -22,9 +22,13 @@
       </div>
 
       <div id="card-list" class="card-container">
-        <tiny-card v-for="card in cards" :key="card.id" class="card-item">
+        <tiny-card
+          v-for="card in cards"
+          :key="card.id"
+          custom-class="card-item"
+        >
           <Image :src="card.icon" />
-          <div class="header mt2 mb-2">{{ card.name }}</div>
+          <div class="header mt-2 mb-2">{{ card.name }}</div>
           <div class="line-clamp-2">{{ card.description }}</div>
           <div class="mt2">
             <tiny-tag
@@ -120,6 +124,11 @@
     observer.observe(pagerRef.value.$el);
   }
 
+  function search() {
+    pager.value.currentPage = 1;
+    fetchData();
+  }
+
   function handleRefresh() {
     fetchData();
   }
@@ -195,7 +204,7 @@
 
   .card-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 12px;
     row-gap: 12px;
   }
