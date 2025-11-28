@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { RedisService } from "../../libs/redis/redis.service";
 import { v7 } from "uuid";
-import { JwtService } from "@nestjs/jwt";
+import { JwtService } from "@app/jwt";
 import { ConfigService } from "@nestjs/config";
 import { AccessTokenPayload, RefreshTokenPayload } from "./entity/token";
 
@@ -25,7 +25,7 @@ export class TokenService {
   ){}
 
   async revokeToken(token: string) {
-    const {id:uid, jti, refreshTokenJti } = this.jwt.decode(token) as AccessTokenPayload;
+    const {id:uid, jti, refreshTokenJti } = this.jwt.decode<AccessTokenPayload>(token);
     const redis = this.redisService.getRedis();
     await redis.del(`rt:${uid}:${refreshTokenJti}`)
     await redis.del(`at:${uid}:${jti}`)
@@ -80,7 +80,7 @@ export class TokenService {
     await multi.exec();
   }
 
-  createToken(id: number, email: string): TokenData{
+  async createToken(id: number, email: string): Promise<TokenData>{
     const accessTokenTTLSeconds = this.cfg.get('REDIS_SECONDS') ?? 7200;
     const refreshTokenTTL = this.cfg.get('REFRESH_TOKEN_TTL') // ms;
     const accessTokenTTL = accessTokenTTLSeconds * 1000;
@@ -94,7 +94,10 @@ export class TokenService {
       ttl: accessTokenTTL,
       refreshTokenJti: refreshTokenJTI
     };
-    const accessToken = this.jwt.sign(accessTokenPayload);
+    const accessToken = await this.jwt.sign(
+      accessTokenPayload,
+      accessTokenTTL
+    );
     const refreshTokenPayload:RefreshTokenPayload = {
       jti: refreshTokenJTI,
       ttl: refreshTokenTTL,
@@ -103,7 +106,7 @@ export class TokenService {
       email,
       accessTokenJti: accessTokenJTI
     }
-    const refreshToken = this.jwt.sign(refreshTokenPayload);
+    const refreshToken = await this.jwt.sign(refreshTokenPayload, refreshTokenTTL);
     return {
       accessToken,
       refreshToken,

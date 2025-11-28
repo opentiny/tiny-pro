@@ -1,12 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from '../auth.service';
-import { JwtService } from '@nestjs/jwt';
+import { JwtService } from '@app/jwt';
 import { RedisService } from '../../../libs/redis/redis.service';
 import { I18nContext, I18nService } from 'nestjs-i18n';
 import { encry, User } from '@app/models';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { HttpException } from '@nestjs/common';
 import { TokenService } from '../token.service';
+import { ConfigService } from '@nestjs/config';
 
 jest.mock('uuid', () => ({
   v7: jest.fn(() => 'mocked-uuid-v7'),
@@ -62,6 +63,12 @@ describe('AuthService', () => {
         {
           provide: TokenService,
           useValue: tokenService
+        },
+        {
+          provide: ConfigService,
+          useValue:{
+            get: jest.fn()
+          }
         }
       ],
     }).compile();
@@ -94,7 +101,12 @@ describe('AuthService', () => {
 
   describe('logout', () => {
     it('should delete a token from Redis after verifying it', async () => {
-      jest.spyOn(jwtService, 'verify').mockResolvedValue({ email: 'test@example.com' });
+      jest.spyOn(jwtService, 'verify').mockResolvedValue({
+        payload: {
+          email: 'test@example.com',
+          id: 1,
+        }
+      });
       jest.spyOn(redisService, 'delUserToken').mockResolvedValue(true);
       await service.logout('test-token');
       expect(jwtService.verify).toHaveBeenCalledWith('test-token');
