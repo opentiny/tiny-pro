@@ -1,6 +1,6 @@
 # TinyPro
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-6-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-7-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 TinyCLI 是一个跨平台的前端工程化 CLI 工具，为开发者提供一系列开发套件及工程插件，覆盖前端开发的整个链路，保证团队开发过程的一致性和可复制性。
@@ -157,6 +157,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="12.5%"><a href="https://github.com/hu-qi"><img src="https://avatars.githubusercontent.com/u/17986122?v=4?s=100" width="100px;" alt="huqi"/><br /><sub><b>huqi</b></sub></a><br /><a href="https://github.com/opentiny/tiny-pro/commits?author=hu-qi" title="Code">💻</a></td>
       <td align="center" valign="top" width="12.5%"><a href="https://github.com/Muyu-art"><img src="https://avatars.githubusercontent.com/u/72800755?v=4?s=100" width="100px;" alt="CatWithFish"/><br /><sub><b>CatWithFish</b></sub></a><br /><a href="https://github.com/opentiny/tiny-pro/commits?author=Muyu-art" title="Code">💻</a></td>
       <td align="center" valign="top" width="12.5%"><a href="https://github.com/zzcr"><img src="https://avatars.githubusercontent.com/u/18521562?v=4?s=100" width="100px;" alt="ajaxzheng"/><br /><sub><b>ajaxzheng</b></sub></a><br /><a href="https://github.com/opentiny/tiny-pro/commits?author=zzcr" title="Code">💻</a></td>
+      <td align="center" valign="top" width="12.5%"><a href="https://github.com/zhaoxiaofeng876"><img src="https://avatars.githubusercontent.com/u/66005052?v=4?s=100" width="100px;" alt="zhaoxiaofeng876"/><br /><sub><b>zhaoxiaofeng876</b></sub></a><br /><a href="https://github.com/opentiny/tiny-pro/commits?author=zhaoxiaofeng876" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
