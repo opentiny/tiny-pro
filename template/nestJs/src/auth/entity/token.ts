@@ -1,3 +1,8 @@
+export type ApiTokenPayload = {
+  type: 'api';
+  email: string;
+}
+export type TokenPayload = ApiTokenPayload | AccessTokenPayload;
 export type TokenPayloadBase = {
   jti: string;
   issueAt: string;

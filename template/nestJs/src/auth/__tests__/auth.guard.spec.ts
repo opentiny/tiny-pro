@@ -1,6 +1,6 @@
 import { HttpException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { JwtService } from '@nestjs/jwt';
+import { JwtService } from '@app/jwt';
 import { AuthGuard } from '../auth.guard';
 import { AuthService } from '../auth.service';
 import { I18nContext } from 'nestjs-i18n';

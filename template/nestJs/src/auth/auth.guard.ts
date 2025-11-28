@@ -6,12 +6,13 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { JwtService } from '@nestjs/jwt';
+import { JwtService } from '@app/jwt';
 import { Request } from 'express';
 import { AuthService } from './auth.service';
 import { I18nContext } from 'nestjs-i18n';
 import { I18nTranslations } from '../.generate/i18n.generated';
 import { TokenService } from './token.service';
+import { TokenPayload } from './entity/token';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -42,11 +43,11 @@ export class AuthGuard implements CanActivate {
     }
     try {
       await this.jwt.verify(token);
-      const payload = await this.jwt.decode(token);
+      const payload = this.jwt.decode<TokenPayload>(token);
       req['user'] = payload;
 
       // 检查是否是API token
-      if (payload.type === 'api') {
+      if ('type' in payload && payload.type === 'api') {
         // 验证API token
         const isValidApiToken = await this.authService.validateApiToken(
           payload.email,

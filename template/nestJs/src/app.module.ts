@@ -28,13 +28,13 @@ import { I18Module } from './i18/i18.module';
 import { I18LangService } from './i18/lang.service';
 import { I18Service } from './i18/i18.service';
 import {
-  AcceptLanguageResolver,
   HeaderResolver,
   I18nModule,
 } from 'nestjs-i18n';
 import { MockModule } from './mock/mock.module';
 import { RejectRequestGuard } from './public/reject.guard';
 import { HealthCheckController } from './health-check.controller';
+import { CONFIG_SCHEMA } from './config-schema';
 
 @Module({
   imports: [
@@ -46,6 +46,8 @@ import { HealthCheckController } from './health-check.controller';
     MenuModule,
     ConfigModule.forRoot({
       isGlobal: true,
+      expandVariables: true,
+      validationSchema: CONFIG_SCHEMA
     }),
     I18Module,
     I18nModule.forRoot({
