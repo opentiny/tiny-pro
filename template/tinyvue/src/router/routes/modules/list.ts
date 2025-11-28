@@ -27,9 +27,9 @@ export default {
     },
     {
       path: 'card', // The midline path complies with SEO specifications
-      name: 'card',
-      id: 'card',
-      label: 'card',
+      name: 'Card',
+      id: 'Card',
+      label: 'Card',
       component: () => import('@/views/list/card-list/index.vue'),
       meta: {
         locale: 'menu.list.cardList',
