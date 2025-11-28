@@ -99,7 +99,6 @@ describe('AuthService', () => {
       await service.logout('test-token');
       expect(jwtService.verify).toHaveBeenCalledWith('test-token');
       expect(tokenService.revokeByUid).toHaveBeenCalled();
-      // expect(redisService.delUserToken).toHaveBeenCalledWith('user:test@example.com:token');
     });
   });
 
