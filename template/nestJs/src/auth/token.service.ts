@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { RedisService } from "../../libs/redis/redis.service";
-import { v7 } from "uuid";
+import { v4 } from "uuid";
 import { JwtService } from "@app/jwt";
 import { ConfigService } from "@nestjs/config";
 import { AccessTokenPayload, RefreshTokenPayload } from "./entity/token";
@@ -84,8 +84,8 @@ export class TokenService {
     const accessTokenTTLSeconds = this.cfg.get('REDIS_SECONDS') ?? 7200;
     const refreshTokenTTL = this.cfg.get('REFRESH_TOKEN_TTL') // ms;
     const accessTokenTTL = accessTokenTTLSeconds * 1000;
-    const accessTokenJTI = v7();
-    const refreshTokenJTI = v7();
+    const accessTokenJTI = v4();
+    const refreshTokenJTI = v4();
     const accessTokenPayload: AccessTokenPayload = {
       jti: accessTokenJTI,
       id,
