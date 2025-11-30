@@ -41,7 +41,7 @@ export class UserService {
       address,
       status,
     } = createUserDto;
-    
+
     // 检查必填字段
     if (!email || !password || !name) {
       throw new HttpException(
@@ -250,7 +250,7 @@ export class UserService {
       if (!user) {
         return;
       }
-      await this.authService.kickOut(email);
+      await this.authService.kickOut(user.id);
       return this.userRep.remove(user);
     }
     throw new HttpException(
@@ -294,7 +294,7 @@ export class UserService {
           ).salt
         );
         await this.userRep.save(await user);
-        await this.authService.kickOut((await user).email);
+        await this.authService.kickOut((await user).id);
         return;
       }
     }
@@ -309,7 +309,7 @@ export class UserService {
     if (user) {
       (await user).password = await this.encry(newPassword, (await user).salt);
       await this.userRep.save(await user);
-      await this.authService.kickOut((await user).email);
+      await this.authService.kickOut((await user).id);
       return;
     }
   }
@@ -373,7 +373,7 @@ export class UserService {
 
     const newProfile = await this.userRep.save(user);
     if (userRoles !== (roleIds || []).join('')) {
-      await this.authService.kickOut(email);
+      await this.authService.kickOut(user.id);
     }
     return newProfile;
   }

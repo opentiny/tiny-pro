@@ -10,6 +10,9 @@ export class RedisService {
       port: parseInt(process.env.REDIS_PORT),
     });
   }
+  getRedis(){
+    return this.redisClient;
+  }
   async setUserToken(
     email: string,
     token: string,

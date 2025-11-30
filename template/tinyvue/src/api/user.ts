@@ -22,6 +22,12 @@ export interface LoginDataMail {
   mailname: string;
   mailpassword: string;
 }
+export interface LoginResponse {
+  accessToken: string;
+  accessTokenTTL: number;
+  refreshToken: string;
+  refreshTokenTTL: number;
+}
 
 export interface LoginRes {
   token: string;
@@ -40,7 +46,7 @@ export interface UserData {
 }
 
 export function login(data: LoginData) {
-  return axios.post<LoginRes>(`${import.meta.env.VITE_BASE_API}/auth/login`, data);
+  return axios.post<LoginResponse>(`${import.meta.env.VITE_BASE_API}/auth/login`, data);
 }
 export function loginMail(data: LoginDataMail) {
   return axios.post<LoginRes>(`${import.meta.env.VITE_BASE_API}/mail/login`, data);

@@ -24,8 +24,18 @@
       ],
       "@app/models/*": [
         "libs/models/src/*"
+      ],
+      "@app/jwt": [
+        "libs/jwt/src"
+      ],
+      "@app/jwt/*": [
+        "libs/jwt/src/*"
       ]
     }
   },
-  "include": ["src/**/*", "./src/global.d.ts", "libs/**/*"]
+  "include": [
+    "src/**/*",
+    "./src/global.d.ts",
+    "libs/**/*"
+  ]
 }
