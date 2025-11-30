@@ -23,6 +23,6 @@ ENV PAGINATION_LIMIT=10
 ENV DATABASE_NAME=""
 
 EXPOSE 3000
-VOLUME [ "./dist/data" ]
+VOLUME [ "/builder/dist/data" ]
 CMD ["sh", "endpoint.sh"]
 
