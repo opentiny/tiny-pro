@@ -43,6 +43,8 @@ PAGINATION_LIMIT = 10
 REFRESH_TOKEN_TTL = 604800000
 # 至多有多少个设备可以同时在线
 DEVICE_LIMIT=1
+# 是否启用演示模式
+PREVIEW_MODE=true
 ```
 
 ### 开发前检查清单
