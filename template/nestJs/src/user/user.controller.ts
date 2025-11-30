@@ -8,11 +8,8 @@ import {
   HttpStatus,
   Param,
   ParseArrayPipe,
-  ParseEnumPipe,
-  ParseIntPipe,
   Patch,
   Post,
-  Put,
   Query,
   Req,
 } from '@nestjs/common';
@@ -26,16 +23,36 @@ import { UpdatePwdUserDto } from './dto/update-pwd-user.dto';
 import { I18n, I18nContext } from 'nestjs-i18n';
 import { I18nTranslations } from '../.generate/i18n.generated';
 import { Reject } from '../public/reject.decorator';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiProperty } from '@nestjs/swagger';
+import { User } from '@app/models';
+import { BatchRemoveUserDto } from './dto/batch-remove-user.dto';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @ApiOperation({summary: '注册'})
+  @ApiCreatedResponse({
+    type: ()=>User,
+    description: '注册成功后的返回'
+  })
+  @ApiBearerAuth()
   @Reject()
   @Post('reg')
   @Permission('user::add')
   async register(@Body() body: CreateUserDto) {
     return this.userService.create(body, false);
   }
+
+
+  @ApiOperation({summary: '获取用户信息'})
+  @ApiParam({
+    name: 'email',
+    description: '用户邮箱'
+  })
+  @ApiOkResponse({
+    type: ()=>User
+  })
   @Get('/info/:email?')
   async getUserInfo(
     @I18n() i18n: I18nContext<I18nTranslations>,
@@ -52,6 +69,14 @@ export class UserController {
     return this.userService.getUserInfo(_email, ['role', 'role.permission']);
   }
 
+  @ApiOperation({summary: '删除用户'})
+  @ApiParam({
+    name: 'email',
+    description: '用户邮箱'
+  })
+  @ApiOkResponse({
+    type: User
+  })
   @Reject()
   @Delete('/:email')
   @Permission('user::remove')
@@ -59,12 +84,18 @@ export class UserController {
     return this.userService.deleteUser(email);
   }
 
+  @ApiOperation({summary: '修改用户信息'})
+  @ApiOkResponse({
+    type: User,
+  })
   @Reject()
   @Patch('/update')
   @Permission('user::update')
   async UpdateUser(@Body() body: UpdateUserDto) {
     return this.userService.updateUserInfo(body);
   }
+
+  @ApiOperation({summary: '分页查询用户'})
   @Get()
   @Permission('user::query')
   async getAllUser(
@@ -76,6 +107,7 @@ export class UserController {
     return this.userService.getAllUser(paginationQuery, name, role, email);
   }
 
+  @ApiOperation({summary: '修改某位用户的密码', description: '强制性的修改'})
   @Reject()
   @Patch('/admin/updatePwd')
   @Permission('user::password::force-update')
@@ -83,6 +115,7 @@ export class UserController {
     return this.userService.updatePwdAdmin(body);
   }
 
+  @ApiOperation({summary: '修改自身的密码'})
   @Reject()
   @Patch('/updatePwd')
   @Permission('user::update')
@@ -90,10 +123,16 @@ export class UserController {
     return this.userService.updatePwdUser(body);
   }
 
+  @ApiOperation({summary: '批量删除用户'})
+  @ApiOkResponse({
+    type: [User]
+  })
   @Reject()
   @Post('/batch')
   @Permission('user::batch-remove')
-  async batchRemoveUser(@Body() emails: string[]) {
+  async batchRemoveUser(
+    @Body() {emails}: BatchRemoveUserDto,
+  ) {
     return this.userService.batchDeleteUser(emails);
   }
 }
