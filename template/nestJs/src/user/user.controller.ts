@@ -31,10 +31,10 @@ import { BatchRemoveUserDto } from './dto/batch-remove-user.dto';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @ApiOperation({summary: '注册'})
+  @ApiOperation({summary: '创建用户'})
   @ApiCreatedResponse({
     type: ()=>User,
-    description: '注册成功后的返回'
+    description: '返回创建后的用户'
   })
   @ApiBearerAuth()
   @Reject()
