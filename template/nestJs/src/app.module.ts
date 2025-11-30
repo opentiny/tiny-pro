@@ -100,9 +100,8 @@ export class AppModule implements OnModuleInit {
     }
     const IS_PREVIEW_MOD = this.cfg.get('PREVIEW_MODE');
     if (IS_PREVIEW_MOD) {
-      Logger.warn('You are currently in demonstration mode');
-      Logger.warn('All additions, deletions, and modifications will be rejected');
-      Logger.warn('If you want to turn off the demo mode, please set the `PREVIEW_MODE` environment variable to `false`')
+      Logger.warn('You are currently in demonstration mode. All additions, deletions, and modifications request will be rejected');
+      Logger.warn('If you want to disable the demo mode, please set the `PREVIEW_MODE` environment variable to `false`')
       Logger.warn('Alternatively, you can create an `.env` file and set `PREVIEV_MODE` to `false`')
     }
     const LOCK_FILE = join(data, 'lock');
