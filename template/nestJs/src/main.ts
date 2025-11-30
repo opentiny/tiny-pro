@@ -10,6 +10,7 @@ import { createLogger } from 'winston';
 import { utilities, WinstonModule } from 'nest-winston';
 import 'winston-daily-rotate-file'; // 用于存储日志到文件
 import { RequestMethod } from '@nestjs/common';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 dotenv.config({ path: '.env' });
 
@@ -87,6 +88,13 @@ async function bootstrap() {
       },
     })
   );
+    const config = new DocumentBuilder()
+    .setTitle(process.env.SWAGGER_TITLE || 'Tiny Pro')
+    .setDescription(process.env.SWAGGER_DESC || '开箱即用的中后台模板')
+    .setVersion(process.env.SWAGGER_VERSION || '1.0.0')
+    .build();
+  const documentFactory = () => SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, documentFactory);
   await app.listen(3000);
   console.log(`Application is running on: ${await app.getUrl()}`);
 }
