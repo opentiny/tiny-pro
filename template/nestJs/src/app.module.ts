@@ -37,7 +37,7 @@ import { HealthCheckController } from './health-check.controller';
 import { ApplicationModule } from './application/application.module';
 import { ApplicationService } from './application/application.service';
 import { applicationData } from './application/init/data';
-import { CONFIG_SCHEMA } from './config-schema';
+import { CONFIG_SCHEMA, Configure } from './config-schema';
 
 @Module({
   imports: [
@@ -89,13 +89,21 @@ export class AppModule implements OnModuleInit {
     private menu: MenuService,
     private lang: I18LangService,
     private i18: I18Service,
-    private application: ApplicationService
+    private application: ApplicationService,
+    private cfg: ConfigService<Configure>
   ) {}
   async onModuleInit() {
     const ROOT = __dirname;
     const data = join(ROOT, 'data');
     if (!existsSync(data)) {
       mkdirSync(data);
+    }
+    const IS_PREVIEW_MOD = this.cfg.get('PREVIEW_MODE');
+    if (IS_PREVIEW_MOD) {
+      Logger.warn('You are currently in demonstration mode');
+      Logger.warn('All additions, deletions, and modifications will be rejected');
+      Logger.warn('If you want to turn off the demo mode, please set the `PREVIEW_MODE` environment variable to `false`')
+      Logger.warn('Alternatively, you can create an `.env` file and set `PREVIEV_MODE` to `false`')
     }
     const LOCK_FILE = join(data, 'lock');
     if (existsSync(LOCK_FILE)) {

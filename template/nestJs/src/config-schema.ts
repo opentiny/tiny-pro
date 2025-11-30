@@ -19,6 +19,7 @@ export type Configure = {
   MOCK_REGEX:string;
   REFRESH_TOKEN_TTL:number;
   DEVICE_LIMIT:number;
+  PREVIEW_MODE: boolean;
 }
 
 export const CONFIG_SCHEMA = Joi.object<Configure>({
@@ -39,5 +40,6 @@ export const CONFIG_SCHEMA = Joi.object<Configure>({
   GLOBAL_PREFIX: Joi.string(),
   MOCK_REGEX: Joi.string(),
   REFRESH_TOKEN_TTL: Joi.number(),
-  DEVICE_LIMIT: Joi.number()
+  DEVICE_LIMIT: Joi.number(),
+  PREVIEW_MODE: Joi.bool().default(true)
 })
