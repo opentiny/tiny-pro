@@ -24,5 +24,5 @@ ENV DATABASE_NAME=""
 
 EXPOSE 3000
 VOLUME [ "/builder/dist/data" ]
-CMD ["sh", "endpoint.sh"]
+CMD ["sh", "./endpoint.sh"]
 
