@@ -30,6 +30,6 @@ services:
       - mysql
       - redis
     volumes:
-      - ./data:/APP/dist/data
+      - ./data:/builder/dist/data
 
 
