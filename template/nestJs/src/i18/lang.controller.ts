@@ -12,11 +12,15 @@ import { I18LangService } from './lang.service';
 import { CreateLang } from './dto/create-lang.dto';
 import { Permission } from '../public/permission.decorator';
 import { Reject } from '../public/reject.decorator';
+import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam } from '@nestjs/swagger';
+import { Lang } from '@app/models';
 
 @Controller('/lang')
 export class I18nLangController {
   constructor(private readonly langService: I18LangService) {}
 
+  @ApiOperation({summary: '创建一个语言'})
+  @ApiCreatedResponse({type: Lang})
   @Reject()
   @Permission('lang::add')
   @Post('')
@@ -24,12 +28,21 @@ export class I18nLangController {
     return this.langService.create(data);
   }
 
+  @ApiOperation({summary: '列出所有的语言'})
+  @ApiCreatedResponse({type: [Lang]})
   @Permission('lang::query')
   @Get('')
   findAllLang() {
     return this.langService.findAll();
   }
 
+  @ApiOperation({summary: '修改某个的语言'})
+  @ApiOkResponse({type: Lang})
+  @ApiParam({
+    name: 'id',
+    description: '语言的数据库主键',
+    type: Number
+  })
   @Reject()
   @Permission('lang::update')
   @Patch(':id')
@@ -40,6 +53,13 @@ export class I18nLangController {
     return this.langService.update(id, data);
   }
 
+  @ApiOperation({summary: '修改某个的语言'})
+  @ApiOkResponse({type: Lang})
+  @ApiParam({
+    name: 'id',
+    description: '语言的数据库主键',
+    type: Number
+  })
   @Reject()
   @Permission('lang::remove')
   @Delete(':id')
