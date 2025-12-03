@@ -17,7 +17,7 @@ export class Lang {
 
   @ApiProperty({
     description: '语言对应的国际化词条',
-    type: [I18]
+    type: ()=>[I18]
   })
   @OneToMany(() => I18, (i18) => i18.lang)
   i18: I18[];
