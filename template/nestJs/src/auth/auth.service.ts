@@ -7,7 +7,7 @@ import { RedisService } from '../../libs/redis/redis.service';
 import { I18nTranslations } from '../.generate/i18n.generated';
 import { I18nContext, I18nService } from 'nestjs-i18n';
 import { TokenService } from './token.service';
-import { AccessTokenPayload } from './entity/token';
+import { AccessTokenPayload, RefreshTokenPayload } from './entity/token';
 import { pick } from '../../libs/utils/pick';
 import { JwtService } from '@app/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -35,8 +35,44 @@ export class AuthService {
 
   async logout(token: string): Promise<void> {
     const decoded = await this.jwtService.verify<AccessTokenPayload>(token);
-    await this.tokenService.revokeByUid(decoded.payload.id)
+    const {id,jti} = decoded.payload;
+    const accessToken = await this.tokenService.getTokenByJti(id,jti,'at');
+    if (accessToken) {
+      await this.tokenService.revokeToken(accessToken)
+    }
     return;
+  }
+
+  async refreshToken(
+    maybeToken: string
+  ){
+    const token = this.jwtService.decode<AccessTokenPayload | RefreshTokenPayload>(maybeToken);
+    if ('refreshTokenJti' in token) {
+      throw new HttpException(
+        this.i18n.translate('exception.common.tokenError'),
+        HttpStatus.BAD_REQUEST
+      )
+    }
+    const refresTokenObject = token as RefreshTokenPayload;
+    const {id, jti, accessTokenJti, email} = refresTokenObject;
+    const refreshToken = await this.tokenService.getTokenByJti(id, jti,'rt');
+    if (!refreshToken) {
+      throw new HttpException(
+        this.i18n.translate('exception.common.tokenExpire'),
+        HttpStatus.UNAUTHORIZED
+      )
+    }
+    const accessToken = await this.tokenService.getTokenByJti(id, accessTokenJti, 'at');
+    if (accessToken){
+      await this.tokenService.revokeToken(accessToken);
+    }
+    await this.tokenService.revokeToken(refreshToken);
+    const tokenPair = await this.tokenService.createToken(id, email);
+    // 颁发一个新的token
+    // issueToken 内部会在颁发前踢出最老的会话, 也会删除过期的会话, 这里就不用调用 this.tokenService.revokeExpiredToken 了
+    await this.tokenService.issueToken(id, tokenPair);
+    // 返回一个新的TokenPair
+    return pick(tokenPair, ['accessToken', 'accessTokenTTL', 'refreshToken', 'refreshTokenTTL'])
   }
 
   async login(dto: CreateAuthDto) {

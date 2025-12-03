@@ -7,16 +7,13 @@ import {
   loginMail as userLoginMail,
   updateUserInfo,
   getUserInfo,
-  getAllUser,
+  flushToken,
 } from '@/api/user';
-import {getRoleMenu} from "@/api/menu";
-import {clearToken, getToken, setToken} from '@/utils/auth';
+import {clearToken, getRefreshToken, getToken, setRefreshToken, setToken} from '@/utils/auth';
 import {removeRouteListener} from '@/utils/route-listener';
-import {useRouter} from "vue-router";
 import {getRoleInfo} from "@/api/role";
 import {UserInfo, UserState} from './types';
 
-const router = useRouter();
 
 const useUserStore = defineStore('user', {
   state: (): UserState => ({
@@ -43,6 +40,8 @@ const useUserStore = defineStore('user', {
     reset: false,
     roleId: 0,
     rolePermission: [],
+    refreshToken: getRefreshToken(),
+    accessToken: getToken()
   }),
 
   getters: {
@@ -67,6 +66,19 @@ const useUserStore = defineStore('user', {
     resetInfo() {
       this.$reset();
     },
+    flushToken(){
+      const refreshToken = this.refreshToken as string;
+      flushToken({token: refreshToken})
+      .then((tokenPair) => {
+        return tokenPair.data
+      })
+      .then((data) => {
+        this.refreshToken = data.refreshToken;
+        this.accessToken = data.accessToken;
+        setRefreshToken(data.refreshToken)
+        setToken(data.accessToken);
+      })
+    },
 
     // Reset filter information
     resetFilterInfo() {
@@ -85,8 +97,11 @@ const useUserStore = defineStore('user', {
     async login(loginForm: LoginData) {
       try {
         const res = await userLogin(loginForm);
-        const { accessToken } = res.data;
+        const { accessToken, refreshToken } = res.data;
+        this.refreshToken = refreshToken;
+        this.accessToken = accessToken;
         setToken(accessToken);
+        setRefreshToken(refreshToken);
         const userRes = await getUserInfo(loginForm.email)
         const userInfo = {
           id: userRes.data.id,

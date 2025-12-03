@@ -1,16 +1,24 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { LogoutAuthDto } from './dto/logout-auth.dto';
 import { CreateApiTokenDto } from './dto/create-api-token.dto';
 import { RevokeApiTokenDto } from './dto/revoke-api-token.dto';
 import { Public } from '../public/public.decorator';
-import { Permission } from '../public/permission.decorator';
 import { AuthGuard } from './auth.guard';
+import { RefreshToken } from './dto/refresh-token.dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+
+  @Public()
+  @Post('/token/refresh')
+  async refreshToken(
+    @Body() body: RefreshToken
+  ){
+    return this.authService.refreshToken(body.token)
+  }
 
   @Public()
   @Post('login')
