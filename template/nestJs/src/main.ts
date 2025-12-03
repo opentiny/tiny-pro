@@ -9,8 +9,10 @@ import * as winston from 'winston';
 import { createLogger } from 'winston';
 import { utilities, WinstonModule } from 'nest-winston';
 import 'winston-daily-rotate-file'; // 用于存储日志到文件
-import { RequestMethod } from '@nestjs/common';
+import { INestApplication, RequestMethod } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
+import { Configure } from './config-schema';
 
 dotenv.config({ path: '.env' });
 
@@ -66,6 +68,8 @@ async function bootstrap() {
     }),
   });
 
+  const cfg = app.get<ConfigService<Configure>>(ConfigService);
+
   app.setGlobalPrefix(process.env.GLOBAL_PREFIX || '/api', {
     exclude: [{ path: 'healthCheck', method: RequestMethod.GET }]
   });
@@ -88,14 +92,21 @@ async function bootstrap() {
       },
     })
   );
-    const config = new DocumentBuilder()
-    .setTitle(process.env.SWAGGER_TITLE || 'Tiny Pro')
-    .setDescription(process.env.SWAGGER_DESC || '开箱即用的中后台模板')
-    .setVersion(process.env.SWAGGER_VERSION || '1.0.0')
-    .build();
-  const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, documentFactory);
+  if (cfg.get('ENABLE_SWAGGER')) {
+    prepareSwagger(cfg, app);
+  }
   await app.listen(3000);
   console.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap();
+
+
+function prepareSwagger(cfg: ConfigService<Configure>,app: INestApplication<any>){
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle(cfg.get('SWAGGER_TITLE'))
+    .setDescription(cfg.get('SWAGGER_DESC'))
+    .setVersion(cfg.get('SWAGGER_VERSION'))
+    .build();
+  const documentFactory = () => SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup('api', app, documentFactory)
+}
