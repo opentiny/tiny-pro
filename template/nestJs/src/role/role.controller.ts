@@ -78,6 +78,7 @@ export class RoleController {
     return this.roleService.findAllDetail(page, limit, name);
   }
 
+  @ApiOperation({summary: '修改角色信息'})
   @ApiOkResponse({
     type: Role
   })
@@ -88,6 +89,7 @@ export class RoleController {
     return this.roleService.update(dto);
   }
 
+  @ApiOperation({summary: '删除角色'})
   @ApiOkResponse({
     type: [Role]
   })
@@ -103,6 +105,8 @@ export class RoleController {
     return this.roleService.delete(id);
   }
 
+
+  @ApiOperation({summary: '获取角色信息'})
   @ApiParam({
     type: Number,
     description: '角色ID',
