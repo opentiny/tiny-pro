@@ -14,18 +14,21 @@
         autoClear: false,
         showStatus: true,
       }"
+      :render-empty="renderEmpty"
     >
       <tiny-grid-column
         :title="$t('advanceForm.form.process.name')"
         field="name"
         :show-icon="false"
-        :editor="{ component: 'input', autoselect: true }"
+        :editor="{ component: TinyInput, autoselect: true }"
+        :renderer="defaultRender"
       ></tiny-grid-column>
       <tiny-grid-column
         :title="$t('advanceForm.form.process.number')"
         field="number"
         :show-icon="false"
-        :editor="{ component: 'input', autoselect: true }"
+        :editor="{ component: TinyInput, autoselect: true }"
+        :renderer="defaultRender"
       ></tiny-grid-column>
       <tiny-grid-column
         :title="$t('advanceForm.form.process.department')"
@@ -35,10 +38,18 @@
           component: TinySelect,
           autoselect: true,
           attrs: {
-            options: departmentOptions,
+            options: options.department,
           },
         }"
-      ></tiny-grid-column>
+      >
+        <template #default="data">
+          <selectRender
+            :data="data"
+            :options="options.department"
+            field="department"
+          ></selectRender>
+        </template>
+      </tiny-grid-column>
       <tiny-grid-column
         :title="$t('advanceForm.form.process.status')"
         field="status"
@@ -47,10 +58,18 @@
           component: TinySelect,
           autoselect: true,
           attrs: {
-            options: statusOptions,
+            options: options.status,
           },
         }"
-      ></tiny-grid-column>
+      >
+        <template #default="data">
+          <selectRender
+            :data="data"
+            :options="options.status"
+            field="status"
+          ></selectRender>
+        </template>
+      </tiny-grid-column>
       <tiny-grid-column
         :title="$t('advanceForm.form.process.runningStatus')"
         field="runningStatus"
@@ -59,15 +78,24 @@
           component: TinySelect,
           autoselect: true,
           attrs: {
-            options: runningStatusOptions,
+            options: options.status,
           },
         }"
-      ></tiny-grid-column>
+        :renderer="{ component: statusRender }"
+      >
+      </tiny-grid-column>
       <tiny-grid-column
         :title="$t('advanceForm.form.process.createTime')"
         field="createTime"
         :show-icon="false"
-        :editor="{ component: TinyTimeSelect, autoselect: true }"
+        :editor="{
+          component: TinyDatePicker,
+          autoselect: true,
+          attrs: {
+            type: 'datetime',
+          },
+        }"
+        :renderer="defaultRender"
       ></tiny-grid-column>
       <tiny-grid-column
         :title="$t('advanceForm.form.process.operation')"
@@ -105,18 +133,33 @@
 </template>
 <script setup>
   import {
+    TinyInput,
     TinySelect,
     TinyGrid,
     TinyGridColumn,
     TinyButton,
-    TinyNotify,
-    TinyTimeSelect,
     TinyPopconfirm,
     Modal,
+    TinyDatePicker,
+    TinyPager,
+    TinyTag,
   } from '@opentiny/vue';
   import { iconSave, iconDel } from '@opentiny/vue-icon';
   import { t } from '@opentiny/vue-locale';
+  import { useDateFormat } from '@vueuse/core';
   import { ref } from 'vue';
+  import statusRender from './status-render.vue';
+  import selectRender from './select-render.vue';
+
+  defineProps({
+    options: {
+      type: {
+        status: [],
+        department: [],
+      },
+      default: {},
+    },
+  });
 
   const gridRef = ref('gridRef');
   const IconDel = iconDel();
@@ -127,34 +170,17 @@
       {
         name: '黄芊义',
         number: 'a00101227',
-        department: '中软',
-        status: '运行中',
-        runningStatus: '进行中',
-        createTime: '111111',
+        department: '1',
+        status: 'running',
+        runningStatus: 'finished',
+        createTime: new Date(),
       },
     ],
   });
 
-  const departmentOptions = ref([
-    {
-      label: '中软',
-      value: '中软',
-    },
-    { label: '软通', value: '软通' },
-  ]);
-  const statusOptions = ref([
-    {
-      label: '运行中',
-      value: '运行中',
-    },
-  ]);
-  const runningStatusOptions = ref([
-    {
-      label: '进行中',
-      value: '进行中',
-    },
-    { label: '已完成', value: '已完成' },
-  ]);
+  const defaultRender = (h, { row, column }) => {
+    return row[column.property] ?? '--';
+  };
 
   const addRow = () => {
     if (gridRef.value.getActiveRow()) {
@@ -165,6 +191,7 @@
 
       return;
     }
+
     gridRef.value.insert({}).then((res) => {
       gridRef.value.setActiveRow(res.row);
     });

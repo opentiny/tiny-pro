@@ -2,98 +2,81 @@
   <div id="project-form">
     <tiny-form
       ref="formRef"
+      class="form-container"
       label-position="top"
       :model="basicInfo"
       :rules="rules"
       :validate-type="validType"
     >
-      <tiny-row>
-        <tiny-col :span="4">
-          <tiny-form-item
-            :label="$t('advanceForm.form.basicInfo.projectName')"
-            prop="projectName"
-          >
-            <tiny-input v-model="basicInfo.projectName"></tiny-input>
-          </tiny-form-item>
-        </tiny-col>
-        <tiny-col :span="4">
-          <tiny-form-item
-            :label="$t('advanceForm.form.basicInfo.position')"
-            prop="position"
-          >
-            <tiny-select
-              v-model="basicInfo.position"
-              :options="projectData.positionOptions"
-            ></tiny-select>
-          </tiny-form-item>
-        </tiny-col>
-        <tiny-col :span="4">
-          <tiny-form-item
-            :label="$t('advanceForm.form.basicInfo.hr')"
-            prop="hr"
-          >
-            <tiny-select
-              v-model="basicInfo.hr"
-              :options="projectData.hrOptions"
-            ></tiny-select>
-          </tiny-form-item>
-        </tiny-col>
-      </tiny-row>
-      <tiny-row>
-        <tiny-col :span="4">
-          <tiny-form-item
-            :label="$t('advanceForm.form.basicInfo.teacher')"
-            prop="teacher"
-          >
-            <tiny-select
-              v-model="basicInfo.teacher"
-              :options="projectData.teacherOptions"
-            ></tiny-select>
-          </tiny-form-item>
-        </tiny-col>
-        <tiny-col :span="4">
-          <tiny-form-item
-            :label="$t('advanceForm.form.basicInfo.startTime')"
-            prop="startTime"
-          >
-            <tiny-date-picker v-model="basicInfo.startTime"></tiny-date-picker>
-          </tiny-form-item>
-        </tiny-col>
-        <tiny-col :span="4">
-          <tiny-form-item
-            :label="$t('advanceForm.form.basicInfo.endTime')"
-            prop="endTime"
-          >
-            <tiny-date-picker v-model="basicInfo.endTime"></tiny-date-picker>
-          </tiny-form-item>
-        </tiny-col>
-      </tiny-row>
-      <tiny-row>
-        <tiny-col :span="4">
-          <tiny-form-item
-            :label="$t('advanceForm.form.basicInfo.phone')"
-            prop="phone"
-          >
-            <tiny-input v-model="basicInfo.phone"></tiny-input>
-          </tiny-form-item>
-        </tiny-col>
-        <tiny-col :span="4">
-          <tiny-form-item
-            :label="$t('advanceForm.form.basicInfo.address')"
-            prop="address"
-          >
-            <tiny-input v-model="basicInfo.address"></tiny-input
-          ></tiny-form-item>
-        </tiny-col>
-        <tiny-col :span="4">
-          <tiny-form-item
-            :label="$t('advanceForm.form.basicInfo.remark')"
-            prop="remark"
-          >
-            <tiny-input v-model="basicInfo.remark"></tiny-input
-          ></tiny-form-item>
-        </tiny-col>
-      </tiny-row>
+      <!-- 项目名称 -->
+      <tiny-form-item
+        :label="$t('advanceForm.form.basicInfo.projectName')"
+        prop="projectName"
+      >
+        <tiny-input v-model="basicInfo.projectName"></tiny-input>
+      </tiny-form-item>
+      <!-- 培养职位 -->
+      <tiny-form-item
+        :label="$t('advanceForm.form.basicInfo.position')"
+        prop="position"
+      >
+        <tiny-select
+          v-model="basicInfo.position"
+          :options="projectData.positionOptions"
+        ></tiny-select>
+      </tiny-form-item>
+      <!-- HR -->
+      <tiny-form-item :label="$t('advanceForm.form.basicInfo.hr')" prop="hr">
+        <tiny-select
+          v-model="basicInfo.hr"
+          :options="projectData.hrOptions"
+        ></tiny-select>
+      </tiny-form-item>
+      <!-- 导师 -->
+      <tiny-form-item
+        :label="$t('advanceForm.form.basicInfo.teacher')"
+        prop="teacher"
+      >
+        <tiny-select
+          v-model="basicInfo.teacher"
+          :options="projectData.teacherOptions"
+        ></tiny-select>
+      </tiny-form-item>
+      <!-- 开始时间 -->
+      <tiny-form-item
+        :label="$t('advanceForm.form.basicInfo.startTime')"
+        prop="startTime"
+      >
+        <tiny-date-picker v-model="basicInfo.startTime"></tiny-date-picker>
+      </tiny-form-item>
+      <!-- 结束时间 -->
+      <tiny-form-item
+        :label="$t('advanceForm.form.basicInfo.endTime')"
+        prop="endTime"
+      >
+        <tiny-date-picker v-model="basicInfo.endTime"></tiny-date-picker>
+      </tiny-form-item>
+      <!-- 电话 -->
+      <tiny-form-item
+        :label="$t('advanceForm.form.basicInfo.phone')"
+        prop="phone"
+      >
+        <tiny-input v-model="basicInfo.phone"></tiny-input>
+      </tiny-form-item>
+      <!-- 地址 -->
+      <tiny-form-item
+        :label="$t('advanceForm.form.basicInfo.address')"
+        prop="address"
+      >
+        <tiny-input v-model="basicInfo.address"></tiny-input
+      ></tiny-form-item>
+      <!-- 备注 -->
+      <tiny-form-item
+        :label="$t('advanceForm.form.basicInfo.remark')"
+        prop="remark"
+      >
+        <tiny-input v-model="basicInfo.remark"></tiny-input
+      ></tiny-form-item>
     </tiny-form>
   </div>
 </template>
@@ -115,7 +98,13 @@
   } from '@opentiny/vue';
   import { ref, reactive, onMounted } from 'vue';
   import { t } from '@opentiny/vue-locale';
-  import { getBaseData } from '@/api/form';
+
+  defineProps({
+    projectData: {
+      type: { positionOptions: [], hrOptions: [], teacherOptions: [] },
+      default: {},
+    },
+  });
 
   const formRef = ref();
 
@@ -131,12 +120,6 @@
     remark: '',
   });
   const validType = ref('text');
-  let loadingState = ref(null);
-  const projectData = reactive({
-    positionOptions: [],
-    hrOptions: [],
-    teacherOptions: [],
-  });
 
   const commonRule = [
     {
@@ -155,10 +138,6 @@
     phone: [...commonRule],
     address: [...commonRule],
     remark: [...commonRule],
-  });
-
-  onMounted(() => {
-    fetchData();
   });
 
   const validForm = () => {
@@ -180,29 +159,16 @@
     formRef.value.resetFields();
   };
 
-  // 请求数据接口方法
-  const fetchData = async () => {
-    loadingState.value = Loading.service({
-      text: 'loading...',
-      target: document.getElementById('project-form'),
-      background: 'rgba(0, 0, 0, 0.7)',
-    });
-    try {
-      const { data } = await getBaseData();
-      projectData.positionOptions = data.position;
-      projectData.hrOptions = data.HR;
-      projectData.teacherOptions = data.mentor.map((item) => ({
-        label: item,
-        value: item,
-      }));
-    } finally {
-      loadingState.value.close();
-    }
-  };
-
   defineExpose({
     validForm,
     resetForm,
   });
 </script>
-<style scoped lang="less"></style>
+<style scoped lang="less">
+  .form-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+    gap: 10%;
+    row-gap: 12px;
+  }
+</style>

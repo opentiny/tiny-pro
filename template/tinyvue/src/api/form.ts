@@ -27,10 +27,20 @@ export function getBaseData() {
 
 // 表单的数据提交&&校验
 export function submitStepForm(data: UnitStepModel) {
-  return axios.post(`${import.meta.env.VITE_MOCK_SERVER_HOST}/api/channel-form/submit`, { data });
+  return axios.post(
+    `${import.meta.env.VITE_MOCK_SERVER_HOST}/api/channel-form/submit`,
+    { data },
+  );
 }
 
 // 获取step表单的初始数据选项
 export function getStepData() {
   return axios.get(`${import.meta.env.VITE_MOCK_SERVER_HOST}/api/step/getdata`);
+}
+
+// 获取advance表单的初始数据选项
+export function getAdvanceData() {
+  return axios.get(
+    `${import.meta.env.VITE_MOCK_SERVER_HOST}/api/advance/getdata`,
+  );
 }

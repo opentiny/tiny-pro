@@ -36,6 +36,21 @@ const initBase = mock({
   ],
   mentor: ['Teacher1', 'Teacher2', 'Teacher3', 'Teacher4'],
   director: ['Director1', 'Director2', 'Director3', 'Director4'],
+  status: ['running', 'finished', 'delayed'],
+  department: [
+    {
+      value: '1',
+      label: 'department01',
+    },
+    {
+      value: '2',
+      label: 'department02',
+    },
+    {
+      value: '3',
+      label: 'department03',
+    },
+  ],
 });
 
 export default [
@@ -63,6 +78,15 @@ export default [
     method: 'post',
     response: () => {
       return successResponseWrap('ok');
+    },
+  },
+
+  // init-advance
+  {
+    url: '/api/advance/getdata',
+    method: 'get',
+    response: () => {
+      return successResponseWrap(initBase);
     },
   },
 ] as any;

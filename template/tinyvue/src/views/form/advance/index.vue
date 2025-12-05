@@ -1,18 +1,18 @@
 <template lang="">
   <div class="container-list">
     <Breadcrumb :items="['menu.form', 'menu.form.advance']" />
-    <div class="content-container">
+    <div id="content-container">
       <div class="content">
         <div class="header mb-4">{{
           $t('advanceForm.form.basicInfo.title')
         }}</div>
-        <BasicInfo ref="basicInfoRef"></BasicInfo>
+        <BasicInfo ref="basicInfoRef" :project-data="projectData"></BasicInfo>
       </div>
       <div class="content">
         <div class="header mb-4">{{
           $t('advanceForm.form.process.title')
         }}</div>
-        <ProcessGrid ref="processGrid"></ProcessGrid>
+        <ProcessGrid ref="processGrid" :options="processOptions"></ProcessGrid>
       </div>
 
       <div class="footer">
@@ -31,14 +31,32 @@
 </template>
 <script setup>
   import { t } from '@opentiny/vue-locale';
-  import { ref } from 'vue';
-  import { TinyButton, Modal } from '@opentiny/vue';
+  import { ref, reactive, onMounted } from 'vue';
+  import { TinyButton, Modal, Loading } from '@opentiny/vue';
+  import { getAdvanceData } from '@/api/form';
   import BasicInfo from './basic-info/index.vue';
   import ProcessGrid from './process-grid/index.vue';
+
+  let loadingState = ref(null);
 
   const basicInfoRef = ref();
 
   const processGrid = ref();
+
+  const projectData = reactive({
+    positionOptions: [],
+    hrOptions: [],
+    teacherOptions: [],
+  });
+
+  const processOptions = reactive({
+    status: [],
+    department: [],
+  });
+
+  onMounted(() => {
+    fetchData();
+  });
 
   const handleFormReset = () => {
     basicInfoRef.value.resetForm();
@@ -54,6 +72,31 @@
       });
     }
   };
+
+  // 请求数据接口方法
+  const fetchData = async () => {
+    loadingState.value = Loading.service({
+      text: 'loading...',
+      target: document.getElementById('content-container'),
+      background: 'rgba(0, 0, 0, 0.7)',
+    });
+    try {
+      const { data } = await getAdvanceData();
+      projectData.positionOptions = data.position;
+      projectData.hrOptions = data.HR;
+      projectData.teacherOptions = data.mentor.map((item) => ({
+        label: item,
+        value: item,
+      }));
+      processOptions.status = data.status.map((item) => ({
+        label: item,
+        value: item,
+      }));
+      processOptions.department = data.department;
+    } finally {
+      loadingState.value.close();
+    }
+  };
 </script>
 <style scoped lang="less">
   .container-list {
@@ -64,7 +107,7 @@
     overflow-y: auto;
   }
 
-  .content-container {
+  #content-container {
     height: calc(100% - 53px); // 53px is the height of breadcrumb
     overflow: auto;
   }
