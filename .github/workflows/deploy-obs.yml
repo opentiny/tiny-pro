@@ -42,7 +42,7 @@ jobs:
           export NODE_OPTIONS="--max-old-space-size=8192"
           pnpm -F tiny-pro-vue build
         env:
-          VITE_BASE: //res-static.opentiny.design/tiny-pro-vue/${{ env.VERSION }}/
+          VITE_BASE: //res-static.opentiny.design/tiny-pro-vue/${{ env.VERSION }}/vue-pro/pages/
           VITE_OUT_DIR: ../dist/vue-pro/pages
       - name: Copy files
         run: |
