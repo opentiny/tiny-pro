@@ -44,6 +44,7 @@ jobs:
         env:
           VITE_BASE: //res-static.opentiny.design/tiny-pro-vue/${{ env.VERSION }}/vue-pro/pages/
           VITE_OUT_DIR: ../dist/vue-pro/pages
+          VITE_BASE_API: /tiny-pro-vue/api
       - name: Copy files
         run: |
           cp ./template/tinyvue/dist/vue-pro/pages/index.html ./template/tinyvue/dist/vue-pro/pages/404.html
