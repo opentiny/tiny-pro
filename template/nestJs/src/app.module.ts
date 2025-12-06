@@ -15,7 +15,7 @@ import { AuthGuard } from './auth/auth.guard';
 import { PermissionGuard } from './permission/permission.guard';
 import { RoleModule } from './role/role.module';
 import { join } from 'path';
-import { existsSync, readFileSync, writeFileSync, mkdirSync, unlinkSync } from 'fs';
+import { readFileSync } from 'fs';
 import { UserService } from './user/user.service';
 import { RoleService } from './role/role.service';
 import { PermissionService } from './permission/permission.service';
@@ -100,7 +100,8 @@ export class AppModule implements OnModuleInit {
     private i18: I18Service,
     private application: ApplicationService,
     private lock: InstallLock,
-    private redis: RedisService
+    private redis: RedisService,
+    private cfg: ConfigService<Configure>
   ) {}
   async isInstalled(redis: Redis) {
     return redis.exists(INSTALL_FLAG);
