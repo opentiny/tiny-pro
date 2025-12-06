@@ -110,19 +110,12 @@ export class AppModule implements OnModuleInit {
     return redis.set(INSTALL_FLAG, '1');
   }
   async onModuleInit() {
-    const ROOT = __dirname;
-    const data = join(ROOT, 'data');
-    if (!existsSync(data)) {
-      mkdirSync(data);
-    }
     const IS_PREVIEW_MOD = this.cfg.get('PREVIEW_MODE');
     if (IS_PREVIEW_MOD) {
       Logger.warn('You are currently in demonstration mode. All additions, deletions, and modifications request will be rejected');
       Logger.warn('If you want to disable the demo mode, please set the `PREVIEW_MODE` environment variable to `false`')
       Logger.warn('Alternatively, you can create an `.env` file and set `PREVIEV_MODE` to `false`')
     }
-    const LOCK_FILE = join(data, 'lock');
-    if (existsSync(LOCK_FILE)) {
     const redis = this.redis.getRedis();
     if (await this.isInstalled(redis)){
       Logger.warn(
