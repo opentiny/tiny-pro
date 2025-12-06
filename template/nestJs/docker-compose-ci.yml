@@ -1,0 +1,35 @@
+version: "3"
+
+services:
+  mysql:
+    image: mysql:8
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: demo_tiny_pro
+    ports:
+      - "3306:3306"
+    command:
+      - --mysql-native-password=ON
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+  back:
+    build:
+      context: .
+      dockerfile: dockerfile
+    env_file:
+      - .env-ci
+    environment:
+      DATABASE_HOST: mysql
+      REDIS_HOST: redis
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mysql
+      - redis
+    volumes:
+      - ./data:/builder/dist/data
+
+
