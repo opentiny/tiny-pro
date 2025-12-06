@@ -38,4 +38,4 @@ export interface UserFilterData {
   submit?: boolean;
   reset?: boolean;
 }
-export type UserState = UserInfo & UserFilterData;
+export type UserState = UserInfo & UserFilterData & {refreshToken: string; accessToken: string;};

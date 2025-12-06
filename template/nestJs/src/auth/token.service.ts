@@ -33,7 +33,7 @@ export class TokenService {
     await redis.lrem(`user:${uid}:at`, 0, jti)
   }
 
-  async revokeExpiredToken(uid: number){
+  private async revokeExpiredToken(uid: number){
     const redis = this.redisService.getRedis();
 
     const allRefreshTokenJti = await redis.lrange(`user:${uid}:rt`, 0, -1);
@@ -181,5 +181,13 @@ export class TokenService {
   ){
     const redis = this.redisService.getRedis();
     return redis.llen(`user:${userIdentifier}:rt`)
+  }
+  async getTokenByJti(
+    id: number,
+    jti: string,
+    type: 'at' | 'rt'
+  ) {
+    const redis = this.redisService.getRedis();
+    return redis.get(`${type}:${id}:${jti}`);
   }
 }

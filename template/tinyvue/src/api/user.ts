@@ -44,7 +44,13 @@ export interface UserData {
   filterStatus?: [];
   filterType?: [];
 }
+export interface RefreshToken {
+  token: string;
+}
 
+export function flushToken(data: RefreshToken){
+  return axios.post<LoginResponse>(`${import.meta.env.VITE_BASE_API}/auth/token/refresh`, data)
+}
 export function login(data: LoginData) {
   return axios.post<LoginResponse>(`${import.meta.env.VITE_BASE_API}/auth/login`, data);
 }
