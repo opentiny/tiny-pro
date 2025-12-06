@@ -154,6 +154,7 @@ export class AppModule implements OnModuleInit {
     }
     if (await this.isInstalled(redis)) {
       Logger.log('Already installed');
+      await this.lock.release();
       return;
     }
 
@@ -271,6 +272,7 @@ export class AppModule implements OnModuleInit {
       const err = e as HttpException;
       Logger.error(err.message);
       Logger.error(`Please clear the database and try again`);
+      await this.lock.release();
       process.exit(-1);
     } finally {
       await this.lock.release();
