@@ -45,11 +45,11 @@
         }"
       >
         <template #default="data">
-          <selectRender
+          <SelectRender
             :data="data"
             :options="options.department"
             field="department"
-          ></selectRender>
+          ></SelectRender>
         </template>
       </tiny-grid-column>
       <tiny-grid-column
@@ -85,7 +85,7 @@
             options: options.status,
           },
         }"
-        :renderer="{ component: statusRender }"
+        :renderer="{ component: StatusRender }"
       >
       </tiny-grid-column>
       <tiny-grid-column
@@ -145,7 +145,7 @@
     </tiny-grid>
   </div>
 </template>
-<script setup>
+<script lang="ts" setup>
   import {
     TinyInput,
     TinySelect,
@@ -162,8 +162,8 @@
   import { t } from '@opentiny/vue-locale';
   import { useDateFormat } from '@vueuse/core';
   import { ref } from 'vue';
-  import statusRender from './status-render.vue';
-  import selectRender from './select-render.vue';
+  import StatusRender from './status-render.vue';
+  import SelectRender from './select-render.vue';
 
   defineProps({
     options: {

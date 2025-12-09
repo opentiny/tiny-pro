@@ -4,7 +4,7 @@
     <div v-else>--</div>
   </div>
 </template>
-<script setup>
+<script lang="ts" setup>
   import { TinyTag } from '@opentiny/vue';
   import { computed } from 'vue';
 

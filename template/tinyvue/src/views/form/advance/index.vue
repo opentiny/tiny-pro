@@ -6,13 +6,16 @@
         <div class="header mb-4">{{
           $t('advanceForm.form.basicInfo.title')
         }}</div>
-        <BasicInfo ref="basicInfoRef" :project-data="projectData"></BasicInfo>
+        <basic-info ref="basicInfoRef" :project-data="projectData"></basic-info>
       </div>
       <div class="content">
         <div class="header mb-4">{{
           $t('advanceForm.form.process.title')
         }}</div>
-        <ProcessGrid ref="processGrid" :options="processOptions"></ProcessGrid>
+        <process-grid
+          ref="processGrid"
+          :options="processOptions"
+        ></process-grid>
       </div>
 
       <div class="footer">
@@ -29,7 +32,7 @@
     </div>
   </div>
 </template>
-<script setup>
+<script lang="ts" setup>
   import { t } from '@opentiny/vue-locale';
   import { ref, reactive, onMounted } from 'vue';
   import { TinyButton, Modal, Loading } from '@opentiny/vue';
