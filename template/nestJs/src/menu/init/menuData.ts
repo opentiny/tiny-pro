@@ -289,4 +289,14 @@ export const menuData = [
     path: 'card',
     locale: 'menu.list.cardList',
   },
+  {
+    name: 'Advance',
+    order: 3,
+    parentId: null,
+    menuType: 'normal',
+    icon: '',
+    component: 'form/advance/index',
+    path: 'advance',
+    locale: 'menu.form.advance',
+  },
 ];

@@ -37,5 +37,17 @@ export default {
         roles: [RoleType.admin],
       },
     },
+    {
+      path: 'advance',
+      name: 'Advance',
+      id: 'Advance',
+      label: 'Advance',
+      component: () => import('@/views/form/advance/index.vue'),
+      meta: {
+        locale: 'menu.form.advance',
+        requiresAuth: true,
+        roles: [RoleType.admin],
+      },
+    },
   ],
 };
