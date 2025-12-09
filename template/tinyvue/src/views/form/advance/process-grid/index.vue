@@ -14,11 +14,11 @@
         autoClear: false,
         showStatus: true,
       }"
-      :render-empty="renderEmpty"
     >
       <tiny-grid-column
         :title="$t('advanceForm.form.process.name')"
         field="name"
+        min-width="120px"
         :show-icon="false"
         :editor="{ component: TinyInput, autoselect: true }"
         :renderer="defaultRender"
@@ -26,6 +26,7 @@
       <tiny-grid-column
         :title="$t('advanceForm.form.process.number')"
         field="number"
+        min-width="120px"
         :show-icon="false"
         :editor="{ component: TinyInput, autoselect: true }"
         :renderer="defaultRender"
@@ -33,6 +34,7 @@
       <tiny-grid-column
         :title="$t('advanceForm.form.process.department')"
         field="department"
+        min-width="120px"
         :show-icon="false"
         :editor="{
           component: TinySelect,
@@ -54,6 +56,7 @@
         :title="$t('advanceForm.form.process.status')"
         field="status"
         :show-icon="false"
+        min-width="120px"
         :editor="{
           component: TinySelect,
           autoselect: true,
@@ -74,6 +77,7 @@
         :title="$t('advanceForm.form.process.runningStatus')"
         field="runningStatus"
         :show-icon="false"
+        min-width="120px"
         :editor="{
           component: TinySelect,
           autoselect: true,
@@ -88,6 +92,7 @@
         :title="$t('advanceForm.form.process.createTime')"
         field="createTime"
         :show-icon="false"
+        min-width="160px"
         :editor="{
           component: TinyDatePicker,
           autoselect: true,
@@ -95,11 +100,12 @@
             type: 'datetime',
           },
         }"
-        :renderer="defaultRender"
+        format-text="longDateTime"
       ></tiny-grid-column>
       <tiny-grid-column
         :title="$t('advanceForm.form.process.operation')"
         field="operation"
+        min-width="120px"
       >
         <template #default="data">
           <a
@@ -109,6 +115,14 @@
           >
             <IconSave class="operation-icon"></IconSave
             >{{ $t('advanceForm.form.process.save') }}
+          </a>
+          <a
+            v-if="!$refs.gridRef.hasActiveRow(data.row)"
+            class="mr-2"
+            @click="editRow(data.row)"
+          >
+            <IconEdit class="operation-icon"></IconEdit
+            >{{ $t('advanceForm.form.process.edit') }}
           </a>
           <tiny-popconfirm
             :title="$t('advanceForm.form.delete.title')"
@@ -144,7 +158,7 @@
     TinyPager,
     TinyTag,
   } from '@opentiny/vue';
-  import { iconSave, iconDel } from '@opentiny/vue-icon';
+  import { iconSave, iconDel, iconEdit } from '@opentiny/vue-icon';
   import { t } from '@opentiny/vue-locale';
   import { useDateFormat } from '@vueuse/core';
   import { ref } from 'vue';
@@ -164,6 +178,7 @@
   const gridRef = ref('gridRef');
   const IconDel = iconDel();
   const IconSave = iconSave();
+  const IconEdit = iconEdit();
 
   const gridTable = ref({
     data: [
@@ -203,6 +218,10 @@
 
   const deleteRow = (row) => {
     gridRef.value.remove(row);
+  };
+
+  const editRow = (row) => {
+    gridRef.value.setActiveRow(row);
   };
 
   const resetGrid = () => {

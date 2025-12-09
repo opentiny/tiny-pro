@@ -59,8 +59,8 @@
   });
 
   const handleFormReset = () => {
-    basicInfoRef.value.resetForm();
-    processGrid.value.resetGrid();
+    basicInfoRef.value?.resetForm();
+    processGrid.value?.resetGrid();
   };
 
   const handleSubmit = () => {
