@@ -14,6 +14,7 @@
         autoClear: false,
         showStatus: true,
       }"
+      align="center"
     >
       <tiny-grid-column
         :title="$t('advanceForm.form.process.name')"
