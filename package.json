@@ -1,6 +1,6 @@
 {
   "name": "@opentiny/tiny-toolkit-pro",
-  "version": "1.4.0-alpha.2",
+  "version": "1.4.0-beta.0",
   "description": "TinyPro Vue：开箱即用、前后端分离的 Vue 后台管理模板",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -55,8 +55,7 @@
     "doc:html": "typedoc src/ --exclude **/*.spec.ts --target ES6 --mode file --out build/docs",
     "doc:json": "typedoc src/ --exclude **/*.spec.ts --target ES6 --mode file --json build/docs/typedoc.json",
     "doc:publish": "gh-pages -m \"[ci skip] Updates\" -d build/docs",
-    "clean": "trash build test",
-    "prepublishOnly": "run-s fix build"
+    "clean": "trash build test"
   },
   "scripts-info": {
     "info": "Display information about the package scripts",
