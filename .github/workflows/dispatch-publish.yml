@@ -40,6 +40,8 @@ jobs:
       # 步骤2: 设置pnpm包管理器
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
+        with:
+          version: 9
 
       # 步骤3: 设置Node.js环境
       - name: Setup Node
@@ -78,31 +80,46 @@ jobs:
           fi
           echo "version: $VERSION"
           echo "value=$VERSION" >> $GITHUB_OUTPUT
-
-      - name: Build lib
+      - name: Bump version
+        run: |
+          # pnpm 自带 npm 版本管理
+          pnpm version ${{ steps.ver.outputs.value }} --no-git-tag-version
+          # 显示确认
+          cat package.json | jq .version
+      - name: Build
         run: pnpm build
+      - name: Clean node_modules
+        run: |
+          # 删除任何意外混进去的 node_modules
+          ls
+          rm -rf node_modules
+          find template -type d -name node_modules -prune -exec rm -rf {} +
+          # 生成待发布 tarball（验证用）
+          npm pack --dry-run
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: dist-artifact
-          path: dist/
+          path: ./
   # Publish job
   publish:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org
       - name: Download build artifact
         uses: actions/download-artifact@v4
         with:
           name: dist-artifact
-          path: dist/
+          path: ./
       - name: Show version and tag
         run: |
           echo "publish version: ${{ needs.build.outputs.version }}"
           echo "publish tag: ${{ inputs.tag }}"
-
-      # 步骤8: 发布组件到NPM
-      - name: Publish @opentiny/fluent-editor
+      - name: Publish @opentiny/tiny-toolkit-pro
         run: |
           echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc
           npm publish --tag ${{ inputs.tag }}
