@@ -10,7 +10,6 @@ import { RedisModule } from '../../libs/redis/redis.module';
 import { TokenService } from './token.service';
 import { JwtModule as SelfJwtModule } from '@app/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { LockerModule } from '@app/locker';
 
 @Module({
   controllers: [AuthController],

@@ -12,8 +12,6 @@ import { pick } from '../../libs/utils/pick';
 import { JwtService } from '@app/jwt';
 import { ConfigService } from '@nestjs/config';
 import { Configure } from 'src/config-schema';
-import { WithLock } from '@app/locker/with-lock.decorator';
-import { LockerService } from '@app/locker';
 
 @Injectable()
 export class AuthService {
