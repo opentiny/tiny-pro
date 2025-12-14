@@ -87,7 +87,7 @@
       "json",
       "ts"
     ],
-    "rootDir": "src",
+    "rootDir": ".",
     "testRegex": ".spec.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
@@ -112,7 +112,8 @@
     "testEnvironment": "node",
     "moduleNameMapper": {
       "@app/models": "<rootDir>/../libs/models/src/index.ts",
-      "^@app/jwt(|/.*)$": "<rootDir>/../libs/jwt/src/$1"
+      "^@app/jwt(|/.*)$": "<rootDir>/../libs/jwt/src/$1",
+      "^@app/locker(|/.*)$": "<rootDir>/libs/locker/src/$1"
     }
   }
 }

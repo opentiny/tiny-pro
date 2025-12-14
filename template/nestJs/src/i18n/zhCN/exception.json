@@ -3,7 +3,9 @@
     "unauth": "未登录",
     "tokenError": "异常token",
     "tokenExpire": "token过期",
-    "forbidden": "需要`{permission}`权限, 但是您并没有该权限"
+    "forbidden": "需要`{permission}`权限, 但是您并没有该权限",
+    "internalError": "内部错误",
+    "timeout": "服务超时"
   },
   "user":{
     "requiredFieldsMissing": "缺少必填字段",

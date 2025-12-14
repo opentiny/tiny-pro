@@ -9,10 +9,13 @@ import { AuthGuard } from './auth.guard';
 import { RefreshToken } from './dto/refresh-token.dto';
 import { ApiCreatedResponse, ApiOperation } from '@nestjs/swagger';
 import { ApiToken, TokenPair } from './entity/token';
+import { WithLock } from '@app/locker/with-lock.decorator';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+  ) {}
 
   @ApiOperation({
     summary: '刷新令牌对',

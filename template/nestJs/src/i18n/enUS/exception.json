@@ -3,7 +3,9 @@
     "unauth": "UnAuth",
     "tokenError": "Token invalid",
     "tokenExpire": "Token expire",
-    "forbidden": "Need `{permission}` permission, but you don't have it"
+    "forbidden": "Need `{permission}` permission, but you don't have it",
+    "internalError": "Internal Error",
+    "timeout": "Service Timeout"
   },
   "user":{
     "requiredFieldsMissing": "required fields missing",

@@ -30,6 +30,12 @@
       ],
       "@app/jwt/*": [
         "libs/jwt/src/*"
+      ],
+      "@app/locker": [
+        "libs/locker/src"
+      ],
+      "@app/locker/*": [
+        "libs/locker/src/*"
       ]
     }
   },

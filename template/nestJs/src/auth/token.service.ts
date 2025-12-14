@@ -4,6 +4,10 @@ import { v4 } from "uuid";
 import { JwtService } from "@app/jwt";
 import { ConfigService } from "@nestjs/config";
 import { AccessTokenPayload, RefreshTokenPayload } from "./entity/token";
+import { LockerService } from "@app/locker";
+import { WithLock } from "@app/locker/with-lock.decorator";
+import { I18nTranslations } from "../.generate/i18n.generated";
+import { I18nService } from "nestjs-i18n";
 
 export type TokenData = {
   accessToken: string;
@@ -21,9 +25,16 @@ export class TokenService {
   constructor(
     private redisService: RedisService,
     private jwt: JwtService,
-    private cfg: ConfigService
+    private cfg: ConfigService,
+    private locker: LockerService,
+    private readonly i18n: I18nService<I18nTranslations>
   ){}
 
+  @WithLock({
+    key(args){
+      return `lock:revokeToken:${args[0]}`
+    }
+  })
   async revokeToken(token: string) {
     const {id:uid, jti, refreshTokenJti } = this.jwt.decode<AccessTokenPayload>(token);
     const redis = this.redisService.getRedis();
@@ -33,6 +44,11 @@ export class TokenService {
     await redis.lrem(`user:${uid}:at`, 0, jti)
   }
 
+  @WithLock({
+    key(args){
+      return `lock:revokeExpiredToken:${args[0]}`
+    }
+  })
   private async revokeExpiredToken(uid: number){
     const redis = this.redisService.getRedis();
 
@@ -60,6 +76,11 @@ export class TokenService {
     }
   }
 
+  @WithLock({
+    key(args){
+      return `lock:revokeByUid:${args[0]}`
+    }
+  })
   async revokeByUid(uid: number){
     const redis = this.redisService.getRedis();
     const userRTJTI = await redis.lrange(`user:${uid}:rt`, 0, -1);
@@ -80,6 +101,11 @@ export class TokenService {
     await multi.exec();
   }
 
+  @WithLock({
+    key(args){
+      return `lock:createToken:${args[0]}:${args[1]}`
+    }
+  })
   async createToken(id: number, email: string): Promise<TokenData>{
     const accessTokenTTLSeconds = this.cfg.get('REDIS_SECONDS') ?? 7200;
     const refreshTokenTTL = this.cfg.get('REFRESH_TOKEN_TTL') // ms;
@@ -119,6 +145,11 @@ export class TokenService {
     }
   }
 
+  @WithLock({
+    key(args){
+      return `lock:getLastToken:${args[0]}`
+    }
+  })
   // 获取最早登陆的Token
   async getLastToken(
     uid: number
@@ -137,6 +168,11 @@ export class TokenService {
     return {accessToken, refreshToken}
 
   }
+  @WithLock({
+    key(args){
+      return `lock:accessTokenAlive:${args[0]}`
+    }
+  })
   async accessTokenAlive(
     token: string
   ){
@@ -145,6 +181,11 @@ export class TokenService {
     return redis.exists(`at:${id}:${jti}`);
   }
 
+  @WithLock({
+    key(args){
+      return `lock:issueToken:${args[0]}`
+    }
+  })
   async issueToken(
     uid: number,
     token: TokenData
@@ -176,12 +217,22 @@ export class TokenService {
       .lpush(`user:${uid}:at`, token.accessTokenJTI)
       .exec();
   }
+  @WithLock({
+    key(args){
+      return `lock:getUserTokenCount:${args[0]}`
+    }
+  })
   async getUserTokenCount(
     userIdentifier: number
   ){
     const redis = this.redisService.getRedis();
     return redis.llen(`user:${userIdentifier}:rt`)
   }
+  @WithLock({
+    key(args){
+      return `lock:getTokenByJti:${args[0]}:${args[1]}:${args[2]}`
+    }
+  })
   async getTokenByJti(
     id: number,
     jti: string,

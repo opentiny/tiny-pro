@@ -11,6 +11,8 @@ export type I18nTranslations = {
             "tokenError": string;
             "tokenExpire": string;
             "forbidden": string;
+            "internalError": string;
+            "timeout": string;
         };
         "user": {
             "requiredFieldsMissing": string;
