@@ -19,6 +19,7 @@ export class MockController {
 
   @Get('*')
   async getMock(@Req() req: Request) {
+    // TODO: MOCK_REGEX 配置不生效，比如：/\/?tiny-pro-vue\/api\/mock/gim
     const path = req.path.replace(process.env.MOCK_REGEX || '/mock', '');
     const item = data.filter(
       (dataItem) => dataItem.method === 'get' && dataItem.url === path
