@@ -26,6 +26,7 @@ export type Configure = {
    * 这很危险, 如果设置为true, 请确保你的DATABASE_HOST是本地环境！
    */
   DATABASE_SYNCHRONIZE:boolean;
+  // 是否自动加载Entry (建议设置为true)
   DATABASE_AUTOLOADENTITIES:boolean;
   /**
    * JWT secrect
@@ -43,6 +44,7 @@ export type Configure = {
    * 数据库 端口
    */
   REDIS_PORT:string;
+  // JwT过期时间 (已废弃)
   EXPIRES_IN:string;
   /**
    * 默认页码
@@ -56,6 +58,7 @@ export type Configure = {
    * api全局前缀
    */
   GLOBAL_PREFIX:string;
+  // mock接口glob表达式
   MOCK_REGEX:string;
   /**
    * 刷新令牌过期时间
@@ -65,6 +68,7 @@ export type Configure = {
    * 设备数量限制, -1表示无限制
    */
   DEVICE_LIMIT:number;
+  // 是否启用演示模式, 如果设置为true, 则会拒绝所有的增加、修改、删除操作
   PREVIEW_MODE: boolean;
   /**
    * 是否启用SWAGGER

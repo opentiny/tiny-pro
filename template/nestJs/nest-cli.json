@@ -39,6 +39,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/jwt/tsconfig.lib.json"
       }
+    },
+    "locker": {
+      "type": "library",
+      "root": "libs/locker",
+      "entryFile": "index",
+      "sourceRoot": "libs/locker/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/locker/tsconfig.lib.json"
+      }
     }
   }
 }

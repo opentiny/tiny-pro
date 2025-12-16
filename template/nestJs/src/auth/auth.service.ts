@@ -42,7 +42,6 @@ export class AuthService {
     }
     return;
   }
-
   async refreshToken(
     maybeToken: string
   ){

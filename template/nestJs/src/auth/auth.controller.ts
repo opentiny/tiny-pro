@@ -12,7 +12,9 @@ import { ApiToken, TokenPair } from './entity/token';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+  ) {}
 
   @ApiOperation({
     summary: '刷新令牌对',

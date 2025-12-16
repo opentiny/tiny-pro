@@ -39,7 +39,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       }),
       global: true,
     }),
-    UserModule,
+    UserModule
   ],
 })
 export class AuthModule {}

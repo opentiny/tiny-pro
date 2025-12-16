@@ -42,6 +42,7 @@ import { InstallLock } from './install-lock';
 import { RedisService } from '../libs/redis/redis.service';
 import Redis from 'ioredis';
 import { RedisModule } from '../libs/redis/redis.module';
+import { LockerModule } from '@app/locker';
 
 const INSTALL_FLAG = 'FLAG:INSTALL';
 const MAX_RETRY = 20;
@@ -71,7 +72,10 @@ const MAX_RETRY = 20;
       typesOutputPath: join(__dirname, '../src/.generate/i18n.generated.ts'),
     }),
     MockModule,
-    RedisModule
+    RedisModule,
+    LockerModule.register({
+      global: true
+    }),
   ],
   controllers: [HealthCheckController],
   providers: [
