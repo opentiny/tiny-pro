@@ -12,35 +12,39 @@
   </div>
   <div class="divider my-auto w-[1px] h-[50%] max-sm:w-[60%] max-sm:h-[1px] max-sm:smx-auto max-md:mx-[2%] max-sm:my-[2%]"></div>
   <div class="user-content pb-[8px] max-sm:pb-[20px] max-sm:mt-[10px]">
-    <tiny-layout>
+    <tiny-layout :cols="12">
       <tiny-row justify="center" class="margin-bottom flex flex-wrap">
         <transition-fade-down-group>
-          <img src="@/assets/images/head-1.png" class="head-image" />
-          <tiny-col class="w-[calc((100%-140px)/3)] max-md:w-[calc((100%-94px)/2)] max-sm:w-[calc(100%-50px)]">
+          <tiny-col class="w-[calc((100%-140px)/3)] max-md:w-[calc((100%-94px)/2)] max-sm:w-[calc(100%-50px)] flex" :span="4">
+            <img src="@/assets/images/head-1.png" class="head-image" />
             <div class="col">
               <div>{{ $t('stepForm.recruitment.department') }}</div>
               <div class="space"></div>
               <div>{{ userStore.userInfo.department }}</div>
             </div>
           </tiny-col>
-          <img src="@/assets/images/head-2.png" class="head-image" />
-          <tiny-col class="w-[calc((100%-140px)/3)] max-md:w-[calc((100%-94px)/2)] max-sm:w-[calc(100%-50px)]">
+          <tiny-col class="w-[calc((100%-140px)/3)] max-md:w-[calc((100%-94px)/2)] max-sm:w-[calc(100%-50px)] flex" :span="4">
+            <img src="@/assets/images/head-2.png" class="head-image" />
             <div class="col">
               <div>{{ $t('stepForm.recruitment.type') }}</div>
               <div class="space"></div>
               <div>{{ userStore.userInfo.employeeType }}</div>
             </div>
           </tiny-col>
-          <img src="@/assets/images/head-3.png" class="head-image" />
-          <tiny-col class="w-[calc((100%-140px)/3)] max-md:w-[calc((100%-94px)/2)] max-sm:w-[calc(100%-50px)]">
+          <tiny-col class="w-[calc((100%-140px)/3)] max-md:w-[calc((100%-94px)/2)] max-sm:w-[calc(100%-50px)] flex" :span="4">
+            <img src="@/assets/images/head-3.png" class="head-image" />
             <div class="col">
               <div>{{ $t('stepForm.recruitment.position') }}</div>
               <div class="space"></div>
               <div>{{ userStore.userInfo.job }}</div>
             </div>
           </tiny-col>
-          <img src="@/assets/images/head-4.png" class="head-image" />
-          <tiny-col class="w-[calc((100%-140px)/3)] max-md:w-[calc((100%-94px)/2)] max-sm:w-[calc(100%-50px)]">
+        </transition-fade-down-group>
+      </tiny-row>
+      <tiny-row justify="center" class="margin-bottom flex flex-wrap">
+        <transition-fade-down-group>
+          <tiny-col class="w-[calc((100%-140px)/3)] max-md:w-[calc((100%-94px)/2)] max-sm:w-[calc(100%-50px)] flex" :span="4">
+            <img src="@/assets/images/head-4.png" class="head-image" />
             <div class="col">
               <div>{{ $t('stepForm.probation.start') }}</div>
               <div class="space"></div>
@@ -51,16 +55,16 @@
               </div>
             </div>
           </tiny-col>
-          <img src="@/assets/images/head-5.png" class="head-image" />
-          <tiny-col class="w-[calc((100%-140px)/3)] max-md:w-[calc((100%-94px)/2)] max-sm:flex-col max-sm:w-[calc(100%-50px)]">
+          <tiny-col class="w-[calc((100%-140px)/3)] max-md:w-[calc((100%-94px)/2)] max-sm:flex-col max-sm:w-[calc(100%-50px)] flex" :span="4">
+            <img src="@/assets/images/head-5.png" class="head-image" />
             <div class="col">
               <div>{{ $t('stepForm.start.date') }}</div>
               <div class="space"></div>
               <div>{{ userStore.userInfo.protocolStart }}</div>
             </div>
           </tiny-col>
-          <img src="@/assets/images/head-6.png" class="head-image" />
-          <tiny-col class="w-[calc((100%-140px)/3)] max-md:w-[calc((100%-94px)/2)] max-sm:flex-col max-sm:w-[calc(100%-50px)]">
+          <tiny-col class="w-[calc((100%-140px)/3)] max-md:w-[calc((100%-94px)/2)] max-sm:flex-col max-sm:w-[calc(100%-50px)] flex" :span="4">
+            <img src="@/assets/images/head-6.png" class="head-image" />
             <div class="col">
               <div>{{ $t('stepForm.probation.period') }}</div>
               <div class="space"></div>
