@@ -46,7 +46,6 @@ const config = {
     extensions: ['.ts', '.js'],
   },
   define: {
-    'process.env': {},
     'BUILD_TOOLS': "'VITE'",
   },
   css: {

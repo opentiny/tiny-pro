@@ -50,7 +50,7 @@ jobs:
           else
             VERSION="$(node -p "require('./template/tinyvue/package.json').version")"
           fi
-          echo "Home version: $VERSION"
+          echo "version: $VERSION"
           echo "value=$VERSION" >> $GITHUB_OUTPUT
       - name: Build site
         run: |
@@ -59,7 +59,9 @@ jobs:
         env:
           VITE_BASE: //res-static.opentiny.design/tiny-pro-vue/${{ steps.ver.outputs.value }}/vue-pro/pages/
           VITE_OUT_DIR: ../dist/vue-pro/pages
+          VITE_CONTEXT: /vue-pro/pages/
           VITE_BASE_API: /tiny-pro-vue/api
+          VITE_MOCK_SERVER_HOST: /tiny-pro-vue/api/mock
       - name: Copy files
         run: |
           cp ./template/tinyvue/dist/vue-pro/pages/index.html ./template/tinyvue/dist/vue-pro/pages/404.html
