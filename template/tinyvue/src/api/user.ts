@@ -103,7 +103,7 @@ export function updateUserInfo(data: any) {
 
 export function getUserData(data?: UserData) {
   return axios.post<UserRes>(
-    `${import.meta.env.VITE_MOCK_SERVER_HOST}${import.meta.env.VITE_BASE_API}/user/data`,
+    `${import.meta.env.VITE_MOCK_SERVER_HOST}/api/user/data`,
     data,
   );
 }
