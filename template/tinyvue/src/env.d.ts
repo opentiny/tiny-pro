@@ -1,7 +1,5 @@
 /// <reference types="vite/client" />
 
-import { I18n } from 'vue-i18n'
-
 export {};
 
 declare module '*.vue' {
