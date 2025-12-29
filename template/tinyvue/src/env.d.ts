@@ -15,7 +15,7 @@ declare global {
   interface ImportMetaEnv {
     readonly VITE_API_BASE_URL: string;
     readonly VITE_MOCK_SERVER_HOST: string;
-    readonly VITE_LOWCODE_DESIGNER_ENABLED: boolean;
+    readonly VITE_LOWCODE_DESIGNER_ENABLED: string;
     readonly VITE_CONTEXT: string;
     readonly VITE_BASE_API: string;
     readonly VITE_SERVER_HOST: string;
