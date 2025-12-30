@@ -246,7 +246,9 @@
 
   // 设计器
   const openLowCodeDesigner = () => {
-    window.open(`http://localhost:8090/?type=app&id=1&tenant=1&pageid=1`, '_blank');
+    // 支持通过环境变量配置设计器链接，默认为开发环境地址
+    const designerUrl = import.meta.env.VITE_LOWCODE_DESIGNER_URL || 'http://localhost:8090';
+    window.open(`${designerUrl}/?type=app&id=1&tenant=1&pageid=1`, '_blank');
   };
 
   // 用户设置
