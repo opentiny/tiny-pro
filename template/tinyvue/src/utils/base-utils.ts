@@ -9,6 +9,10 @@ export function isCommonError(error: unknown): error is CommonError {
   );
 }
 
+export const sleep = (ms: number): Promise<void> => {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
 export default class BaseUtils {
   public static getErrorMessage(error: unknown): string {
     return this.convertToCommonError(error).message;
