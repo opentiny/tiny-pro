@@ -19,17 +19,24 @@
 
 ### 启动后端
 
-```bash
-cd template/nestJs
+1. 将 `.env.example` 改成 `.env`
+2. `cd template/nestJ2`
+3. `pnpm i`
+4. 配置 `DATABASE_HOST` 为开发机的数据库IP
+5. 配置 `DATABASE_PORT` 为开发机的数据库端口
+6. 配置 `DATABASE_USERNAME` 为开发机的数据库用户名
+7. 配置 `DATABASE_PASSWORD` 为开发机的数据库密码
+8. 配置 `DATABASE_NAME` 为开发机数据库表 (必须存在)
+9. 配置 `DATABASE_SYNCHRONIZE` 为 `true`
+  1. 因为这里是开发环境, 是否会强制删除所有数据不重要
+10. 配置 `REDIS_HOST` 为开发环境 Redis的IP
+11. 配置 `REDIS_PORT` 为开发环境 Redis的端口
+12. (可选) 配置 `DEVICE_LIMIT` 为 -1 (如果需要开多个页面)
+13. `pnpm start`
 
-pnpm i
-```
+#### 刷新数据库
 
-将 `.env.example` 改成 `.env`，然后执行以下命令即可：
-
-```bash
-pnpm start
-```
+在开发机器环境运行 `FLUSHDB` 并清空数据库
 
 ### 启动前端
 
