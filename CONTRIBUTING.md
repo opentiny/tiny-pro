@@ -20,7 +20,7 @@
 ### 启动后端
 
 1. 将 `.env.example` 改成 `.env`
-2. `cd template/nestJ2`
+2. `cd template/nestJs`
 3. `pnpm i`
 4. 配置 `DATABASE_HOST` 为开发机的数据库IP
 5. 配置 `DATABASE_PORT` 为开发机的数据库端口
@@ -36,7 +36,7 @@
 
 #### 刷新数据库
 
-在开发机器环境运行 `FLUSHDB` 并清空数据库
+在开发机器 Redis 中运行 `FLUSHDB` 并清空数据库
 
 ### 启动前端
 
