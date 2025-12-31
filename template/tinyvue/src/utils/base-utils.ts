@@ -1,5 +1,11 @@
 import { CommonError } from '@/types/global';
 
+/**
+ * Determines whether a value conforms to the CommonError shape.
+ *
+ * @param error - The value to test for a CommonError-like object
+ * @returns `true` if `error` is a non-null object that has a `message` property of type `string`, `false` otherwise.
+ */
 export function isCommonError(error: unknown): error is CommonError {
   return (
     typeof error === 'object' &&
