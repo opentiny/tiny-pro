@@ -204,6 +204,7 @@
 
   // 检查是否启用低代码设计器
   const isLowcodeDesignerEnabled = computed(() => {
+    console.log(import.meta.env.VITE_LOWCODE_DESIGNER_ENABLED);
     return import.meta.env.VITE_LOWCODE_DESIGNER_ENABLED === 'true';
   });
 

@@ -62,6 +62,17 @@ jobs:
           VITE_CONTEXT: /vue-pro/pages/
           VITE_BASE_API: /tiny-pro-vue/api
           VITE_MOCK_SERVER_HOST: /tiny-pro-vue/api/mock
+          VITE_LOWCODE_DESIGNER_ENABLED: true
+      - name: Build lowcode-designer
+        run: |
+          export NODE_OPTIONS="--max-old-space-size=8192"
+          cd template/lowcode-designer
+          pnpm build
+      - name: Copy lowcode-designer to vue-pro/designer
+        run: |
+          # 将 lowcode-designer 的构建产物放入 vue-pro/designer 目录下
+          mkdir -p ./template/tinyvue/dist/vue-pro/designer
+          cp -r ./template/lowcode-designer/dist/* ./template/tinyvue/dist/vue-pro/designer/
       - name: Copy files
         run: |
           cp ./template/tinyvue/dist/vue-pro/pages/index.html ./template/tinyvue/dist/vue-pro/pages/404.html
