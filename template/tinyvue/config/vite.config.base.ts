@@ -40,13 +40,23 @@ const config = {
       },
       {
         find: '@opentiny/vue-icon',
-        replacement: resolve('node_modules/@opentiny/vue-icon'), // compile template
+        replacement: resolve(__dirname, '../node_modules/@opentiny/vue-icon'), // compile template
+      },
+      {
+        find: '@opentiny/vue-theme',
+        replacement: resolve(__dirname, '../node_modules/@opentiny/vue-theme'),
       },
     ],
-    extensions: ['.ts', '.js'],
+    extensions: ['.ts', '.js', '.css'],
+    preserveSymlinks: false,
   },
   define: {
     'BUILD_TOOLS': "'VITE'",
+  },
+  optimizeDeps: {
+    esbuildOptions: {
+      resolveExtensions: ['.ts', '.js', '.css'],
+    },
   },
   css: {
     preprocessorOptions: {

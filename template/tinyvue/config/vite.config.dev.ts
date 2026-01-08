@@ -1,24 +1,34 @@
 import { mergeConfig, loadEnv } from 'vite';
 import eslint from 'vite-plugin-eslint';
 import baseConfig from './vite.config.base';
+import { resolve } from 'path';
+import { configDotenv } from 'dotenv';
+
+// 加载 dev.env 文件
+configDotenv({
+  path: resolve(__dirname, '../dev.env'),
+});
+
+// 加载环境变量（development 模式会读取 .env.development 和 .env）
+const env = loadEnv('development', process.cwd());
 
 const proxyConfig = {
-  [loadEnv('', process.cwd()).VITE_BASE_API]: {
-    target: loadEnv('', process.cwd()).VITE_SERVER_HOST,
+  [env.VITE_BASE_API]: {
+    target: env.VITE_SERVER_HOST,
     changeOrigin: true,
     logLevel: 'debug',
     rewrite: (path: string) =>
       path.replace(
-        new RegExp(`${loadEnv('', process.cwd()).VITE_BASE_API}`),
+        new RegExp(`${env.VITE_BASE_API}`),
         '',
       ),
   },
-  [loadEnv('', process.cwd()).VITE_MOCK_SERVER_HOST]: {
-    target: loadEnv('', process.cwd()).VITE_SERVER_HOST,
+  [env.VITE_MOCK_SERVER_HOST]: {
+    target: env.VITE_SERVER_HOST,
     changeOrigin: true,
     rewrite: (path: string) => {
 
-      return path.replace(new RegExp(`${loadEnv('', process.cwd()).VITE_MOCK_SERVER_HOST}`), '/mock')
+      return path.replace(new RegExp(`${env.VITE_MOCK_SERVER_HOST}`), '/mock')
     },
   },
 };
@@ -33,6 +43,16 @@ export default mergeConfig(
       proxy: {
         ...proxyConfig,
       },
+    },
+    define: {
+      // 确保 VITE_LOWCODE_DESIGNER_ENABLED 被注入到客户端代码
+      'import.meta.env.VITE_LOWCODE_DESIGNER_ENABLED': JSON.stringify(
+        process.env.VITE_LOWCODE_DESIGNER_ENABLED || 'false'
+      ),
+      // 确保 VITE_LOWCODE_DESIGNER_URL 被注入到客户端代码
+      'import.meta.env.VITE_LOWCODE_DESIGNER_URL': JSON.stringify(
+        process.env.VITE_LOWCODE_DESIGNER_URL || 'http://localhost:8090'
+      ),
     },
     plugins: [
       eslint({
