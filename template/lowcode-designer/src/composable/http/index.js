@@ -3,6 +3,7 @@ import { HttpService } from '@opentiny/tiny-engine'
 import { useBroadcastChannel } from '@vueuse/core'
 import { constants } from '@opentiny/tiny-engine-utils'
 import Login from './Login.vue'
+import mockConfig from './mockConfig'
 
 const LOGIN_EXPIRED_CODE = 401
 const { BROADCAST_CHANNEL } = constants
@@ -34,6 +35,71 @@ const preRequest = (config) => {
 
   if (isVsCodeEnv) {
     config.baseURL = ''
+  }
+
+  // 检查是否需要 mock - 纯前端项目，拦截 /api/user/me 接口
+  const fullUrl = (config.baseURL || '') + (config.url || '')
+  const urlToCheck = config.url || ''
+
+  // 检查是否是 /api/user/me 或 /user/me 请求
+  const isMeRequest = /\/api\/user\/me$|\/user\/me$/.test(fullUrl) ||
+    /\/api\/user\/me$|\/user\/me$/.test(urlToCheck)
+
+  if (isMeRequest && (config.method || 'GET').toUpperCase() === 'GET') {
+
+    // 找到对应的 mock 配置
+    const mockRoute = mockConfig.find((route) => {
+      const urlMatch = typeof route.url === 'string'
+        ? fullUrl.includes(route.url) || urlToCheck.includes(route.url)
+        : route.url.test(fullUrl) || route.url.test(urlToCheck)
+      const methodMatch = !route.method ||
+        route.method.toUpperCase() === (config.method || 'GET').toUpperCase()
+      return urlMatch && methodMatch
+    })
+
+    if (mockRoute) {
+      // 直接调用 mock 的 response 函数
+      const mockResult = mockRoute.response(config)
+
+      // 如果返回的是 Promise，等待 resolve
+      if (mockResult && typeof mockResult.then === 'function') {
+        return mockResult.then(([status, data]) => {
+          // 返回一个模拟的响应对象
+          // 注意：axios 请求拦截器返回的应该是 config，但我们可以通过返回一个特殊对象来阻止请求
+          // 实际上，我们需要修改 config，让它不会发送真实请求
+          config.adapter = () => {
+            // 返回一个 Promise，resolve 一个模拟的响应
+            return Promise.resolve({
+              data: {
+                data,
+                error: null
+              },
+              status,
+              statusText: 'OK',
+              headers: {},
+              config
+            })
+          }
+          return config
+        })
+      } else {
+        // 如果 response 不是异步的，直接处理
+        const [status, data] = mockResult
+        config.adapter = () => {
+          return Promise.resolve({
+            data: {
+              data,
+              error: null
+            },
+            status,
+            statusText: 'OK',
+            headers: {},
+            config
+          })
+        }
+        return config
+      }
+    }
   }
 
   return config
@@ -124,7 +190,9 @@ const customizeHttpService = () => {
     interceptors: {
       request: [preRequest],
       response: [[preResponse, errorResponse]]
-    }
+    },
+    mockConfig,
+    enableMock: true
   }
 
   HttpService.apis.setOptions(options)
