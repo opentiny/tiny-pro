@@ -171,6 +171,16 @@
             : Number(menuInfo.parentId),
       };
     },
+    setMenuInfo: (data: Omit<CreateMenuDto, 'id'>) => {
+      menuInfo.name = data.name;
+      menuInfo.path = data.path;
+      menuInfo.component = data.component;
+      menuInfo.icon = data.icon;
+      menuInfo.menuType = data.menuType;
+      menuInfo.parentId = data.parentId;
+      menuInfo.order = data.order;
+      menuInfo.locale = data.locale;
+    },
     valid: async () => {
       return menuForm.value.validate();
     },

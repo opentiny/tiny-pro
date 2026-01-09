@@ -7,6 +7,7 @@
     Modal as TinyModal,
     Loading,
   } from '@opentiny/vue';
+  import { WebMcpServer, z } from '@opentiny/next-sdk'
   import { getAllLocalItems } from '@/api/local';
   import useLoading from '@/hooks/loading';
   import {
@@ -26,6 +27,7 @@
   import menuTree, { Node } from './menu-tree.vue';
   import UpdateForm from './update-form.vue';
   import AddMenu from './add-menu.vue';
+import { sleep } from '@/utils/base-utils';
 
   const { modalSize } = useResponsiveSize()
 
@@ -241,10 +243,52 @@
     fetchLocalItems();
   });
 
-  onMounted(() => {
+  onMounted(async () => {
     Promise.all([fetchMenu(), fetchLocalItems()]).finally(() => {
       treeLoading.value = false;
     });
+
+    const server = new WebMcpServer({
+      name: 'menu-management-mcp-server',
+      version: '1.0.0'
+    })
+    const serverTransport = inject<any>('serverTransport')
+
+    server.registerTool(
+      'add-menu',
+      {
+        title: '添加菜单',
+        description: '添加菜单',
+        inputSchema: {
+          name: z.string().describe('名称'),
+          order: z.number().describe('优先级').default(0),
+          parentId: z.number().describe('父菜单ID').optional(),
+          icon: z.string().describe('图标').optional().default(''),
+          component: z.string().describe('组件'),
+          path: z.string().describe('路径'),
+          locale: z.string().describe('国际化'),
+        }
+      },
+      async ({ name, order, parentId, icon, component, path, locale }) => {
+        handleAddMenu()
+        await sleep(1000)
+        addMenu.value.setMenuInfo({
+          name,
+          order,
+          parentId,
+          icon,
+          component,
+          menuType: "/",
+          path,
+          locale,
+        })
+        await sleep(1000)
+        onClickAdd()
+        return { content: [{ type: 'text', text: `收到: ${name}` }] }
+      }
+    )
+
+    await server.connect(serverTransport)
   });
 </script>
 

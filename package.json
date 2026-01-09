@@ -33,6 +33,7 @@
   "homepage": "https://opentiny.design/pro/",
   "pnpm": {
     "overrides": {
+      "@modelcontextprotocol/sdk": "1.16.0",
       "@opentiny/tiny-engine-common>@opentiny/vue-renderless": "~3.20.0",
       "@opentiny/tiny-engine-plugin-datasource>@opentiny/vue-renderless": "~3.20.0",
       "@opentiny/tiny-engine-plugin-block>@opentiny/vue-renderless": "~3.20.0",
