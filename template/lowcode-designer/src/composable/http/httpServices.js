@@ -57,6 +57,12 @@ export default defineService({
       mock = new AxiosMockAdapter(http);
       mock.onGet(/\/mock\/bundle\.json$/).passThrough();
       mock.onPost(/\/app-center\/api\/ai\/chat/).passThrough();
+      // 允许 tiny-pro 的接口通过，不被 mock 拦截
+      mock.onAny(/\/api\/auth\/api-token/).passThrough();
+      mock.onAny(/\/api\/i18n/).passThrough();
+      mock.onAny(/\/api\/menu/).passThrough();
+      mock.onAny(/\/api\/role/).passThrough();
+      mock.onAny(/\/api\/role\/detail/).passThrough();
 
       http.interceptors.request.use((config) => {
         const AI_PATH = '/app-center/api/ai/chat';
@@ -164,6 +170,8 @@ export default defineService({
         mock = new AxiosMockAdapter(http);
         mock.onGet(/\/mock\/bundle\.json$/).passThrough();
         mock.onPost(/\/app-center\/api\/ai\/chat/).passThrough();
+        // 允许 /api/auth/api-token 接口通过，不被 mock 拦截
+        mock.onAny(/\/api\/auth\/api-token/).passThrough();
 
         http.interceptors.request.use((config) => {
           const AI_PATH = '/app-center/api/ai/chat';
