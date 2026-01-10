@@ -101,10 +101,8 @@
     Option as TinyOption,
     Popover as TinyPopover,
   } from '@opentiny/vue';
-  import { WebMcpServer, z } from '@opentiny/next-sdk'
-  import { computed, reactive, ref, watch, onMounted, inject } from 'vue';
+  import { computed, reactive, ref, watch } from 'vue';
   import { useI18n } from 'vue-i18n';
-  import { sleep } from '@/utils/base-utils';
   import langTable from './lang-table.vue';
 
   const emits = defineEmits<{
@@ -218,39 +216,6 @@
       setLangTableClose()
     }
   })
-
-  onMounted(async () => {
-    const server = new WebMcpServer({
-      name: 'i18n-management-mcp-server',
-      version: '1.0.0'
-    })
-    const serverTransport = inject<any>('serverTransport')
-
-    server.registerTool(
-      'add-i18n-entry',
-      {
-        title: '添加国际化词条',
-        description: '添加国际化词条',
-        inputSchema: {
-          key: z.string().describe('词条关键字'),
-          content: z.string().describe('词条内容'),
-          lang: z.union([z.literal(1), z.literal(2)]).describe('词条语言ID，英文 enUS 为：1，中文 zhCN 为：2'),
-        }
-      },
-      async ({ key, content, lang }) => {
-        onOpen()
-        await sleep(1000)
-        locale.key = key
-        locale.content = content
-        locale.lang = lang
-        await sleep(1000)
-        addLocale()
-        return { content: [{ type: 'text', text: `收到: ${key}` }] }
-      }
-    )
-
-    await server.connect(serverTransport)
-  });
 </script>
 
 <style scoped lang="less">
