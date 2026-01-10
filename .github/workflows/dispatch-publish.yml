@@ -23,50 +23,41 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.sha }}
   cancel-in-progress: true
 
-# 定义工作流中的作业
 jobs:
   build:
-    # 指定运行环境为最新版本的ubuntu
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.ver.outputs.value }}
     steps:
-      # 步骤1: 检出代码
       - name: CheckOut Code
         uses: actions/checkout@v4
         with:
           ref: ${{ github.ref_name }}
 
-      # 步骤2: 设置pnpm包管理器
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 9
 
-      # 步骤3: 设置Node.js环境
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20 # 使用Node.js 20版本
-          registry-url: "https://registry.npmjs.org" # 设置npm registry地址
+          node-version: 20
+          registry-url: "https://registry.npmjs.org"
 
-      # 步骤4: 获取pnpm缓存目录路径
       - name: Get pnpm store directory
         id: pnpm-cache
         run: |
           echo "pnpm_cache_dir=$(pnpm store path)" >> $GITHUB_OUTPUT
 
-      # 步骤5: 配置pnpm缓存
       - uses: actions/cache@v3
         name: Setup pnpm cache
         with:
           path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
-          # 使用操作系统类型和pnpm-lock.yaml的哈希值作为缓存键
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
-      # 步骤6: 安装项目依赖
       - name: Install dependencies
         run: pnpm i --no-frozen-lockfile
       - name: Get version
@@ -96,25 +87,6 @@ jobs:
           find template -type d -name node_modules -prune -exec rm -rf {} +
           # 生成待发布 tarball（验证用）
           npm pack --dry-run
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist-artifact
-          path: ./
-  # Publish job
-  publish:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          registry-url: https://registry.npmjs.org
-      - name: Download build artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: dist-artifact
-          path: ./
       - name: Show version and tag
         run: |
           echo "publish version: ${{ needs.build.outputs.version }}"
