@@ -9,21 +9,10 @@
  * A PARTICULAR PURPOSE. SEE THE APPLICABLE LICENSES FOR MORE DETAILS.
  *
  */
-import { configurators } from './configurators/';
-import 'virtual:svg-icons-register';
-import '@opentiny/tiny-engine-generate-code-tinypro/style.css';
-import { initIndexDB } from './db';
-import registry from '../registry.js';
 
-async function startApp() {
-  const { init } = await import('@opentiny/tiny-engine');
-  await initIndexDB();
+import registry from '../registry.js'
+import { defineEntry } from '@opentiny/tiny-engine'
 
-  init({
-    registry: [registry],
-    configurators,
-    createAppSignal: ['global_service_init_finish'],
-  });
-}
+defineEntry(registry)
 
-startApp();
+export { registry }
