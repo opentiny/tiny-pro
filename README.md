@@ -8,7 +8,7 @@ TinyCLI 是一个跨平台的前端工程化 CLI 工具，为开发者提供一�
 TinyPro 是 TinyCLI 的一个套件，是一个开箱即用、前后端分离的后台管理模板。
 
 特性：
-- 支持 NestJS 后端
+- 支持 NestJS / Spring Boot 后端
 - 支持通过可视化方式配置菜单
 - 细粒度权限管理：角色、用户、菜单、组件权限
 - 支持多种构建工具：Webpack / Vite / Rspack / Farm
@@ -19,6 +19,7 @@ TinyPro 是 TinyCLI 的一个套件，是一个开箱即用、前后端分离的
 - 国际化
 
 官网：[https://opentiny.design/vue-pro](https://opentiny.design/vue-pro)
+演示站点：[https://opentiny.design/vue-pro/pages](https://opentiny.design/vue-pro/pages)
 
 ## 一行命令初始化一个后台管理模板
 
