@@ -19,6 +19,7 @@ TinyPro 是 TinyCLI 的一个套件，是一个开箱即用、前后端分离的
 - 国际化
 
 官网：[https://opentiny.design/vue-pro](https://opentiny.design/vue-pro)
+
 演示站点：[https://opentiny.design/vue-pro/pages](https://opentiny.design/vue-pro/pages)
 
 ## 一行命令初始化一个后台管理模板
