@@ -171,6 +171,33 @@
         "component": "exception/500/index",
         "path": "500",
         "locale": "menu.exception.500"
+      },
+      {
+        "name": "系统繁忙",
+        "order": 1,
+        "menuType": "normal",
+        "icon": "",
+        "component": "exception/system-busy/index",
+        "path": "system-busy",
+        "locale": "menu.exception.system-busy"
+      },
+      {
+        "name": "加载失败",
+        "order": 1,
+        "menuType": "normal",
+        "icon": "",
+        "component": "exception/load-failure/index",
+        "path": "load-failure",
+        "locale": "menu.exception.load-failure"
+      },
+      {
+        "name": "暂无搜索结果",
+        "order": 1,
+        "menuType": "normal",
+        "icon": "",
+        "component": "exception/no-search-results/index",
+        "path": "no-search-results",
+        "locale": "menu.exception.no-search-results"
       }
     ]
   },

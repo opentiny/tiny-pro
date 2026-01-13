@@ -49,5 +49,41 @@ export default {
         roles: [RoleType.admin, RoleType.user],
       },
     },
+    {
+      path: 'system-busy',
+      name: '系统繁忙',
+      id: 'system-busy',
+      label: '系统繁忙',
+      component: () => import('@/views/exception/system-busy/index.vue'),
+      meta: {
+        locale: 'menu.exception.system-busy',
+        requiresAuth: true,
+        roles: [RoleType.admin, RoleType.user],
+      },
+    },
+     {
+      path: 'load-failure',
+      name: '加载失败',
+      id: 'load-failure',
+      label: '加载失败',
+      component: () => import('@/views/exception/load-failure/index.vue'),
+      meta: {
+        locale: 'menu.exception.load-failure',
+        requiresAuth: true,
+        roles: [RoleType.admin, RoleType.user],
+      },
+    },
+     {
+      path: 'no-search-results',
+      name: '暂无搜索结果',
+      id: 'no-search-results',
+      label: '暂无搜索结果',
+      component: () => import('@/views/exception/no-search-results/index.vue'),
+      meta: {
+        locale: 'menu.exception.no-search-results',
+        requiresAuth: true,
+        roles: [RoleType.admin, RoleType.user],
+      },
+    },
   ],
 };
