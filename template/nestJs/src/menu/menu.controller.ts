@@ -41,7 +41,6 @@ export class MenuController {
 
   @ApiOperation({summary: '添加一个菜单'})
   @ApiCreatedResponse({type: Menu})
-  @Reject()
   @Post()
   @Permission('menu::add')
   async createMenu(@Body() dto: CreateMenuDto) {

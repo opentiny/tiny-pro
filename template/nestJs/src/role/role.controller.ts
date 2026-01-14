@@ -28,7 +28,6 @@ export class RoleController {
   @ApiCreatedResponse({
     type: Role,
   })
-  @Reject()
   @Permission('role::add')
   @Post()
   create(@Body() createRoleDto: CreateRoleDto) {

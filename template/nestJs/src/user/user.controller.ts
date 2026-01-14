@@ -25,7 +25,6 @@ import { I18nTranslations } from '../.generate/i18n.generated';
 import { Reject } from '../public/reject.decorator';
 import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiProperty } from '@nestjs/swagger';
 import { User } from '@app/models';
-import { BatchRemoveUserDto } from './dto/batch-remove-user.dto';
 
 @Controller('user')
 export class UserController {
@@ -37,7 +36,6 @@ export class UserController {
     description: '返回创建后的用户'
   })
   @ApiBearerAuth()
-  @Reject()
   @Post('reg')
   @Permission('user::add')
   async register(@Body() body: CreateUserDto) {

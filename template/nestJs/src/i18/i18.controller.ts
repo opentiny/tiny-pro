@@ -14,7 +14,6 @@ import {
 import { I18Service } from './i18.service';
 import { CreateI18Dto } from './dto/create-i18.dto';
 import { UpdateI18Dto } from './dto/update-i18.dto';
-import { I18LangService } from './lang.service';
 import { Permission } from '../public/permission.decorator';
 import { Reject } from '../public/reject.decorator';
 import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery } from '@nestjs/swagger';
@@ -28,7 +27,6 @@ export class I18Controller {
 
   @ApiOperation({summary: '创建一个国际化词条'})
   @ApiCreatedResponse({type: I18})
-  @Reject()
   @Permission('i18n::add')
   @Post()
   create(@Body() createI18Dto: CreateI18Dto) {
