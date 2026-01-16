@@ -3,11 +3,12 @@ import { PermissionService } from './permission.service';
 import { PermissionController } from './permission.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Permission } from '@app/models';
+import { PermissionInit } from './permission.initalizer';
 
 @Module({
   controllers: [PermissionController],
-  providers: [PermissionService],
+  providers: [PermissionService, PermissionInit],
   imports: [TypeOrmModule.forFeature([Permission])],
-  exports: [PermissionService],
+  exports: [PermissionService, PermissionInit],
 })
 export class PermissionModule {}
