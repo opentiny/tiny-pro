@@ -9,7 +9,7 @@
   <tiny-remoter
     agent-root="https://agent.opentiny.design/api/v1/webmcp-trial/"
     :session-id="sessionId"
-    :menuItems="[
+    :menu-items="[
       {
         action: 'qr-code',
         show: false
