@@ -21,7 +21,6 @@ export class I18nLangController {
 
   @ApiOperation({summary: '创建一个语言'})
   @ApiCreatedResponse({type: Lang})
-  @Reject()
   @Permission('lang::add')
   @Post('')
   createLang(@Body() data: CreateLang) {

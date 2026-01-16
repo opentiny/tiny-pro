@@ -28,7 +28,6 @@ export class PermissionController {
     description: '数据库记录',
     type: PermissionEntity
   })
-  @Reject()
   @Permission('permission::add')
   @Post()
   create(@Body() dto: CreatePermissionDto) {
