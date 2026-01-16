@@ -110,6 +110,7 @@
   const emits = defineEmits<{
     langChange: [];
     localChange: [];
+    batchRemove: [];
   }>();
   const { open, onOpen, onClose } = useDisclosure();
   const { open: langPopoverOpen, onClose: setLangPopoverClose } =
@@ -180,7 +181,6 @@
             setLangPopoverClose();
           });
       })
-      .catch(() => {});
   };
 
   const i18 = useI18n();
@@ -210,7 +210,6 @@
             onClose();
           });
       })
-      .catch(() => {});
   };
   watch(open, (value) => {
     if(!value && (langPopoverOpen.value || langTableOpen.value)) {
@@ -237,12 +236,12 @@
           lang: z.union([z.literal(1), z.literal(2)]).describe('词条语言ID，英文 enUS 为：1，中文 zhCN 为：2'),
         }
       },
-      async ({ key, content, lang }) => {
+      async ({ key, content, lang: langId }) => {
         onOpen()
         await sleep(1000)
         locale.key = key
         locale.content = content
-        locale.lang = lang
+        locale.lang = langId
         await sleep(1000)
         addLocale()
         return { content: [{ type: 'text', text: `收到: ${key}` }] }

@@ -24,10 +24,10 @@
   import { useMenuStore } from '@/store/modules/router';
   import { useRouter } from 'vue-router';
   import { useTabStore } from '@/store';
+import { sleep } from '@/utils/base-utils';
   import menuTree, { Node } from './menu-tree.vue';
   import UpdateForm from './update-form.vue';
   import AddMenu from './add-menu.vue';
-import { sleep } from '@/utils/base-utils';
 
   const { modalSize } = useResponsiveSize()
 
@@ -269,7 +269,7 @@ import { sleep } from '@/utils/base-utils';
           locale: z.string().describe('国际化'),
         }
       },
-      async ({ name, order, parentId, icon, component, path, locale }) => {
+      async ({ name, order, parentId, icon, component, path, locale: menuLocale }) => {
         handleAddMenu()
         await sleep(1000)
         addMenu.value.setMenuInfo({
@@ -280,7 +280,7 @@ import { sleep } from '@/utils/base-utils';
           component,
           menuType: "/",
           path,
-          locale,
+          locale: menuLocale,
         })
         await sleep(1000)
         onClickAdd()
