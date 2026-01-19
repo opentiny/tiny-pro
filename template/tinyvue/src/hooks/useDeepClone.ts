@@ -1,41 +1,40 @@
-import { Ref, unref } from 'vue';
+import type { Ref } from 'vue'
+import { unref } from 'vue'
 
-export const useDeepClone = <
+export function useDeepClone<
   T extends {
-    [x: string]: any;
+    [x: string]: any
   },
->(
-  value: T | Ref<T>,
-): T => {
-  const innerValue = unref(value);
+>(value: T | Ref<T>): T {
+  const innerValue = unref(value)
   if (value === null || value === undefined) {
-    return value;
+    return value
   }
   if (
-    typeof innerValue === 'boolean' ||
-    typeof innerValue === 'string' ||
-    typeof innerValue === 'number'
+    typeof innerValue === 'boolean'
+    || typeof innerValue === 'string'
+    || typeof innerValue === 'number'
   ) {
-    return innerValue;
+    return innerValue
   }
-  const data = Object.create(null);
-  if (innerValue instanceof Array) {
-    const arr = [];
+  const data = Object.create(null)
+  if (Array.isArray(innerValue)) {
+    const arr = []
     for (let i = 0; i < innerValue.length; i += 1) {
-      arr.push(useDeepClone(innerValue[i]));
+      arr.push(useDeepClone(innerValue[i]))
     }
-    return arr as unknown as T;
+    return arr as unknown as T
   }
-  const entries = Object.entries(innerValue);
+  const entries = Object.entries(innerValue)
   for (let i = 0; i < entries.length; i += 1) {
-    const [key, v] = entries[i];
+    const [key, v] = entries[i]
     if (typeof v !== 'object') {
-      data[key] = v;
+      data[key] = v
     }
     if (typeof v === 'function') {
-      data[key] = v;
+      data[key] = v
     }
-    data[key] = useDeepClone(v);
+    data[key] = useDeepClone(v)
   }
-  return data;
-};
+  return data
+}

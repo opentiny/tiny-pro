@@ -1,10 +1,9 @@
-/* eslint-disable prefer-template */
-import { createRouter, createWebHistory } from 'vue-router';
-import NProgress from 'nprogress'; // progress bar
-import createRouteGuard from './guard';
-import constant from './constant';
+import NProgress from 'nprogress' // progress bar
+import { createRouter, createWebHistory } from 'vue-router'
+import constant from './constant'
+import createRouteGuard from './guard'
 
-NProgress.configure({ showSpinner: false }); // NProgress Configuration
+NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
 const router = createRouter({
   history: createWebHistory(),
@@ -13,10 +12,10 @@ const router = createRouter({
     ...constant,
   ],
   scrollBehavior() {
-    return { top: 0 };
+    return { top: 0 }
   },
-});
+})
 
-createRouteGuard(router);
+createRouteGuard(router)
 
-export default router;
+export default router

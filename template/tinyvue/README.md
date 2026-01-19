@@ -10,12 +10,13 @@
 
 请选择任何一个你喜欢的包管理工具进行安装, 这里使用的`npm`
 
-```
+```bash
 npm i
 ```
+
 ### 启动开发环境
 
-```
+```bash
 npm run dev
 ```
 
@@ -23,13 +24,13 @@ npm run dev
 
 部分场景使用了mock数据, 所以请确保您启动了mock服务
 
-```
+```bash
 npm run mock
 ```
 
 ## 目录结构
 
-```
+```bash
 config              # 打包工具配置文件
 public
 src

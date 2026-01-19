@@ -1,17 +1,16 @@
-import { resolve } from 'path';
-import { defineConfig, loadEnv } from 'vite';
-import vue from '@vitejs/plugin-vue';
-import vueJsx from '@vitejs/plugin-vue-jsx';
-import svgLoader from 'vite-svg-loader';
-import eslint from 'vite-plugin-eslint';
-import UnoCSS from 'unocss/vite';
+import { resolve } from 'node:path'
+import process from 'node:process'
+import vue from '@vitejs/plugin-vue'
+import vueJsx from '@vitejs/plugin-vue-jsx'
+import UnoCSS from 'unocss/vite'
+import { defineConfig, loadEnv } from 'vite'
+import svgLoader from 'vite-svg-loader'
 
 const config = {
   plugins: [
     vue(),
     vueJsx(),
     svgLoader({ svgoConfig: {} }),
-    eslint({ cache: false }), // 禁用缓存‌
     UnoCSS(),
   ],
   build: {
@@ -51,7 +50,7 @@ const config = {
     preserveSymlinks: false,
   },
   define: {
-    'BUILD_TOOLS': "'VITE'",
+    BUILD_TOOLS: '\'VITE\'',
   },
   optimizeDeps: {
     esbuildOptions: {
@@ -70,5 +69,5 @@ const config = {
       },
     },
   },
-};
-export default defineConfig(config);
+}
+export default defineConfig(config)

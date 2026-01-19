@@ -1,22 +1,22 @@
+import { isLogin } from '../utils/auth'
 import {
-  successResponseWrap,
   failResponseWrap,
   initData,
-} from '../utils/setup-mock';
-import { isLogin } from '../utils/auth';
+  successResponseWrap,
+} from '../utils/setup-mock'
 
-const positive = JSON.parse(JSON.stringify(initData.tableData));
-const negative = JSON.parse(JSON.stringify(initData.tableData.reverse()));
-const initlist = JSON.parse(JSON.stringify(initData.chartData[0].list));
-const userInfo = JSON.parse(JSON.stringify(initData.userInfo));
+const positive = JSON.parse(JSON.stringify(initData.tableData))
+const negative = JSON.parse(JSON.stringify(initData.tableData.reverse()))
+const initlist = JSON.parse(JSON.stringify(initData.chartData[0].list))
+const userInfo = JSON.parse(JSON.stringify(initData.userInfo))
 export default [
   // 注册
   {
     url: '/api/user/register',
     method: 'post',
-    response: (params: { body: any; }) => {
-      localStorage.setItem('registerUser', JSON.stringify(params.body));
-      return successResponseWrap({ ...userInfo, role: 'admin' });
+    response: (params: { body: any }) => {
+      localStorage.setItem('registerUser', JSON.stringify(params.body))
+      return successResponseWrap({ ...userInfo, role: 'admin' })
     },
   },
 
@@ -26,13 +26,13 @@ export default [
     method: 'get',
     response: () => {
       if (isLogin()) {
-        const role = window.localStorage.getItem('userRole') || 'admin';
+        const role = window.localStorage.getItem('userRole') || 'admin'
         return successResponseWrap({
           ...userInfo,
           role,
-        });
+        })
       }
-      return successResponseWrap(null);
+      return successResponseWrap(null)
     },
   },
 
@@ -42,13 +42,13 @@ export default [
     method: 'put',
     response: () => {
       if (isLogin()) {
-        const role = window.localStorage.getItem('userRole') || 'admin';
+        const role = window.localStorage.getItem('userRole') || 'admin'
         return successResponseWrap({
           ...userInfo,
           role,
-        });
+        })
       }
-      return successResponseWrap(null);
+      return successResponseWrap(null)
     },
   },
 
@@ -56,31 +56,31 @@ export default [
   {
     url: '/api/user/login',
     method: 'post',
-    response: (params: { body: any; }) => {
+    response: (params: { body: any }) => {
       const registerUser = JSON.parse(
-        localStorage.getItem('registerUser') || '{}'
-      );
-      const { username, password } = JSON.parse(JSON.stringify(params.body));
+        localStorage.getItem('registerUser') || '{}',
+      )
+      const { username, password } = JSON.parse(JSON.stringify(params.body))
       if (!username) {
-        return failResponseWrap(null, '邮箱名不能为空', 'InvalidParameter');
+        return failResponseWrap(null, '邮箱名不能为空', 'InvalidParameter')
       }
       if (!password) {
-        return failResponseWrap(null, '密码不能为空', 'InvalidParameter');
+        return failResponseWrap(null, '密码不能为空', 'InvalidParameter')
       }
       if (
-        (username === 'admin@example.com' && password === 'admin') ||
-        (username === registerUser.username &&
-          password === registerUser.password)
+        (username === 'admin@example.com' && password === 'admin')
+        || (username === registerUser.username
+          && password === registerUser.password)
       ) {
-        window.localStorage.setItem('userRole', 'admin');
+        window.localStorage.setItem('userRole', 'admin')
         return successResponseWrap({
           token: '12345',
           userInfo: {
             ...userInfo,
           },
-        });
+        })
       }
-      return failResponseWrap(null, '账号或者密码错误', 'InvalidParameter');
+      return failResponseWrap(null, '账号或者密码错误', 'InvalidParameter')
     },
   },
 
@@ -89,7 +89,7 @@ export default [
     url: '/api/user/logout',
     method: 'post',
     response: () => {
-      return successResponseWrap(null);
+      return successResponseWrap(null)
     },
   },
 
@@ -99,49 +99,49 @@ export default [
     method: 'post',
     response: (params: any) => {
       const { sort, startTime, endTime, filterStatus, filterType } = JSON.parse(
-        JSON.stringify(params.body)
-      );
-      initData.tableData = positive;
-      initData.chartData[0].list = initlist;
+        JSON.stringify(params.body),
+      )
+      initData.tableData = positive
+      initData.chartData[0].list = initlist
       if (sort === 1 || sort === 3) {
-        initData.chartData[0].list.reverse();
-        initData.tableData = positive;
-        return successResponseWrap(initData);
+        initData.chartData[0].list.reverse()
+        initData.tableData = positive
+        return successResponseWrap(initData)
       }
       if (sort === 2 || sort === 4) {
-        initData.chartData[0].list.reverse();
-        initData.tableData = negative;
-        return successResponseWrap(initData);
+        initData.chartData[0].list.reverse()
+        initData.tableData = negative
+        return successResponseWrap(initData)
       }
       if (
-        startTime !== '' ||
-        endTime !== '' ||
-        filterStatus.length !== 0 ||
-        (filterType.length !== 0 && sort === undefined)
+        startTime !== ''
+        || endTime !== ''
+        || filterStatus.length !== 0
+        || (filterType.length !== 0 && sort === undefined)
       ) {
-        const start = new Date(JSON.parse(JSON.stringify(startTime))).getTime();
-        const end = new Date(JSON.parse(JSON.stringify(endTime))).getTime();
-        // eslint-disable-next-line func-names
-        const table = initData.tableData.filter(function (item: any) {
+        const start = new Date(JSON.parse(JSON.stringify(startTime))).getTime()
+        const end = new Date(JSON.parse(JSON.stringify(endTime))).getTime()
+
+        const table = initData.tableData.filter((item: any) => {
           return (
-            filterType.includes(item.bid) &&
-            filterStatus.includes(item.pid) &&
-            new Date(JSON.parse(JSON.stringify(item.time))).getTime() - start >
-              0 &&
-            new Date(JSON.parse(JSON.stringify(item.time))).getTime() - end < 0
-          );
-        });
-        // eslint-disable-next-line func-names
-        const chart = initData.chartData[0].list.filter(function (item: any) {
+            filterType.includes(item.bid)
+            && filterStatus.includes(item.pid)
+            && new Date(JSON.parse(JSON.stringify(item.time))).getTime() - start
+            > 0
+            && new Date(JSON.parse(JSON.stringify(item.time))).getTime() - end < 0
+          )
+        })
+
+        const chart = initData.chartData[0].list.filter((item: any) => {
           return (
             filterType.includes(item.bid) && filterStatus.includes(item.pid)
-          );
-        });
-        initData.tableData = table;
-        initData.chartData[0].list = chart;
-        return successResponseWrap(initData);
+          )
+        })
+        initData.tableData = table
+        initData.chartData[0].list = chart
+        return successResponseWrap(initData)
       }
-      return successResponseWrap(initData);
+      return successResponseWrap(initData)
     },
   },
-] as any;
+] as any

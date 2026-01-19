@@ -1,36 +1,36 @@
-import { defineStore } from 'pinia';
-import { getRoleMenu } from '@/api/menu';
-import useUserStore from './user';
+import { defineStore } from 'pinia'
+import { getRoleMenu } from '@/api/menu'
+import useUserStore from './user'
 
 export const useMenuStore = defineStore('menu', {
   state() {
     return {
       menuList: [] as any[],
       flatMenuList: [] as any[],
-    };
+    }
   },
   actions: {
     async getMenuList() {
-      const userStore = useUserStore();
+      const userStore = useUserStore()
       if (!userStore.email) {
-        return [];
+        return []
       }
-      const { data } = await getRoleMenu(userStore.email);
-      this.menuList = data;
-      this.menuListFlat();
-      return data;
+      const { data } = await getRoleMenu(userStore.email)
+      this.menuList = data
+      this.menuListFlat()
+      return data
     },
     menuListFlat() {
-      this.flatMenuList = [];
+      this.flatMenuList = []
       const dfs = (item: any) => {
-        this.flatMenuList.push(item);
+        this.flatMenuList.push(item)
         for (let i = 0; i < item.children.length; i += 1) {
-          dfs(item.children[i]);
+          dfs(item.children[i])
         }
-      };
+      }
       for (let i = 0; i < this.menuList.length; i += 1) {
-        dfs(this.menuList[i]);
+        dfs(this.menuList[i])
       }
     },
   },
-});
+})

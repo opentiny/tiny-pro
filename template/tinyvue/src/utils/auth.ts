@@ -1,25 +1,25 @@
-const TOKEN_KEY = 'token';
-const REFRESH_TOKEN_KEY = 'token:refresh';
+const TOKEN_KEY = 'token'
+const REFRESH_TOKEN_KEY = 'token:refresh'
 
-const isLogin = () => {
-  return !!sessionStorage.getItem(TOKEN_KEY);
-};
-
-const getToken = () => {
-  return sessionStorage.getItem(TOKEN_KEY);
-};
-const getRefreshToken = () => sessionStorage.getItem(REFRESH_TOKEN_KEY);
-
-const setRefreshToken = (token: string) => {
-  sessionStorage.setItem(REFRESH_TOKEN_KEY, token);
+function isLogin() {
+  return !!sessionStorage.getItem(TOKEN_KEY)
 }
 
-const setToken = (token: string) => {
-  sessionStorage.setItem(TOKEN_KEY, token);
-};
+function getToken() {
+  return sessionStorage.getItem(TOKEN_KEY)
+}
+const getRefreshToken = () => sessionStorage.getItem(REFRESH_TOKEN_KEY)
 
-const clearToken = () => {
-  sessionStorage.removeItem(TOKEN_KEY);
-};
+function setRefreshToken(token: string) {
+  sessionStorage.setItem(REFRESH_TOKEN_KEY, token)
+}
 
-export { isLogin, getToken, setToken, clearToken, getRefreshToken, setRefreshToken};
+function setToken(token: string) {
+  sessionStorage.setItem(TOKEN_KEY, token)
+}
+
+function clearToken() {
+  sessionStorage.removeItem(TOKEN_KEY)
+}
+
+export { clearToken, getRefreshToken, getToken, isLogin, setRefreshToken, setToken }

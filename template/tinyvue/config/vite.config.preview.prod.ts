@@ -1,7 +1,8 @@
-import { mergeConfig } from 'vite';
-import baseConig from './vite.config.preview.base';
-import configCompressPlugin from './plugin/compress';
-import configVisualizerPlugin from './plugin/visualizer';
+import process from 'node:process'
+import { mergeConfig } from 'vite'
+import configCompressPlugin from './plugin/compress'
+import configVisualizerPlugin from './plugin/visualizer'
+import baseConig from './vite.config.preview.base'
 
 export default mergeConfig(
   {
@@ -23,5 +24,5 @@ export default mergeConfig(
       chunkSizeWarningLimit: 2000,
     },
   },
-  baseConig
-);
+  baseConig,
+)

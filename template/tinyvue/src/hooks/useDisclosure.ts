@@ -1,16 +1,16 @@
-import { ref } from 'vue';
+import { ref } from 'vue'
 
-export const useDisclosure = () => {
-  const open = ref(false);
+export function useDisclosure() {
+  const open = ref(false)
   const onClose = () => {
-    open.value = false;
-  };
+    open.value = false
+  }
   const onOpen = () => {
-    open.value = true;
-  };
+    open.value = true
+  }
   return {
     open,
     onClose,
     onOpen,
-  };
-};
+  }
+}

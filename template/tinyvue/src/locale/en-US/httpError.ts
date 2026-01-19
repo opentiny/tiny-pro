@@ -5,4 +5,4 @@ export default {
   'http.error.InvalidParameter': 'Invalid request parameter',
   'http.error.InternalError': 'Internal error',
   'http.error.ErrorPassword': 'Account or password error',
-};
+}

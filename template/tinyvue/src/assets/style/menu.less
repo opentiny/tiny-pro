@@ -14,14 +14,7 @@
 }
 
 // 主标题点击后显示背景色
-:deep(
-    .tiny-tree-menu
-      .tiny-tree
-      .tiny-tree-node.is-current
-      > .tiny-tree-node__content
-      .tree-node-name
-      .tiny-svg
-  ) {
+:deep(.tiny-tree-menu .tiny-tree .tiny-tree-node.is-current > .tiny-tree-node__content .tree-node-name .tiny-svg) {
   fill: var(--tv-tree-menu-node-current-color);
 }
 

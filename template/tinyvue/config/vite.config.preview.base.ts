@@ -1,16 +1,14 @@
-import { resolve } from 'path';
-import { defineConfig } from 'vite';
-import vue from '@vitejs/plugin-vue';
-import vueJsx from '@vitejs/plugin-vue-jsx';
-import svgLoader from 'vite-svg-loader';
-import eslint from 'vite-plugin-eslint';
+import { resolve } from 'node:path'
+import vue from '@vitejs/plugin-vue'
+import vueJsx from '@vitejs/plugin-vue-jsx'
+import { defineConfig } from 'vite'
+import svgLoader from 'vite-svg-loader'
 
 export default defineConfig({
   plugins: [
     vue(),
     vueJsx(),
     svgLoader({ svgoConfig: {} }),
-    eslint({ cache: false }), // 禁用缓存‌
   ],
   build: {
     outDir: resolve(__dirname, '../dist/vue-pro/pages'),
@@ -54,4 +52,4 @@ export default defineConfig({
       },
     },
   },
-});
+})

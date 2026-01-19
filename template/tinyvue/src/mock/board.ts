@@ -1,5 +1,5 @@
-import Mock from 'mockjs';
-import { successResponseWrap } from '../utils/setup-mock';
+import Mock from 'mockjs'
+import { successResponseWrap } from '../utils/setup-mock'
 
 const initData = Mock.mock({
   options: [
@@ -16,7 +16,7 @@ const initData = Mock.mock({
       label: 'work.mock.Test',
     },
   ],
-});
+})
 
 const initData1 = Mock.mock({
   options: [
@@ -33,7 +33,7 @@ const initData1 = Mock.mock({
       label: 'work.mock.week3',
     },
   ],
-});
+})
 
 const initData2 = Mock.mock({
   options: [
@@ -50,48 +50,50 @@ const initData2 = Mock.mock({
       label: 'work.mock.hardware',
     },
   ],
-});
+})
 
 const changeDate = Mock.mock({
   options1: [101, 212, 122, 232],
   options2: [323, 555, 425, 2221],
   options3: [23234, 234, 989, 122],
-});
+})
 export default [
   {
     url: '/api/user/getdata',
     method: 'get',
     response: () => {
-      return successResponseWrap(initData);
+      return successResponseWrap(initData)
     },
   },
   {
     url: '/api/user/getrpractic',
     method: 'get',
     response: () => {
-      return successResponseWrap(initData1);
+      return successResponseWrap(initData1)
     },
   },
   {
     url: '/api/user/getrtrain',
     method: 'get',
     response: () => {
-      return successResponseWrap(initData2);
+      return successResponseWrap(initData2)
     },
   },
   {
     url: '/api/user/getselect',
     method: 'post',
     response: (data: any) => {
-      let result = null;
+      let result = null
       if (data.body === 1) {
-        result = successResponseWrap(changeDate.options1);
-      } else if (data.body === 2) {
-        result = successResponseWrap(changeDate.options2);
-      } else {
-        result = successResponseWrap(changeDate.options3);
+        result = successResponseWrap(changeDate.options1)
       }
-      return result;
+      else if (data.body === 2) {
+        result = successResponseWrap(changeDate.options2)
+      }
+      else {
+        result = successResponseWrap(changeDate.options3)
+      }
+      return result
     },
   },
-] as any;
+] as any

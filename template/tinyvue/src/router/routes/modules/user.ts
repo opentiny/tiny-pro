@@ -1,4 +1,4 @@
-import { RoleType } from '@/types/roleType';
+import { RoleType } from '@/types/roleType'
 
 export default {
   path: 'user',
@@ -38,4 +38,4 @@ export default {
       },
     },
   ],
-};
+}

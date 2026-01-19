@@ -1,1 +1,1 @@
-export const isUndefined = (val: unknown): val is undefined => val === undefined;
+export const isUndefined = (val: unknown): val is undefined => val === undefined

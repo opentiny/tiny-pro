@@ -1,29 +1,26 @@
-import Mock from 'mockjs';
-import debug from './env';
+import Mock from 'mockjs'
+import debug from './env'
 
-export default ({ mock, setup }: { mock?: boolean; setup: () => void }) => {
-  if (mock !== false && debug) setup();
-};
+export default ({ mock, setup }: { mock?: boolean, setup: () => void }) => {
+  if (mock !== false && debug)
+    setup()
+}
 
-export const successResponseWrap = (data: unknown) => {
+export function successResponseWrap(data: unknown) {
   return {
     data,
     errMsg: '',
     code: '0',
-  };
-};
+  }
+}
 
-export const failResponseWrap = (
-  data: unknown,
-  errMsg: string,
-  code = '500'
-) => {
+export function failResponseWrap(data: unknown, errMsg: string, code = '500') {
   return {
     data,
     errMsg,
     code,
-  };
-};
+  }
+}
 
 export const initData = Mock.mock({
   chartData: [
@@ -249,4 +246,4 @@ export const initData = Mock.mock({
     address: 'xian',
     status: 'normal',
   },
-});
+})
