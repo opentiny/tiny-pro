@@ -38,6 +38,7 @@ describe('AuthService', () => {
     accessTokenAlive: jest.fn(),
     issueToken: jest.fn(),
     getUserTokenCount: jest.fn(),
+    getTokenByJti: jest.fn(),
   }
 
   beforeEach(async () => {
@@ -105,12 +106,15 @@ describe('AuthService', () => {
         payload: {
           email: 'test@example.com',
           id: 1,
+          jti: 'test-jti',
         }
       });
-      jest.spyOn(redisService, 'delUserToken').mockResolvedValue(true);
+      jest.spyOn(tokenService, 'getTokenByJti').mockResolvedValue('access-token');
+      jest.spyOn(tokenService, 'revokeToken').mockResolvedValue(undefined);
       await service.logout('test-token');
       expect(jwtService.verify).toHaveBeenCalledWith('test-token');
-      expect(tokenService.revokeByUid).toHaveBeenCalled();
+      expect(tokenService.getTokenByJti).toHaveBeenCalledWith(1, 'test-jti', 'at');
+      expect(tokenService.revokeToken).toHaveBeenCalledWith('access-token');
     });
   });
 
