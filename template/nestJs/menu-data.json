@@ -1,0 +1,263 @@
+[
+  {
+    "label": "Board",
+    "children": [
+      {
+        "label": "Home",
+        "children": [],
+        "url": "home",
+        "component": "board/home/index",
+        "icon": "",
+        "menuType": "normal",
+        "locale": "menu.home"
+      },
+      {
+        "label": "Work",
+        "children": [],
+        "url": "work",
+        "component": "board/work/index",
+        "icon": "",
+        "menuType": "normal",
+        "locale": "menu.work"
+      }
+    ],
+    "url": "board",
+    "component": "board/index",
+    "icon": "IconApplication",
+    "menuType": "normal",
+    "locale": "menu.board"
+  },
+  {
+    "label": "List",
+    "children": [
+      {
+        "label": "Table",
+        "children": [],
+        "url": "table",
+        "component": "list/search-table/index",
+        "icon": "",
+        "menuType": "normal",
+        "locale": "menu.list.searchTable"
+      },
+      {
+        "label": "Card",
+        "children": [],
+        "url": "card",
+        "component": "list/card-list/index",
+        "icon": "",
+        "menuType": "normal",
+        "locale": "menu.list.cardList"
+      }
+    ],
+    "url": "list",
+    "component": "list/index",
+    "icon": "IconFiles",
+    "menuType": "normal",
+    "locale": "menu.list"
+  },
+  {
+    "label": "Form",
+    "children": [
+      {
+        "label": "Base",
+        "children": [],
+        "url": "base",
+        "component": "form/base/index",
+        "icon": "",
+        "menuType": "normal",
+        "locale": "menu.form.base"
+      },
+      {
+        "label": "Step",
+        "children": [],
+        "url": "step",
+        "component": "form/step/index",
+        "icon": "",
+        "menuType": "normal",
+        "locale": "menu.form.step"
+      }
+    ],
+    "url": "form",
+    "component": "form/index",
+    "icon": "IconSetting",
+    "menuType": "normal",
+    "locale": "menu.form"
+  },
+  {
+    "label": "Profile",
+    "children": [
+      {
+        "label": "Detail",
+        "children": [],
+        "url": "detail",
+        "component": "profile/detail/index",
+        "icon": "",
+        "menuType": "normal",
+        "locale": "menu.profile.detail"
+      }
+    ],
+    "url": "profile",
+    "component": "profile/index",
+    "icon": "IconFiletext",
+    "menuType": "normal",
+    "locale": "menu.profile"
+  },
+  {
+    "label": "Result",
+    "children": [
+      {
+        "label": "Success",
+        "children": [],
+        "url": "success",
+        "component": "result/success/index",
+        "icon": "",
+        "menuType": "normal",
+        "locale": "menu.result.success"
+      },
+      {
+        "label": "Error",
+        "children": [],
+        "url": "error",
+        "component": "result/error/index",
+        "icon": "",
+        "menuType": "normal",
+        "locale": "menu.result.error"
+      }
+    ],
+    "url": "result",
+    "component": "result/index",
+    "icon": "IconSuccessful",
+    "menuType": "normal",
+    "locale": "menu.result"
+  },
+  {
+    "label": "Exception",
+    "children": [
+      {
+        "label": "403",
+        "children": [],
+        "url": "403",
+        "component": "exception/403/index",
+        "icon": "",
+        "menuType": "normal",
+        "locale": "menu.exception.403"
+      },
+      {
+        "label": "500",
+        "children": [],
+        "url": "500",
+        "component": "exception/500/index",
+        "icon": "",
+        "menuType": "normal",
+        "locale": "menu.exception.500"
+      },
+      {
+        "label": "404",
+        "children": [],
+        "url": "404",
+        "component": "exception/404/index",
+        "icon": "",
+        "menuType": "normal",
+        "locale": "menu.exception.404"
+      }
+    ],
+    "url": "exception",
+    "component": "exception/index",
+    "icon": "IconCueL",
+    "menuType": "normal",
+    "locale": "menu.exception"
+  },
+  {
+    "label": "User",
+    "children": [
+      {
+        "label": "Info",
+        "children": [],
+        "url": "info",
+        "component": "user/info/index",
+        "icon": "",
+        "menuType": "normal",
+        "locale": "menu.user.info"
+      }
+    ],
+    "url": "user",
+    "component": "user/index",
+    "icon": "IconUser",
+    "menuType": "normal",
+    "locale": "menu.user"
+  },
+  {
+    "label": "MenuPage",
+    "children": [
+      {
+        "label": "SecondMenu",
+        "children": [],
+        "url": "secondMenu",
+        "component": "menu/demo/index",
+        "icon": "add-cube",
+        "menuType": "normal",
+        "locale": "menu.menuPage.second"
+      }
+    ],
+    "url": "menuPage",
+    "component": "menu/index",
+    "icon": "IconApp",
+    "menuType": "normal",
+    "locale": "menu.menuPage"
+  },
+  {
+    "label": "SystemManager",
+    "children": [
+      {
+        "label": "AllMenu",
+        "children": [],
+        "url": "menu/allMenu",
+        "component": "menu/info/index",
+        "icon": "IconGrade",
+        "menuType": "admin",
+        "locale": "menu.menu.info"
+      },
+      {
+        "label": "AllPermission",
+        "children": [],
+        "url": "permission/allPermission",
+        "component": "permission/info/index",
+        "icon": "IconFolderOpened",
+        "menuType": "admin",
+        "locale": "menu.permission.info"
+      },
+      {
+        "label": "AllRole",
+        "children": [],
+        "url": "role/allRole",
+        "component": "role/info/index",
+        "icon": "IconActivation",
+        "menuType": "admin",
+        "locale": "menu.role.info"
+      },
+      {
+        "label": "AllInfo",
+        "children": [],
+        "url": "userManager/allInfo",
+        "component": "userManager/info/index",
+        "icon": "IconGroup",
+        "menuType": "admin",
+        "locale": "menu.userManager.info"
+      },
+      {
+        "label": "Local",
+        "children": [],
+        "url": "locale",
+        "component": "locale/index",
+        "icon": "IconFlag",
+        "menuType": "",
+        "locale": "menu.i18n"
+      }
+    ],
+    "url": "",
+    "component": "menu/index",
+    "icon": "IconTotal",
+    "menuType": "normal",
+    "locale": "menu.systemManager"
+  }
+]

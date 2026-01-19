@@ -34,7 +34,6 @@ interface MenuMap {
   [key: number]: Menu;
 }
 
-type NumberArray = number[];
 const toNode = (menu: Menu): ITreeNodeData => {
   return {
     label: menu.name,
@@ -98,47 +97,6 @@ export class MenuService {
   async findAllMenu() {
     const menu = this.menu.find();
     return convertToTree(await menu);
-  }
-
-  /* istanbul ignore next */
-  async getMenuAllId() {
-    const menu = await this.menu.find();
-    for (const item of menu) {
-      this.menuId.push(item.id);
-    }
-    await this.handleMenuParentId(this.menuId);
-    return this.menuId;
-  }
-
-  /* istanbul ignore next */
-  async handleMenuParentId(menuId: number[]) {
-    const menu = await this.menu.find();
-    if (menu) {
-      menu[1].parentId = menuId[0];
-      menu[2].parentId = menuId[0];
-      menu[4].parentId = menuId[3];
-      menu[6].parentId = menuId[5];
-      menu[7].parentId = menuId[5];
-      menu[9].parentId = menuId[8];
-      menu[11].parentId = menuId[10];
-      menu[12].parentId = menuId[10];
-      menu[14].parentId = menuId[13];
-      menu[15].parentId = menuId[13];
-      menu[16].parentId = menuId[13];
-      menu[18].parentId = menuId[17];
-      menu[20].parentId = menuId[19];
-      menu[21].parentId = menuId[20];
-      menu[23].parentId = menuId[22];
-      menu[24].parentId = menuId[22];
-      menu[25].parentId = menuId[22];
-      menu[26].parentId = menuId[22];
-      menu[27].parentId = menuId[22];
-      menu[28].parentId = menuId[3];
-      menu[29].parentId = menuId[5];
-    }
-    for (const item of menu) {
-      await this.menu.update(item.id, { parentId: item.parentId });
-    }
   }
 
   async createMenu(dto: CreateMenuDto, isInit: boolean) {

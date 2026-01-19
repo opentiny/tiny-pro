@@ -1,8 +1,6 @@
-import { SequelizeModule } from '@nestjs/sequelize';
 import {
   HttpException,
   Logger,
-  LoggerService,
   Module,
   OnModuleInit,
 } from '@nestjs/common';
@@ -20,10 +18,8 @@ import { UserService } from './user/user.service';
 import { RoleService } from './role/role.service';
 import { PermissionService } from './permission/permission.service';
 import { MenuService } from './menu/menu.service';
-import { Permission } from '@app/models';
 import { MenuModule } from './menu/menu.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { menuData } from './menu/init/menuData';
 import { I18Module } from './i18/i18.module';
 import { I18LangService } from './i18/lang.service';
 import { I18Service } from './i18/i18.service';
@@ -36,13 +32,17 @@ import { RejectRequestGuard } from './public/reject.guard';
 import { HealthCheckController } from './health-check.controller';
 import { ApplicationModule } from './application/application.module';
 import { ApplicationService } from './application/application.service';
-import { applicationData } from './application/init/data';
 import { CONFIG_SCHEMA, Configure } from './config-schema';
 import { InstallLock } from './install-lock';
 import { RedisService } from '../libs/redis/redis.service';
 import Redis from 'ioredis';
 import { RedisModule } from '../libs/redis/redis.module';
 import { LockerModule } from '@app/locker';
+import { MenuInitializer } from './menu/menu.initializer';
+import { RoleInit } from './role/role.initializer';
+import { PermissionInit } from './permission/permission.initalizer';
+import { UserInit } from './user/user.initalizer';
+import { ApplicationInit } from './application/application.init';
 
 const INSTALL_FLAG = 'FLAG:INSTALL';
 const MAX_RETRY = 20;
@@ -96,16 +96,16 @@ const MAX_RETRY = 20;
 })
 export class AppModule implements OnModuleInit {
   constructor(
-    private user: UserService,
-    private role: RoleService,
-    private permission: PermissionService,
-    private menu: MenuService,
     private lang: I18LangService,
     private i18: I18Service,
-    private application: ApplicationService,
     private lock: InstallLock,
     private redis: RedisService,
-    private cfg: ConfigService<Configure>
+    private cfg: ConfigService<Configure>,
+    private menuInit: MenuInitializer,
+    private roleInit: RoleInit,
+    private permissionInit: PermissionInit,
+    private userInit: UserInit,
+    private applicationInit: ApplicationInit
   ) {}
   async isInstalled(redis: Redis) {
     return redis.exists(INSTALL_FLAG);
@@ -186,91 +186,12 @@ export class AppModule implements OnModuleInit {
           Logger.log(`${name} - ${key} save success`);
         }
       }
-      const permissions = {
-        user: [
-          'add',
-          'remove',
-          'update',
-          'query',
-          'password::force-update',
-          'batch-remove',
-        ],
-        permission: ['add', 'remove', 'update', 'get'],
-        role: ['add', 'remove', 'update', 'query'],
-        menu: ['add', 'remove', 'update', 'query'],
-        i18n: ['add', 'remove', 'update', 'query', 'batch-remove'],
-        lang: ['add', 'remove', 'update', 'query'],
-      };
-      const tasks = [];
-      const isInit = true;
-      let permission = await this.permission.create(
-        {
-          name: '*',
-          desc: 'super permission',
-        },
-        isInit
-      );;
-      for (const [module, actions] of Object.entries(permissions)) {
-        for (const action of actions) {
-          tasks.push(
-            this.permission.create(
-              {
-                name: `${module}::${action}`,
-                desc: '',
-              },
-              isInit
-            )
-          );
-        }
-      }
-      // TODO Menu
-      for (const item of menuData) {
-        await this.menu.createMenu(item, isInit);
-      }
 
-      // application
-      for (const item of applicationData) {
-        await this.application.createApplication(item, isInit);
-      }
-
-      const status = Promise.allSettled(tasks);
-      const statusData = await status;
-      const hasFail = statusData.some((data) => data.status === 'rejected');
-      if (hasFail) {
-        const fail: any[] = statusData.filter(
-          (data) => data.status === 'rejected'
-        );
-        fail.forEach((data) => {
-          Logger.error(`${data.reason}`);
-        });
-        Logger.error('Please clear the database and try again');
-        await this.lock.release();
-        process.exit(-1);
-      }
-
-      const menuId = this.menu.getMenuAllId();
-      const role = await this.role.create(
-        {
-          name: 'admin',
-          permissionIds: [permission.id],
-          menuIds: await menuId,
-        },
-        isInit
-      );
-      const user = await this.user.create(
-        {
-          email: 'admin@no-reply.com',
-          password: 'admin',
-          roleIds: [role.id],
-          name: 'admin',
-          status: 1,
-        },
-        isInit
-      );
-      Logger.log(`[APP]: create admin user success`);
-      Logger.log(`[APP]: email: ${user.email}`);
-      Logger.log(`[APP]: password: 'admin'`);
-      Logger.log('Enjoy!');
+      await this.applicationInit.run();
+      await this.menuInit.run();
+      await this.permissionInit.run();
+      await this.roleInit.run();
+      await this.userInit.run()
       await this.setIsInstalled(redis);
     } catch (e) {
       const err = e as HttpException;
