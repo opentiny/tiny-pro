@@ -63,12 +63,8 @@ const chartSettings = ref({
     },
   },
   label: {
-    normal: {
-      show: true,
-      textStyle: {
-        fontSize: 5,
-      },
-    },
+    show: true,
+    fontSize: 5,
   },
   selectedMode: false,
   markPoint: {
