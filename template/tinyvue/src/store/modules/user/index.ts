@@ -1,19 +1,20 @@
-import {defineStore} from 'pinia';
-import {
-  login as userLogin,
-  logout as userLogout,
+import type { UserInfo, UserState } from './types'
+import type {
   LoginData,
   LoginDataMail,
-  loginMail as userLoginMail,
-  updateUserInfo,
-  getUserInfo,
+} from '@/api/user'
+import { defineStore } from 'pinia'
+import { getRoleInfo } from '@/api/role'
+import {
   flushToken,
-} from '@/api/user';
-import {clearToken, getRefreshToken, getToken, setRefreshToken, setToken} from '@/utils/auth';
-import {removeRouteListener} from '@/utils/route-listener';
-import {getRoleInfo} from "@/api/role";
-import {UserInfo, UserState} from './types';
-
+  getUserInfo,
+  updateUserInfo,
+  login as userLogin,
+  loginMail as userLoginMail,
+  logout as userLogout,
+} from '@/api/user'
+import { clearToken, getRefreshToken, getToken, setRefreshToken, setToken } from '@/utils/auth'
+import { removeRouteListener } from '@/utils/route-listener'
 
 const useUserStore = defineStore('user', {
   state: (): UserState => ({
@@ -41,73 +42,73 @@ const useUserStore = defineStore('user', {
     roleId: 0,
     rolePermission: [],
     refreshToken: getRefreshToken(),
-    accessToken: getToken()
+    accessToken: getToken(),
   }),
 
   getters: {
     userInfo(state: UserState): UserState {
-      return state;
+      return state
     },
   },
 
   actions: {
     switchRoles() {
       return new Promise((resolve) => {
-        this.role = this.role === 'user' ? 'admin' : 'user';
-        resolve(this.role);
-      });
+        this.role = this.role === 'user' ? 'admin' : 'user'
+        resolve(this.role)
+      })
     },
     // Set user's information
     setInfo(partial: Partial<UserState>) {
-      this.$patch(partial);
+      this.$patch(partial)
     },
 
     // Reset user's information
     resetInfo() {
-      this.$reset();
+      this.$reset()
     },
-    flushToken(){
-      const refreshToken = this.refreshToken as string;
-      flushToken({token: refreshToken})
-      .then((tokenPair) => {
-        return tokenPair.data
-      })
-      .then((data) => {
-        this.refreshToken = data.refreshToken;
-        this.accessToken = data.accessToken;
-        setRefreshToken(data.refreshToken)
-        setToken(data.accessToken);
-      })
+    flushToken() {
+      const refreshToken = this.refreshToken as string
+      flushToken({ token: refreshToken })
+        .then((tokenPair) => {
+          return tokenPair.data
+        })
+        .then((data) => {
+          this.refreshToken = data.refreshToken
+          this.accessToken = data.accessToken
+          setRefreshToken(data.refreshToken)
+          setToken(data.accessToken)
+        })
     },
 
     // Reset filter information
     resetFilterInfo() {
-      this.startTime = '';
-      this.endTime = '';
-      this.filterStatus = [];
-      this.filterType = [];
+      this.startTime = ''
+      this.endTime = ''
+      this.filterStatus = []
+      this.filterType = []
     },
 
     async updateInfo(data: UserInfo) {
-      const res = await updateUserInfo(data);
-      this.setInfo(res.data);
+      const res = await updateUserInfo(data)
+      this.setInfo(res.data)
     },
 
     // Login
     async login(loginForm: LoginData) {
       try {
-        const res = await userLogin(loginForm);
-        const { accessToken, refreshToken } = res.data;
-        this.refreshToken = refreshToken;
-        this.accessToken = accessToken;
-        setToken(accessToken);
-        setRefreshToken(refreshToken);
+        const res = await userLogin(loginForm)
+        const { accessToken, refreshToken } = res.data
+        this.refreshToken = refreshToken
+        this.accessToken = accessToken
+        setToken(accessToken)
+        setRefreshToken(refreshToken)
         const userRes = await getUserInfo(loginForm.email)
         const userInfo = {
           id: userRes.data.id,
-          name:userRes.data.name,
-          email:userRes.data.email,
-          role:'',
+          name: userRes.data.name,
+          email: userRes.data.email,
+          role: '',
           department: userRes.data.department,
           employeeType: userRes.data.employeeType,
           job: '',
@@ -119,46 +120,48 @@ const useUserStore = defineStore('user', {
           address: userRes.data.address,
           status: userRes.data.status,
           roleId: 0,
-          rolePermission: []
+          rolePermission: [],
         }
-        if(userRes.data.role){
-          userInfo.role = userRes.data.role[0].name;
-          userInfo.job = userRes.data.role[0].name;
-          userInfo.roleId = userRes.data.role[0].id;
+        if (userRes.data.role) {
+          userInfo.role = userRes.data.role[0].name
+          userInfo.job = userRes.data.role[0].name
+          userInfo.roleId = userRes.data.role[0].id
         }
-        const {data} = await getRoleInfo(userInfo.roleId)
-        const permissions = data.permission;
+        const { data } = await getRoleInfo(userInfo.roleId)
+        const permissions = data.permission
         for (let i = 0; i < permissions.length; i += 1) {
           userInfo.rolePermission.push(permissions[i].name)
         }
-        this.setInfo(userInfo);
-      } catch (err) {
-        clearToken();
-        throw err;
+        this.setInfo(userInfo)
+      }
+      catch (err) {
+        clearToken()
+        throw err
       }
     },
 
     async loginMail(loginForm: LoginDataMail) {
       try {
-        const res = await userLoginMail(loginForm);
-        setToken(res.data.token);
-      } catch (err) {
-        clearToken();
-        throw err;
+        const res = await userLoginMail(loginForm)
+        setToken(res.data.token)
+      }
+      catch (err) {
+        clearToken()
+        throw err
       }
     },
 
     // Logout
     async logout() {
       const data = {
-        token:getToken()
+        token: getToken(),
       }
-      await userLogout(data);
-      this.resetInfo();
-      clearToken();
-      removeRouteListener();
+      await userLogout(data)
+      this.resetInfo()
+      clearToken()
+      removeRouteListener()
     },
   },
-});
+})
 
-export default useUserStore;
+export default useUserStore

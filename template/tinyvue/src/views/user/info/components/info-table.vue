@@ -1,8 +1,20 @@
+<script lang="ts" setup>
+import {
+  Grid as TinyGrid,
+  GridColumn as TinyGridColumn,
+} from '@opentiny/vue'
+import { useResponsiveSize } from '@/hooks/responsive'
+
+defineProps<{ tableData: any[] }>()
+
+const { gridSize } = useResponsiveSize()
+</script>
+
 <template>
   <div class="table">
-    <tiny-grid ref="expandGrid" :data="tableData" :auto-resize="true" :size="gridSize" align="center">
-      <tiny-grid-column type="index" width="10%"></tiny-grid-column>
-      <tiny-grid-column type="expand" width="10%">
+    <TinyGrid :data="tableData" :auto-resize="true" :size="gridSize" align="center">
+      <TinyGridColumn type="index" width="10%" />
+      <TinyGridColumn type="expand" width="10%">
         <template #default="data">
           <ul>
             <li>
@@ -23,47 +35,32 @@
             </li>
           </ul>
         </template>
-      </tiny-grid-column>
-      <tiny-grid-column
+      </TinyGridColumn>
+      <TinyGridColumn
         field="name"
         :title="$t('userInfo.table.columnA')"
-      ></tiny-grid-column>
-      <tiny-grid-column
+      />
+      <TinyGridColumn
         field="time"
         :title="$t('userInfo.table.columnB')"
-      ></tiny-grid-column>
-      <tiny-grid-column field="type" :title="$t('userInfo.table.columnC')">
+      />
+      <TinyGridColumn field="type" :title="$t('userInfo.table.columnC')">
         <template #default="data">
           <span>{{ $t(`${data.row.type}`) }}</span>
         </template>
-      </tiny-grid-column>
-      <tiny-grid-column field="status" :title="$t('userInfo.table.columnD')">
+      </TinyGridColumn>
+      <TinyGridColumn field="status" :title="$t('userInfo.table.columnD')">
         <template #default="data">
           <span>{{ $t(`${data.row.status}`) }}</span>
         </template>
-      </tiny-grid-column>
-    </tiny-grid>
+      </TinyGridColumn>
+    </TinyGrid>
   </div>
 </template>
 
-<script lang="ts" setup>
-  import {
-    GridColumn as TinyGridColumn,
-    Grid as TinyGrid,
-  } from '@opentiny/vue';
-  import { useResponsiveSize } from '@/hooks/responsive'
-
-  const { gridSize } = useResponsiveSize()
-
-  const props = defineProps({
-    // eslint-disable-next-line vue/require-prop-types
-    tableData: [] as any,
-  });
-</script>
-
 <style scoped lang="less">
   .table {
-    padding-bottom: 20px;
-    background-color: #fff;
-  }
+  padding-bottom: 20px;
+  background-color: #fff;
+}
 </style>

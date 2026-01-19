@@ -5,4 +5,4 @@ export default {
   'http.error.InvalidParameter': '无效的请求参数',
   'http.error.InternalError': '服务器错误',
   'http.error.ErrorPassword': '账号或密码错误',
-};
+}

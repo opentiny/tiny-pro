@@ -1,181 +1,176 @@
+<script lang="ts" setup>
+import { TinyHuichartsMap as TinyChartMap } from '@opentiny/vue-huicharts'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
+import chinaData from '@/assets/china.json'
+import { debounce } from '@/hooks/responsive'
+import RegionTable from './regiontable.vue'
+
+const data = [
+  { name: '北京市', value: 350000 },
+  { name: '天津市', value: 120000 },
+  { name: '上海市', value: 300000 },
+  { name: '重庆市', value: 92000 },
+  { name: '河北省', value: 25000 },
+  { name: '河南省', value: 20000 },
+  { name: '云南省', value: 500 },
+  { name: '辽宁省', value: 3050 },
+  { name: '黑龙江省', value: 80000 },
+  { name: '湖南省', value: 2000 },
+  { name: '安徽省', value: 24580 },
+  { name: '山东省', value: 40629 },
+  { name: '新疆维吾尔自治区', value: 36981 },
+  { name: '江苏省', value: 13569 },
+  { name: '浙江省', value: 24956 },
+  { name: '江西省', value: 15194 },
+  { name: '湖北省', value: 41398 },
+  { name: '广西壮族自治区', value: 41150 },
+  { name: '甘肃省', value: 17630 },
+  { name: '山西省', value: 27370 },
+  { name: '内蒙古自治区', value: 27370 },
+  { name: '陕西省', value: 97208 },
+  { name: '吉林省', value: 88290 },
+  { name: '福建省', value: 19978 },
+  { name: '贵州省', value: 94485 },
+  { name: '广东省', value: 89426 },
+  { name: '青海省', value: 35484 },
+  { name: '西藏自治区', value: 97413 },
+  { name: '四川省', value: 54161 },
+  { name: '宁夏回族自治区', value: 56515 },
+  { name: '海南省', value: 54871 },
+  { name: '台湾省', value: 48544 },
+  { name: '香港省', value: 49474 },
+  { name: '澳门特别行政区', value: 34594 },
+]
+
+const mapChartsRef = ref()
+const chartData = ref({
+  columns: ['name', 'value'],
+  rows: data,
+})
+const chartSettings = ref({
+  position: 'china',
+  mapOrigin: chinaData, // 用户自己的地图数据
+  roam: false,
+  zoom: 1.2,
+  top: '30px',
+  itemStyle: {
+    normal: {
+      borderColor: 'skyblue',
+      borderWidth: 1,
+      shadowColor: '#ccc',
+      shadowBlur: 30,
+      opacity: 1,
+    },
+  },
+  label: {
+    show: true,
+    fontSize: 5,
+  },
+  selectedMode: false,
+  markPoint: {
+    symbol: 'none',
+    symbolSize: 0,
+  },
+})
+const legendVisible = ref(false)
+const visualMap = ref({
+  show: true,
+  top: 'bottom',
+  left: 'left',
+  realtime: false,
+  splitList: [
+    { start: 5000, end: 500000 },
+    { start: 4000, end: 5000 },
+    { start: 3000, end: 4000 },
+    { start: 2000, end: 3000 },
+    { start: 1000, end: 2000 },
+    { start: 0, end: 1000 },
+  ],
+  color: ['#9feaa5', '#5475f5', '#85daef', '#74e2ca', '#e6ac53', '#9fb5ea'],
+})
+
+const windowWidth = ref(0)
+
+onMounted(() => {
+  const resizeHandler = debounce(() => {
+    windowWidth.value = window.innerWidth
+    mapChartsRef.value?.resize()
+  }, 200)
+
+  window.addEventListener('resize', resizeHandler)
+
+  const el = mapChartsRef.value?.$el || mapChartsRef.value
+  let observer: ResizeObserver | null = null
+  if (el) {
+    observer = new ResizeObserver(() => mapChartsRef.value?.resize())
+    observer.observe(el)
+  }
+
+  resizeHandler()
+  setTimeout(() => {
+    mapChartsRef.value?.resize()
+  }, 200)
+
+  onUnmounted(() => {
+    window.removeEventListener('resize', resizeHandler)
+    observer?.disconnect()
+  })
+  setTimeout(() => {
+    mapChartsRef.value?.resize()
+  }, 200)
+})
+
+const chartWidth = computed(() => windowWidth.value <= 768 ? '80vw' : '30vw')
+</script>
+
 <template>
   <div class="region-box">
     <div class="region-title">
-      <img src="@/assets/images/map-background3.png" class="image" />
+      <img src="@/assets/images/map-background3.png" class="image">
       <h3>{{ $t('home.region.title') }}</h3>
     </div>
-    <div class="region flex w-full max-md:flex-col max-md:items-center">
-      <tiny-chart-map v-if="chartSettings.mapOrigin" ref="mapChartsRef" :width="chartWidth" :settings="chartSettings" :data="chartData" :visual-map="visualMap" :legend-visible="legendVisible"></tiny-chart-map>
-      <div class="region-from w-[46vw] ml-[5%]  max-md:w-[100%] max-md:ml-[0%] max-md:pt-[5%] max-sm:pt-[10%]">
-        <RegionTable></RegionTable>
+    <div class="region w-full flex max-md:flex-col max-md:items-center">
+      <TinyChartMap v-if="chartSettings.mapOrigin" ref="mapChartsRef" :width="chartWidth" :settings="chartSettings" :data="chartData" :visual-map="visualMap" :legend-visible="legendVisible" />
+      <div class="region-from ml-[5%] w-[46vw] max-md:ml-[0%] max-md:w-[100%] max-md:pt-[5%] max-sm:pt-[10%]">
+        <RegionTable />
       </div>
     </div>
   </div>
 </template>
 
-<script lang="ts" setup>
-  import { onMounted, onUnmounted, ref, computed, nextTick } from 'vue';
-  import { TinyHuichartsMap as TinyChartMap } from '@opentiny/vue-huicharts'
-  import chinaData from '@/assets/china.json'
-  import { debounce } from  '@/hooks/responsive'
-  import RegionTable from './regiontable.vue';
-
-  const data = [
-    { name: '北京市', value: 350000 },
-    { name: '天津市', value: 120000 },
-    { name: '上海市', value: 300000 },
-    { name: '重庆市', value: 92000 },
-    { name: '河北省', value: 25000 },
-    { name: '河南省', value: 20000 },
-    { name: '云南省', value: 500 },
-    { name: '辽宁省', value: 3050 },
-    { name: '黑龙江省', value: 80000 },
-    { name: '湖南省', value: 2000 },
-    { name: '安徽省', value: 24580 },
-    { name: '山东省', value: 40629 },
-    { name: '新疆维吾尔自治区', value: 36981 },
-    { name: '江苏省', value: 13569 },
-    { name: '浙江省', value: 24956 },
-    { name: '江西省', value: 15194 },
-    { name: '湖北省', value: 41398 },
-    { name: '广西壮族自治区', value: 41150 },
-    { name: '甘肃省', value: 17630 },
-    { name: '山西省', value: 27370 },
-    { name: '内蒙古自治区', value: 27370 },
-    { name: '陕西省', value: 97208 },
-    { name: '吉林省', value: 88290 },
-    { name: '福建省', value: 19978 },
-    { name: '贵州省', value: 94485 },
-    { name: '广东省', value: 89426 },
-    { name: '青海省', value: 35484 },
-    { name: '西藏自治区', value: 97413 },
-    { name: '四川省', value: 54161 },
-    { name: '宁夏回族自治区', value: 56515 },
-    { name: '海南省', value: 54871 },
-    { name: '台湾省', value: 48544 },
-    { name: '香港省', value: 49474 },
-    { name: '澳门特别行政区', value: 34594 },
-  ];
-
-  const mapChartsRef = ref();
-  const chartData = ref({
-    columns: ['name', 'value'],
-    rows: data
-  })
-  const chartSettings = ref({
-    position: 'china',
-    mapOrigin: chinaData, // 用户自己的地图数据
-    roam: false,
-    zoom: 1.2,
-    top: '30px',
-    itemStyle: {
-      normal: {
-        borderColor: 'skyblue',
-        borderWidth: 1,
-        shadowColor: '#ccc',
-        shadowBlur: 30,
-        opacity: 1,
-      },
-    },
-    label: {
-      normal: {
-        show: true,
-        textStyle: {
-          fontSize: 5,
-        },
-      },
-    },
-    selectedMode: false,
-    markPoint: {
-      symbol: 'none',
-      symbolSize: 0,
-    },
-  })
-  const legendVisible = ref(false)
-  const visualMap = ref({
-    show: true,
-    top: 'bottom',
-    left: 'left',
-    realtime: false,
-    splitList: [
-      { start: 5000, end: 500000 },
-      { start: 4000, end: 5000 },
-      { start: 3000, end: 4000 },
-      { start: 2000, end: 3000 },
-      { start: 1000, end: 2000 },
-      { start: 0, end: 1000 },
-    ],
-    color: ['#9feaa5', '#5475f5', '#85daef', '#74e2ca', '#e6ac53', '#9fb5ea'],
-  })
-
-  const windowWidth = ref(0)
-
-  onMounted(() => {
-    const resizeHandler = debounce(() => {
-      windowWidth.value = window.innerWidth;
-      mapChartsRef.value?.resize();
-    }, 200);
-
-    window.addEventListener('resize', resizeHandler);
-
-    const el = mapChartsRef.value?.$el || mapChartsRef.value;
-    let observer: ResizeObserver | null = null;
-    if (el) {
-      observer = new ResizeObserver(() => mapChartsRef.value?.resize());
-      observer.observe(el);
-    }
-
-    resizeHandler();
-    setTimeout(() => {
-      mapChartsRef.value?.resize();
-    }, 200)
-
-    onUnmounted(() => {
-      window.removeEventListener('resize', resizeHandler);
-      observer?.disconnect();
-    });
-    setTimeout(() => {
-      mapChartsRef.value?.resize();
-    }, 200)
-  });
-
-  const chartWidth = computed(() => windowWidth.value <= 768 ? '80vw' : '30vw')
-</script>
-
 <style scoped lang="less">
   .region-box {
-    margin-top: 20px;
-    padding: 20px 16px;
-    background: #fff;
-    border-radius: 6px;
-    box-shadow: 0 3px 10px #4062e133;
-  }
+  margin-top: 20px;
+  padding: 20px 16px;
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: 0 3px 10px #4062e133;
+}
 
-  .region {
-    justify-content: space-between;    
-  }
+.region {
+  justify-content: space-between;
+}
 
-  .region-title {
-    display: flex;
-  }
+.region-title {
+  display: flex;
+}
 
-  h3 {
-    width: 300px;
-    margin-top: 1.5%;
-    margin-left: 10px;
-    color: #524343;
-    font-weight: 700;
-    font-size: 18px;
-  }
+h3 {
+  width: 300px;
+  margin-top: 1.5%;
+  margin-left: 10px;
+  color: #524343;
+  font-weight: 700;
+  font-size: 18px;
+}
 
-  .image {
-    width: 25px;
-    height: 25px;
-    margin-top: 1.5%;
-    margin-left: 1.5%;
-    background: tomato;
-    border-radius: 4px;
-    opacity: 0.6;
-  }
-
+.image {
+  width: 25px;
+  height: 25px;
+  margin-top: 1.5%;
+  margin-left: 1.5%;
+  background: tomato;
+  border-radius: 4px;
+  opacity: 0.6;
+}
 </style>

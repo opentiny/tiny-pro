@@ -11,7 +11,7 @@ export default {
   'login.form.login.success': '欢迎使用',
   'login.form.userName.placeholder': '用户名：admin',
   'login.form.password.placeholder': '密码：admin',
-  'login.form.mailName.placeholder': "邮箱名：123{'@'}example.com",
+  'login.form.mailName.placeholder': '邮箱名：123{\'@\'}example.com',
   'login.form.mailpassword.placeholder': '密码：admin',
   'login.form.registerMail.placeholder': '注册邮箱：',
   'login.form.registerPassword.placeholder': '注册密码：',
@@ -28,7 +28,7 @@ export default {
   'login.form.passwordInput': '密码:',
   'login.form.passwordConfirm': '确认密码:',
   'login.form.checkUsername':
-    "字母、数字、下划线、短线、点号{'@'}字母、数字、短线",
+    '字母、数字、下划线、短线、点号{\'@\'}字母、数字、短线',
   'login.form.checkPassword':
     '最少八个字符，至少包含一个大写字母，一个小写字母和一个数字',
   'login.form.confirmPassword': '密码输入不一致',
@@ -40,8 +40,8 @@ export default {
   'login.banner.subSlogan3': '实现灵活的区块式开发',
   'login.icon.language': '语言',
   'login.tip.info': '用户名：admin，密码 admin',
-  'login.tip.mail': "用户名：admin{'@'}no-reply.com，密码 admin",
+  'login.tip.mail': '用户名：admin{\'@\'}no-reply.com，密码 admin',
   'login.tip.right': '请输入正确的用户名密码',
   'login.main.text': 'TinyPro 中后台前端解决方案',
   'setting.foot.title': 'OpenTiny 出品',
-};
+}

@@ -1,5 +1,5 @@
-import Mock from 'mockjs';
-import { successResponseWrap } from '../utils/setup-mock';
+import Mock from 'mockjs'
+import { successResponseWrap } from '../utils/setup-mock'
 
 const initData = Mock.mock({
   Project: [
@@ -51,14 +51,14 @@ const initData = Mock.mock({
       time: '2022-10-16',
     },
   ],
-});
+})
 
 export default [
   {
     url: '/api/detail/getdata',
     method: 'get',
     response: () => {
-      return successResponseWrap(initData);
+      return successResponseWrap(initData)
     },
   },
-] as any;
+] as any

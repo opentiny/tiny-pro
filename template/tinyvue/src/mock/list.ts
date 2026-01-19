@@ -1,5 +1,5 @@
-import Mock from 'mockjs';
-import { successResponseWrap } from '../utils/setup-mock';
+import Mock from 'mockjs'
+import { successResponseWrap } from '../utils/setup-mock'
 
 const taskList = Mock.mock({
   'list|60': [
@@ -21,31 +21,31 @@ const taskList = Mock.mock({
       'lastUpdateUser': '张三',
     },
   ],
-});
+})
 
-let treeData = [];
+let treeData = []
 
 export default [
   // list
   {
     url: '/api/employee/getEmployee',
     method: 'post',
-    response: (params: { body: any; }) => {
+    response: (params: { body: any }) => {
       const { pageIndex = 1, pageSize = 10 } = JSON.parse(
-        JSON.stringify(params.body)
-      );
-      const index = pageIndex as number;
-      const size = pageSize as number;
-      const offset = (index - 1) * size;
-      const count = index * size;
-      treeData = taskList.list.slice(offset, count);
+        JSON.stringify(params.body),
+      )
+      const index = pageIndex as number
+      const size = pageSize as number
+      const offset = (index - 1) * size
+      const count = index * size
+      treeData = taskList.list.slice(offset, count)
 
       const data = Mock.mock({
         total: 60,
         data: treeData,
-      });
+      })
 
-      return successResponseWrap(data);
+      return successResponseWrap(data)
     },
   },
-] as any;
+] as any

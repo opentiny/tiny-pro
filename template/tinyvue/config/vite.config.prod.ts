@@ -1,7 +1,8 @@
-import { mergeConfig, loadEnv } from 'vite';
-import baseConfig from './vite.config.base';
-import configCompressPlugin from './plugin/compress';
-import configVisualizerPlugin from './plugin/visualizer';
+import process from 'node:process'
+import { loadEnv, mergeConfig } from 'vite'
+import configCompressPlugin from './plugin/compress'
+import configVisualizerPlugin from './plugin/visualizer'
+import baseConfig from './vite.config.base'
 
 export default mergeConfig(
   {
@@ -11,10 +12,10 @@ export default mergeConfig(
     define: {
       // 确保环境变量被注入到客户端代码
       'import.meta.env.VITE_LOWCODE_DESIGNER_ENABLED': JSON.stringify(
-        process.env.VITE_LOWCODE_DESIGNER_ENABLED || 'false'
+        process.env.VITE_LOWCODE_DESIGNER_ENABLED || 'false',
       ),
       'import.meta.env.VITE_LOWCODE_DESIGNER_URL': JSON.stringify(
-        process.env.VITE_LOWCODE_DESIGNER_URL || '/designer'
+        process.env.VITE_LOWCODE_DESIGNER_URL || '/designer',
       ),
     },
     build: {
@@ -28,5 +29,5 @@ export default mergeConfig(
       chunkSizeWarningLimit: 2000,
     },
   },
-  baseConfig
-);
+  baseConfig,
+)

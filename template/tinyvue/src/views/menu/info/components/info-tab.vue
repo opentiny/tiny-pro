@@ -1,307 +1,311 @@
 <script lang="ts" setup>
-  import { createMenu, deleteMenu, getAllMenu, updateMenu } from '@/api/menu';
-  import { useI18nMenu } from '@/hooks/useI18nMenu';
-  import { flushRouter, ITreeNodeData } from '@/router/guard/menu';
-  import {
-    Button as TinyButton,
-    Modal as TinyModal,
-    Loading,
-  } from '@opentiny/vue';
-  import { WebMcpServer, z } from '@opentiny/next-sdk'
-  import { getAllLocalItems } from '@/api/local';
-  import useLoading from '@/hooks/loading';
-  import {
-    ComponentInstance,
-    computed,
-    inject,
-    onMounted,
-    ref,
-    watch,
-  } from 'vue';
-  import { useI18n } from 'vue-i18n';
-  import { useDeepClone } from '@/hooks/useDeepClone';
-  import { useResponsiveSize } from '@/hooks/responsive'
-  import { useMenuStore } from '@/store/modules/router';
-  import { useRouter } from 'vue-router';
-  import { useTabStore } from '@/store';
-import { sleep } from '@/utils/base-utils';
-  import menuTree, { Node } from './menu-tree.vue';
-  import UpdateForm from './update-form.vue';
-  import AddMenu from './add-menu.vue';
+import type {
+  ComponentInstance,
+} from 'vue'
+import type { Node } from './menu-tree.vue'
+import type { ITreeNodeData } from '@/router/guard/menu'
+import { WebMcpServer, z } from '@opentiny/next-sdk'
+import {
+  Loading,
+  Button as TinyButton,
+  Modal as TinyModal,
+} from '@opentiny/vue'
+import {
+  computed,
+  inject,
+  onMounted,
+  ref,
+  watch,
+} from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
+import { getAllLocalItems } from '@/api/local'
+import { createMenu, deleteMenu, getAllMenu, updateMenu } from '@/api/menu'
+import useLoading from '@/hooks/loading'
+import { useResponsiveSize } from '@/hooks/responsive'
+import { useDeepClone } from '@/hooks/useDeepClone'
+import { useI18nMenu } from '@/hooks/useI18nMenu'
+import { flushRouter } from '@/router/guard/menu'
+import { useTabStore } from '@/store'
+import { useMenuStore } from '@/store/modules/router'
+import { sleep } from '@/utils/base-utils'
+import AddMenu from './add-menu.vue'
+import menuTree from './menu-tree.vue'
+import UpdateForm from './update-form.vue'
 
-  const { modalSize } = useResponsiveSize()
+const { modalSize } = useResponsiveSize()
 
-  const { t } = useI18n();
-  const vLoading = Loading.directive;
-  const rawMenuData = ref<ITreeNodeData[]>([]);
-  const localeData = ref<{ value: string; label: string }[]>([]);
-  const i18nMenuData = computed(() => useI18nMenu(rawMenuData.value, t));
+const { t } = useI18n()
+const vLoading = Loading.directive
+const rawMenuData = ref<ITreeNodeData[]>([])
+const localeData = ref<{ value: string, label: string }[]>([])
+const i18nMenuData = computed(() => useI18nMenu(rawMenuData.value, t))
 
-  const readonly = ref(false);
-  const updateModal = ref(false);
-  const DEFAULT_NODE = {
-    id: '',
-    label: '',
-    url: '',
-    component: '',
-    customIcon: '',
-    menuType: '',
-    parentId: 0,
-    order: 0,
-    locale: '',
-  };
-  const activeNode = ref<ITreeNodeData>();
-  const form = ref<ComponentInstance<typeof UpdateForm>>();
-  const addMenu = ref<ComponentInstance<typeof AddMenu>>();
-  const { loading, setLoading } = useLoading(false);
-  const { loading: treeLoading, setLoading: setTreeLoading } = useLoading(true);
-  const { loading: addLoading, setLoading: setAddLoading } = useLoading();
-  const addModal = ref(false);
-  const router = useRouter();
-  const tabStore = useTabStore();
+const readonly = ref(false)
+const updateModal = ref(false)
+const DEFAULT_NODE = {
+  id: '',
+  label: '',
+  url: '',
+  component: '',
+  customIcon: '',
+  menuType: '',
+  parentId: 0,
+  order: 0,
+  locale: '',
+}
+const activeNode = ref<ITreeNodeData>()
+const form = ref<ComponentInstance<typeof UpdateForm>>()
+const addMenu = ref<ComponentInstance<typeof AddMenu>>()
+const { loading, setLoading } = useLoading(false)
+const { loading: treeLoading, setLoading: setTreeLoading } = useLoading(true)
+const { loading: addLoading, setLoading: setAddLoading } = useLoading()
+const addModal = ref(false)
+const router = useRouter()
+const tabStore = useTabStore()
 
-  const handleAddMenu = () => {
-    addModal.value = true;
-  };
-  const onAddMenuClose = () => {
-    addModal.value = false;
-  };
-  const onClickAdd = () => {
-    addMenu.value
-      .valid()
-      .then(() => {
-        const menuInfo = addMenu.value.getMenuInfo();
-        setAddLoading(true);
-        createMenu(menuInfo)
-          .then(() => {
-            TinyModal.message({
-              message: t('menuInfo.modal.add.success'),
-              status: 'success',
-            });
-            addModal.value = false;
-            return updateUserMenu();
-          })
-          .then(() => fetchMenu())
-          .catch((error) => {
-            if (error.response && error.response.data) {
-              const errorMessage = error.response.data.message || '未知错误';
-              TinyModal.message({
-                message: errorMessage,
-                status: 'error',
-              });
-            }
-          })
-          .finally(() => {
-            setAddLoading(false);
-          });
-      })
-      .catch(() => {});
-  };
-  const onClose = () => {
-    activeNode.value = DEFAULT_NODE;
-  };
-  const onUpdate = ( data : Node) => {
-    updateModal.value = true;
-    activeNode.value = data;
-    readonly.value = false;
-  };
-  const onCheck = (data : Node) => {
-    activeNode.value = data;
-    updateModal.value = true;
-    readonly.value = true;
-  };
-  const onCancel = () => {
-    activeNode.value = DEFAULT_NODE;
-    updateModal.value = false;
-  };
-  const flushTabs = () => {
-    const routePaths = router.getRoutes().map((routeItem) => routeItem.path);
-    const removeTabs = tabStore.data.filter(
-      ({ link }) => !routePaths.includes(link),
-    );
-    removeTabs.forEach(({ link }) => tabStore.delByLink(link));
-    if (!tabStore.data.includes(tabStore.current)) {
-      tabStore.$patch({
-        current: tabStore.data[0],
-      });
-    }
-  };
-  const onDelete = ( data : Node) => {
-
-    setTreeLoading(true);
-    const node = useDeepClone(data);
-    if (node.parentId === null) {
-      node.parentId = -1;
-    }
-  
-    deleteMenu(Number(node.id.toString()), node.parentId)
-      .then(() => {
-        TinyModal.message({
-          message: '删除成功',
-          status: 'success',
-        });
-        return fetchMenu();
-      })
-      .then(() => {
-        return updateUserMenu();
-      })
-      .then(() => {
-        flushTabs();
-      })
-      .catch((reason) => {
-        const error = reason;
-        if (error.response && error.response.data) {
-          const errorMessage = error.response.data.message || '未知错误';
+function handleAddMenu() {
+  addModal.value = true
+}
+function onAddMenuClose() {
+  addModal.value = false
+}
+function onClickAdd() {
+  addMenu.value
+    .valid()
+    .then(() => {
+      const menuInfo = addMenu.value.getMenuInfo()
+      setAddLoading(true)
+      createMenu(menuInfo)
+        .then(() => {
           TinyModal.message({
-            message: errorMessage,
-            status: 'error',
-          });
-        }
-      })
-      .finally(() => {
-        setTreeLoading(false);
-      });
-  };
-  const onConfirm = () => {
-    setLoading(true);
-    form.value
-      .valid()
-      .then(() => {
-        const menuInfo = form.value.getMenuInfo();
-        activeNode.value = {
-          ...DEFAULT_NODE,
-        };
-        if (menuInfo.id === menuInfo.parentId) {
-          TinyModal.message({
-            message: t('menuInfo.modal.message.error'),
-            status: 'error',
-          });
-          return;
-        }
-        updateMenu({
-          ...menuInfo,
-          path: menuInfo.url,
-          url: undefined,
-          name: menuInfo.oldLabel,
+            message: t('menuInfo.modal.add.success'),
+            status: 'success',
+          })
+          addModal.value = false
+          return updateUserMenu()
         })
-          .then(() => {
+        .then(() => fetchMenu())
+        .catch((error) => {
+          if (error.response && error.response.data) {
+            const errorMessage = error.response.data.message || '未知错误'
             TinyModal.message({
-              message: t('menuInfo.modal.edit.success'),
-              status: 'success',
-            });
-            setTimeout(() => {
-              router.go(0);
-            }, 200);
-            setTreeLoading(true);
-            return fetchMenu();
-          })
-          .then(() => updateUserMenu())
-          .catch((error) => {
-            if (error.response && error.response.data) {
-              const errorMessage = error.response.data.message || '未知错误';
-              TinyModal.message({
-                message: errorMessage,
-                status: 'error',
-              });
-            }
-          })
-          .finally(() => {
-            setLoading(false);
-            setTreeLoading(false);
-          });
-        updateModal.value = false;
-      })
-      .catch(() => {})
-      .finally(() => {
-        setLoading(false);
-      });
-  };
-  const fetchMenu = async () => {
-    const { data } = await getAllMenu();
-    rawMenuData.value = data;
-  };
-  const menuStore = useMenuStore();
-  const { reloadMenu } = inject<{ reloadMenu: () => void }>('RELOAD');
-  const updateUserMenu = async () => {
-    await flushRouter(router);
-    reloadMenu();
-    return menuStore.getMenuList();
-  };
-  const fetchLocalItems = () => {
-    getAllLocalItems(1, 0, 1).then(({ data }) => {
-      localeData.value = data.items.map((item) => {
-        return {
-          value: item.key,
-          label: t(item.key),
-        };
-      });
-    });
-  };
-
-  const { locale } = useI18n();
-  watch(locale, () => {
-    fetchLocalItems();
-  });
-
-  onMounted(async () => {
-    Promise.all([fetchMenu(), fetchLocalItems()]).finally(() => {
-      treeLoading.value = false;
-    });
-
-    const server = new WebMcpServer({
-      name: 'menu-management-mcp-server',
-      version: '1.0.0'
+              message: errorMessage,
+              status: 'error',
+            })
+          }
+        })
+        .finally(() => {
+          setAddLoading(false)
+        })
     })
-    const serverTransport = inject<any>('serverTransport')
+    .catch(() => {})
+}
+function onClose() {
+  activeNode.value = DEFAULT_NODE
+}
+function onUpdate(data: Node) {
+  updateModal.value = true
+  activeNode.value = data
+  readonly.value = false
+}
+function onCheck(data: Node) {
+  activeNode.value = data
+  updateModal.value = true
+  readonly.value = true
+}
+function onCancel() {
+  activeNode.value = DEFAULT_NODE
+  updateModal.value = false
+}
+function flushTabs() {
+  const routePaths = router.getRoutes().map(routeItem => routeItem.path)
+  const removeTabs = tabStore.data.filter(
+    ({ link }) => !routePaths.includes(link),
+  )
+  removeTabs.forEach(({ link }) => tabStore.delByLink(link))
+  if (!tabStore.data.includes(tabStore.current)) {
+    tabStore.$patch({
+      current: tabStore.data[0],
+    })
+  }
+}
+function onDelete(data: Node) {
+  setTreeLoading(true)
+  const node = useDeepClone(data)
+  if (node.parentId === null) {
+    node.parentId = -1
+  }
 
-    server.registerTool(
-      'add-menu',
-      {
-        title: '添加菜单',
-        description: '添加菜单',
-        inputSchema: {
-          name: z.string().describe('名称'),
-          order: z.number().describe('优先级').default(0),
-          parentId: z.number().describe('父菜单ID').optional(),
-          icon: z.string().describe('图标').optional().default(''),
-          component: z.string().describe('组件'),
-          path: z.string().describe('路径'),
-          locale: z.string().describe('国际化'),
-        }
-      },
-      async ({ name, order, parentId, icon, component, path, locale: menuLocale }) => {
-        handleAddMenu()
-        await sleep(1000)
-        addMenu.value.setMenuInfo({
-          name,
-          order,
-          parentId,
-          icon,
-          component,
-          menuType: "/",
-          path,
-          locale: menuLocale,
+  deleteMenu(Number(node.id.toString()), node.parentId)
+    .then(() => {
+      TinyModal.message({
+        message: '删除成功',
+        status: 'success',
+      })
+      return fetchMenu()
+    })
+    .then(() => {
+      return updateUserMenu()
+    })
+    .then(() => {
+      flushTabs()
+    })
+    .catch((reason) => {
+      const error = reason
+      if (error.response && error.response.data) {
+        const errorMessage = error.response.data.message || '未知错误'
+        TinyModal.message({
+          message: errorMessage,
+          status: 'error',
         })
-        await sleep(1000)
-        onClickAdd()
-        return { content: [{ type: 'text', text: `收到: ${name}` }] }
       }
-    )
+    })
+    .finally(() => {
+      setTreeLoading(false)
+    })
+}
+function onConfirm() {
+  setLoading(true)
+  form.value
+    .valid()
+    .then(() => {
+      const menuInfo = form.value.getMenuInfo()
+      activeNode.value = {
+        ...DEFAULT_NODE,
+      }
+      if (menuInfo.id === menuInfo.parentId) {
+        TinyModal.message({
+          message: t('menuInfo.modal.message.error'),
+          status: 'error',
+        })
+        return
+      }
+      updateMenu({
+        ...menuInfo,
+        path: menuInfo.url,
+        url: undefined,
+        name: menuInfo.oldLabel,
+      })
+        .then(() => {
+          TinyModal.message({
+            message: t('menuInfo.modal.edit.success'),
+            status: 'success',
+          })
+          setTimeout(() => {
+            router.go(0)
+          }, 200)
+          setTreeLoading(true)
+          return fetchMenu()
+        })
+        .then(() => updateUserMenu())
+        .catch((error) => {
+          if (error.response && error.response.data) {
+            const errorMessage = error.response.data.message || '未知错误'
+            TinyModal.message({
+              message: errorMessage,
+              status: 'error',
+            })
+          }
+        })
+        .finally(() => {
+          setLoading(false)
+          setTreeLoading(false)
+        })
+      updateModal.value = false
+    })
+    .catch(() => {})
+    .finally(() => {
+      setLoading(false)
+    })
+}
+async function fetchMenu() {
+  const { data } = await getAllMenu()
+  rawMenuData.value = data
+}
+const menuStore = useMenuStore()
+const { reloadMenu } = inject<{ reloadMenu: () => void }>('RELOAD')
+async function updateUserMenu() {
+  await flushRouter(router)
+  reloadMenu()
+  return menuStore.getMenuList()
+}
+function fetchLocalItems() {
+  getAllLocalItems(1, 0, 1).then(({ data }) => {
+    localeData.value = data.items.map((item) => {
+      return {
+        value: item.key,
+        label: t(item.key),
+      }
+    })
+  })
+}
 
-    await server.connect(serverTransport)
-  });
+const { locale } = useI18n()
+watch(locale, () => {
+  fetchLocalItems()
+})
+
+onMounted(async () => {
+  Promise.all([fetchMenu(), fetchLocalItems()]).finally(() => {
+    treeLoading.value = false
+  })
+
+  const server = new WebMcpServer({
+    name: 'menu-management-mcp-server',
+    version: '1.0.0',
+  })
+  const serverTransport = inject<any>('serverTransport')
+
+  server.registerTool(
+    'add-menu',
+    {
+      title: '添加菜单',
+      description: '添加菜单',
+      inputSchema: {
+        name: z.string().describe('名称'),
+        order: z.number().describe('优先级').default(0),
+        parentId: z.number().describe('父菜单ID').optional(),
+        icon: z.string().describe('图标').optional().default(''),
+        component: z.string().describe('组件'),
+        path: z.string().describe('路径'),
+        locale: z.string().describe('国际化'),
+      },
+    },
+    async ({ name, order, parentId, icon, component, path, locale: menuLocale }) => {
+      handleAddMenu()
+      await sleep(1000)
+      addMenu.value.setMenuInfo({
+        name,
+        order,
+        parentId,
+        icon,
+        component,
+        menuType: '/',
+        path,
+        locale: menuLocale,
+      })
+      await sleep(1000)
+      onClickAdd()
+      return { content: [{ type: 'text', text: `收到: ${name}` }] }
+    },
+  )
+
+  await server.connect(serverTransport)
+})
 </script>
 
 <template>
   <div class="tiny-fullscreen-scroll">
     <div class="tiny-fullscreen-wrapper">
       <div class="menu-add-btn">
-        <tiny-button
+        <TinyButton
           v-permission="'menu::add'"
           type="primary"
           @click="handleAddMenu"
-          >{{ $t('menuInfo.modal.title.add') }}</tiny-button
         >
+          {{ $t('menuInfo.modal.title.add') }}
+        </TinyButton>
       </div>
       <menu-tree
         v-loading="treeLoading"
@@ -311,7 +315,7 @@ import { sleep } from '@/utils/base-utils';
         @check="onCheck"
         @delete="onDelete"
       />
-      <tiny-modal
+      <TinyModal
         v-model="addModal"
         show-footer
         resize
@@ -320,26 +324,29 @@ import { sleep } from '@/utils/base-utils';
         :title="$t('menuInfo.modal.title.add')"
         @close="onAddMenuClose"
       >
-        <add-menu
+        <AddMenu
           v-if="addModal"
           ref="addMenu"
           :menus="i18nMenuData"
           :locales="localeData"
         />
         <template #footer>
-          <tiny-button round  @click="onAddMenuClose">{{
-            $t('menu.btn.cancel')
-          }}</tiny-button>
-          <tiny-button
+          <TinyButton round @click="onAddMenuClose">
+            {{
+              $t('menu.btn.cancel')
+            }}
+          </TinyButton>
+          <TinyButton
             type="primary"
             round
             :loading="addLoading"
             @click="onClickAdd"
-            >{{ $t('menu.btn.confirm') }}</tiny-button
           >
+            {{ $t('menu.btn.confirm') }}
+          </TinyButton>
         </template>
-      </tiny-modal>
-      <tiny-modal
+      </TinyModal>
+      <TinyModal
         v-if="!readonly"
         v-model="updateModal"
         show-footer
@@ -350,7 +357,7 @@ import { sleep } from '@/utils/base-utils';
         :title="$t('menuInfo.modal.title.update')"
         @close="onClose"
       >
-        <update-form
+        <UpdateForm
           v-if="updateModal"
           ref="form"
           :node="activeNode"
@@ -360,19 +367,22 @@ import { sleep } from '@/utils/base-utils';
         />
 
         <template #footer>
-          <tiny-button
+          <TinyButton
             v-if="!readonly"
             type="primary"
             :loading="loading"
             @click="onConfirm"
-            >{{ $t('menu.btn.confirm') }}</tiny-button
           >
-          <tiny-button v-if="!readonly" @click="onCancel">{{
-            $t('menu.btn.cancel')
-          }}</tiny-button>
+            {{ $t('menu.btn.confirm') }}
+          </TinyButton>
+          <TinyButton v-if="!readonly" @click="onCancel">
+            {{
+              $t('menu.btn.cancel')
+            }}
+          </TinyButton>
         </template>
-      </tiny-modal>
-      <tiny-modal
+      </TinyModal>
+      <TinyModal
         v-if="readonly"
         v-model="updateModal"
         show-footer
@@ -381,7 +391,7 @@ import { sleep } from '@/utils/base-utils';
         :title="$t('menuInfo.modal.title.info')"
         @close="onClose"
       >
-        <update-form
+        <UpdateForm
           v-if="updateModal"
           ref="form"
           :node="activeNode"
@@ -389,41 +399,41 @@ import { sleep } from '@/utils/base-utils';
           :locale-data="localeData"
           :readonly="readonly"
         />
-      </tiny-modal>
+      </TinyModal>
     </div>
   </div>
 </template>
 
 <style scoped lang="less">
   #contain {
-    height: 100%;
-    padding: 15px;
-    overflow: hidden;
+  height: 100%;
+  padding: 15px;
+  overflow: hidden;
+}
+
+.menu-add-btn {
+  padding: 0px 0 24px 0;
+}
+
+.table {
+  padding-bottom: 20px;
+  background-color: #fff;
+}
+
+.operation {
+  &-delete {
+    padding-right: 10px;
+    color: red;
   }
 
-  .menu-add-btn {
-    padding: 0px 0 24px 0;
+  &-update {
+    padding-right: 5px;
+    color: #1890ff;
   }
 
-  .table {
-    padding-bottom: 20px;
-    background-color: #fff;
+  &-info {
+    padding-right: 10px;
+    color: orange;
   }
-
-  .operation {
-    &-delete {
-      padding-right: 10px;
-      color: red;
-    }
-
-    &-update {
-      padding-right: 5px;
-      color: #1890ff;
-    }
-
-    &-info {
-      padding-right: 10px;
-      color: orange;
-    }
-  }
+}
 </style>

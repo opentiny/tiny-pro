@@ -1,11 +1,51 @@
+<script lang="ts" setup>
+import { ref } from 'vue'
+
+interface CompProps {
+  options?: {
+    status: any[]
+    department: any[]
+  }
+}
+
+defineProps<CompProps>()
+
+const gridTable = ref({
+  data: [
+    {
+      name: '黄芊义',
+      number: 'a00101227',
+      department: '1',
+      status: 'running',
+      runningStatus: 'finished',
+      createTime: new Date(),
+    },
+  ],
+})
+
+function defaultRender(h, { row, column }) {
+  return row[column.property] ?? '--'
+}
+
+function resetGrid() {
+  gridTable.value.data = []
+}
+
+defineExpose({
+  resetGrid,
+})
+</script>
+
 <template lang="">
   <div>
     <div class="mb-4">
-      <tiny-button @click="addRow">{{
-        $t('advanceForm.form.process.add')
-      }}</tiny-button>
+      <TinyButton @click="addRow">
+        {{
+          $t('advanceForm.form.process.add')
+        }}
+      </TinyButton>
     </div>
-    <tiny-grid
+    <TinyGrid
       ref="gridRef"
       :data="gridTable.data"
       :edit-config="{
@@ -16,23 +56,23 @@
       }"
       align="center"
     >
-      <tiny-grid-column
+      <TinyGridColumn
         :title="$t('advanceForm.form.process.name')"
         field="name"
         min-width="120px"
         :show-icon="false"
         :editor="{ component: TinyInput, autoselect: true }"
         :renderer="defaultRender"
-      ></tiny-grid-column>
-      <tiny-grid-column
+      />
+      <TinyGridColumn
         :title="$t('advanceForm.form.process.number')"
         field="number"
         min-width="120px"
         :show-icon="false"
         :editor="{ component: TinyInput, autoselect: true }"
         :renderer="defaultRender"
-      ></tiny-grid-column>
-      <tiny-grid-column
+      />
+      <TinyGridColumn
         :title="$t('advanceForm.form.process.department')"
         field="department"
         min-width="120px"
@@ -50,10 +90,10 @@
             :data="data"
             :options="options.department"
             field="department"
-          ></SelectRender>
+          />
         </template>
-      </tiny-grid-column>
-      <tiny-grid-column
+      </TinyGridColumn>
+      <TinyGridColumn
         :title="$t('advanceForm.form.process.status')"
         field="status"
         :show-icon="false"
@@ -67,14 +107,14 @@
         }"
       >
         <template #default="data">
-          <selectRender
+          <SelectRender
             :data="data"
             :options="options.status"
             field="status"
-          ></selectRender>
+          />
         </template>
-      </tiny-grid-column>
-      <tiny-grid-column
+      </TinyGridColumn>
+      <TinyGridColumn
         :title="$t('advanceForm.form.process.runningStatus')"
         field="runningStatus"
         :show-icon="false"
@@ -87,9 +127,8 @@
           },
         }"
         :renderer="{ component: StatusRender }"
-      >
-      </tiny-grid-column>
-      <tiny-grid-column
+      />
+      <TinyGridColumn
         :title="$t('advanceForm.form.process.createTime')"
         field="createTime"
         :show-icon="false"
@@ -102,8 +141,8 @@
           },
         }"
         format-text="longDateTime"
-      ></tiny-grid-column>
-      <tiny-grid-column
+      />
+      <TinyGridColumn
         :title="$t('advanceForm.form.process.operation')"
         field="operation"
         min-width="120px"
@@ -114,18 +153,16 @@
             class="mr-2"
             @click="saveRow(data.row)"
           >
-            <IconSave class="operation-icon"></IconSave
-            >{{ $t('advanceForm.form.process.save') }}
+            <IconSave class="operation-icon" />{{ $t('advanceForm.form.process.save') }}
           </a>
           <a
             v-if="!$refs.gridRef.hasActiveRow(data.row)"
             class="mr-2"
             @click="editRow(data.row)"
           >
-            <IconEdit class="operation-icon"></IconEdit
-            >{{ $t('advanceForm.form.process.edit') }}
+            <IconEdit class="operation-icon" />{{ $t('advanceForm.form.process.edit') }}
           </a>
-          <tiny-popconfirm
+          <TinyPopconfirm
             :title="$t('advanceForm.form.delete.title')"
             type="warning"
             trigger="click"
@@ -133,109 +170,22 @@
           >
             <template #reference>
               <a class="operation">
-                <IconDel class="operation-icon"></IconDel
-                >{{ $t('advanceForm.form.process.delete') }}
+                <IconDel class="operation-icon" />{{ $t('advanceForm.form.process.delete') }}
               </a>
             </template>
-          </tiny-popconfirm>
+          </TinyPopconfirm>
         </template>
-      </tiny-grid-column>
+      </TinyGridColumn>
       <template #empty>
         <span>{{ $t('advanceForm.form.nodata') }}</span>
       </template>
-    </tiny-grid>
+    </TinyGrid>
   </div>
 </template>
-<script lang="ts" setup>
-  import {
-    TinyInput,
-    TinySelect,
-    TinyGrid,
-    TinyGridColumn,
-    TinyButton,
-    TinyPopconfirm,
-    Modal,
-    TinyDatePicker,
-    TinyPager,
-    TinyTag,
-  } from '@opentiny/vue';
-  import { iconSave, iconDel, iconEdit } from '@opentiny/vue-icon';
-  import { t } from '@opentiny/vue-locale';
-  import { useDateFormat } from '@vueuse/core';
-  import { ref } from 'vue';
-  import StatusRender from './status-render.vue';
-  import SelectRender from './select-render.vue';
 
-  defineProps({
-    options: {
-      type: {
-        status: [],
-        department: [],
-      },
-      default: {},
-    },
-  });
-
-  const gridRef = ref('gridRef');
-  const IconDel = iconDel();
-  const IconSave = iconSave();
-  const IconEdit = iconEdit();
-
-  const gridTable = ref({
-    data: [
-      {
-        name: '黄芊义',
-        number: 'a00101227',
-        department: '1',
-        status: 'running',
-        runningStatus: 'finished',
-        createTime: new Date(),
-      },
-    ],
-  });
-
-  const defaultRender = (h, { row, column }) => {
-    return row[column.property] ?? '--';
-  };
-
-  const addRow = () => {
-    if (gridRef.value.getActiveRow()) {
-      Modal.message({
-        message: t('advanceForm.form.validError.add'),
-        status: 'warning',
-      });
-
-      return;
-    }
-
-    gridRef.value.insert({}).then((res) => {
-      gridRef.value.setActiveRow(res.row);
-    });
-  };
-
-  const saveRow = (row) => {
-    gridRef.value.clearActived();
-  };
-
-  const deleteRow = (row) => {
-    gridRef.value.remove(row);
-  };
-
-  const editRow = (row) => {
-    gridRef.value.setActiveRow(row);
-  };
-
-  const resetGrid = () => {
-    gridTable.value.data = [];
-  };
-
-  defineExpose({
-    resetGrid,
-  });
-</script>
 <style scoped lang="less">
   .operation-icon {
-    margin-right: 3px;
-    fill: currentColor;
-  }
+  margin-right: 3px;
+  fill: currentColor;
+}
 </style>

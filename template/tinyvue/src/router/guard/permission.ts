@@ -1,36 +1,37 @@
-import type { Router, LocationQueryRaw } from 'vue-router';
-import NProgress from 'nprogress'; // progress bar
-import { isLogin } from '@/utils/auth';
-import { Modal } from '@opentiny/vue';
-import { nextTick } from 'vue';
-import { t } from '@opentiny/vue-locale';
+import type { LocationQueryRaw, Router } from 'vue-router'
+import { Modal } from '@opentiny/vue'
+import { t } from '@opentiny/vue-locale'
+import NProgress from 'nprogress' // progress bar
+import { nextTick } from 'vue'
+import { isLogin } from '@/utils/auth'
 
 export default function setupPermissionGuard(router: Router) {
   router.beforeEach(async (to, from, next) => {
-    NProgress.start();
+    NProgress.start()
     if (!isLogin()) {
       if (to.name === 'login') {
-        next();
-        NProgress.done();
-        return;
+        next()
+        NProgress.done()
+        return
       }
-      await nextTick();
+      await nextTick()
       Modal.message({
         message: t('http.error.TokenExpire'),
         status: 'error',
-      });
-      await nextTick();
+      })
+      await nextTick()
       next({
         name: 'login',
         query: {
           redirect: to.name,
           ...to.query,
         } as LocationQueryRaw,
-      });
-      NProgress.done();
-    } else {
-      next();
-      NProgress.done();
+      })
+      NProgress.done()
     }
-  });
+    else {
+      next()
+      NProgress.done()
+    }
+  })
 }

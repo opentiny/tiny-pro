@@ -1,20 +1,20 @@
 {
   "compilerOptions": {
     "target": "ES2020",
+    "jsx": "preserve",
+    "lib": ["es2020", "dom"],
+    "baseUrl": ".",
     "module": "ES2020",
     "moduleResolution": "node",
-    "strict": false,
-    "jsx": "preserve",
-    "sourceMap": true,
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
     },
-    "lib": ["es2020", "dom"],
-    "skipLibCheck": true,
-    "types": ["vite/client", "resize-observer-browser"]
+    "resolveJsonModule": true,
+    "types": ["vite/client", "resize-observer-browser"],
+    "strict": false,
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true
   },
   "include": ["src/**/*", "src/**/*.vue"],
   "exclude": ["node_modules"]

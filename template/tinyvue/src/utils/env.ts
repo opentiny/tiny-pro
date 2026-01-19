@@ -1,3 +1,5 @@
-const debug = process.env.NODE_ENV !== 'production';
+import process from 'node:process'
 
-export default debug;
+const debug = process.env.NODE_ENV !== 'production'
+
+export default debug

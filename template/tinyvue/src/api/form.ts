@@ -1,28 +1,28 @@
-import axios from 'axios';
+import axios from 'axios'
 
 export interface PersonalModel {
-  name: string;
-  sex: string;
-  phone: string;
-  birthDay: string;
-  country: string;
-  email: string;
-  textarea: string;
+  name: string
+  sex: string
+  phone: string
+  birthDay: string
+  country: string
+  email: string
+  textarea: string
 }
 export interface CompanyInfoModel {
-  phone: string;
-  email: string;
-  textarea: string;
-  sw: boolean;
-  select: string;
-  address: string;
+  phone: string
+  email: string
+  textarea: string
+  sw: boolean
+  select: string
+  address: string
 }
 
-export type UnitStepModel = PersonalModel & CompanyInfoModel;
+export type UnitStepModel = PersonalModel & CompanyInfoModel
 
 // 获取base表单的初始数据选项
 export function getBaseData() {
-  return axios.get(`${import.meta.env.VITE_MOCK_SERVER_HOST}/api/base/getdata`);
+  return axios.get(`${import.meta.env.VITE_MOCK_SERVER_HOST}/api/base/getdata`)
 }
 
 // 表单的数据提交&&校验
@@ -30,17 +30,17 @@ export function submitStepForm(data: UnitStepModel) {
   return axios.post(
     `${import.meta.env.VITE_MOCK_SERVER_HOST}/api/channel-form/submit`,
     { data },
-  );
+  )
 }
 
 // 获取step表单的初始数据选项
 export function getStepData() {
-  return axios.get(`${import.meta.env.VITE_MOCK_SERVER_HOST}/api/step/getdata`);
+  return axios.get(`${import.meta.env.VITE_MOCK_SERVER_HOST}/api/step/getdata`)
 }
 
 // 获取advance表单的初始数据选项
 export function getAdvanceData() {
   return axios.get(
     `${import.meta.env.VITE_MOCK_SERVER_HOST}/api/advance/getdata`,
-  );
+  )
 }

@@ -106,7 +106,6 @@ const DarkTheme = {
     'tv-base-color-brand-11': '#CAE3FD',
     'tv-base-color-brand-12': '#F2F9FF',
 
-
     /* 1.2 中立色 */
 
     /* 公用灰色系，用于文本、图标、线条、背景色 */
@@ -138,7 +137,6 @@ const DarkTheme = {
     'tv-base-color-success-11': '#D8EED1',
     'tv-base-color-success-12': '#F3FFF0',
 
-
     'tv-base-color-error-1': '#330002', //
     'tv-base-color-error-2': '#4D0003', // 错误-边框色 /背景色 /错误校验背景色,设计稿用了这个#FCE3E1，但不在色阶中
     'tv-base-color-error-3': '#700505', // 错误-图标色、校验边框色/、悬浮菜单背景色
@@ -166,7 +164,6 @@ const DarkTheme = {
     'tv-base-color-warn-12': '#FFF8E8',
     'tv-base-color-warn-secondary-1': '#ffb700', // 次要告警色 黄色系
 
-
     'tv-base-color-info-1': '#003303',
     'tv-base-color-info-2': '#00124D', // 提示-背景色 / 边框色
     'tv-base-color-info-3': '#082677', // 开关组件“开”禁用背景色
@@ -187,71 +184,69 @@ const PeachesTheme = {
   name: 'PeachesTheme',
   data: {
     /* 品牌主色 */
-  'tv-base-color-brand': '#ec66ab', // 主色黑/链接颜色
+    'tv-base-color-brand': '#ec66ab', // 主色黑/链接颜色
 
-  'tv-base-color-brand-1': '#ec66ab',
-  'tv-base-color-brand-2': '#f3dfe9', // 日期选择悬浮背景色 /提示-背景色
-  'tv-base-color-brand-3': '#f3dfe9', //  浅背景-悬浮色，开关组件“开”禁用背景色
-  'tv-base-color-brand-4': '#ec66ab',
-  'tv-base-color-brand-5': '#ec66ab',
-  'tv-base-color-brand-6': '#ec66ab', // 辅助色， 文字按钮色、文字按钮悬浮色 /单选框选中悬浮/聚焦/激活小圆点填充色和边框色
-  'tv-base-color-brand-7': '#f3dfe9;',
-  'tv-base-color-brand-8': '#f3dfe9;',
-  'tv-tree-menu-node-current-text-color': '#fff',
+    'tv-base-color-brand-1': '#ec66ab',
+    'tv-base-color-brand-2': '#f3dfe9', // 日期选择悬浮背景色 /提示-背景色
+    'tv-base-color-brand-3': '#f3dfe9', //  浅背景-悬浮色，开关组件“开”禁用背景色
+    'tv-base-color-brand-4': '#ec66ab',
+    'tv-base-color-brand-5': '#ec66ab',
+    'tv-base-color-brand-6': '#ec66ab', // 辅助色， 文字按钮色、文字按钮悬浮色 /单选框选中悬浮/聚焦/激活小圆点填充色和边框色
+    'tv-base-color-brand-7': '#f3dfe9;',
+    'tv-base-color-brand-8': '#f3dfe9;',
+    'tv-tree-menu-node-current-text-color': '#fff',
 
-  /* 1.2 中立色 */
+    /* 1.2 中立色 */
 
-  /* 公用灰色系，用于文本、图标、线条、背景色 */
-  'tv-base-color-common-1': '#ffffff', // 顶部导航背景色、 顶部导航下拉背景色/次要按钮-背景色、次要按钮-hover/Focus/active背景色、输入框背景色
-  'tv-base-color-common-2': '#f1f1f1', // 新区域组件-悬浮背景色
-  'tv-base-color-common-3': '#f3dfe9', // 通用背景-页面背景色/ 选块默认色/滑块背景色/分页悬浮色、下拉、列表、悬浮背景、表头背景、下拉菜单、选块选中色
-  'tv-base-color-common-4': '#e4e7ed', // 白色背景分割线 /禁用背景/小表格中禁用背景/支付列表中禁用背景、顶部导航下拉悬浮背景色
-  'tv-base-color-common-5': '#e6e6e6', // 灰色标签背景色/轮播箭头悬浮色
-  'tv-base-color-common-6': '#dbdbdb', // 开关组件“关”禁用背景色/ 禁用描边/ 灰色背景分割线
-  'tv-base-color-common-7': '#bfbfbf', // 选块悬浮色/页签禁用文字色/边框色（如下拉、输入框）/文字禁用/禁用图标
-  'tv-base-color-common-8': '#909399', // 弱化信息、说明文字
-  'tv-base-color-common-9': '#999999', // 次要信息/图标默认/主色悬浮色、链接悬浮色/主要按钮-hover/Focus背景色
-  'tv-base-color-common-10': '#333333',
-  'tv-base-color-common-11': '#54657e', // 正文主色，重要信息、标题颜色、输入类文本颜色、导航栏文字图标/主要按钮-背景色
-  'tv-base-color-common-12': '#474c5e',
-  'tv-base-color-common-13': '#2e3243',
-  'tv-base-color-common-14': '#000000',
-  'tv-base-color-common-15': '#d9d9d9',
+    /* 公用灰色系，用于文本、图标、线条、背景色 */
+    'tv-base-color-common-1': '#ffffff', // 顶部导航背景色、 顶部导航下拉背景色/次要按钮-背景色、次要按钮-hover/Focus/active背景色、输入框背景色
+    'tv-base-color-common-2': '#f1f1f1', // 新区域组件-悬浮背景色
+    'tv-base-color-common-3': '#f3dfe9', // 通用背景-页面背景色/ 选块默认色/滑块背景色/分页悬浮色、下拉、列表、悬浮背景、表头背景、下拉菜单、选块选中色
+    'tv-base-color-common-4': '#e4e7ed', // 白色背景分割线 /禁用背景/小表格中禁用背景/支付列表中禁用背景、顶部导航下拉悬浮背景色
+    'tv-base-color-common-5': '#e6e6e6', // 灰色标签背景色/轮播箭头悬浮色
+    'tv-base-color-common-6': '#dbdbdb', // 开关组件“关”禁用背景色/ 禁用描边/ 灰色背景分割线
+    'tv-base-color-common-7': '#bfbfbf', // 选块悬浮色/页签禁用文字色/边框色（如下拉、输入框）/文字禁用/禁用图标
+    'tv-base-color-common-8': '#909399', // 弱化信息、说明文字
+    'tv-base-color-common-9': '#999999', // 次要信息/图标默认/主色悬浮色、链接悬浮色/主要按钮-hover/Focus背景色
+    'tv-base-color-common-10': '#333333',
+    'tv-base-color-common-11': '#54657e', // 正文主色，重要信息、标题颜色、输入类文本颜色、导航栏文字图标/主要按钮-背景色
+    'tv-base-color-common-12': '#474c5e',
+    'tv-base-color-common-13': '#2e3243',
+    'tv-base-color-common-14': '#000000',
+    'tv-base-color-common-15': '#d9d9d9',
 
-  /* 1.4 功能色 */
-  'tv-base-color-success-1': '#f6ffed',
-  'tv-base-color-success-2': '#daf2bb',
-  'tv-base-color-success-3': '#b9e683', // 成功-按钮active、hover 颜色
-  'tv-base-color-success-4': '#95de64',
-  'tv-base-color-success-5': '#73d13d',
-  'tv-base-color-success-6': '#52c41a', // 成功-背景色/ 图标色/文本色 /进度条当前进度背景色
-  'tv-base-color-success-7': '#389e0d',
+    /* 1.4 功能色 */
+    'tv-base-color-success-1': '#f6ffed',
+    'tv-base-color-success-2': '#daf2bb',
+    'tv-base-color-success-3': '#b9e683', // 成功-按钮active、hover 颜色
+    'tv-base-color-success-4': '#95de64',
+    'tv-base-color-success-5': '#73d13d',
+    'tv-base-color-success-6': '#52c41a', // 成功-背景色/ 图标色/文本色 /进度条当前进度背景色
+    'tv-base-color-success-7': '#389e0d',
 
+    'tv-base-color-error-1': '#fff1f0', //
+    'tv-base-color-error-2': '#fce2e0', // 错误-边框色 /背景色 /错误校验背景色,
+    'tv-base-color-error-3': '#faa7a3', // 错误-图标色、校验边框色/、悬浮菜单背景色
+    'tv-base-color-error-4': '#ff7875', //
+    'tv-base-color-error-5': '#ff4d4f', //
+    'tv-base-color-error-6': '#f5222d', // 错误-文本色/交易金额色 / 紧急告警色
+    'tv-base-color-error-7': '#cf1322',
 
-  'tv-base-color-error-1': '#fff1f0', //
-  'tv-base-color-error-2': '#fce2e0', // 错误-边框色 /背景色 /错误校验背景色,
-  'tv-base-color-error-3': '#faa7a3', // 错误-图标色、校验边框色/、悬浮菜单背景色
-  'tv-base-color-error-4': '#ff7875', //
-  'tv-base-color-error-5': '#ff4d4f', //
-  'tv-base-color-error-6': '#f5222d', // 错误-文本色/交易金额色 / 紧急告警色
-  'tv-base-color-error-7': '#cf1322',
+    'tv-base-color-warn-1': '#fffbe6',
+    'tv-base-color-warn-2': '#ffebd1', // 告警-背景色/边框色（浅）
+    'tv-base-color-warn-3': '#fcd5a4',
+    'tv-base-color-warn-4': '#ffd666',
+    'tv-base-color-warn-5': '#ffc53d',
+    'tv-base-color-warn-6': '#faad14', // 告警-图标色/深色背景 /重要告警色
 
+    'tv-base-color-warn-secondary-1': '#ffb700', // 次要告警色 黄色系
 
-  'tv-base-color-warn-1': '#fffbe6',
-  'tv-base-color-warn-2': '#ffebd1', // 告警-背景色/边框色（浅）
-  'tv-base-color-warn-3': '#fcd5a4',
-  'tv-base-color-warn-4': '#ffd666',
-  'tv-base-color-warn-5': '#ffc53d',
-  'tv-base-color-warn-6': '#faad14', // 告警-图标色/深色背景 /重要告警色
-
-  'tv-base-color-warn-secondary-1': '#ffb700', // 次要告警色 黄色系
-
-  'tv-base-color-info-1': '#e6f7ff',
-  'tv-base-color-info-2': '#deecff', // 提示-背景色 / 边框色
-  'tv-base-color-info-3': '#91d5ff', // 开关组件“开”禁用背景色
-  'tv-base-color-info-4': '#7eb7fc',
-  'tv-base-color-info-5': '#40a9ff',
-  'tv-base-color-info-6': '#1890ff', //  提示-图标色 / 文本色
+    'tv-base-color-info-1': '#e6f7ff',
+    'tv-base-color-info-2': '#deecff', // 提示-背景色 / 边框色
+    'tv-base-color-info-3': '#91d5ff', // 开关组件“开”禁用背景色
+    'tv-base-color-info-4': '#7eb7fc',
+    'tv-base-color-info-5': '#40a9ff',
+    'tv-base-color-info-6': '#1890ff', //  提示-图标色 / 文本色
   },
 }
 
@@ -304,21 +299,20 @@ const VioletTheme = {
     'tv-base-color-success-10': '#088c58',
     'tv-base-color-success-11': '#007a45',
 
-
-    'tv-base-color-error-1': '#ffeceb', // 
+    'tv-base-color-error-1': '#ffeceb', //
     'tv-base-color-error-2': '#ffd7d6', //  错误-边框色 /背景色 /错误校验背景色
     'tv-base-color-error-3': '#ffbab8', //  错误-图标色、校验边框色/、悬浮菜单背景色
-    'tv-base-color-error-4': '#ffa6a3', // 
-    'tv-base-color-error-5': '#ff8985', // 
+    'tv-base-color-error-4': '#ffa6a3', //
+    'tv-base-color-error-5': '#ff8985', //
     'tv-base-color-error-6': '#f66e6a', //  错误-文本色/交易金额色 / 紧急告警色
-    'tv-base-color-error-7': '#df514e', // 
-    'tv-base-color-error-8': '#c83737', // 
-    'tv-base-color-error-9': '#b02121', // 
-    'tv-base-color-error-10': '#971111', // 
-    'tv-base-color-error-11': '#810404', // 
-    'tv-base-color-error-12': '#c7000b', // 
+    'tv-base-color-error-7': '#df514e', //
+    'tv-base-color-error-8': '#c83737', //
+    'tv-base-color-error-9': '#b02121', //
+    'tv-base-color-error-10': '#971111', //
+    'tv-base-color-error-11': '#810404', //
+    'tv-base-color-error-12': '#c7000b', //
     'tv-base-color-error-13': '#d64a52', //  错误-背景色/错误校验背景色
-    'tv-base-color-error-14': '#b12220', // 
+    'tv-base-color-error-14': '#b12220', //
 
     'tv-base-color-warn-1': '#fff3e8',
     'tv-base-color-warn-2': '#ffe1c7', // 告警-背景色/边框色（浅）
@@ -365,7 +359,7 @@ const DeepnessTheme = {
     'tv-tree-menu-node-current-text-color': '#fff',
     'tv-tree-menu-square-left-border-color': '#fff',
     'tv-tree-menu-node-hover-bg-color': '#252b3a',
-    'tv-base-common-title-color': '#272727'
+    'tv-base-common-title-color': '#272727',
   },
 }
 
@@ -385,7 +379,7 @@ const Theme6 = {
     'tv-tree-menu-square-left-border-color': '#fff',
     'tv-tree-menu-node-hover-bg-color': '#343a40',
     'tv-base-common-title-color': '#272727',
-    'tv-base-icon-color': '#fff'
+    'tv-base-icon-color': '#fff',
   },
 }
 
@@ -405,7 +399,7 @@ const Theme7 = {
     'tv-tree-menu-square-left-border-color': '#fff',
     'tv-tree-menu-node-hover-bg-color': '#25316c',
     'tv-base-common-title-color': '#272727',
-    'tv-base-icon-color': '#fff'
+    'tv-base-icon-color': '#fff',
   },
 }
 
@@ -425,7 +419,7 @@ const Theme8 = {
     'tv-tree-menu-square-left-border-color': '#fff',
     'tv-tree-menu-node-hover-bg-color': '#673ab7',
     'tv-base-common-title-color': '#272727',
-    'tv-base-icon-color': '#fff'
+    'tv-base-icon-color': '#fff',
   },
 }
 
@@ -445,7 +439,7 @@ const Theme9 = {
     'tv-tree-menu-square-left-border-color': '#fff',
     'tv-tree-menu-node-hover-bg-color': '#4f7dff',
     'tv-base-common-title-color': '#272727',
-    'tv-base-icon-color': '#fff'
+    'tv-base-icon-color': '#fff',
   },
 }
 
@@ -465,7 +459,7 @@ const Theme10 = {
     'tv-tree-menu-square-left-border-color': '#fff',
     'tv-tree-menu-node-hover-bg-color': '#4daf77',
     'tv-base-common-title-color': '#272727',
-    'tv-base-icon-color': '#fff'
+    'tv-base-icon-color': '#fff',
   },
 }
 
@@ -485,7 +479,7 @@ const Theme11 = {
     'tv-tree-menu-square-left-border-color': '#fff',
     'tv-tree-menu-node-hover-bg-color': '#5faa15',
     'tv-base-common-title-color': '#272727',
-    'tv-base-icon-color': '#fff'
+    'tv-base-icon-color': '#fff',
   },
 }
 
@@ -505,7 +499,7 @@ const Theme12 = {
     'tv-tree-menu-square-left-border-color': '#fff',
     'tv-tree-menu-node-hover-bg-color': '#ff6a0b',
     'tv-base-common-title-color': '#272727',
-    'tv-base-icon-color': '#fff'
+    'tv-base-icon-color': '#fff',
   },
 }
 
@@ -525,7 +519,7 @@ const Theme13 = {
     'tv-tree-menu-square-left-border-color': '#fff',
     'tv-tree-menu-node-hover-bg-color': '#f36b7f',
     'tv-base-common-title-color': '#272727',
-    'tv-base-icon-color': '#fff'
+    'tv-base-icon-color': '#fff',
   },
 }
 
@@ -546,7 +540,7 @@ const Theme14 = {
     'tv-button-primary-normal-bg-color': '#edf2f6',
     'tv-button-primary-text-color': '#000',
     'tv-base-common-title-color': '#000',
-    'tv-base-icon-color': '#252b3a'
+    'tv-base-icon-color': '#252b3a',
   },
 }
 
@@ -567,7 +561,7 @@ const Theme15 = {
     'tv-button-primary-normal-bg-color': '#e5e8f5',
     'tv-button-primary-text-color': '#000',
     'tv-base-common-title-color': '#000',
-    'tv-base-icon-color': '#252b3a'
+    'tv-base-icon-color': '#252b3a',
   },
 }
 
@@ -589,7 +583,7 @@ const Theme16 = {
     'tv-button-primary-text-color': '#000',
     'tv-tree-menu-square-left-border-color': '#000',
     'tv-base-common-title-color': '#000',
-    'tv-base-icon-color': '#252b3a'
+    'tv-base-icon-color': '#252b3a',
   },
 }
 
@@ -611,7 +605,7 @@ const Theme17 = {
     'tv-button-primary-text-color': '#000',
     'tv-tree-menu-square-left-border-color': '#000',
     'tv-base-common-title-color': '#000',
-    'tv-base-icon-color': '#252b3a'
+    'tv-base-icon-color': '#252b3a',
   },
 }
 
@@ -633,7 +627,7 @@ const Theme18 = {
     'tv-button-primary-text-color': '#000',
     'tv-tree-menu-square-left-border-color': '#000',
     'tv-base-common-title-color': '#000',
-    'tv-base-icon-color': '#252b3a'
+    'tv-base-icon-color': '#252b3a',
   },
 }
 
@@ -655,7 +649,7 @@ const Theme19 = {
     'tv-button-primary-text-color': '#000',
     'tv-tree-menu-square-left-border-color': '#000',
     'tv-base-common-title-color': '#000',
-    'tv-base-icon-color': '#252b3a'
+    'tv-base-icon-color': '#252b3a',
   },
 }
 
@@ -677,7 +671,7 @@ const Theme20 = {
     'tv-button-primary-text-color': '#000',
     'tv-tree-menu-square-left-border-color': '#000',
     'tv-base-common-title-color': '#000',
-    'tv-base-icon-color': '#252b3a'
+    'tv-base-icon-color': '#252b3a',
   },
 }
 
@@ -699,7 +693,7 @@ const Theme21 = {
     'tv-button-primary-text-color': '#000',
     'tv-tree-menu-square-left-border-color': '#000',
     'tv-base-common-title-color': '#000',
-    'tv-base-icon-color': '#252b3a'
+    'tv-base-icon-color': '#252b3a',
   },
 }
 const SwitchlightColor: any = [
@@ -805,13 +799,12 @@ const SwitchdarkColor: any = [
 ]
 
 export {
+  DarkTheme,
+  DeepnessTheme,
   DefaultTheme,
   PeachesTheme,
-  VioletTheme,
-  DeepnessTheme,
   SwitchdarkColor,
   SwitchlightColor,
-  DarkTheme,
   Theme6,
   Theme7,
   Theme8,
@@ -820,4 +813,5 @@ export {
   Theme11,
   Theme12,
   Theme13,
+  VioletTheme,
 }

@@ -1,12 +1,12 @@
-import { createMockServer } from '@gaonengwww/mock-server';
-import list from './list';
-import froms from '../views/form/step/mock';
-import profile from './profile';
-import board from './board';
-import user from './user';
+import { createMockServer } from '@gaonengwww/mock-server'
+import froms from '../views/form/step/mock'
+import board from './board'
+import list from './list'
+import profile from './profile'
+import user from './user'
 
-let mockData = [...list, ...froms, ...profile, ...board, ...user] as any;
+const mockData = [...list, ...froms, ...profile, ...board, ...user] as any
 
 createMockServer({
   mocks: mockData,
-});
+})

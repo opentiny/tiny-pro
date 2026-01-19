@@ -1,10 +1,10 @@
-import { createPinia } from 'pinia';
-import useAppStore from './modules/app';
-import useUserStore from './modules/user';
-import useTabBarStore from './modules/tab-bar';
-import { useTabStore } from './modules/tabs';
+import { createPinia } from 'pinia'
+import useAppStore from './modules/app'
+import useTabBarStore from './modules/tab-bar'
+import { useTabStore } from './modules/tabs'
+import useUserStore from './modules/user'
 
-const pinia = createPinia();
+const pinia = createPinia()
 
-export { useAppStore, useUserStore, useTabBarStore, useTabStore};
-export default pinia;
+export { useAppStore, useTabBarStore, useTabStore, useUserStore }
+export default pinia
