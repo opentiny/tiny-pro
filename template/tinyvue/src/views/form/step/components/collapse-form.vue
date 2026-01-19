@@ -40,7 +40,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, reactive, onMounted, watch, defineExpose } from 'vue';
+  import { ref, reactive, onMounted, watch } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { Modal, Loading } from '@opentiny/vue';
   import { useAppStore } from '@/store';

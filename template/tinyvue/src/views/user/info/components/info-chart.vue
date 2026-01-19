@@ -47,7 +47,6 @@
 </template>
 
 <script lang="ts" setup>
-  import { defineProps } from 'vue';
   import tip1 from '@/assets/images/tip1.png';
   import tip2 from '@/assets/images/tip2.png';
   import tip3 from '@/assets/images/tip3.png';

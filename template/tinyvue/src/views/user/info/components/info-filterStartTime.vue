@@ -10,7 +10,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { watch, ref, defineExpose } from 'vue';
+  import { watch, ref } from 'vue';
   import { DatePicker as TinyDatePicker } from '@opentiny/vue';
   import { useUserStore } from '@/store';
 

@@ -172,7 +172,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, onMounted, reactive, ref, defineProps } from 'vue';
+  import { computed, onMounted, reactive, ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import {
     Select as TinySelect,
