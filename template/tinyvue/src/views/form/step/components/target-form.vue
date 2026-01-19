@@ -10,7 +10,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, reactive, defineExpose } from 'vue';
+  import { ref, reactive } from 'vue';
   import { Transfer as TinyTransfer } from '@opentiny/vue';
 
   interface data {

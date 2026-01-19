@@ -24,7 +24,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, reactive, computed, defineExpose, toRefs } from 'vue';
+  import { ref, reactive, computed, toRefs } from 'vue';
   import {
     Layout as TinyLayout,
     Form as TinyForm,

@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { watch, ref, defineExpose } from 'vue';
+  import { watch, ref } from 'vue';
   import { DatePicker as TinyDatePicker, Modal } from '@opentiny/vue';
   import { useI18n } from 'vue-i18n';
   import { useUserStore } from '@/store';

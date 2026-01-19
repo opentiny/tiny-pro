@@ -7,7 +7,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { PropType, defineProps } from 'vue';
+  import { PropType } from 'vue';
   import {
     Breadcrumb as TinyBreadcrumb,
     BreadcrumbItem as TinyBreadcrumbItem,
