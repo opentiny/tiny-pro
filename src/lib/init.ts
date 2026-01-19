@@ -6,7 +6,7 @@ import chalk from 'chalk';
 import spawn from 'cross-spawn';
 import inquirer, { QuestionCollection } from 'inquirer';
 import { cliConfig, logs, fs } from '@opentiny/cli-devkit';
-import {createEditor} from 'properties-parser';
+import { createEditor } from 'properties-parser';
 import {
   buildCommand,
   buildConfigs,
@@ -209,7 +209,7 @@ const createServerSync = (answers: ProjectInfo) => {
   const serverFrom = utils.getTemplatePath(`${serverFramework}`);
   const serverTo = utils.getDistPath(`${name}/${serverFramework}`);
   if (serverFramework === ServerFrameworks.SpringBoot) {
-    console.log("springboot的服务端配置")
+    console.log('springboot的服务端配置');
     // 拷贝 SpringBoot 模板代码到目标目录
     copySync(serverFrom, serverTo);
 
@@ -243,56 +243,83 @@ const createServerSync = (answers: ProjectInfo) => {
       return;
     }
 
-if (!existsSync(propertiesFilePath)) {
-  log.error(`❌ 未找到 Spring Boot 配置文件：${propertiesFilePath}`);
-  return;
-}
+    if (!existsSync(propertiesFilePath)) {
+      log.error(`❌ 未找到 Spring Boot 配置文件：${propertiesFilePath}`);
+      return;
+    }
 
-// ✅ 1. 使用 createEditor 读取 properties 文件
-const editor = createEditor(propertiesFilePath);
+    // ✅ 1. 使用 createEditor 读取 properties 文件
+    const editor = createEditor(propertiesFilePath);
 
-// ✅ 3. 使用 editor.set(...) 方法逐一设置每一个配置项
-editor.set('server.port', config.SERVER_PORT.toString()); // 动态端口
+    // ✅ 3. 使用 editor.set(...) 方法逐一设置每一个配置项
+    editor.set('server.port', config.SERVER_PORT.toString()); // 动态端口
 
-editor.set('spring.datasource.url', `jdbc:mysql://${config.DB_HOST}:${config.DB_PORT}/${config.DB_NAME}?allowMultiQueries=true&serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=utf8&autoReconnect=true&allowMultiQueries=true&allowPublicKeyRetrieval=true&useSSL=false`);
-editor.set('spring.datasource.username', config.DB_USERNAME);
-editor.set('spring.datasource.password', config.DB_PASSWORD);
-editor.set('spring.datasource.driver-class-name', 'com.mysql.cj.jdbc.Driver');
+    editor.set(
+      'spring.datasource.url',
+      `jdbc:mysql://${config.DB_HOST}:${config.DB_PORT}/${config.DB_NAME}?allowMultiQueries=true&serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=utf8&autoReconnect=true&allowMultiQueries=true&allowPublicKeyRetrieval=true&useSSL=false`
+    );
+    editor.set('spring.datasource.username', config.DB_USERNAME);
+    editor.set('spring.datasource.password', config.DB_PASSWORD);
+    editor.set(
+      'spring.datasource.driver-class-name',
+      'com.mysql.cj.jdbc.Driver'
+    );
 
-// HikariCP 配置
-editor.set('spring.datasource.hikari.pool-name', 'HikariCPDatasource');
-editor.set('spring.datasource.hikari.minimum-idle', '5');
-editor.set('spring.datasource.hikari.idle-timeout', '180000');
-editor.set('spring.datasource.hikari.maximum-pool-size', '10');
-editor.set('spring.datasource.hikari.auto-commit', 'true');
-editor.set('spring.datasource.hikari.max-lifetime', '180000');
-editor.set('spring.datasource.hikari.connection-timeout', '30000');
+    // HikariCP 配置
+    editor.set('spring.datasource.hikari.pool-name', 'HikariCPDatasource');
+    editor.set('spring.datasource.hikari.minimum-idle', '5');
+    editor.set('spring.datasource.hikari.idle-timeout', '180000');
+    editor.set('spring.datasource.hikari.maximum-pool-size', '10');
+    editor.set('spring.datasource.hikari.auto-commit', 'true');
+    editor.set('spring.datasource.hikari.max-lifetime', '180000');
+    editor.set('spring.datasource.hikari.connection-timeout', '30000');
 
-// MyBatis-Plus
-editor.set('mybatis-plus.mapper-locations', 'classpath:mappers/*.xml');
-editor.set('mybatis-plus.type-aliases-package', 'com.TinyPro.entity.po');
-editor.set('mybatis-plus.configuration.map-underscore-to-camel-case', 'true');
-editor.set('mybatis-plus.configuration.default-enum-type-handler', 'org.apache.ibatis.type.EnumOrdinalTypeHandler');
+    // MyBatis-Plus
+    editor.set('mybatis-plus.mapper-locations', 'classpath:mappers/*.xml');
+    editor.set('mybatis-plus.type-aliases-package', 'com.TinyPro.entity.po');
+    editor.set(
+      'mybatis-plus.configuration.map-underscore-to-camel-case',
+      'true'
+    );
+    editor.set(
+      'mybatis-plus.configuration.default-enum-type-handler',
+      'org.apache.ibatis.type.EnumOrdinalTypeHandler'
+    );
 
-// JPA (如同时使用)
-editor.set('spring.jpa.hibernate.ddl-auto', 'update');
-editor.set('spring.jpa.database-platform', 'org.hibernate.dialect.MySQL8Dialect');
-editor.set('spring.jpa.properties.hibernate.dialect', 'org.hibernate.dialect.MySQL8Dialect');
-editor.set('spring.jpa.properties.hibernate.dialect.storage_engine', 'innodb');
-editor.set('spring.jpa.properties.hibernate.globally_quoted_identifiers', 'true');
-editor.set('spring.jpa.hibernate.naming.physical-strategy', 'org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl');
+    // JPA (如同时使用)
+    editor.set('spring.jpa.hibernate.ddl-auto', 'update');
+    editor.set(
+      'spring.jpa.database-platform',
+      'org.hibernate.dialect.MySQL8Dialect'
+    );
+    editor.set(
+      'spring.jpa.properties.hibernate.dialect',
+      'org.hibernate.dialect.MySQL8Dialect'
+    );
+    editor.set(
+      'spring.jpa.properties.hibernate.dialect.storage_engine',
+      'innodb'
+    );
+    editor.set(
+      'spring.jpa.properties.hibernate.globally_quoted_identifiers',
+      'true'
+    );
+    editor.set(
+      'spring.jpa.hibernate.naming.physical-strategy',
+      'org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl'
+    );
 
-// JWT
-editor.set('jwt.secret', '0Zi4SA==');
+    // JWT
+    editor.set('jwt.secret', '0Zi4SA==');
 
-// Redis
-editor.set('spring.data.redis.host', config.REDIS_HOST);
-editor.set('spring.data.redis.port', config.REDIS_PORT.toString());
+    // Redis
+    editor.set('spring.data.redis.host', config.REDIS_HOST);
+    editor.set('spring.data.redis.port', config.REDIS_PORT.toString());
 
-// ✅ 4. 保存修改后的内容到原 .properties 文件
-editor.save(propertiesFilePath);
+    // ✅ 4. 保存修改后的内容到原 .properties 文件
+    editor.save(propertiesFilePath);
 
-log.success(`✅ Spring Boot 配置文件已更新：${propertiesFilePath}`);
+    log.success(`✅ Spring Boot 配置文件已更新：${propertiesFilePath}`);
   } else if (serverFramework === ServerFrameworks.NestJs) {
     const config = {
       DATABASE_HOST: answers.dialect && (answers.host ?? 'localhost'),
@@ -439,7 +466,14 @@ const packageJsonProcess = (
  * @dbAnswers  询问服务端配置的选择值
  */
 const createProjectSync = (answers: ProjectInfo) => {
-  const { description, name, serverConfirm, buildTool, serverFramework, lowcodeEngine } = answers;
+  const {
+    description,
+    name,
+    serverConfirm,
+    buildTool,
+    serverFramework,
+    lowcodeEngine,
+  } = answers;
   const templatePath = VueVersion.Vue3;
   // 模板来源目录
   const from = utils.getTemplatePath(templatePath);
@@ -447,7 +481,7 @@ const createProjectSync = (answers: ProjectInfo) => {
   const to = utils.getDistPath(serverConfirm ? `${name}/web` : name);
   fs.copyTpl(from, to);
   // 将项目名称、描述写入 package.json中
-  if (serverFramework ===  ServerFrameworks.NestJs) {
+  if (serverFramework === ServerFrameworks.NestJs) {
     try {
       const packageJsonPath = path.join(to, 'package.json');
       let packageJson = JSON.parse(
@@ -611,7 +645,9 @@ export const installDependencies = (answers: ProjectInfo) => {
       '\n-------------------- 技术支持：官方小助手微信opentiny-official --------------------\n'
     )
   );
-};export default async () => {
+};
+
+export default async () => {
   // 拷贝模板到当前目录
   let projectInfo: ProjectInfo;
 
