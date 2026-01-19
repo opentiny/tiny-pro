@@ -1,22 +1,6 @@
-<template>
-  <div>
-    <div class="flex gap-10 w-full min-h-[272px] max-md:flex-col">
-      <div class="w-1/2 max-md:w-full">
-        <div class="card-title mb-2">{{ $t('work.index.trainees') }}</div>
-        <tiny-chart-bar ref="barRef" width="100%" height="272px" :options="options1"></tiny-chart-bar>
-      </div>
-      <div class="w-1/2 max-md:w-full">
-        <div class="card-title mb-2">{{ $t('work.index.coachNum') }}</div>
-        <tiny-chart-line ref="lineRef" width="100%" height="272px" :options="options2"></tiny-chart-line>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script lang="ts" setup>
-import { ref, onMounted, onUnmounted } from 'vue';
-import transitionFadeSlideGroup from '@/components/transition/transition-fade-slide-group.vue';
 import { TinyHuichartsBar as TinyChartBar, TinyHuichartsLine as TinyChartLine } from '@opentiny/vue-huicharts'
+import { onMounted, onUnmounted, ref } from 'vue'
 
 // 加载效果
 const options1 = ref({
@@ -26,8 +10,8 @@ const options1 = ref({
     show: true,
     ellipsis: {
       labelWidth: 30,
-      overflow: "truncate"
-    }
+      overflow: 'truncate',
+    },
   },
   yAxis: {
     name: 'Mbps',
@@ -47,7 +31,7 @@ const options1 = ref({
       right: '0',
     },
     textStyle: {
-      padding: [-2, 0, 0, 0]
+      padding: [-2, 0, 0, 0],
     },
     type: 'scroll',
     pageIconSize: 10,
@@ -107,7 +91,7 @@ const options1 = ref({
       已完成: 380,
       xkey: '10月',
     },
-  ]
+  ],
 })
 const options2 = ref({
   smooth: true,
@@ -134,7 +118,7 @@ const options2 = ref({
       right: '0',
     },
     textStyle: {
-      padding: [-2, 0, 0, 0]
+      padding: [-2, 0, 0, 0],
     },
     type: 'scroll',
     pageIconSize: 10,
@@ -187,31 +171,51 @@ const options2 = ref({
       人力部: 50,
     },
 
-  ]
+  ],
 })
 const barRef = ref()
 const lineRef = ref()
 onMounted(() => {
-    setTimeout(() => {
-      barRef.value?.resize()
-      lineRef.value?.resize()
-    }, 200)
+  setTimeout(() => {
+    barRef.value?.resize()
+    lineRef.value?.resize()
+  }, 200)
 
-    const observer = new ResizeObserver(() => {
-      barRef.value?.resize();
-      lineRef.value?.resize();
-    });
+  const observer = new ResizeObserver(() => {
+    barRef.value?.resize()
+    lineRef.value?.resize()
+  })
 
-    const el1 = barRef.value?.$el || barRef.value;
-    const el2 = lineRef.value?.$el || lineRef.value;
+  const el1 = barRef.value?.$el || barRef.value
+  const el2 = lineRef.value?.$el || lineRef.value
 
-    if (el1) observer.observe(el1);
-    if (el2) observer.observe(el2);
+  if (el1)
+    observer.observe(el1)
+  if (el2)
+    observer.observe(el2)
 
-    onUnmounted(() => observer.disconnect());
+  onUnmounted(() => observer.disconnect())
 })
-
 </script>
+
+<template>
+  <div>
+    <div class="min-h-[272px] w-full flex gap-10 max-md:flex-col">
+      <div class="w-1/2 max-md:w-full">
+        <div class="card-title mb-2">
+          {{ $t('work.index.trainees') }}
+        </div>
+        <TinyChartBar ref="barRef" width="100%" height="272px" :options="options1" />
+      </div>
+      <div class="w-1/2 max-md:w-full">
+        <div class="card-title mb-2">
+          {{ $t('work.index.coachNum') }}
+        </div>
+        <TinyChartLine ref="lineRef" width="100%" height="272px" :options="options2" />
+      </div>
+    </div>
+  </div>
+</template>
 
 <style scoped lang="less">
 .card-title {
@@ -220,6 +224,5 @@ onMounted(() => {
   font-size: 16px;
   font-weight: 700;
   margin-bottom: 16px;
-
 }
 </style>

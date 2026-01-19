@@ -14,4 +14,4 @@ export default {
   'theme-text-violet': '优雅、浪漫、温柔、神秘、高贵',
   'theme-text-deepness': '平稳、中性、空间、力量、坚硬',
   'theme-text-dark': '深沉、果断、勇敢、坚韧、向往',
-};
+}

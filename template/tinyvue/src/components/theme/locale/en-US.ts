@@ -15,4 +15,4 @@ export default {
   'theme-text-violet': 'Elegant, romantic, gentle, mysterious, noble',
   'theme-text-deepness': 'Smooth, Neutral, Space, Strength, Hard',
   'theme-text-dark': 'Deep, decisive, brave, tenacious, yearning',
-};
+}

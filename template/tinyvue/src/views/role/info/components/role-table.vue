@@ -1,172 +1,170 @@
 <script lang="ts" setup>
-  import { nextTick, reactive, ref, watch } from 'vue';
-  import { Role } from '@/store/modules/user/types';
-  import {
-    Grid as TinyGrid,
-    GridColumn as TinyGridColumn,
-    Modal,
-    TinySelect,
-    TinyPopconfirm
-  } from '@opentiny/vue';
-  import { IconDel,IconCueL } from '@opentiny/vue-icon';
-  import { deleteRole , updateRole } from '@/api/role';
-  import { Permission } from '@/api/permission';
-  import { ITreeNodeData } from '@/router/guard/menu';
-  import { useI18n } from 'vue-i18n';
-  import useLoading from '@/hooks/loading';
-  import { useResponsiveSize } from '@/hooks/responsive'
-  import { Pager } from '@/types/global';
-  import permissionTable from './permission-table.vue';
+import type { Permission } from '@/api/permission'
+import type { ITreeNodeData } from '@/router/guard/menu'
+import type { Role } from '@/store/modules/user/types'
+import type { Pager } from '@/types/global'
+import {
+  Modal,
+  Grid as TinyGrid,
+  GridColumn as TinyGridColumn,
+  TinyPopconfirm,
+  TinySelect,
+} from '@opentiny/vue'
+import { IconCueL, IconDel } from '@opentiny/vue-icon'
+import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { deleteRole, updateRole } from '@/api/role'
+import useLoading from '@/hooks/loading'
+import { useResponsiveSize } from '@/hooks/responsive'
+import permissionTable from './permission-table.vue'
 
-  const { gridSize } = useResponsiveSize()
-  
-  const props = defineProps<{
-    tableData: (Role & { menus: ITreeNodeData[] })[];
-    fetchOption: {
-      api: (args: { page: Pager }) => any;
-    };
-    permissions: Permission[];
-    pagerConfig: {
-      attrs: Pager;
-    };
-    filter: any;
-  }>();
+const props = defineProps<{
+  tableData: (Role & { menus: ITreeNodeData[] })[]
+  fetchOption: {
+    api: (args: { page: Pager }) => any
+  }
+  permissions: Permission[]
+  pagerConfig: {
+    attrs: Pager
+  }
+  filter: any
+}>()
 
-  const emits = defineEmits<{
-    menuUpdate: [ITreeNodeData[], number, Role];
-    roleDelete: [number];
-    updateRoleClose: [];
-  }>();
-  const roleTable = reactive([]);
+const emits = defineEmits<{
+  menuUpdate: [ITreeNodeData[], number, Role]
+  roleDelete: [number]
+  updateRoleClose: []
+}>()
 
-  const iconDel = IconDel();
-  const iconCueL = IconCueL();
-  const { t } = useI18n();
-  const grid = ref();
-  const { loading, setLoading } = useLoading();
+const { gridSize } = useResponsiveSize()
 
-  const onMenuUpdate = (data: ITreeNodeData[], roldId: number, role: Role) => {
-    emits('menuUpdate', data, roldId, role);
-  };
-  const onRoleDelete = (id: number, row) => {
-    setLoading(true);
-    deleteRole(id)
-      .then(() => {
-        grid.value.remove(row);
-      })
-      .then(() => {
-        Modal.message({
-          message: t('message.delete.success'),
-          status: 'success',
-        });
-        emits('roleDelete', id);
-      })
-      .catch((error) => {
-        if (error.response && error.response.data) {
-          const errorMessage = error.response.data.message || '未知错误';
-          Modal.message({
-            message: errorMessage,
-            status: 'error',
-          });
-        }
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  };
-  const getPermission = (row:any) => {
-    let permissionDate = ''
-    if (row?.permission.length) {
-      row?.permission.forEach((item, index) => {
-        permissionDate = `${permissionDate} ${row?.permission[index].name}`
-      });
-    }
-    return permissionDate
-  };
-  const onUpdate = (args:any) => {
-    const menuIds = args.row.menus.map(menu => menu.id);
-    updateRole({
-      ...args.row,
-      menuIds
+const { t } = useI18n()
+const grid = ref()
+const { loading, setLoading } = useLoading()
+
+function onMenuUpdate(data: ITreeNodeData[], roldId: number, role: Role) {
+  emits('menuUpdate', data, roldId, role)
+}
+function onRoleDelete(id: number, row) {
+  setLoading(true)
+  deleteRole(id)
+    .then(() => {
+      grid.value.remove(row)
     })
-      .then(({ data }) => {
+    .then(() => {
+      Modal.message({
+        message: t('message.delete.success'),
+        status: 'success',
+      })
+      emits('roleDelete', id)
+    })
+    .catch((error) => {
+      if (error.response && error.response.data) {
+        const errorMessage = error.response.data.message || '未知错误'
         Modal.message({
-          message: t('permissionInfo.edit.success'),
-          status: 'success',
-        });
-        emits('updateRoleClose');
+          message: errorMessage,
+          status: 'error',
+        })
+      }
+    })
+    .finally(() => {
+      setLoading(false)
+    })
+}
+function getPermission(row: any) {
+  let permissionDate = ''
+  if (row?.permission.length) {
+    row?.permission.forEach((item, index) => {
+      permissionDate = `${permissionDate} ${row?.permission[index].name}`
+    })
+  }
+  return permissionDate
+}
+function onUpdate(args: any) {
+  const menuIds = args.row.menus.map(menu => menu.id)
+  updateRole({
+    ...args.row,
+    menuIds,
+  })
+    .then(() => {
+      Modal.message({
+        message: t('permissionInfo.edit.success'),
+        status: 'success',
       })
-      .catch((error) => {
-        if (error.response && error.response.data) {
-          const errorMessage = error.response.data.message || '未知错误';
-          Modal.message({
-            message: errorMessage,
-            status: 'error',
-          });
-        }
-      })
-      .finally(() => {
-        emits('updateRoleClose');
-      });
-  };
-  defineExpose({
-    reload: () => {
-      grid.value.handleFetch();
-    },
-  });
+      emits('updateRoleClose')
+    })
+    .catch((error) => {
+      if (error.response && error.response.data) {
+        const errorMessage = error.response.data.message || '未知错误'
+        Modal.message({
+          message: errorMessage,
+          status: 'error',
+        })
+      }
+    })
+    .finally(() => {
+      emits('updateRoleClose')
+    })
+}
+defineExpose({
+  reload: () => {
+    grid.value.handleFetch()
+  },
+})
 </script>
 
 <template>
-  <tiny-grid
+  <TinyGrid
     ref="grid"
     :fetch-data="props.fetchOption"
     auto-resize
     :loading="loading"
     :pager="props.pagerConfig"
-     :edit-config="{ trigger: 'click', mode: 'cell', showStatus: true }"
+    :edit-config="{ trigger: 'click', mode: 'cell', showStatus: true }"
     remote-filter
     :size="gridSize"
     align="center"
     @edit-closed="onUpdate"
   >
-    <tiny-grid-column type="expand" width="5%">
+    <TinyGridColumn type="expand" width="5%">
       <template #default="data">
         <permission-table :permission="data.row.permission" />
       </template>
-    </tiny-grid-column>
-    <tiny-grid-column
+    </TinyGridColumn>
+    <TinyGridColumn
       field="id"
       width="20%"
       :title="$t('roleInfo.table.id')"
-    ></tiny-grid-column>
-    <tiny-grid-column
+    />
+    <TinyGridColumn
       field="name"
       :title="$t('roleInfo.table.name')"
       :filter="props.filter.inputFilter"
       :editor="{ component: 'input', autoselect: true }"
-    ></tiny-grid-column>
-    <tiny-grid-column
-    field="permissionIds"
-    :title="$t('roleInfo.table.desc')"
-    show-overflow="tooltip"
-    :editor="{
-      component: TinySelect,
-      attrs: {
-        multiple: true,
-        'collapse-tags': true,
-        'value-key':'id',
-        options: props.permissions,
-        textField: 'name',
-        valueField: 'id'
-      }
-    }">
+    />
+    <TinyGridColumn
+      field="permissionIds"
+      :title="$t('roleInfo.table.desc')"
+      show-overflow="tooltip"
+      :editor="{
+        component: TinySelect,
+        attrs: {
+          'multiple': true,
+          'collapse-tags': true,
+          'value-key': 'id',
+          'options': props.permissions,
+          'textField': 'name',
+          'valueField': 'id',
+        },
+      }"
+    >
       <template #default="data">
-          {{ getPermission(data.row) }}
+        {{ getPermission(data.row) }}
       </template>
-    </tiny-grid-column>
-    <tiny-grid-column :title="$t('roleInfo.table.operations')">
+    </TinyGridColumn>
+    <TinyGridColumn :title="$t('roleInfo.table.operations')">
       <template #default="data">
-        <iconCueL class="del-icon"></iconCueL>
+        <IconCueL class="del-icon" />
         <a
           v-permission="'role::update'"
           class="operation-update"
@@ -174,48 +172,46 @@
         >
           {{ $t('roleInfo.table.bind') }}
         </a>
-        <tiny-popconfirm :title="$t('menuInfo.modal.title.confirm')" type="warning" trigger="click" @confirm="onRoleDelete(data.row.id, data.row)">
+        <TinyPopconfirm :title="$t('menuInfo.modal.title.confirm')" type="warning" trigger="click" @confirm="onRoleDelete(data.row.id, data.row)">
           <template #reference>
-            <iconDel class="del-icon"></iconDel>
+            <IconDel class="del-icon" />
 
             <a
-            v-permission="'role::remove'"
-            class="operation-update"
-          >
-            {{ $t('roleInfo.table.operations.delete') }}
-          </a>
+              v-permission="'role::remove'"
+              class="operation-update"
+            >
+              {{ $t('roleInfo.table.operations.delete') }}
+            </a>
           </template>
-        </tiny-popconfirm>
-
+        </TinyPopconfirm>
       </template>
-    </tiny-grid-column>
-  </tiny-grid>
+    </TinyGridColumn>
+  </TinyGrid>
 </template>
 
 <style lang="less" scoped>
   .operation {
-    &-delete {
-      padding-right: 5px;
-      color: red;
-    }
-
-    &-update {
-      padding-right: 5px;
-      color: #1890ff;
-    }
-
-    &-pwd-update {
-      color: orange;
-    }
-  }
-  .del-icon{
-    fill: #1890ff;
-    margin-right: 8px;
-    font-size: 16px;
-    margin-top: -3px;
-  }
-  .operation-update:hover{
-    text-decoration: underline;
+  &-delete {
+    padding-right: 5px;
+    color: red;
   }
 
+  &-update {
+    padding-right: 5px;
+    color: #1890ff;
+  }
+
+  &-pwd-update {
+    color: orange;
+  }
+}
+.del-icon {
+  fill: #1890ff;
+  margin-right: 8px;
+  font-size: 16px;
+  margin-top: -3px;
+}
+.operation-update:hover {
+  text-decoration: underline;
+}
 </style>

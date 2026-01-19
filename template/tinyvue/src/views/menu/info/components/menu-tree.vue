@@ -1,39 +1,74 @@
+<script lang="ts" setup>
+import type { ITreeNodeData } from '@/router/guard/menu'
+import { TinyGrid, TinyGridColumn, TinyPopconfirm } from '@opentiny/vue'
+import { IconDel, IconEdit } from '@opentiny/vue-icon'
+import { ref, watch } from 'vue'
+import { useResponsiveSize } from '@/hooks/responsive'
+
+const props = defineProps<{
+  data: ITreeNodeData[]
+  localeData: { value: string, label: string }[]
+}>()
+
+const emits = defineEmits<{
+  check: [Node]
+  update: [Node]
+  delete: [Node]
+}>()
+
+const { gridSize } = useResponsiveSize()
+
+export interface Node {
+  data: ITreeNodeData
+  children: Node[]
+}
+const menuList = ref([])
+function confirm(row) {
+  emits('delete', row)
+}
+watch(
+  () => props.data.length,
+  () => {
+    menuList.value = props.data
+  },
+  { immediate: true },
+)
+</script>
+
 <template>
-  <tiny-grid  
-    ref="grid" 
-    :data="menuList" 
+  <TinyGrid
+    :data="menuList"
     :tree-config="{ children: 'children' }"
-    :auto-resize="true" 
+    :auto-resize="true"
     align="center"
     :size="gridSize"
-    >
-    <tiny-grid-column 
-    field="locale" 
-    :title="$t('menuInfo.table.name')" 
-    tree-node
+  >
+    <TinyGridColumn
+      field="locale"
+      :title="$t('menuInfo.table.name')"
+      tree-node
     >
       <template #default="{ row }">
-          {{ $t(row.locale) }} 
+        {{ $t(row.locale) }}
       </template>
-    </tiny-grid-column>
-    <tiny-grid-column field="id" title="ID"></tiny-grid-column>
-    <tiny-grid-column 
-      field="parentId"  
+    </TinyGridColumn>
+    <TinyGridColumn field="id" title="ID" />
+    <TinyGridColumn
+      field="parentId"
       :title="$t('menuInfo.table.parentId')"
-      >
-    </tiny-grid-column>
-    <tiny-grid-column field="order" :title="$t('menuInfo.table.order')"></tiny-grid-column>
-    <tiny-grid-column field="customIcon" :title="$t('menuInfo.table.icon')">
+    />
+    <TinyGridColumn field="order" :title="$t('menuInfo.table.order')" />
+    <TinyGridColumn field="customIcon" :title="$t('menuInfo.table.icon')">
       <template #default="{ row }">
-          {{ row.customIcon }}
+        {{ row.customIcon }}
       </template>
-    </tiny-grid-column>
-    <tiny-grid-column field="component" :title="$t('menuInfo.table.component')"></tiny-grid-column>
-    <tiny-grid-column field="url"  :title="$t('menuInfo.table.path')" ></tiny-grid-column>
-    <tiny-grid-column field="locale"  :title="$t('menuInfo.table.locale')"></tiny-grid-column>
-    <tiny-grid-column :title="$t('permissionInfo.table.operations')" width="200" >
+    </TinyGridColumn>
+    <TinyGridColumn field="component" :title="$t('menuInfo.table.component')" />
+    <TinyGridColumn field="url" :title="$t('menuInfo.table.path')" />
+    <TinyGridColumn field="locale" :title="$t('menuInfo.table.locale')" />
+    <TinyGridColumn :title="$t('permissionInfo.table.operations')" width="200">
       <template #default="{ row }">
-        <iconEdit class="del-icon"></iconEdit>
+        <IconEdit class="del-icon" />
         <a
           v-permission="'menu::update'"
           class="operation-update"
@@ -41,86 +76,47 @@
         >
           {{ $t('menuInfo.table.operations.update') }}
         </a>
-        <tiny-popconfirm :title="$t('menuInfo.modal.title.confirm')" type="warning" trigger="click" @confirm="confirm(row)">
+        <TinyPopconfirm :title="$t('menuInfo.modal.title.confirm')" type="warning" trigger="click" @confirm="confirm(row)">
           <template #reference>
-            <iconDel class="del-icon"></iconDel>
+            <IconDel class="del-icon" />
             <a
               v-permission="'menu::remove'"
               class="operation-update"
             >
               {{ $t('menuInfo.table.operations.delete') }}
-          </a>
+            </a>
           </template>
-        </tiny-popconfirm>
-
+        </TinyPopconfirm>
       </template>
-    </tiny-grid-column>
-  </tiny-grid>
+    </TinyGridColumn>
+  </TinyGrid>
 </template>
-
-<script lang="ts" setup>
-  import { watch,ref } from 'vue';
-  import { IconDel, IconEdit } from '@opentiny/vue-icon';
-  import { ITreeNodeData } from '@/router/guard/menu';
-  import { TinyGrid, TinyGridColumn ,TinyPopconfirm  } from '@opentiny/vue';
-  import { useResponsiveSize } from '@/hooks/responsive'
-
-  const { gridSize } = useResponsiveSize()
-  
-  export type Node = {
-    data: ITreeNodeData;
-    children: Node[];
-  };
-  const props = defineProps<{
-    data: ITreeNodeData[];
-    localeData: { value: string; label: string }[];
-  }>();
-  const iconDel = IconDel();
-  const menuList = ref([])
-  const iconEdit = IconEdit();
-  const emits = defineEmits<{
-    check: [Node];
-    update: [Node];
-    delete: [Node];
-  }>();
-
-  const confirm = (row) =>{
-    emits('delete', row)
-  }
-  watch(
-      () => props.data.length,
-      () => {
-          menuList.value = props.data
-      },
-      { immediate: true },
-    );
-</script>
 
 <style scoped lang="less">
   .operation {
-    &-delete {
-      padding-right: 10px;
-      color: red;
-    }
-
-    &-update {
-      padding-right: 5px;
-      color: #1890ff;
-    }
-
-    &-info {
-      padding-right: 10px;
-      color: orange;
-    }
-  }
-  .del-icon{
-    fill: #1890ff;
-    margin-right: 8px;
-    font-size: 16px;
-    margin-top: -3px;
+  &-delete {
+    padding-right: 10px;
+    color: red;
   }
 
-  .operation-update:hover{
-    text-decoration: underline;
+  &-update {
+    padding-right: 5px;
+    color: #1890ff;
   }
+
+  &-info {
+    padding-right: 10px;
+    color: orange;
+  }
+}
+.del-icon {
+  fill: #1890ff;
+  margin-right: 8px;
+  font-size: 16px;
+  margin-top: -3px;
+}
+
+.operation-update:hover {
+  text-decoration: underline;
+}
 </style>

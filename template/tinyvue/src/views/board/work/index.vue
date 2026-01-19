@@ -1,62 +1,67 @@
+<script lang="ts" setup>
+import learncoach from './components/learn-coach.vue'
+import learnplan from './components/learn-plan.vue'
+import learnprobation from './components/learn-probation.vue'
+import learntrain from './components/learn-traini.vue'
+
+const Home = [
+  { label: 'work.index.Brave', value: 'work.index.Growth' },
+  { label: 'work.index.Termbase', value: '' },
+  { label: 'work.index.Library', value: '', isOld: true },
+]
+</script>
+
 <template>
   <div class="container-work">
     <Breadcrumb :items="['menu.board', 'menu.work']" />
     <div class="work-image">
       <transition-slide>
-        <img src="@/assets/images/woker.png" alt="403" class="user-image" />
+        <img src="@/assets/images/woker.png" alt="403" class="user-image">
       </transition-slide>
     </div>
     <div class="content">
       <div class="left">
         <div class="card">
-          <div class="card-title">{{ $t('work.index.learn') }}</div>
+          <div class="card-title">
+            {{ $t('work.index.learn') }}
+          </div>
           <div>
-            <learnplan></learnplan>
+            <learnplan />
           </div>
         </div>
         <div class="card">
           <div>
-            <learncoach></learncoach>
+            <learncoach />
           </div>
         </div>
         <div class="card-center flex gap-2 max-md:flex-col">
           <div class="card card-issue flex-3 max-md:w-full">
-            <div class="card-title">{{ $t('work.index.formalization') }}</div>
-            <learnprobation></learnprobation>
+            <div class="card-title">
+              {{ $t('work.index.formalization') }}
+            </div>
+            <learnprobation />
           </div>
           <div class="card card-home flex-1 max-md:w-full">
-            <div class="card-title">{{ $t('work.index.Home') }}</div>
+            <div class="card-title">
+              {{ $t('work.index.Home') }}
+            </div>
             <div v-for="item in Home" :key="item" class="home-title">
-              <span :class="{'dt-icon':true,'is-old':item?.isOld}"></span>
+              <span class="dt-icon" :class="{ 'is-old': item?.isOld }" />
               <span class="line-clamp-2">{{ $t(item.label) }}</span>
               <span v-if="item.value" class="home-tip">{{ $t(item.value) }}</span>
             </div>
           </div>
         </div>
         <div class="card">
-            <div class="card-title">{{ $t('work.index.collect') }}</div>
-            <learntrain></learntrain>
+          <div class="card-title">
+            {{ $t('work.index.collect') }}
+          </div>
+          <learntrain />
         </div>
       </div>
     </div>
   </div>
 </template>
-
-<script lang="ts" setup>
-import transitionFadeDownGroup from '@/components/transition/transition-fade-down-group.vue';
-import learnplan from './components/learn-plan.vue';
-import learncoach from './components/learn-coach.vue';
-import learnprobation from './components/learn-probation.vue';
-import learnpracticed from './components/learn-practiced.vue';
-import learntrain from './components/learn-traini.vue';
-
-
-const Home = [
-  { label: 'work.index.Brave', value: 'work.index.Growth' },
-  { label: 'work.index.Termbase',  value: ''},
-  { label: 'work.index.Library',  value: '' ,isOld : true},
-];
-</script>
 
 <style scoped lang="less">
 .container-work {
@@ -110,7 +115,7 @@ const Home = [
         font-weight: 700;
         margin-bottom: 16px;
       }
-      .card-coach{
+      .card-coach {
         position: absolute;
         top: 24px;
         left: calc(50% + 24px);
@@ -133,7 +138,7 @@ const Home = [
       .card-home {
         margin-top: 0px;
         flex: 1;
-        span:hover{
+        span:hover {
           text-decoration: underline;
         }
       }
@@ -165,7 +170,6 @@ const Home = [
       background: #fff;
       border-radius: 10px;
       box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.05);
-
     }
 
     .card:hover {
@@ -174,19 +178,19 @@ const Home = [
   }
 }
 
-.col>span {
+.col > span {
   display: flex;
   flex-direction: column;
   padding: 10px 10px;
   text-align: center;
 }
 
-.col>span:first-child {
+.col > span:first-child {
   color: #010407;
   font-weight: 500;
 }
 
-.col>span:last-child {
+.col > span:last-child {
   font-weight: 900;
   font-size: large;
 }
@@ -205,7 +209,7 @@ const Home = [
     margin-top: 7px;
     margin-right: 16px;
   }
-  .is-old{
+  .is-old {
     background: #ff8800;
   }
 
@@ -213,7 +217,7 @@ const Home = [
     height: 18px;
     line-height: 18px;
     color: #1476ff;
-    background: #DEECFF;
+    background: #deecff;
     margin-top: 2px;
     margin-left: 8px;
     font-size: 12px;

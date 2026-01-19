@@ -25,7 +25,7 @@ export default class BaseUtils {
     try {
       return new Error(JSON.stringify(error))
     }
-    catch (e) {
+    catch {
       return new Error(String(error))
     }
   }

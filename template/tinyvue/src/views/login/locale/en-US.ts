@@ -11,7 +11,7 @@ export default {
   'login.form.login.success': 'welcome to use',
   'login.form.userName.placeholder': 'Username: admin',
   'login.form.password.placeholder': 'Password: admin',
-  'login.form.mailName.placeholder': "EmailName：123{'@'}example.com",
+  'login.form.mailName.placeholder': 'EmailName：123{\'@\'}example.com',
   'login.form.mailpassword.placeholder': 'Password：admin',
   'login.form.registerMail.placeholder': 'Register Email：',
   'login.form.registerPassword.placeholder': 'Registration password：',
@@ -29,7 +29,7 @@ export default {
   'login.form.passwordInput': 'Password:',
   'login.form.passwordConfirm': 'Confirm Password:',
   'login.form.checkUsername':
-    "Letters, numbers, underscores, dashes, dots{'@'}Letters, numbers, dashes",
+    'Letters, numbers, underscores, dashes, dots{\'@\'}Letters, numbers, dashes',
   'login.form.checkPassword':
     'At least eight characters, including at least one uppercase letter, one lowercase letter, and one digit',
   'login.form.confirmPassword': 'Inconsistent passwords',
@@ -43,8 +43,8 @@ export default {
   'login.banner.subSlogan3': 'Realize flexible block development',
   'login.icon.language': 'language',
   'login.tip.info': 'User name: admin; password: admin',
-  'login.tip.mail': "User name: admin{'@'}example.com; password: admin",
+  'login.tip.mail': 'User name: admin{\'@\'}example.com; password: admin',
   'login.tip.right': 'Enter the correct user name and password',
   'login.main.text': 'TinyPro Mid-Back-End Front-End Solution',
   'setting.foot.title': 'Produced by OpenTiny',
-};
+}

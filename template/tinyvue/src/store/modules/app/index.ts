@@ -51,7 +51,6 @@ const useAppStore = defineStore('app', {
     },
     // Update app settings
     updateSettings(partial: Partial<AppState>) {
-      // @ts-ignore-next-line
       this.$patch(partial)
       localStorage.setItem(CONSTANT.APP_STATE, JSON.stringify(this.get()))
     },

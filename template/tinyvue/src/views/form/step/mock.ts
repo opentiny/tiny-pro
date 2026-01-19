@@ -1,5 +1,5 @@
-import Mock from 'mockjs';
-import { successResponseWrap } from '../../../utils/setup-mock';
+import Mock from 'mockjs'
+import { successResponseWrap } from '../../../utils/setup-mock'
 
 const initBase = Mock.mock({
   Project: [
@@ -49,7 +49,7 @@ const initBase = Mock.mock({
     'baseForm.form.label.frequencythree',
     'baseForm.form.label.frequencyfour',
   ],
-});
+})
 
 const initStep = Mock.mock({
   position: [
@@ -101,7 +101,7 @@ const initStep = Mock.mock({
       label: 'department03',
     },
   ],
-});
+})
 
 export default [
   // init-base
@@ -109,7 +109,7 @@ export default [
     url: '/api/base/getdata',
     method: 'get',
     response: () => {
-      return successResponseWrap(initBase);
+      return successResponseWrap(initBase)
     },
   },
 
@@ -118,7 +118,7 @@ export default [
     url: '/api/step/getdata',
     method: 'get',
     response: () => {
-      return successResponseWrap(initStep);
+      return successResponseWrap(initStep)
     },
   },
 
@@ -127,7 +127,7 @@ export default [
     url: '/api/channel-form/submit',
     method: 'post',
     response: () => {
-      return successResponseWrap('ok');
+      return successResponseWrap('ok')
     },
   },
 
@@ -136,7 +136,7 @@ export default [
     url: '/api/advance/getdata',
     method: 'get',
     response: () => {
-      return successResponseWrap(initStep);
+      return successResponseWrap(initStep)
     },
   },
-] as any;
+] as any

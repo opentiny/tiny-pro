@@ -1,3 +1,37 @@
+<script lang="ts" setup>
+import { reactive } from 'vue'
+import { getUserInfo } from '@/api/user'
+
+const props = defineProps({
+  email: String,
+  statusMap: {
+    type: Object,
+    default: () => ({}),
+  },
+})
+
+// 初始化请求数据
+fetchData(props.email)
+
+const state = reactive<{
+  userData: any
+}>({
+  userData: {} as any,
+})
+
+async function fetchData(email: string) {
+  if (email) {
+    const { data } = await getUserInfo(email)
+    if (data.role && data.role.length) {
+      data.roleIds = data.role[0].id
+      data.roleName = data.role[0].name
+    }
+    state.userData = data
+    state.userData.probationDate = [data.probationStart, data.probationEnd]
+  }
+}
+</script>
+
 <template>
   <ul class="tiny-info-expand">
     <li>
@@ -47,43 +81,6 @@
   </ul>
 </template>
 
-<script lang="ts" setup>
-import { reactive } from 'vue';
-import { useI18n } from 'vue-i18n';
-import { getUserInfo } from '@/api/user';
-
-const props = defineProps({
-  email: String,
-  statusMap: {
-    type: Object,
-    default: () => ({})
-  }
-});
-
-const { t } = useI18n();
-
-// 初始化请求数据
-fetchData(props.email);
-
-const state = reactive<{
-  userData: any;
-}>({
-  userData: {} as any,
-});
-
-async function fetchData(email: string) {
-  if (email) {
-    const { data } = await getUserInfo(email);
-    if (data.role && data.role.length) {
-      data.roleIds = data.role[0].id;
-      data.roleName = data.role[0].name;
-    }
-    state.userData = data;
-    state.userData.probationDate = [data.probationStart, data.probationEnd];
-  }
-}
-</script>
-
 <style scoped lang="less">
 .tiny-info-expand {
   display: flex;
@@ -112,7 +109,7 @@ async function fetchData(email: string) {
   }
 
   // 给第七个往后的li增加margin-top:16px;
-  li:nth-child(n+7) {
+  li:nth-child(n + 7) {
     margin-top: 16px;
   }
 }

@@ -1,13 +1,50 @@
+<script lang="ts" setup>
+import {
+  Grid as TinyGrid,
+  GridColumn as TinyGridColumn,
+  Pager as TinyPager,
+} from '@opentiny/vue'
+import { computed, defineProps, ref, toRefs } from 'vue'
+import { useResponsive, useResponsiveSize } from '@/hooks/responsive'
+
+// 父组件传值
+const props = defineProps({
+  tableData: [],
+})
+const { gridSize } = useResponsiveSize()
+const { sm } = useResponsive()
+
+const pagerLayout = computed(() =>
+  sm.value ? 'total, prev, pager, next' : 'total, sizes, prev, pager, next, jumper',
+)
+
+const { tableData } = toRefs(props)
+const custPager = ref({
+  currentPage: 1,
+  pageSize: 5,
+})
+
+function currentChange(current) {
+  custPager.value.currentPage = current
+}
+
+function sizeChange(size) {
+  custPager.value.pageSize = size
+}
+</script>
+
 <template>
   <div class="record-detail">
-    <div class="detail-header">{{ $t('baseForm.form.record') }}</div>
+    <div class="detail-header">
+      {{ $t('baseForm.form.record') }}
+    </div>
     <div class="detail-row" noSpace>
-      <tiny-grid
+      <TinyGrid
         :data="
           tableData.slice(
             (custPager.currentPage - 1) * custPager.pageSize,
-            (custPager.currentPage - 1) * custPager.pageSize +
-              custPager.pageSize,
+            (custPager.currentPage - 1) * custPager.pageSize
+              + custPager.pageSize,
           )
         "
         seq-serial
@@ -15,30 +52,30 @@
         :size="gridSize"
         align="center"
       >
-        <tiny-grid-column
+        <TinyGridColumn
           :title="$t('home.roundtable.index')"
           type="index"
           align="left"
-        ></tiny-grid-column>
-        <tiny-grid-column
+        />
+        <TinyGridColumn
           field="version"
           :title="$t('menu.plan.version')"
-        ></tiny-grid-column>
-        <tiny-grid-column
+        />
+        <TinyGridColumn
           field="operation"
           :title="$t('menu.plan.operation')"
-        ></tiny-grid-column>
-        <tiny-grid-column
+        />
+        <TinyGridColumn
           field="updated"
           :title="$t('menu.plan.updated')"
-        ></tiny-grid-column>
-        <tiny-grid-column
+        />
+        <TinyGridColumn
           field="time"
           :title="$t('menu.plan.time')"
           show-overflow="false"
-        ></tiny-grid-column>
-      </tiny-grid>
-      <tiny-pager
+        />
+      </TinyGrid>
+      <TinyPager
         :current-page="custPager.currentPage"
         :page-size="custPager.pageSize"
         :total="tableData.length"
@@ -46,44 +83,7 @@
         :layout="pagerLayout"
         @current-change="currentChange"
         @size-change="sizeChange"
-      ></tiny-pager>
+      />
     </div>
   </div>
 </template>
-
-<script lang="ts" setup>
-  import { defineProps, ref, toRefs, computed, onMounted, onBeforeUnmount } from 'vue';
-  import {
-    Row as TinyRow,
-    Grid as TinyGrid,
-    GridColumn as TinyGridColumn,
-    Pager as TinyPager,
-  } from '@opentiny/vue';
-  import { useResponsive, useResponsiveSize } from '@/hooks/responsive'
-
-  const { gridSize } = useResponsiveSize()
-  const { sm } = useResponsive()
-   
-  const pagerLayout = computed(() =>
-    sm.value ? 'total, prev, pager, next' : 'total, sizes, prev, pager, next, jumper'
-  )
-
-  // 父组件传值
-  const props = defineProps({
-    tableData: [],
-  });
-
-  const { tableData } = toRefs(props);
-  const custPager = ref({
-    currentPage: 1,
-    pageSize: 5,
-  });
-
-  const currentChange = (current) => {
-    custPager.value.currentPage = current;
-  };
-
-  const sizeChange = (size) => {
-    custPager.value.pageSize = size;
-  };
-</script>
