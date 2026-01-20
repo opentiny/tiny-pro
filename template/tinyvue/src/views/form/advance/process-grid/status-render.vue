@@ -17,7 +17,7 @@ const type = computed(() => {
 })
 </script>
 
-<template lang="">
+<template>
   <div>
     <TinyTag v-if="value" :value="value" :type="type" />
     <div v-else>
@@ -26,4 +26,4 @@ const type = computed(() => {
   </div>
 </template>
 
-<style lang=""></style>
+<style scoped lang="less"></style>

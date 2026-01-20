@@ -1,21 +1,23 @@
-<script setup>
+<script lang="ts" setup>
 import { computed } from 'vue'
 
-const props = defineProps({
-  data: Object,
-  options: Array,
-  field: String,
-})
+interface CompProps {
+  data: Record<string, any>
+  options: Array<{ value: string, label: string }>
+  field: string
+}
+
+const { options, data, field } = defineProps<CompProps>()
+
 const tranformValue = computed(() => {
   return (
-    props.options.find(item => item.value === props.data.row[props.field])
-      ?.label ?? '--'
+    options.find(item => item.value === data.row[field])?.label ?? '--'
   )
 })
 </script>
 
-<template lang="">
+<template>
   <div>{{ tranformValue }} </div>
 </template>
 
-<style lang=""></style>
+<style scoped lang="less"></style>

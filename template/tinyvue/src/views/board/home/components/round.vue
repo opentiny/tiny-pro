@@ -109,8 +109,15 @@ watch(currentLocale, () => {
       <img src="@/assets/images/map-background3.png" class="image">
       <h3>{{ $t('home.round.title') }}</h3>
     </div>
+
     <div class="round w-full flex max-md:flex-col max-md:items-center">
-      <TinyChartRing ref="ringRef" :width="chartWidth" height="40vh" :options="options" :extend="chartExtend" />
+      <TinyChartRing
+        ref="ringRef"
+        :width="chartWidth"
+        height="40vh"
+        :options="options"
+        :extend="chartExtend"
+      />
       <div class="round-from ml-[5%] w-[46vw] max-md:ml-[0%] max-md:w-[100%] max-md:pt-[5%] max-sm:pt-[10%]">
         <RoundTable />
       </div>
@@ -119,7 +126,7 @@ watch(currentLocale, () => {
 </template>
 
 <style scoped lang="less">
-  .round-box {
+.round-box {
   margin-top: 20px;
   padding: 20px 16px;
   background: #fff;

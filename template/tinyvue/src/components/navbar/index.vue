@@ -9,11 +9,7 @@ import {
   Row as TinyRow,
   UserHead as TinyUserHead,
 } from '@opentiny/vue'
-import {
-  IconCheckOut,
-  IconEdit,
-  IconUser,
-} from '@opentiny/vue-icon'
+import { iconCheckOut, iconEdit, iconUser } from '@opentiny/vue-icon'
 import { computed, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { updatePwdUser } from '@/api/user'
@@ -42,13 +38,16 @@ const locales = [...LOCALE_OPTIONS]
 const { lg } = useResponsive()
 const { modalSize } = useResponsiveSize()
 
+const IconCheckOut = iconCheckOut()
+const IconEdit = iconEdit()
+const IconUser = iconUser()
+
 const menuOpen = ref(false)
 
 function toggleMenu() {
   menuOpen.value = !menuOpen.value
 }
 
-// 加载效果
 const state = reactive<{
   isPwdUpdate: boolean
   pwdData: any
@@ -170,12 +169,7 @@ async function handlePwdUpdateSubmit() {
   <div class="navbar">
     <div class="left-side">
       <div style="display: flex; align-items: center">
-        <img
-          class="max-lg:w-[38px]"
-          src="@/assets/images/opentiny-logo.png"
-          alt="logo"
-          @click="jumpUrl"
-        >
+        <img class="max-lg:w-[38px]" src="@/assets/images/opentiny-logo.png" alt="logo" @click="jumpUrl">
         <h5 @click="jumpUrl">
           OpenTiny
         </h5>
@@ -193,11 +187,7 @@ async function handlePwdUpdateSubmit() {
 
       <ul class="right-side" :class="{ open: menuOpen }">
         <li>
-          <input
-            id="navbar-search"
-            class="input-icon"
-            :placeholder="$t('setting.input.search')"
-          >
+          <input id="navbar-search" class="input-icon" :placeholder="$t('setting.input.search')">
         </li>
         <li v-if="!lg">
           <div class="divider" />
@@ -208,9 +198,7 @@ async function handlePwdUpdateSubmit() {
           <img src="@/assets/images/lan.png" alt="lan" class="navbar-lan">
           <div v-if="lan" class="trigger-lan">
             <li
-              v-for="(item, index) in locales"
-              :key="index"
-              :value="item.value"
+              v-for="(item, index) in locales" :key="index" :value="item.value"
               @click="changeLocale(locales[index].value)"
             >
               {{ item.label }}
@@ -252,24 +240,12 @@ async function handlePwdUpdateSubmit() {
   </div>
   <div v-if="state.isPwdUpdate">
     <TinyModal
-      v-model="state.isPwdUpdate"
-      :lock-scroll="true"
-      show-header
-      show-footer
-      mask-closable="true"
-      height="auto"
-      :width="modalSize"
-      :title="$t('userInfo.modal.title.pwdUpdate')"
+      v-model="state.isPwdUpdate" :lock-scroll="true" show-header show-footer mask-closable="true"
+      height="auto" :width="modalSize" :title="$t('userInfo.modal.title.pwdUpdate')"
     >
       <template #default>
         <tiny-layout>
-          <TinyForm
-            :model="state.pwdData"
-            :rules="rules"
-            label-width="120px"
-            :label-align="true"
-            label-position="left"
-          >
+          <TinyForm :model="state.pwdData" :rules="rules" label-width="120px" :label-align="true" label-position="left">
             <TinyRow :flex="true">
               <TinyCol :span="10" label-width="100px">
                 <TinyFormItem :label="$t('userInfo.table.email')">
@@ -280,45 +256,24 @@ async function handlePwdUpdateSubmit() {
 
             <TinyRow :flex="true">
               <TinyCol :span="10" label-width="100px">
-                <TinyFormItem
-                  :label="$t('userInfo.modal.input.oldPassword')"
-                  prop="oldPassword"
-                >
-                  <TinyInput
-                    v-model="state.pwdData.oldPassword"
-                    type="password"
-                    show-password
-                  />
+                <TinyFormItem :label="$t('userInfo.modal.input.oldPassword')" prop="oldPassword">
+                  <TinyInput v-model="state.pwdData.oldPassword" type="password" show-password />
                 </TinyFormItem>
               </TinyCol>
             </TinyRow>
 
             <TinyRow :flex="true">
               <TinyCol :span="10" label-width="100px">
-                <TinyFormItem
-                  :label="$t('userInfo.modal.input.newPassword')"
-                  prop="newPassword"
-                >
-                  <TinyInput
-                    v-model="state.pwdData.newPassword"
-                    type="password"
-                    show-password
-                  />
+                <TinyFormItem :label="$t('userInfo.modal.input.newPassword')" prop="newPassword">
+                  <TinyInput v-model="state.pwdData.newPassword" type="password" show-password />
                 </TinyFormItem>
               </TinyCol>
             </TinyRow>
 
             <TinyRow :flex="true">
               <TinyCol :span="10" label-width="100px">
-                <TinyFormItem
-                  :label="$t('userInfo.modal.input.confirmNewPassword')"
-                  prop="confirmNewPassword"
-                >
-                  <TinyInput
-                    v-model="state.pwdData.confirmNewPassword"
-                    type="password"
-                    show-password
-                  />
+                <TinyFormItem :label="$t('userInfo.modal.input.confirmNewPassword')" prop="confirmNewPassword">
+                  <TinyInput v-model="state.pwdData.confirmNewPassword" type="password" show-password />
                 </TinyFormItem>
               </TinyCol>
             </TinyRow>
@@ -327,14 +282,10 @@ async function handlePwdUpdateSubmit() {
       </template>
       <template #footer>
         <TinyButton type="primary" @click="handlePwdUpdateSubmit">
-          {{
-            $t('menu.btn.confirm')
-          }}
+          {{ $t('menu.btn.confirm') }}
         </TinyButton>
         <TinyButton @click="handlePwdUpdateCancel">
-          {{
-            $t('menu.btn.cancel')
-          }}
+          {{ $t('menu.btn.cancel') }}
         </TinyButton>
       </template>
     </TinyModal>
@@ -342,7 +293,7 @@ async function handlePwdUpdateSubmit() {
 </template>
 
 <style scoped lang="less">
-  .navbar {
+.navbar {
   display: flex;
   justify-content: space-between;
   height: 100%;

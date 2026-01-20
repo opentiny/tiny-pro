@@ -113,7 +113,7 @@ watch(
 </template>
 
 <style scoped lang="less">
-  .margin-bottom {
+.margin-bottom {
   display: flex;
   align-items: center;
   justify-content: center;

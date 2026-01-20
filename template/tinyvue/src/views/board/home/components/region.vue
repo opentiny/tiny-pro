@@ -129,8 +129,17 @@ const chartWidth = computed(() => windowWidth.value <= 768 ? '80vw' : '30vw')
       <img src="@/assets/images/map-background3.png" class="image">
       <h3>{{ $t('home.region.title') }}</h3>
     </div>
+
     <div class="region w-full flex max-md:flex-col max-md:items-center">
-      <TinyChartMap v-if="chartSettings.mapOrigin" ref="mapChartsRef" :width="chartWidth" :settings="chartSettings" :data="chartData" :visual-map="visualMap" :legend-visible="legendVisible" />
+      <TinyChartMap
+        v-if="chartSettings.mapOrigin"
+        ref="mapChartsRef"
+        :width="chartWidth"
+        :settings="chartSettings"
+        :data="chartData"
+        :visual-map="visualMap"
+        :legend-visible="legendVisible"
+      />
       <div class="region-from ml-[5%] w-[46vw] max-md:ml-[0%] max-md:w-[100%] max-md:pt-[5%] max-sm:pt-[10%]">
         <RegionTable />
       </div>
@@ -139,7 +148,7 @@ const chartWidth = computed(() => windowWidth.value <= 768 ? '80vw' : '30vw')
 </template>
 
 <style scoped lang="less">
-  .region-box {
+.region-box {
   margin-top: 20px;
   padding: 20px 16px;
   background: #fff;

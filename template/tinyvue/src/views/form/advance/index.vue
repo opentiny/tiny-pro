@@ -69,28 +69,21 @@ async function fetchData() {
 }
 </script>
 
-<template lang="">
+<template>
   <div class="container-list">
     <Breadcrumb :items="['menu.form', 'menu.form.advance']" />
     <div id="content-container">
       <div class="content">
         <div class="header mb-4">
-          {{
-            $t('advanceForm.form.basicInfo.title')
-          }}
+          {{ $t('advanceForm.form.basicInfo.title') }}
         </div>
         <BasicInfo ref="basicInfoRef" :project-data="projectData" />
       </div>
       <div class="content">
         <div class="header mb-4">
-          {{
-            $t('advanceForm.form.process.title')
-          }}
+          {{ $t('advanceForm.form.process.title') }}
         </div>
-        <ProcessGrid
-          ref="processGrid"
-          :options="processOptions"
-        />
+        <ProcessGrid ref="processGrid" :options="processOptions" />
       </div>
 
       <div class="footer">
@@ -110,7 +103,7 @@ async function fetchData() {
 </template>
 
 <style scoped lang="less">
-  .container-list {
+.container-list {
   flex: 1 1 auto;
   flex-direction: column;
   justify-content: space-between;

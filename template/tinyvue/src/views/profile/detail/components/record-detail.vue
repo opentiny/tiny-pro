@@ -4,7 +4,7 @@ import {
   GridColumn as TinyGridColumn,
   Pager as TinyPager,
 } from '@opentiny/vue'
-import { computed, defineProps, ref, toRefs } from 'vue'
+import { computed, ref, toRefs } from 'vue'
 import { useResponsive, useResponsiveSize } from '@/hooks/responsive'
 
 // 父组件传值

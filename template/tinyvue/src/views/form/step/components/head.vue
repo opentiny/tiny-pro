@@ -96,7 +96,7 @@ const userStore = useUserStore()
 </template>
 
 <style scoped lang="less">
-  .user-content {
+.user-content {
   display: flex;
   flex-direction: column;
   justify-content: center;

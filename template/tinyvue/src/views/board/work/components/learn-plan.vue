@@ -40,7 +40,7 @@ import {
               :percentage="20"
               color="#f23030"
             />
-            <span class="plan-pass">23  <span class="num">&nbsp;/ {{ $t('work.index.Numbers') }}</span> </span>
+            <span class="plan-pass">23 <span class="num">&nbsp;/ {{ $t('work.index.Numbers') }}</span> </span>
           </div>
         </div>
       </TinyCol>
@@ -83,18 +83,21 @@ import {
 </template>
 
 <style scoped lang="less">
-  .col {
+.col {
   height: 106px;
   text-align: center;
   background: #f5f5f5;
   border-radius: 10px;
+
   .col-content {
     margin: 0 24px;
     display: flex;
     justify-content: space-between;
+
     .progress {
       width: 50%;
     }
+
     .plan-pass {
       font-size: 20px;
       font-weight: 700;

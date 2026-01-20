@@ -100,7 +100,7 @@ import {
 </template>
 
 <style scoped lang="less">
-  .main {
+.main {
   padding: 0;
 
   .col {
@@ -186,13 +186,12 @@ import {
 :deep(.tiny-col:first-child) {
   padding-left: 0;
 }
+
 :deep(.tiny-col:last-child) {
   padding-right: 0;
 }
-</style>
 
-<style lang="less" scoped>
-  @media (max-width: @screen-xg) {
+@media (max-width: @screen-xg) {
   .main {
     display: none;
   }

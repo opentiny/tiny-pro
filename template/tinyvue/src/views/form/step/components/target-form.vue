@@ -54,7 +54,7 @@ defineExpose({
 </template>
 
 <style scoped lang="less">
-  .contain {
+.contain {
   display: flex;
   justify-content: start;
   padding-left: 14px;

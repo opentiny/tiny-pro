@@ -189,10 +189,12 @@ onMounted(() => {
   const el1 = barRef.value?.$el || barRef.value
   const el2 = lineRef.value?.$el || lineRef.value
 
-  if (el1)
+  if (el1) {
     observer.observe(el1)
-  if (el2)
+  }
+  if (el2) {
     observer.observe(el2)
+  }
 
   onUnmounted(() => observer.disconnect())
 })

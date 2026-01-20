@@ -1,15 +1,9 @@
 <script lang="ts" setup>
-import { IconYes } from '@opentiny/vue-icon'
+import type TinyThemeTool from '@opentiny/vue-theme/theme-tool'
+import { iconYes } from '@opentiny/vue-icon'
 import { inject, onMounted, watch } from 'vue'
 import { useAppStore } from '@/store'
-import {
-  DarkTheme,
-  DeepnessTheme,
-  PeachesTheme,
-  SwitchdarkColor,
-  SwitchlightColor,
-  VioletTheme,
-} from './type'
+import { DarkTheme, DeepnessTheme, PeachesTheme, SwitchdarkColor, SwitchlightColor, VioletTheme } from './type'
 
 // 默认循环颜色内容
 const themeTitle = [
@@ -44,9 +38,10 @@ const themeTitle = [
     color: 'dark',
   },
 ]
-const Yes = IconYes()
+
+const Yes = iconYes()
 const appStore = useAppStore()
-const theme = inject('THEME')
+const theme = inject<TinyThemeTool>('THEME')
 
 onMounted(() => {
   if (appStore.themelist === 'none') {
@@ -86,12 +81,7 @@ function change(item: any) {
 }
 
 // 选中自定义
-function choose(item: {
-  value?: number
-  color?: string
-  dark: any
-  theme: any
-}) {
+function choose(item: typeof SwitchdarkColor[0] | typeof SwitchlightColor[0]) {
   appStore.themelist = 'none'
   appStore.updateSettings({ themeValue: item.value })
   theme.changeTheme(item.theme)
@@ -138,13 +128,7 @@ watch(
               <h4>{{ $t(item.title) }}</h4>
               <span>{{ $t(item.content) }}</span>
               <div class="theme-tip">
-                <Yes
-                  :class="
-                    item.color === appStore.themelist
-                      ? 'theme-list-yes'
-                      : 'theme-list-no'
-                  "
-                />
+                <Yes :class="item.color === appStore.themelist ? 'theme-list-yes' : 'theme-list-no'" />
               </div>
             </div>
           </div>
@@ -155,20 +139,9 @@ watch(
         <div>
           <span>{{ $t('theme.title.light') }}</span>
           <div class="theme-line flex max-sm:grid max-sm:grid-cols-4 max-sm:gap-2">
-            <div
-              v-for="item in SwitchlightColor"
-              :key="item.value"
-              class="light"
-            >
-              <div
-                class="theme-block"
-                :style="{ 'background-color': item.color }"
-                @click="choose(item)"
-              >
-                <Yes
-                  v-if="item.value === appStore.themeValue"
-                  class="theme-yes"
-                />
+            <div v-for="item in SwitchlightColor" :key="item.value" class="light">
+              <div class="theme-block" :style="{ 'background-color': item.color }" @click="choose(item)">
+                <Yes v-if="item.value === appStore.themeValue" class="theme-yes" />
               </div>
             </div>
           </div>
@@ -176,20 +149,9 @@ watch(
         <div>
           <span>{{ $t('theme.title.deep') }}</span>
           <div class="theme-line flex max-sm:grid max-sm:grid-cols-4 max-sm:gap-2">
-            <div
-              v-for="item in SwitchdarkColor"
-              :key="item.value"
-              class="black"
-            >
-              <div
-                class="theme-block"
-                :style="{ 'background-color': item.color }"
-                @click="choose(item)"
-              >
-                <Yes
-                  v-if="item.value === appStore.themeValue"
-                  class="theme-yes"
-                />
+            <div v-for="item in SwitchdarkColor" :key="item.value" class="black">
+              <div class="theme-block" :style="{ 'background-color': item.color }" @click="choose(item)">
+                <Yes v-if="item.value === appStore.themeValue" class="theme-yes" />
               </div>
             </div>
           </div>
@@ -200,7 +162,7 @@ watch(
 </template>
 
 <style scoped lang="less">
-  .theme-content {
+.theme-content {
   height: calc(100vh - 15px);
   overflow-y: auto;
 }

@@ -8,9 +8,6 @@ import router from '@/router'
 import { useAppStore, useTabStore } from '@/store'
 import { useMenuStore } from '@/store/modules/router'
 
-const menuStore = useMenuStore()
-await menuStore.getMenuList()
-const rawMenuData = computed(() => useDeepClone(unref(menuStore.menuList)))
 type SideMenuData = (ITreeNodeData & { meta: { url: string } })[]
 
 let routerTitle = [] as any
@@ -45,6 +42,10 @@ function filtter(treeNodeDatas: ITreeNodeData[]) {
   return menus
 }
 
+const menuStore = useMenuStore()
+menuStore.getMenuList()
+const rawMenuData = computed(() => useDeepClone(unref(menuStore.menuList)))
+
 const MenuData = computed(() => {
   if (routerTitle.length) {
     routerTitle = []
@@ -68,7 +69,9 @@ function findId(name: string, path: string) {
     if (url.join('/') === path) {
       return item.id
     }
+
     const len = item.children.length ?? 0
+
     for (let i = 0; i < len; i += 1) {
       if (item.children?.[i]) {
         const id = dfs(
@@ -82,6 +85,7 @@ function findId(name: string, path: string) {
     }
     return undefined
   }
+
   for (let i = 0; i < MenuData.value.length; i += 1) {
     const menu = MenuData.value[i]
     const data = dfs(menu, [
@@ -94,9 +98,11 @@ function findId(name: string, path: string) {
   }
   return -1
 }
+
 const tree = ref()
 const expandeArr = ref<(string | number)[]>([])
 const tabStore = useTabStore()
+
 onMounted(() => {
   if (window.innerWidth <= 768) {
     const collapseBtn = document.querySelector('.tiny-tree-menu__toggle-button')
@@ -127,7 +133,6 @@ onMounted(() => {
       :data="MenuData"
       :show-filter="false"
       node-key="id"
-
       :default-expanded-keys="expandeArr"
       only-check-children
       check-strictly

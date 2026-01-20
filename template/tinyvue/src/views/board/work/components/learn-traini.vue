@@ -51,7 +51,9 @@ onMounted(() => {
           class="col flex flex-col items-start justify-start rounded bg-white p-6"
         >
           <img src="@/assets/images/collectImage1.png" class="h-10 w-10">
-          <div class="favorite-title mt-3 text-[14px] font-bold leading-[22px] max-md:text-[12px] max-md:leading-[18px]">
+          <div
+            class="favorite-title mt-3 text-[14px] font-bold leading-[22px] max-md:text-[12px] max-md:leading-[18px]"
+          >
             {{ $t(item.value) }}
           </div>
           <div class="mt-2 text-left text-[12px] text-gray-500 max-md:text-[10px] max-md:leading-[16px]">
@@ -75,7 +77,7 @@ onMounted(() => {
 </template>
 
 <style scoped lang="less">
-  .favorite-title {
+.favorite-title {
   &:hover {
     text-decoration: underline;
   }

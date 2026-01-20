@@ -4,7 +4,7 @@ import {
   TabItem as TinyTabItem,
   Tabs as TinyTabs,
 } from '@opentiny/vue'
-import { IconChevronDown } from '@opentiny/vue-icon'
+import { iconChevronDown } from '@opentiny/vue-icon'
 import { onMounted, reactive, ref, watch } from 'vue'
 import { getUserData } from '@/api/user'
 import { useResponsive } from '@/hooks/responsive'
@@ -30,7 +30,7 @@ const state = reactive<{
 
 // 变量设置
 const userStore = useUserStore()
-const ChevronDown = IconChevronDown()
+const ChevronDown = iconChevronDown()
 const activeName = ref('1')
 const Filter = ref(false)
 const Sort = ref(false)

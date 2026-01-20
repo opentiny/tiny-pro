@@ -1,18 +1,10 @@
 <script lang="ts" setup>
-import type { PropType } from 'vue'
 import {
   Breadcrumb as TinyBreadcrumb,
   BreadcrumbItem as TinyBreadcrumbItem,
 } from '@opentiny/vue'
 
-defineProps({
-  items: {
-    type: Array as PropType<string[]>,
-    default() {
-      return []
-    },
-  },
-})
+const { items = [] } = defineProps<{ items?: string[] }>()
 </script>
 
 <template>
@@ -24,7 +16,7 @@ defineProps({
 </template>
 
 <style scoped lang="less">
-  .container-breadcrumb {
+.container-breadcrumb {
   margin: 16px 0px;
 }
 </style>
