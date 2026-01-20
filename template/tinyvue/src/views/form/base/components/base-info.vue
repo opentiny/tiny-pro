@@ -11,14 +11,7 @@ import {
   Row as TinyRow,
   Select as TinySelect,
 } from '@opentiny/vue'
-import {
-  computed,
-  defineExpose,
-  defineProps,
-  reactive,
-  ref,
-  toRefs,
-} from 'vue'
+import { computed, reactive, ref, toRefs } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 interface FilterOptions {
