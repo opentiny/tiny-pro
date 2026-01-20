@@ -10,9 +10,9 @@ import {
   UserHead as TinyUserHead,
 } from '@opentiny/vue'
 import {
-  IconCheckOut,
-  IconEdit,
-  IconUser,
+  iconCheckOut,
+  iconEdit,
+  iconUser,
 } from '@opentiny/vue-icon'
 import { computed, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -41,6 +41,10 @@ const { changeLocale } = useLocale()
 const locales = [...LOCALE_OPTIONS]
 const { lg } = useResponsive()
 const { modalSize } = useResponsiveSize()
+
+const IconCheckOut = iconCheckOut()
+const IconEdit = iconEdit()
+const IconUser = iconUser()
 
 const menuOpen = ref(false)
 

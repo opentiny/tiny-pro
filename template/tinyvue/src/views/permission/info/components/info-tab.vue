@@ -22,7 +22,7 @@ import {
   TinyPopconfirm,
   Row as TinyRow,
 } from '@opentiny/vue'
-import { IconDel } from '@opentiny/vue-icon'
+import { iconDel } from '@opentiny/vue-icon'
 import { computed, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
@@ -40,6 +40,8 @@ const { t } = useI18n()
 
 const { gridSize, modalSize } = useResponsiveSize()
 const { sm } = useResponsive()
+
+const IconDel = iconDel()
 
 // 加载效果
 const state = reactive<{

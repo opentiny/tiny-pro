@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import { Button as TinyButton } from '@opentiny/vue'
-import { IconLanguage } from '@opentiny/vue-icon'
+import { iconLanguage } from '@opentiny/vue-icon'
 import { ref } from 'vue'
 import useLocale from '@/hooks/locale'
 import { LOCALE_OPTIONS } from '@/locale'
 
 const locales = [...LOCALE_OPTIONS]
 const { changeLocale } = useLocale()
-const Language = IconLanguage()
+const IconLanguage = iconLanguage()
 const LangDrop = ref(false)
 
 function changeLangDrop() {
@@ -16,7 +16,7 @@ function changeLangDrop() {
 </script>
 
 <template>
-  <TinyButton :icon="Language" circle @click="changeLangDrop" />
+  <TinyButton :icon="IconLanguage" circle @click="changeLangDrop" />
   <span>{{ $t('login.icon.language') }}</span>
   <div v-if="LangDrop" class="login-lan-drop">
     <li

@@ -10,7 +10,7 @@ import {
   TinyPopconfirm,
   TinySelect,
 } from '@opentiny/vue'
-import { IconCueL, IconDel } from '@opentiny/vue-icon'
+import { iconCueL, iconDel } from '@opentiny/vue-icon'
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { deleteRole, updateRole } from '@/api/role'
@@ -35,6 +35,9 @@ const emits = defineEmits<{
   roleDelete: [number]
   updateRoleClose: []
 }>()
+
+const IconCueL = iconCueL()
+const IconDel = iconDel()
 
 const { gridSize } = useResponsiveSize()
 

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { IconYes } from '@opentiny/vue-icon'
+import { iconYes } from '@opentiny/vue-icon'
 import { inject, onMounted, watch } from 'vue'
 import { useAppStore } from '@/store'
 import {
@@ -44,7 +44,7 @@ const themeTitle = [
     color: 'dark',
   },
 ]
-const Yes = IconYes()
+const Yes = iconYes()
 const appStore = useAppStore()
 const theme = inject('THEME')
 

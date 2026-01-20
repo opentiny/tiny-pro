@@ -4,7 +4,7 @@ import {
   Button as TinyButton,
   Switch as TinySwitch,
 } from '@opentiny/vue'
-import { IconClose } from '@opentiny/vue-icon'
+import { iconClose } from '@opentiny/vue-icon'
 import { useClipboard } from '@vueuse/core'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -14,6 +14,8 @@ const { copy } = useClipboard()
 const appStore = useAppStore()
 const visible = computed(() => appStore.Settings)
 const { t } = useI18n()
+
+const IconClose = iconClose()
 
 function cancel() {
   appStore.updateSettings({ Settings: false })

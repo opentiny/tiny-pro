@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { ITreeNodeData } from '@/router/guard/menu'
 import { TinyGrid, TinyGridColumn, TinyPopconfirm } from '@opentiny/vue'
-import { IconDel, IconEdit } from '@opentiny/vue-icon'
+import { iconDel, iconEdit } from '@opentiny/vue-icon'
 import { ref, watch } from 'vue'
 import { useResponsiveSize } from '@/hooks/responsive'
 
@@ -17,6 +17,9 @@ const emits = defineEmits<{
 }>()
 
 const { gridSize } = useResponsiveSize()
+
+const IconDel = iconDel()
+const IconEdit = iconEdit()
 
 export interface Node {
   data: ITreeNodeData
