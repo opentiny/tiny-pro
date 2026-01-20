@@ -115,6 +115,7 @@ const Home = [
         font-weight: 700;
         margin-bottom: 16px;
       }
+
       .card-coach {
         position: absolute;
         top: 24px;
@@ -138,6 +139,7 @@ const Home = [
       .card-home {
         margin-top: 0px;
         flex: 1;
+
         span:hover {
           text-decoration: underline;
         }
@@ -209,6 +211,7 @@ const Home = [
     margin-top: 7px;
     margin-right: 16px;
   }
+
   .is-old {
     background: #ff8800;
   }

@@ -114,34 +114,23 @@ async function fetchData(
 
 <template>
   <div class="container">
-    <TinyGrid :key="sm ? 'sm' : 'lg'" :fetch-data="fetchDataOption" :pager="sm ? pagerConfigSm : pagerConfigLg" :size="gridSize" :auto-resize="true" align="center">
-      <TinyGridColumn
-        field="id"
-        :title="$t('home.roundtable.index')"
-        width="16%"
-      />
-      <TinyGridColumn
-        field="space"
-        :title="$t('home.roundtable.space')"
-      />
-      <TinyGridColumn
-        field="pv"
-        :title="$t('home.roundtable.pv')"
-      />
-      <TinyGridColumn
-        field="play"
-        :title="$t('home.roundtable.play')"
-      />
-      <TinyGridColumn
-        field="page"
-        :title="$t('home.roundtable.page')"
-      />
+    <TinyGrid
+      :key="sm ? 'sm' : 'lg'"
+      :fetch-data="fetchDataOption"
+      :pager="sm ? pagerConfigSm : pagerConfigLg"
+      :size="gridSize" :auto-resize="true" align="center"
+    >
+      <TinyGridColumn field="id" :title="$t('home.roundtable.index')" width="16%" />
+      <TinyGridColumn field="space" :title="$t('home.roundtable.space')" />
+      <TinyGridColumn field="pv" :title="$t('home.roundtable.pv')" />
+      <TinyGridColumn field="play" :title="$t('home.roundtable.play')" />
+      <TinyGridColumn field="page" :title="$t('home.roundtable.page')" />
     </TinyGrid>
   </div>
 </template>
 
 <style scoped lang="less">
-  .container {
+.container {
   width: inherit;
 }
 </style>

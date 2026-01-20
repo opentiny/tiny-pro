@@ -353,14 +353,22 @@ watch(currentLocale, (newValue) => {
   <div class="curve-box">
     <img src="@/assets/images/map-background3.png" class="image">
     <h3>{{ $t('home.curve.trend') }}</h3>
+
     <div class="curve">
-      <TinyChartHistogram ref="chartRef" width="100%" height="100%" :data-zoom="dataZoom" :options="options" :extend="chartExtend" class="max-md:pt-[26px]" />
+      <TinyChartHistogram
+        ref="chartRef"
+        width="100%"
+        height="100%"
+        :data-zoom="dataZoom"
+        :options="options"
+        :extend="chartExtend" class="max-md:pt-[26px]"
+      />
     </div>
   </div>
 </template>
 
 <style scoped lang="less">
-  .curve-box {
+.curve-box {
   margin-top: 20px;
   padding: 20px 16px;
   background: #fff;

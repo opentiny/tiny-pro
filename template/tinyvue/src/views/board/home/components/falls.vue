@@ -76,7 +76,7 @@ const options = ref({
     axisLabel: {
       formatter(value: any, index: any) {
         return (
-        // eslint-disable-next-line prefer-template
+          // eslint-disable-next-line prefer-template
           list[index]?.label + '  ' + list[index]?.value + '  ' + value + 's'
         )
       },
@@ -211,13 +211,21 @@ watch(currentLocale, () => {
     <div class="falls">
       <img src="@/assets/images/map-background2.png" class="image">
       <h3>{{ $t('home.falls.line') }}</h3>
-      <TinyChartWaterfall id="flow" ref="waterFallRef" width="100%" height="100%" :options="options" :extend="chartExtend" />
+
+      <TinyChartWaterfall
+        id="flow"
+        ref="waterFallRef"
+        width="100%"
+        height="100%"
+        :options="options"
+        :extend="chartExtend"
+      />
     </div>
   </div>
 </template>
 
 <style scoped lang="less">
-  .falls-box {
+.falls-box {
   margin-top: 20px;
   padding: 20px 16px;
   background: #fff;
