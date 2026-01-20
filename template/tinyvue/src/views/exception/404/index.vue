@@ -16,5 +16,5 @@
 </template>
 
 <style scoped lang="less">
-  @import '@/assets/style/exception.less'; /* 引入公共样式 */
+@import '@/assets/style/exception.less';
 </style>
