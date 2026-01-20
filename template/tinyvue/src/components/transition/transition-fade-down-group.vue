@@ -29,7 +29,7 @@ function onEnter(el: HTMLElement, done: () => void) {
 </template>
 
 <style lang="less">
-  .fade-slide-top-bottom-enter-active {
+.fade-slide-top-bottom-enter-active {
   transition: all 300ms ease-out;
 }
 

@@ -5,7 +5,7 @@
 </template>
 
 <style lang="less">
-  .left-slide-fade-enter-active {
+.left-slide-fade-enter-active {
   transition: all 300ms ease-out;
 }
 
