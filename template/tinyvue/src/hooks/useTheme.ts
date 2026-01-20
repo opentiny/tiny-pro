@@ -4,14 +4,16 @@ import * as Themes from '@/components/theme/type'
 import { useAppStore } from '@/store'
 import useThemes from './themes'
 
-export function useTheme(themeTool: typeof TinyThemeTool) {
+export function useTheme(themeTool: TinyThemeTool) {
   const { themelist, $patch } = useAppStore()
   const themeName = computed(() =>
     themelist?.length
       ? `${themelist[0].toUpperCase()}${themelist.slice(1).toLowerCase()}Theme`
       : 'DefaultTheme',
   )
+
   const { isDark } = useThemes()
+
   watch(
     themeName,
     () => {
@@ -23,6 +25,7 @@ export function useTheme(themeTool: typeof TinyThemeTool) {
     },
     { immediate: true },
   )
+
   onMounted(() => {
     watch(
       isDark,
@@ -37,10 +40,12 @@ export function useTheme(themeTool: typeof TinyThemeTool) {
       { immediate: true },
     )
   })
+
   const toggleTheme = (name: string) => {
     $patch({
       themelist: name,
     })
   }
+
   return { toggleTheme }
 }

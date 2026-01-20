@@ -1,10 +1,5 @@
 <script lang="ts" setup>
-import {
-  Modal,
-  TabItem,
-  Tabs,
-  Modal as tinyModal,
-} from '@opentiny/vue'
+import { Modal, TabItem, Tabs, Modal as tinyModal } from '@opentiny/vue'
 import locale from '@opentiny/vue-locale'
 import TinyThemeTool from '@opentiny/vue-theme/theme-tool'
 import { computed, nextTick, provide, ref, watch } from 'vue'
@@ -172,6 +167,7 @@ const disTheme = ref(false)
 const theme = new TinyThemeTool()
 useTheme(theme)
 provide('THEME', theme)
+
 function themeVisible() {
   disTheme.value = !disTheme.value
 }
@@ -211,9 +207,15 @@ watch(appStore.$state, (newValue) => {
       </div>
       <div class="flex">
         <Suspense>
-          <Menu v-if="reloadKey !== 'menu' && layoutMode[myPattern].menu" class="z-[100] shadow-[0_4px_12px_#0000001a]" />
+          <Menu
+            v-if="reloadKey !== 'menu' && layoutMode[myPattern].menu"
+            class="z-[100] shadow-[0_4px_12px_#0000001a]"
+          />
         </Suspense>
-        <div class="h-[calc(100vh-60px)] flex-1 bg-[#f5f6f7] text-[#ccc]" :style="{ width: isMenuCollapsed ? '100%' : 'calc(100% - 220px)', padding: '0 10px' }">
+        <div
+          class="h-[calc(100vh-60px)] flex-1 bg-[#f5f6f7] text-[#ccc]"
+          :style="{ width: isMenuCollapsed ? '100%' : 'calc(100% - 220px)', padding: '0 10px' }"
+        >
           <Tabs
             :key="tabsRefreshKey"
             v-model="currentTabName"
@@ -240,13 +242,8 @@ watch(appStore.$state, (newValue) => {
     </div>
     <div v-if="disTheme">
       <tiny-modal
-        v-model="disTheme"
-        show-header
-        show-footer
-        :title="$t('theme.title.main')"
-        mask-closable="true"
-        height="auto"
-        :width="modalSize"
+        v-model="disTheme" show-header show-footer :title="$t('theme.title.main')" mask-closable="true"
+        height="auto" :width="modalSize"
       >
         <template #default>
           <Theme />
@@ -254,17 +251,12 @@ watch(appStore.$state, (newValue) => {
         <template #footer />
       </tiny-modal>
     </div>
-    <img
-      v-if="!appStore.navbar"
-      src="@/assets/images/global.png"
-      class="global-setting"
-      @click="switchSet"
-    >
+    <img v-if="!appStore.navbar" src="@/assets/images/global.png" class="global-setting" @click="switchSet">
   </div>
 </template>
 
 <style scoped lang="less">
-  .layout {
+.layout {
   width: 100%;
   height: 100%;
 }

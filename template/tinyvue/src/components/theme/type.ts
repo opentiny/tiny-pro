@@ -696,7 +696,8 @@ const Theme21 = {
     'tv-base-icon-color': '#252b3a',
   },
 }
-const SwitchlightColor: any = [
+
+const SwitchlightColor = [
   {
     value: 1,
     color: '#343a40',
@@ -747,7 +748,7 @@ const SwitchlightColor: any = [
   },
 ]
 
-const SwitchdarkColor: any = [
+const SwitchdarkColor = [
   {
     value: 9,
     color: '#343a40',
