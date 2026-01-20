@@ -70,9 +70,7 @@ onMounted(() => {
     />
     <template #footer>
       <TinyButton round @click="() => emits('close')">
-        {{
-          $t('menu.btn.cancel')
-        }}
+        {{ $t('menu.btn.cancel') }}
       </TinyButton>
       <TinyButton round type="primary" @click="onConfirm">
         {{ $t('menu.btn.confirm') }}

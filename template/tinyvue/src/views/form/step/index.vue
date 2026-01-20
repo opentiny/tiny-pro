@@ -85,7 +85,7 @@ function handleFormRestore() {
 </template>
 
 <style scoped lang="less">
-  .form-card {
+.form-card {
   padding: 24px 14px;
 }
 

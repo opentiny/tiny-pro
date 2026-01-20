@@ -7,7 +7,6 @@ interface CompProps {
     department: any[]
   }
 }
-
 defineProps<CompProps>()
 
 const gridTable = ref({
@@ -36,13 +35,11 @@ defineExpose({
 })
 </script>
 
-<template lang="">
+<template>
   <div>
     <div class="mb-4">
       <TinyButton @click="addRow">
-        {{
-          $t('advanceForm.form.process.add')
-        }}
+        {{ $t('advanceForm.form.process.add') }}
       </TinyButton>
     </div>
     <TinyGrid
@@ -142,6 +139,7 @@ defineExpose({
         }"
         format-text="longDateTime"
       />
+
       <TinyGridColumn
         :title="$t('advanceForm.form.process.operation')"
         field="operation"
@@ -184,7 +182,7 @@ defineExpose({
 </template>
 
 <style scoped lang="less">
-  .operation-icon {
+.operation-icon {
   margin-right: 3px;
   fill: currentColor;
 }
