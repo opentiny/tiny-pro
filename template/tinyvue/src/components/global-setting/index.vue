@@ -66,10 +66,7 @@ function changefooter(item: boolean) {
             <div>{{ $t('settings.navbar') }}</div>
             <div>{{ $t('setting.mode.navbar') }}</div>
           </span>
-          <TinySwitch
-            v-model="appStore.navbar"
-            @change="changenavbar"
-          />
+          <TinySwitch v-model="appStore.navbar" @change="changenavbar" />
         </div>
 
         <div>
@@ -77,10 +74,7 @@ function changefooter(item: boolean) {
             <div>{{ $t('settings.menu') }}</div>
             <div>{{ $t('setting.mode.menu') }}</div>
           </span>
-          <TinySwitch
-            v-model="appStore.menu"
-            @change="changemenu"
-          />
+          <TinySwitch v-model="appStore.menu" @change="changemenu" />
         </div>
 
         <div>
@@ -88,10 +82,7 @@ function changefooter(item: boolean) {
             <div>{{ $t('settings.footer') }}</div>
             <div>{{ $t('setting.mode.footer') }}</div>
           </span>
-          <TinySwitch
-            v-model="appStore.footer"
-            @change="changefooter"
-          />
+          <TinySwitch v-model="appStore.footer" @change="changefooter" />
         </div>
       </div>
 
@@ -112,7 +103,7 @@ function changefooter(item: boolean) {
 </template>
 
 <style scoped lang="less">
-  .global-set-contain {
+.global-set-contain {
   position: fixed;
   top: 0;
   left: 0;

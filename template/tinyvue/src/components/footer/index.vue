@@ -14,7 +14,7 @@
 </template>
 
 <style lang="less" scoped>
-  .footer {
+.footer {
   display: flex;
   align-items: center;
   justify-content: center;
