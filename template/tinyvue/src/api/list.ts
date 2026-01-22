@@ -17,14 +17,14 @@ export interface BaseEmployeeInfo {
   workbenchName: string
   project: string
   address: string
+  createTime: string
+  lastUpdateUser: string
 }
 
 export interface EmployeeInfo extends BaseEmployeeInfo {
   id: string
   rank: string
   description: string
-  createTime: string
-  lastUpdateUser: string
 }
 
 export interface UpdateEmployeeInfo extends BaseEmployeeInfo {

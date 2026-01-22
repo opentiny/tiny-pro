@@ -1,28 +1,22 @@
 <script lang="ts" setup>
-import type { EmployeeInfo, QueryTaskParmas, UpdateEmployeeInfo } from '@/api/list'
+import type { EmployeeInfo, QueryTaskParmas } from '@/api/list'
 import {
   Modal,
   Button as TinyButton,
-  Col as TinyCol,
-  DatePicker as TinyDatePicker,
-  DialogBox as TinyDialogBox,
   FileUpload as TinyFileUpload,
-  Form as TinyForm,
-  FormItem as TinyFormItem,
   Grid as TinyGrid,
   GridColumn as TinyGridColumn,
-  Input as TinyInput,
   Pager as TinyPager,
   Popconfirm as TinyPopconfirm,
-  Row as TinyRow,
-  Select as TinySelect,
 } from '@opentiny/vue'
 import { iconDel, iconEditor, iconRefresh, iconSetting } from '@opentiny/vue-icon'
 import { t } from '@opentiny/vue-locale'
-import { reactive, ref } from 'vue'
+import { defineAsyncComponent, reactive, ref } from 'vue'
 import * as XLSX from 'xlsx'
-import { deleteEmployee, getEmployeeInfo, queryEmployeeList, updateEmployeeInfo } from '@/api/list'
+import { deleteEmployee, queryEmployeeList } from '@/api/list'
 import { useResponsive, useResponsiveSize } from '@/hooks/responsive'
+
+const EditDialog = defineAsyncComponent(() => import('./components/EditDialog.vue'))
 
 const IconEditor = iconEditor()
 const IconDel = iconDel()
@@ -174,32 +168,6 @@ function handleRefresh() {
   taskGrid?.value.handleFetch('reload')
 }
 
-const updateVisibility = ref(false)
-
-const localeForm = ref()
-const formModel = reactive<UpdateEmployeeInfo>({
-  id: '',
-  name: '',
-  employeeNo: '',
-  departmentLevel: '',
-  department: '',
-  status: '',
-  workbenchName: '',
-  project: '',
-  type: '',
-  address: '',
-  roles: '',
-})
-
-const departmentLevelOptions = reactive([
-  { label: '一级', value: '一级' },
-  { label: '二级', value: '二级' },
-  { label: '三级', value: '三级' },
-])
-const departmentOptions = reactive([
-  { label: '公共服务部', value: '公共服务部' },
-  { label: '计算管理部', value: '计算管理部' },
-])
 const statusOptions = reactive([
   {
     value: '0',
@@ -219,36 +187,11 @@ function getStatusText(status: string) {
   return statusOptions.find(({ value }) => status === value)?.label || ''
 }
 
-const rolesOptions = reactive([
-  { label: '前端', value: '前端' },
-  { label: '后端', value: '后端' },
-  { label: '测试', value: '测试' },
-])
-const lastUpdateUserOptions = reactive([
-  { label: '张三', value: '张三' },
-  { label: '李四', value: '李四' },
-  { label: '王五', value: '王五' },
-])
+const updateVisibility = ref(false)
+const currentEmployeeId = ref('')
 
-function handleUpdateSubmit() {
-  localeForm.value.validate().then(() => {
-    // 提交表单
-    updateEmployeeInfo(formModel).then(() => {
-      Modal.message({
-        message: '更新成功',
-        status: 'success',
-      })
-      handleRefresh()
-      updateVisibility.value = false
-    })
-  })
-}
-
-async function handleUpdated(id: string) {
-  const res = await getEmployeeInfo(id)
-  Object.keys(formModel).forEach((key) => {
-    formModel[key] = res[key] || ''
-  })
+function handleUpdated(id: string) {
+  currentEmployeeId.value = id
   updateVisibility.value = true
 }
 
@@ -372,93 +315,12 @@ function toCsvEvent() {
         </div>
       </div>
     </div>
-    <TinyDialogBox
-      v-model:visible="updateVisibility" :title="t('userInfo.table.updateTable')" width="700px"
-      :close-on-click-modal="false"
-    >
-      <TinyForm ref="localeForm" :model="formModel" label-position="left" label-width="94px">
-        <TinyRow>
-          <TinyCol :span="6">
-            <TinyFormItem :label="$t('searchTable.columns.name')" prop="name">
-              <TinyInput v-model="formModel.name" />
-            </TinyFormItem>
-          </TinyCol>
-          <TinyCol :span="6">
-            <TinyFormItem :label="$t('searchTable.columns.employeeNo')" prop="employeeNo">
-              <TinyInput v-model="formModel.employeeNo" />
-            </TinyFormItem>
-          </TinyCol>
-        </TinyRow>
-        <TinyRow>
-          <TinyCol :span="6">
-            <TinyFormItem :label="$t('searchTable.columns.departmentLevel')" prop="departmentLevel">
-              <TinySelect v-model="formModel.departmentLevel" :options="departmentLevelOptions" />
-            </TinyFormItem>
-          </TinyCol>
-          <TinyCol :span="6">
-            <TinyFormItem :label="$t('searchTable.columns.department')" prop="department">
-              <TinySelect v-model="formModel.department" :options="departmentOptions" />
-            </TinyFormItem>
-          </TinyCol>
-        </TinyRow>
-        <TinyRow>
-          <TinyCol :span="6">
-            <TinyFormItem :label="$t('searchTable.columns.status')" prop="status">
-              <TinySelect v-model="formModel.status" :options="statusOptions" />
-            </TinyFormItem>
-          </TinyCol>
-          <TinyCol :span="6">
-            <TinyFormItem :label="$t('searchTable.columns.workbenchName')" prop="workbenchName">
-              <TinyInput v-model="formModel.workbenchName" />
-            </TinyFormItem>
-          </TinyCol>
-        </TinyRow>
-        <TinyRow>
-          <TinyCol :span="6">
-            <TinyFormItem :label="$t('searchTable.columns.project')" prop="project">
-              <TinyInput v-model="formModel.project" />
-            </TinyFormItem>
-          </TinyCol>
-          <TinyCol :span="6">
-            <TinyFormItem :label="$t('searchTable.columns.type')" prop="type">
-              <TinyInput v-model="formModel.type" />
-            </TinyFormItem>
-          </TinyCol>
-        </TinyRow>
-        <TinyRow>
-          <TinyCol :span="6">
-            <TinyFormItem :label="$t('searchTable.columns.address')" prop="address">
-              <TinyInput v-model="formModel.address" />
-            </TinyFormItem>
-          </TinyCol>
-          <TinyCol :span="6">
-            <TinyFormItem :label="$t('searchTable.columns.roles')" prop="roles">
-              <TinySelect v-model="formModel.roles" :options="rolesOptions" />
-            </TinyFormItem>
-          </TinyCol>
-        </TinyRow>
-        <TinyRow>
-          <TinyCol :span="6">
-            <TinyFormItem :label="$t('searchTable.columns.lastUpdateUser')" prop="lastUpdateUser">
-              <TinySelect v-model="formModel.lastUpdateUser" :options="lastUpdateUserOptions" />
-            </TinyFormItem>
-          </TinyCol>
-          <TinyCol :span="6">
-            <TinyFormItem :label="$t('searchTable.columns.createTime')" prop="createTime">
-              <TinyDatePicker v-model="formModel.createTime" placeholder="请选择日期" />
-            </TinyFormItem>
-          </TinyCol>
-        </TinyRow>
-      </TinyForm>
-      <template #footer>
-        <TinyButton size="small" @click="updateVisibility = false">
-          {{ $t('menu.btn.cancel') }}
-        </TinyButton>
-        <TinyButton size="small" type="primary" @click="handleUpdateSubmit">
-          {{ $t('menu.btn.confirm') }}
-        </TinyButton>
-      </template>
-    </TinyDialogBox>
+
+    <EditDialog
+      v-model="updateVisibility"
+      :employee-id="currentEmployeeId"
+      :on-refresh="handleRefresh"
+    />
   </div>
 </template>
 
