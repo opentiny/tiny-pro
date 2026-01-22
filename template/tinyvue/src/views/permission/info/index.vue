@@ -8,3 +8,5 @@ import infoTab from './components/info-tab.vue'
     <info-tab />
   </GeneralLayout>
 </template>
+
+<style lang="less" scoped></style>
