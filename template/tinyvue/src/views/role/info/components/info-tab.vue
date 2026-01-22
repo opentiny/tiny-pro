@@ -34,11 +34,7 @@ const { t } = useI18n()
 const tableData = ref<any[]>([])
 const menus = ref<ITreeNodeData[]>([])
 const { open, onOpen, onClose } = useDisclosure()
-const {
-  open: addModalVisible,
-  onOpen: onAdd,
-  onClose: onAddHide,
-} = useDisclosure()
+const { open: addModalVisible, onOpen: onAdd, onClose: onAddHide } = useDisclosure()
 const { loading, setLoading } = useLoading()
 const i18MenuDatas = computed(() => useI18nMenu(menus.value, t))
 const selectedId = ref<number[]>([])
@@ -250,7 +246,7 @@ function onRoleDelete() {
 </template>
 
 <style scoped lang="less">
-  #contain {
+#contain {
   height: 100%;
   padding: 16px;
   overflow: hidden;
