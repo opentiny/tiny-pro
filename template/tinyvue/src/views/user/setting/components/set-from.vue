@@ -134,10 +134,7 @@ defineExpose({
     >
       <TinyRow :flex="true" justify="left">
         <TinyCol :span="5" label-width="100px">
-          <TinyFormItem
-            :label="$t('userSetting.department')"
-            prop="department"
-          >
+          <TinyFormItem :label="$t('userSetting.department')" prop="department">
             <TinyInput v-model="state.filterOptions.department" />
           </TinyFormItem>
         </TinyCol>
@@ -156,7 +153,7 @@ defineExpose({
               :placeholder="$t('baseForm.form.label.placeholder')"
             >
               <TinyOption
-                v-for="item in projectData as any"
+                v-for="item in projectData"
                 :key="item.value"
                 :label="$t(item.label)"
                 :value="item.label"
@@ -168,8 +165,7 @@ defineExpose({
           <TinyFormItem :label="$t('userSetting.date')" prop="date">
             <TinyDatePicker
               v-model="state.filterOptions.date"
-              unlink-panels
-              type="daterange"
+              unlink-panels type="daterange"
               range-separator="-"
               :start-placeholder="$t('userSetting.first')"
               :end-placeholder="$t('userSetting.last')"
@@ -186,10 +182,7 @@ defineExpose({
         </TinyCol>
         <TinyCol :span="5" label-width="100px">
           <TinyFormItem :label="$t('userSetting.startTime')" prop="startTime">
-            <TinyDatePicker
-              v-model="state.filterOptions.startTime"
-              @blur="handleBlur"
-            />
+            <TinyDatePicker v-model="state.filterOptions.startTime" @blur="handleBlur" />
           </TinyFormItem>
         </TinyCol>
       </TinyRow>
@@ -197,13 +190,12 @@ defineExpose({
       <TinyRow :flex="true" justify="left">
         <TinyCol :span="5" label-width="100px">
           <TinyFormItem :label="$t('userSetting.endTime')" prop="endTime">
-            <TinyDatePicker
-              v-model="state.filterOptions.endTime"
-              @blur="handleBlur"
-            />
+            <TinyDatePicker v-model="state.filterOptions.endTime" @blur="handleBlur" />
           </TinyFormItem>
         </TinyCol>
       </TinyRow>
     </TinyForm>
   </TinyLayout>
 </template>
+
+<style lang="less" scoped></style>

@@ -1,11 +1,12 @@
 <script lang="ts" setup>
 import { Modal, Button as TinyButton } from '@opentiny/vue'
-import { ref } from 'vue'
+import { defineAsyncComponent, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useUserStore } from '@/store'
 import { getSimpleDate } from '@/utils/time'
-import headtop from '../../form/step/components/head.vue'
-import setFrom from './components/set-from.vue'
+
+const HeadTop = defineAsyncComponent(() => import('../../form/step/components/head.vue'))
+const SetFrom = defineAsyncComponent(() => import('./components/set-from.vue'))
 
 const { t } = useI18n()
 const setFormRef = ref()
@@ -29,7 +30,9 @@ async function handleSubmit() {
       protocolStart: getSimpleDate(data.filterOptions.startTime),
       protocolEnd: getSimpleDate(data.filterOptions.endTime),
     }
+
     await userStore.updateInfo(newTemp)
+
     Modal.message({
       message: t('baseForm.form.submit.success'),
       status: 'success',
@@ -50,16 +53,12 @@ async function handleSubmit() {
     <Breadcrumb :items="['menu.user', 'menu.user.setting']" />
     <div class="general-card">
       <div class="general-top">
-        <headtop />
+        <HeadTop />
       </div>
       <div class="general-contain">
-        <setFrom ref="setFormRef" />
+        <SetFrom ref="setFormRef" />
         <div class="general-btn">
-          <TinyButton
-            type="primary"
-            native-type="submit"
-            @click="handleSubmit"
-          >
+          <TinyButton type="primary" native-type="submit" @click="handleSubmit">
             {{ $t('userSetting.save') }}
           </TinyButton>
           <TinyButton @click="handleFormReset">
@@ -72,7 +71,7 @@ async function handleSubmit() {
 </template>
 
 <style scoped lang="less">
-  .container-set {
+.container-set {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
