@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { EmployeeInfo, QueryTaskParmas } from '@/api/list'
+import type { EmployeeInfo, QueryTaskParmas, UpdateEmployeeInfo } from '@/api/list'
 import {
   Modal,
   Button as TinyButton,
@@ -36,12 +36,6 @@ const tags = ref([])
 
 // 搜索配置
 const items = reactive([])
-// 加载效果
-const state = reactive<{
-  updateVisibility: boolean
-}>({
-  updateVisibility: false,
-})
 
 const basePagerConfigAttrs = { currentPage: 1, pageSize: 10, pageSizes: [10, 20, 50, 100], total: 10 }
 
@@ -180,8 +174,10 @@ function handleRefresh() {
   taskGrid?.value.handleFetch('reload')
 }
 
+const updateVisibility = ref(false)
+
 const localeForm = ref()
-const formModel = reactive({
+const formModel = reactive<UpdateEmployeeInfo>({
   id: '',
   name: '',
   employeeNo: '',
@@ -193,9 +189,8 @@ const formModel = reactive({
   type: '',
   address: '',
   roles: '',
-  lastUpdateUser: '',
-  createTime: '',
 })
+
 const departmentLevelOptions = reactive([
   { label: '一级', value: '一级' },
   { label: '二级', value: '二级' },
@@ -244,17 +239,17 @@ function handleUpdateSubmit() {
         status: 'success',
       })
       handleRefresh()
-      state.updateVisibility = false
+      updateVisibility.value = false
     })
   })
 }
 
-async function handleUpdated(id) {
+async function handleUpdated(id: string) {
   const res = await getEmployeeInfo(id)
   Object.keys(formModel).forEach((key) => {
     formModel[key] = res[key] || ''
   })
-  state.updateVisibility = true
+  updateVisibility.value = true
 }
 
 function importExcel(files) {
@@ -378,7 +373,7 @@ function toCsvEvent() {
       </div>
     </div>
     <TinyDialogBox
-      v-model:visible="state.updateVisibility" :title="t('userInfo.table.updateTable')" width="700px"
+      v-model:visible="updateVisibility" :title="t('userInfo.table.updateTable')" width="700px"
       :close-on-click-modal="false"
     >
       <TinyForm ref="localeForm" :model="formModel" label-position="left" label-width="94px">
@@ -456,7 +451,7 @@ function toCsvEvent() {
         </TinyRow>
       </TinyForm>
       <template #footer>
-        <TinyButton size="small" @click="state.updateVisibility = false">
+        <TinyButton size="small" @click="updateVisibility = false">
           {{ $t('menu.btn.cancel') }}
         </TinyButton>
         <TinyButton size="small" type="primary" @click="handleUpdateSubmit">

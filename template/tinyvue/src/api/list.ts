@@ -6,22 +6,29 @@ export interface QueryTaskParmas {
   [key: string]: any
 }
 
-export interface EmployeeInfo {
-  id: string
+export interface BaseEmployeeInfo {
   name: string
-  rank: string
-  description: string
-  createTime: string
   status: string
   type: string
   roles: string
-  employeeNo: number
+  employeeNo: string
   department: string
   departmentLevel: string
   workbenchName: string
   project: string
   address: string
+}
+
+export interface EmployeeInfo extends BaseEmployeeInfo {
+  id: string
+  rank: string
+  description: string
+  createTime: string
   lastUpdateUser: string
+}
+
+export interface UpdateEmployeeInfo extends BaseEmployeeInfo {
+  id: string
 }
 
 export function queryEmployeeList(params: QueryTaskParmas) {
