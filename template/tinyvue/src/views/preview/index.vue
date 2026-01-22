@@ -131,34 +131,24 @@ const fetchDataOption = reactive({
       </TinyLayout>
     </div>
     <div class="preview-table">
-      <TinyGrid :key="sm ? 'sm' : 'lg'" :fetch-data="fetchDataOption" :pager="sm ? pagerConfigSm : pagerConfigLg" :size="gridSize" :auto-resize="true">
-        <TinyGridColumn
-          field="id"
-          :title="$t('home.roundtable.index')"
-          width="160"
-        />
-        <TinyGridColumn
-          field="space"
-          :title="$t('home.roundtable.space')"
-          width="180"
-        />
-        <TinyGridColumn
-          field="pv"
-          :title="$t('home.roundtable.pv')"
-          width="180"
-        />
-        <TinyGridColumn
-          field="play"
-          :title="$t('home.roundtable.play')"
-          width="200"
-        />
+      <TinyGrid
+        :key="sm ? 'sm' : 'lg'"
+        :fetch-data="fetchDataOption"
+        :pager="sm ? pagerConfigSm : pagerConfigLg"
+        :size="gridSize"
+        :auto-resize="true"
+      >
+        <TinyGridColumn field="id" :title="$t('home.roundtable.index')" width="160" />
+        <TinyGridColumn field="space" :title="$t('home.roundtable.space')" width="180" />
+        <TinyGridColumn field="pv" :title="$t('home.roundtable.pv')" width="180" />
+        <TinyGridColumn field="play" :title="$t('home.roundtable.play')" width="200" />
       </TinyGrid>
     </div>
   </div>
 </template>
 
 <style scoped lang="less">
-  .preview-main {
+.preview-main {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -255,7 +245,7 @@ const fetchDataOption = reactive({
 </style>
 
 <style lang="less" scoped>
-  @media (max-width: @screen-xs) {
+@media (max-width: @screen-xs) {
   .main {
     overflow-x: auto;
   }

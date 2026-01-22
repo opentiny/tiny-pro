@@ -29,7 +29,7 @@ export default [
   {
     path: import.meta.env.VITE_CONTEXT + 'preview',
     name: 'preview',
-    component: () => import('@/views/Preview/index.vue'),
+    component: () => import('@/views/preview/index.vue'),
   },
   {
     name: 'redirect',
