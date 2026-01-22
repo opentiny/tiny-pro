@@ -1,7 +1,5 @@
 <script lang="ts" setup>
-import type {
-  QueryTaskParmas,
-} from '@/api/list'
+import type { EmployeeInfo, QueryTaskParmas } from '@/api/list'
 import {
   Modal,
   Button as TinyButton,
@@ -21,72 +19,63 @@ import {
 } from '@opentiny/vue'
 import { iconDel, iconEditor, iconRefresh, iconSetting } from '@opentiny/vue-icon'
 import { t } from '@opentiny/vue-locale'
-import { reactive, ref, toRefs } from 'vue'
+import { reactive, ref } from 'vue'
 import * as XLSX from 'xlsx'
-import {
-  deleteEmployee,
-  getEmployeeInfo,
-  queryEmployeeList,
-  updateEmployeeInfo,
-} from '@/api/list'
+import { deleteEmployee, getEmployeeInfo, queryEmployeeList, updateEmployeeInfo } from '@/api/list'
 import { useResponsive, useResponsiveSize } from '@/hooks/responsive'
 
 const IconEditor = iconEditor()
 const IconDel = iconDel()
 const IconRefresh = iconRefresh()
 const IconSetting = iconSetting()
+
 const { gridSize } = useResponsiveSize()
 const { sm } = useResponsive()
-// 初始化请求数据
-interface FilterOptions {
-  id: string
-  department: string
-  roles: string
-  dateRange: Array<string | Date>
-  name: string
-  status: string
-  workbenchName: string
-  project: string
-  type: string
-  address: string
-}
+
 const tags = ref([])
 
 // 搜索配置
 const items = reactive([])
 // 加载效果
 const state = reactive<{
-  loading: boolean
-  filterOptions: FilterOptions
   updateVisibility: boolean
 }>({
-  loading: false,
-  filterOptions: {} as FilterOptions,
   updateVisibility: false,
 })
 
+const basePagerConfigAttrs = { currentPage: 1, pageSize: 10, pageSizes: [10, 20, 50, 100], total: 10 }
+
 const pagerConfigSm = {
   component: TinyPager,
-  attrs: { currentPage: 1, pageSize: 10, pageSizes: [10, 20, 50, 100], total: 10, layout: 'total, prev, pager, next' },
+  attrs: { ...basePagerConfigAttrs, layout: 'total, prev, pager, next' },
 }
+
 const pagerConfigLg = {
   component: TinyPager,
-  attrs: { currentPage: 1, pageSize: 10, pageSizes: [10, 20, 50, 100], total: 10, layout: 'sizes, total, prev, pager, next, jumper' },
+  attrs: { ...basePagerConfigAttrs, layout: 'sizes, total, prev, pager, next, jumper' },
 }
 
-const tableData = ref([])
 const taskGrid = ref()
-const { loading, filterOptions } = toRefs(state)
 
-function createItems(list) {
-  if (!list || !list.length)
+interface FilterOption {
+  label: string
+  field: string
+  value: string
+}
+
+const filterOptions = ref<FilterOption[]>([])
+
+function createItems(list: EmployeeInfo[]) {
+  if (!list || !list.length) {
     return
+  }
 
   const excludeKeys = ['id', 'rank', 'description']
-  const fieldOptionsMap = {}
+  const fieldOptionsMap: Record<string, Set<string>> = {}
 
   let minDate = new Date()
   let maxDate = new Date()
+
   list.forEach((item) => {
     Object.keys(item).forEach((key) => {
       if (key === 'createTime') {
@@ -101,6 +90,7 @@ function createItems(list) {
       if (!fieldOptionsMap[key]) {
         fieldOptionsMap[key] = new Set()
       }
+
       fieldOptionsMap[key].add(item[key])
     })
   })
@@ -115,6 +105,7 @@ function createItems(list) {
       options: Array.from(valueSet).map(i => ({ label: i })),
     })
   })
+
   items.push({
     label: t(`searchTable.columns.createTime`),
     field: 'createTime',
@@ -124,15 +115,14 @@ function createItems(list) {
   })
 }
 
+const tableData = ref<EmployeeInfo[]>([])
+
+const loading = ref(false)
+
 // 请求数据接口方法
-async function fetchData(
-  params: QueryTaskParmas = {
-    pageIndex: 1,
-    pageSize: 10,
-    status: '',
-  },
-) {
+async function fetchData(params: QueryTaskParmas) {
   const searchInfo = {}
+
   if (filterOptions.value?.length) {
     filterOptions.value.forEach((item) => {
       searchInfo[item.field] = item.value
@@ -144,7 +134,8 @@ async function fetchData(
     ...params,
   }
 
-  state.loading = true
+  loading.value = true
+
   try {
     const { data } = await queryEmployeeList(queryParmas)
     const { data: list, total } = data
@@ -156,7 +147,7 @@ async function fetchData(
     }
   }
   finally {
-    state.loading = false
+    loading.value = false
   }
 }
 
@@ -279,7 +270,7 @@ function importExcel(files) {
       // 生成 JSON 表格内容
       const ws = XLSX.utils.sheet_to_json(workbook.Sheets[wsname])
       // 将数据赋值给 Grid 数据源
-      tableData.value = ws
+      tableData.value = ws as EmployeeInfo[]
       return true
       // 可以在这里给后端发请求，将读取的 Excel 数据存到数据库表中
     }
@@ -326,9 +317,7 @@ function toCsvEvent() {
             <transition-fade-down-group>
               <div class="search-box-container">
                 <tiny-search-box
-                  v-model="tags"
-                  :items="items"
-                  :empty-placeholder="$t('searchTable.form.placeholder')"
+                  v-model="tags" :items="items" :empty-placeholder="$t('searchTable.form.placeholder')"
                   @change="reloadGrid"
                 />
               </div>
@@ -339,42 +328,19 @@ function toCsvEvent() {
             </transition-fade-down-group>
           </div>
           <TinyGrid
-            :key="sm ? 'sm' : 'lg'"
-            ref="taskGrid"
-            :fetch-data="fetchDataOption"
-            :pager="sm ? pagerConfigSm : pagerConfigLg"
-            :loading="loading"
-            :size="gridSize"
-            :height="640"
-            :auto-resize="true"
-            align="center"
+            :key="sm ? 'sm' : 'lg'" ref="taskGrid" :fetch-data="fetchDataOption"
+            :pager="sm ? pagerConfigSm : pagerConfigLg" :loading="loading" :size="gridSize" :height="640"
+            :auto-resize="true" align="center"
           >
             <TinyGridColumn type="selection" width="60" />
-            <TinyGridColumn
-              field="name"
-              :title="$t('searchTable.columns.name')"
-            />
-            <TinyGridColumn
-              field="employeeNo"
-              :title="$t('searchTable.columns.employeeNo')"
-              sortable
-            />
-            <TinyGridColumn
-              field="departmentLevel"
-              :title="$t('searchTable.columns.departmentLevel')"
-            />
-            <TinyGridColumn
-              field="department"
-              :title="$t('searchTable.columns.department')"
-            />
-            <TinyGridColumn
-              field="status"
-              :title="$t('searchTable.form.status')"
-            >
+            <TinyGridColumn field="name" :title="$t('searchTable.columns.name')" />
+            <TinyGridColumn field="employeeNo" :title="$t('searchTable.columns.employeeNo')" sortable />
+            <TinyGridColumn field="departmentLevel" :title="$t('searchTable.columns.departmentLevel')" />
+            <TinyGridColumn field="department" :title="$t('searchTable.columns.department')" />
+            <TinyGridColumn field="status" :title="$t('searchTable.form.status')">
               <template #default="{ row }">
                 <span
-                  class="status"
-                  :class="{
+                  class="status" :class="{
                     'status-closed': row.status === '0',
                     'status-finished': row.status === '1',
                   }"
@@ -386,54 +352,21 @@ function toCsvEvent() {
                 </span>
               </template>
             </TinyGridColumn>
-            <TinyGridColumn
-              field="workbenchName"
-              :title="$t('searchTable.columns.workbenchName')"
-            />
-            <TinyGridColumn
-              field="project"
-              :title="$t('searchTable.columns.project')"
-            />
-            <TinyGridColumn
-              field="type"
-              :title="$t('searchTable.columns.type')"
-            />
-            <TinyGridColumn
-              field="address"
-              :title="$t('searchTable.columns.address')"
-            />
-            <TinyGridColumn
-              field="roles"
-              :title="$t('searchTable.columns.roles')"
-            />
-            <TinyGridColumn
-              field="lastUpdateUser"
-              :title="$t('searchTable.columns.lastUpdateUser')"
-            />
-            <TinyGridColumn
-              field="createTime"
-              :title="$t('searchTable.columns.createTime')"
-            />
-            <TinyGridColumn
-              :title="$t('searchTable.columns.operations')"
-            >
+            <TinyGridColumn field="workbenchName" :title="$t('searchTable.columns.workbenchName')" />
+            <TinyGridColumn field="project" :title="$t('searchTable.columns.project')" />
+            <TinyGridColumn field="type" :title="$t('searchTable.columns.type')" />
+            <TinyGridColumn field="address" :title="$t('searchTable.columns.address')" />
+            <TinyGridColumn field="roles" :title="$t('searchTable.columns.roles')" />
+            <TinyGridColumn field="lastUpdateUser" :title="$t('searchTable.columns.lastUpdateUser')" />
+            <TinyGridColumn field="createTime" :title="$t('searchTable.columns.createTime')" />
+            <TinyGridColumn :title="$t('searchTable.columns.operations')">
               <template #default="data">
-                <a
-                  class="operation"
-                  @click="handleUpdated(data.row.id)"
-                >
+                <a class="operation" @click="handleUpdated(data.row.id)">
                   <IconEditor class="operation-icon" />{{ $t('userInfo.table.operations.update') }}
                 </a>
-                <TinyPopconfirm
-                  title="确定要删除此用户吗？"
-                  type="info"
-                  trigger="click"
-                  @confirm="handleDelete(data.row.id)"
-                >
+                <TinyPopconfirm title="确定要删除此用户吗？" type="info" trigger="click" @confirm="handleDelete(data.row.id)">
                   <template #reference>
-                    <a
-                      class="operation"
-                    >
+                    <a class="operation">
                       <IconDel class="operation-icon" />{{ $t('searchTable.columns.operations.delete') }}
                     </a>
                   </template>
@@ -445,17 +378,10 @@ function toCsvEvent() {
       </div>
     </div>
     <TinyDialogBox
-      v-model:visible="state.updateVisibility"
-      :title="t('userInfo.table.updateTable')"
-      width="700px"
+      v-model:visible="state.updateVisibility" :title="t('userInfo.table.updateTable')" width="700px"
       :close-on-click-modal="false"
     >
-      <TinyForm
-        ref="localeForm"
-        :model="formModel"
-        label-position="left"
-        label-width="94px"
-      >
+      <TinyForm ref="localeForm" :model="formModel" label-position="left" label-width="94px">
         <TinyRow>
           <TinyCol :span="6">
             <TinyFormItem :label="$t('searchTable.columns.name')" prop="name">
@@ -542,5 +468,5 @@ function toCsvEvent() {
 </template>
 
 <style scoped lang="less">
-  @import './search-table.less';
+@import './search-table.less';
 </style>
