@@ -89,7 +89,7 @@ const useUserStore = defineStore('user', {
       this.filterType = []
     },
 
-    async updateInfo(data: UserInfo) {
+    async updateInfo(data: Partial<UserInfo>) {
       const res = await updateUserInfo(data)
       this.setInfo(res.data)
     },
