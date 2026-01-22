@@ -28,7 +28,7 @@ provide('handle', handle)
 </template>
 
 <style lang="less" scoped>
-  .login-form-container {
+.login-form-container {
   margin-top: 5%;
 }
 
@@ -46,6 +46,7 @@ provide('handle', handle)
 :deep(.tiny-tabs__nav.is-show-active-bar .tiny-tabs__item) {
   margin-right: 0;
 }
+
 // responsive
 @media (max-width: @screen-lg) {
   .login-form-language {

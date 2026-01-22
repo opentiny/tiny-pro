@@ -207,7 +207,7 @@ function handleSubmit() {
 </template>
 
 <style lang="less" scoped>
-  .login-form-container {
+.login-form-container {
   margin-top: 5%;
 }
 
@@ -240,6 +240,7 @@ function handleSubmit() {
 .divide-line {
   margin: 0 5px;
 }
+
 // responsive
 @media (max-width: @screen-ms) {
   .login-form {
