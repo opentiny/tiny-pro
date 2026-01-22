@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { DetailTableData } from '@/api/profile'
 import { Loading } from '@opentiny/vue'
-import { defineAsyncComponent, ref } from 'vue'
+import { defineAsyncComponent, onMounted, ref } from 'vue'
 import { getDetailData } from '@/api/profile'
 
 const EvaluationDetail = defineAsyncComponent(() => import('./components/evaluation-detail.vue'))
@@ -32,7 +32,9 @@ async function fetchData() {
   }
 }
 
-fetchData()
+onMounted(() => {
+  fetchData()
+})
 </script>
 
 <template>
