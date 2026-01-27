@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { WebMcpServer, z } from '@opentiny/next-sdk'
 import type { RoleAddData } from './add-role.vue'
 import type { Permission } from '@/api/permission'
 import type { ITreeNodeData } from '@/router/guard/menu'
@@ -10,7 +11,7 @@ import {
   TinyModal,
   Pager as TinyPager,
 } from '@opentiny/vue'
-import { computed, inject, ref } from 'vue'
+import { computed, inject, ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { getAllMenu } from '@/api/menu'
@@ -25,6 +26,8 @@ import constant from '@/router/constant'
 import { toRoutes } from '@/router/guard/menu'
 import { useTabStore } from '@/store'
 import { useMenuStore } from '@/store/modules/router'
+import { sleep } from '@/utils/base-utils'
+import { getIdByLabel } from '@/utils/tree'
 import addRole from './add-role.vue'
 import menuDrawer from './menu-drawer.vue'
 import roleTable from './role-table.vue'
@@ -71,6 +74,7 @@ const pagerConfigLg = {
   attrs: { currentPage: 1, pageSize: 10, pageSizes: [10, 20, 50, 100], total: 10, layout: 'sizes, total, prev, pager, next, jumper' },
 }
 const roleTableRef = ref()
+const menuDrawerRef = ref()
 const allFilter = {
   inputFilter: {
     inputFilter: true,
@@ -203,6 +207,41 @@ function onRoleUpdateSuccess() {
 function onRoleDelete() {
   roleTableRef.value.reload()
 }
+
+onMounted(async () => {
+  const server = new WebMcpServer({
+    name: 'bind-menu-mcp-server',
+    version: '1.0.0',
+  })
+  const serverTransport = inject<any>('serverTransport')
+
+  server.registerTool(
+    'bind-menu-for-role',
+    {
+      title: '绑定菜单',
+      description: '给某个角色绑定菜单',
+      inputSchema: {
+        role: z.string().describe('需要绑定菜单的角色名称'),
+        menu: z.string().describe('需要绑定的菜单名称'),
+      },
+    },
+    async ({ role, menu }) => {
+      const rowData = tableData.value.find(item => item.name === role)
+      roleTableRef.value.openMenuModal(rowData.menus, rowData.id, rowData)
+      await sleep(1000)
+
+      // 先从菜单名称获取菜单 ID，再勾选菜单
+      const menuId = getIdByLabel(i18MenuDatas.value, menu)
+      menuDrawerRef.value.treeRef.setChecked(menuId, true, false)
+      await sleep(1000)
+
+      menuDrawerRef.value.onConfirm()
+      return { content: [{ type: 'text', text: `收到: ${role}` }] }
+    },
+  )
+
+  await server.connect(serverTransport)
+})
 </script>
 
 <template>
@@ -232,6 +271,7 @@ function onRoleDelete() {
     </div>
     <menu-drawer
       v-if="open"
+      ref="menuDrawerRef"
       v-loading="loading"
       :visible="open"
       :menus="i18MenuDatas"
