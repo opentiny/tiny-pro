@@ -1,13 +1,6 @@
 <script lang="ts" setup>
-import type {
-  Permission,
-} from '@/api/permission'
-import type {
-  FilterType,
-  InputFilterValue,
-  IPaginationMeta,
-  Pager,
-} from '@/types/global'
+import type { Permission } from '@/api/permission'
+import type { FilterType, InputFilterValue, IPaginationMeta, Pager } from '@/types/global'
 import {
   Modal,
   Button as TinyButton,
@@ -25,12 +18,7 @@ import {
 import { iconDel } from '@opentiny/vue-icon'
 import { computed, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import {
-  createPermission,
-  deletePermission,
-  getAllPermission,
-  updatePermission,
-} from '@/api/permission'
+import { createPermission, deletePermission, getAllPermission, updatePermission } from '@/api/permission'
 import { useResponsive, useResponsiveSize } from '@/hooks/responsive'
 
 const roleGrid = ref()
@@ -210,8 +198,7 @@ async function handlePermissionAddCancel() {
       <div class="tiny-fullscreen-wrapper">
         <div class="permission-add-btn">
           <TinyButton v-permission="'permission::add'" type="primary" round @click="handleAddPermission">
-            {{
-              $t('permissionInfo.modal.title.add') }}
+            {{ $t('permissionInfo.modal.title.add') }}
           </TinyButton>
         </div>
         <div class="table">
@@ -253,7 +240,12 @@ async function handlePermissionAddCancel() {
             </TinyGridColumn>
             <TinyGridColumn :title="$t('permissionInfo.table.operations')">
               <template #default="data">
-                <TinyPopconfirm :title="$t('menuInfo.modal.title.confirm')" type="warning" trigger="click" @confirm="handleDelete(data.row)">
+                <TinyPopconfirm
+                  :title="$t('menuInfo.modal.title.confirm')"
+                  type="warning"
+                  trigger="click"
+                  @confirm="handleDelete(data.row)"
+                >
                   <template #reference>
                     <IconDel class="del-icon" />
                     <a v-permission="'permission::remove'" class="operation-update">
@@ -267,6 +259,7 @@ async function handlePermissionAddCancel() {
         </div>
       </div>
     </div>
+
     <div v-if="state.isPermissionAdd">
       <TinyModal
         v-model="state.isPermissionAdd"
@@ -295,14 +288,10 @@ async function handlePermissionAddCancel() {
         </template>
         <template #footer>
           <TinyButton round @click="handlePermissionAddCancel">
-            {{
-              $t('menu.btn.cancel')
-            }}
+            {{ $t('menu.btn.cancel') }}
           </TinyButton>
           <TinyButton round type="primary" @click="handlePermissionAddSubmit">
-            {{
-              $t('menu.btn.confirm')
-            }}
+            {{ $t('menu.btn.confirm') }}
           </TinyButton>
         </template>
       </TinyModal>
@@ -341,12 +330,14 @@ async function handlePermissionAddCancel() {
     color: orange;
   }
 }
+
 .del-icon {
   fill: #1890ff;
   margin-right: 8px;
   font-size: 16px;
   margin-top: -3px;
 }
+
 .operation-update:hover {
   text-decoration: underline;
 }

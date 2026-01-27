@@ -57,7 +57,8 @@ defineExpose({
     :width="modalSize"
     height="auto"
     :title="$t('roleInfo.table.bind')"
-    show-footer @close="() => emits('close')"
+    show-footer
+    @close="() => emits('close')"
   >
     <div class="menu-input">
       <TinyInput v-model="filterText" :placeholder="$t('setting.input.search')" @input="inputChange" />
@@ -83,3 +84,5 @@ defineExpose({
     </template>
   </TinyModal>
 </template>
+
+<style lang="less" scoped></style>

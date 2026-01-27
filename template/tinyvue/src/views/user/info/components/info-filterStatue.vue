@@ -34,16 +34,12 @@ defineExpose({
       *
     </div>
     <span>{{ $t('userInfo.statue.statue') }}：</span>
-    <TinyCheckboxGroup
-      v-model="checkList"
-      type="checkbox"
-      :options="options"
-    />
+    <TinyCheckboxGroup v-model="checkList" type="checkbox" :options="options" />
   </div>
 </template>
 
 <style scoped lang="less">
-  .option {
+.option {
   .required {
     margin-top: 5px;
     color: rgb(190, 24, 24);

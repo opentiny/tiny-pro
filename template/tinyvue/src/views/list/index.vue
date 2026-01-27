@@ -4,8 +4,4 @@
   <router-view />
 </template>
 
-<style scoped lang="less">
-  .operations {
-  display: flex;
-}
-</style>
+<style scoped lang="less"></style>

@@ -6,6 +6,31 @@ export interface QueryTaskParmas {
   [key: string]: any
 }
 
+export interface BaseEmployeeInfo {
+  name: string
+  status: string
+  type: string
+  roles: string
+  employeeNo: string
+  department: string
+  departmentLevel: string
+  workbenchName: string
+  project: string
+  address: string
+  createTime: string
+  lastUpdateUser: string
+}
+
+export interface EmployeeInfo extends BaseEmployeeInfo {
+  id: string
+  rank: string
+  description: string
+}
+
+export interface UpdateEmployeeInfo extends BaseEmployeeInfo {
+  id: string
+}
+
 export function queryEmployeeList(params: QueryTaskParmas) {
   return axios.post(
     `${import.meta.env.VITE_MOCK_SERVER_HOST}/api/employee/getEmployee`,

@@ -9,20 +9,11 @@ defineProps<{ chartData: any[] }>()
 
 <template>
   <div class="chart">
-    <div
-      v-for="item in chartData"
-      :key="item.title"
-      class="list"
-      :value="item.value"
-    >
+    <div v-for="item in chartData" :key="item.title" class="list" :value="item.value">
       <h4>{{ $t(item.title) }}</h4>
       <div v-if="item.value === 1">
         <transition-slide-group>
-          <div
-            v-for="itemson in item.list"
-            :key="itemson.sort"
-            :value="itemson.type"
-          >
+          <div v-for="itemson in item.list" :key="itemson.sort" :value="itemson.type">
             <div v-if="itemson.len === 1" class="cardold" :class="itemson.pid">
               <div class="cardtip">
                 <span class="cardType">{{ $t(itemson.type) }}</span>
@@ -56,7 +47,7 @@ defineProps<{ chartData: any[] }>()
 </template>
 
 <style scoped lang="less">
-  .chart {
+.chart {
   display: flex;
   flex-direction: row;
   width: 100%;

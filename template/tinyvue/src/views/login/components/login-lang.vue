@@ -31,7 +31,7 @@ function changeLangDrop() {
 </template>
 
 <style lang="less" scoped>
-  .login-lan-drop {
+.login-lan-drop {
   margin-left: -36%;
   background: #fff;
   border: 1px solid #ccc;
@@ -55,6 +55,7 @@ span {
   padding-left: 5px;
   font-size: 20px;
 }
+
 // responsive
 @media (max-width: @screen-ms) {
   .login-lan-drop {

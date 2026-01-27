@@ -1,16 +1,15 @@
 <script lang="ts" setup>
+import type { DetailTableData } from '@/api/profile'
 import {
   Grid as TinyGrid,
   GridColumn as TinyGridColumn,
   Pager as TinyPager,
 } from '@opentiny/vue'
-import { computed, ref, toRefs } from 'vue'
+import { computed, ref } from 'vue'
 import { useResponsive, useResponsiveSize } from '@/hooks/responsive'
 
-// 父组件传值
-const props = defineProps({
-  tableData: [],
-})
+const { tableData } = defineProps<{ tableData: DetailTableData[] }>()
+
 const { gridSize } = useResponsiveSize()
 const { sm } = useResponsive()
 
@@ -18,19 +17,24 @@ const pagerLayout = computed(() =>
   sm.value ? 'total, prev, pager, next' : 'total, sizes, prev, pager, next, jumper',
 )
 
-const { tableData } = toRefs(props)
 const custPager = ref({
   currentPage: 1,
   pageSize: 5,
 })
 
-function currentChange(current) {
+function currentChange(current: number) {
   custPager.value.currentPage = current
 }
 
-function sizeChange(size) {
+function sizeChange(size: number) {
   custPager.value.pageSize = size
 }
+
+const listData = computed(() => {
+  const start = (custPager.value.currentPage - 1) * custPager.value.pageSize
+  const end = (custPager.value.currentPage - 1) * custPager.value.pageSize + custPager.value.pageSize
+  return tableData.slice(start, end)
+})
 </script>
 
 <template>
@@ -40,13 +44,7 @@ function sizeChange(size) {
     </div>
     <div class="detail-row" noSpace>
       <TinyGrid
-        :data="
-          tableData.slice(
-            (custPager.currentPage - 1) * custPager.pageSize,
-            (custPager.currentPage - 1) * custPager.pageSize
-              + custPager.pageSize,
-          )
-        "
+        :data="listData"
         seq-serial
         auto-resize
         :size="gridSize"
@@ -87,3 +85,5 @@ function sizeChange(size) {
     </div>
   </div>
 </template>
+
+<style lang="less" scoped></style>

@@ -5,15 +5,17 @@ import {
   Tabs as TinyTabs,
 } from '@opentiny/vue'
 import { iconChevronDown } from '@opentiny/vue-icon'
-import { onMounted, reactive, ref, watch } from 'vue'
+import { onClickOutside } from '@vueuse/core'
+import { defineAsyncComponent, onMounted, reactive, ref, useTemplateRef, watch } from 'vue'
 import { getUserData } from '@/api/user'
 import { useResponsive } from '@/hooks/responsive'
 import { useUserStore } from '@/store'
-import infocard from './info-card.vue'
-import infochart from './info-chart.vue'
-import infofilter from './info-filter.vue'
-import infotable from './info-table.vue'
-import infoTasksTip from './info-tasksTip.vue'
+
+const InfoCard = defineAsyncComponent(() => import('./info-card.vue'))
+const InfoChart = defineAsyncComponent(() => import('./info-chart.vue'))
+const InfoFilter = defineAsyncComponent(() => import('./info-filter.vue'))
+const InfoTable = defineAsyncComponent(() => import('./info-table.vue'))
+const InfoTasksTip = defineAsyncComponent(() => import('./info-tasksTip.vue'))
 
 const { md } = useResponsive()
 
@@ -32,8 +34,7 @@ const state = reactive<{
 const userStore = useUserStore()
 const ChevronDown = iconChevronDown()
 const activeName = ref('1')
-const Filter = ref(false)
-const Sort = ref(false)
+
 const timeList = [
   { label: 'userInfo.end.positiveOrder', value: 1 },
   { label: 'userInfo.end.reverseOrder', value: 2 },
@@ -70,20 +71,32 @@ function changeTime(value: number) {
   userStore.setInfo({ sort: value })
   fetchData()
 }
+
+const filter = ref(false)
+const sort = ref(false)
+
+const filterInfoBoxRef = useTemplateRef('filterInfoBoxRef')
+
 function changeFilter() {
-  Sort.value = false
-  Filter.value = !Filter.value
+  sort.value = false
+  filter.value = true
 }
 
+onClickOutside(filterInfoBoxRef, () => {
+  filter.value = false
+}, {
+  ignore: ['.tiny-date-picker', '.tiny-popup'],
+})
+
 function changeSort() {
-  Filter.value = false
-  Sort.value = !Sort.value
+  filter.value = false
+  sort.value = !sort.value
 }
 
 watch(userStore.$state, (newValue) => {
   if (newValue.reset || newValue.submit) {
     fetchData()
-    Filter.value = false
+    filter.value = false
   }
 })
 
@@ -96,13 +109,13 @@ watch(activeName, () => {
   <div id="contain">
     <TinyTabs v-model="activeName">
       <TinyTabItem :title="$t('userInfo.tab.one')" name="1">
-        <infocard />
+        <InfoCard />
         <div v-if="md" class="contentFilter">
           <transition-slide-group>
             <div class="left" @click="changeSort">
               {{ $t('userInfo.filter.sort') }}
               <ChevronDown />
-              <div v-show="Sort" class="sort" @click.stop>
+              <div v-show="sort" class="sort" @click.stop>
                 <li
                   v-for="(item, index) in timeList"
                   :key="index"
@@ -113,45 +126,44 @@ watch(activeName, () => {
                 </li>
               </div>
             </div>
-            <div class="right" @click="changeFilter">
+            <div ref="filterInfoBoxRef" class="right" @click="changeFilter">
               <img src="@/assets/images/filter.png">
-              <div v-show="Filter" class="filter" @click.stop>
-                <infofilter ref="filterInfo" :active-name="activeName" />
+              <div v-show="filter" class="filter" @click.stop>
+                <InfoFilter ref="filterInfo" :active-name="activeName" />
               </div>
             </div>
           </transition-slide-group>
         </div>
 
-        <infotable :table-data="state.tableData" />
+        <InfoTable :table-data="state.tableData" />
       </TinyTabItem>
       <TinyTabItem :title="$t('userInfo.tab.two')" name="2">
-        <infoTasksTip />
+        <InfoTasksTip />
         <div class="chartLength">
-          <infochart :chart-data="state.chartData" />
+          <InfoChart :chart-data="state.chartData" />
         </div>
       </TinyTabItem>
     </TinyTabs>
   </div>
+
   <div v-if="!md" class="contentFilter">
     <transition-slide-group>
       <div class="left" @click="changeSort">
         {{ $t('userInfo.filter.sort') }}
         <ChevronDown />
-        <div v-show="Sort" class="sort">
+        <div v-show="sort" class="sort">
           <li
-            v-for="(item, index) in timeList"
-            :key="index"
-            :value="item.value"
+            v-for="(item, index) in timeList" :key="index" :value="item.value"
             @click="changeTime(timeList[index].value)"
           >
             {{ $t(item.label) }}
           </li>
         </div>
       </div>
-      <div class="right" @click="changeFilter">
+      <div ref="filterInfoBoxRef" class="right" @click="changeFilter">
         <img src="@/assets/images/filter.png">
-        <div v-show="Filter" class="filter">
-          <infofilter ref="filterInfo" :active-name="activeName" />
+        <div v-show="filter" class="filter">
+          <InfoFilter ref="filterInfo" :active-name="activeName" />
         </div>
       </div>
     </transition-slide-group>
@@ -159,7 +171,7 @@ watch(activeName, () => {
 </template>
 
 <style scoped lang="less">
-  #contain {
+#contain {
   height: 100%;
   padding: 15px;
   overflow: auto;

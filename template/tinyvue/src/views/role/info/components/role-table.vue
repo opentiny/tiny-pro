@@ -48,6 +48,7 @@ const { loading, setLoading } = useLoading()
 function onMenuUpdate(data: ITreeNodeData[], roldId: number, role: Role) {
   emits('menuUpdate', data, roldId, role)
 }
+
 function onRoleDelete(id: number, row) {
   setLoading(true)
   deleteRole(id)
@@ -135,11 +136,7 @@ defineExpose({
         <permission-table :permission="data.row.permission" />
       </template>
     </TinyGridColumn>
-    <TinyGridColumn
-      field="id"
-      width="20%"
-      :title="$t('roleInfo.table.id')"
-    />
+    <TinyGridColumn field="id" width="20%" :title="$t('roleInfo.table.id')" />
     <TinyGridColumn
       field="name"
       :title="$t('roleInfo.table.name')"
@@ -176,14 +173,16 @@ defineExpose({
         >
           {{ $t('roleInfo.table.bind') }}
         </a>
-        <TinyPopconfirm :title="$t('menuInfo.modal.title.confirm')" type="warning" trigger="click" @confirm="onRoleDelete(data.row.id, data.row)">
+        <TinyPopconfirm
+          :title="$t('menuInfo.modal.title.confirm')"
+          type="warning"
+          trigger="click"
+          @confirm="onRoleDelete(data.row.id, data.row)"
+        >
           <template #reference>
             <IconDel class="del-icon" />
 
-            <a
-              v-permission="'role::remove'"
-              class="operation-update"
-            >
+            <a v-permission="'role::remove'" class="operation-update">
               {{ $t('roleInfo.table.operations.delete') }}
             </a>
           </template>
@@ -194,7 +193,7 @@ defineExpose({
 </template>
 
 <style lang="less" scoped>
-  .operation {
+.operation {
   &-delete {
     padding-right: 5px;
     color: red;
@@ -209,12 +208,14 @@ defineExpose({
     color: orange;
   }
 }
+
 .del-icon {
   fill: #1890ff;
   margin-right: 8px;
   font-size: 16px;
   margin-top: -3px;
 }
+
 .operation-update:hover {
   text-decoration: underline;
 }

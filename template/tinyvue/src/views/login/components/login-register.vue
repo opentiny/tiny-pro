@@ -160,9 +160,7 @@ function handleSubmit() {
 
       <div class="login-form-options">
         <TinyLink type="primary" @click="typeChange">
-          {{
-            $t('login.form.change')
-          }}
+          {{ $t('login.form.change') }}
         </TinyLink>
       </div>
 
@@ -181,7 +179,7 @@ function handleSubmit() {
 </template>
 
 <style lang="less" scoped>
-  .login-register-container {
+.login-register-container {
   margin-top: -6%;
   margin-left: 6%;
 
@@ -223,6 +221,7 @@ function handleSubmit() {
     }
   }
 }
+
 @media (max-height: @screen-xs) {
   .login-register-container {
     margin-top: -15%;

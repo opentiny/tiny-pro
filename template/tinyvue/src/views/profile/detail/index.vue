@@ -1,42 +1,37 @@
 <script lang="ts" setup>
-import {
-  Loading,
-} from '@opentiny/vue'
-import { onMounted, reactive } from 'vue'
+import type { DetailTableData } from '@/api/profile'
+import { Loading } from '@opentiny/vue'
+import { defineAsyncComponent, onMounted, ref } from 'vue'
 import { getDetailData } from '@/api/profile'
-import evaluationDetail from './components/evaluation-detail.vue'
-import mentor from './components/mentor-detail.vue'
-import planDetail from './components/plan-detail.vue'
-import recordDetail from './components/record-detail.vue'
-import targetDetail from './components/target-detail.vue'
-import wholeDetail from './components/whole-detail.vue'
 
-// 加载效果
-const state = reactive<{
-  loading: any
-  tableData: Array<object>
-}>({
-  loading: null,
-  tableData: [],
-})
+const EvaluationDetail = defineAsyncComponent(() => import('./components/evaluation-detail.vue'))
+const Mentor = defineAsyncComponent(() => import('./components/mentor-detail.vue'))
+const PlanDetail = defineAsyncComponent(() => import('./components/plan-detail.vue'))
+const RecordDetail = defineAsyncComponent(() => import('./components/record-detail.vue'))
+const TargetDetail = defineAsyncComponent(() => import('./components/target-detail.vue'))
+const WholeDetail = defineAsyncComponent(() => import('./components/whole-detail.vue'))
+
+const loading = ref<any>()
+
+const tableData = ref<DetailTableData[]>([])
 
 // 请求数据接口方法
 async function fetchData() {
-  state.loading = Loading.service({
+  loading.value = Loading.service({
     text: 'loading...',
     target: document.getElementById('container'),
     background: 'rgba(0, 0, 0, 0.7)',
   })
+
   try {
     const { data } = await getDetailData()
-    state.tableData = data.tableData
+    tableData.value = data.tableData
   }
   finally {
-    state.loading.close()
+    loading.value.close()
   }
 }
 
-// 初始化请求数据
 onMounted(() => {
   fetchData()
 })
@@ -49,27 +44,27 @@ onMounted(() => {
     </div>
     <div class="base-body">
       <div class="detail-card">
-        <planDetail />
+        <PlanDetail />
       </div>
       <div class="detail-card mart_16">
-        <targetDetail />
+        <TargetDetail />
       </div>
       <div class="detail-card mart_16">
-        <evaluationDetail />
+        <EvaluationDetail />
       </div>
       <div class="detail-card mart_16">
-        <wholeDetail />
+        <WholeDetail />
       </div>
       <div class="detail-card mart_16">
-        <mentor />
+        <Mentor />
       </div>
       <div class="detail-card footer-card mart_16">
-        <recordDetail :table-data="state.tableData as any" />
+        <RecordDetail :table-data="tableData" />
       </div>
     </div>
   </div>
 </template>
 
 <style scoped lang="less">
-  @import '@/assets/style/details.less';
+@import '@/assets/style/details.less';
 </style>

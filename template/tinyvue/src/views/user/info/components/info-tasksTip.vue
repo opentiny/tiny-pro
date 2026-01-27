@@ -44,7 +44,7 @@ const InfoNum = [
 </template>
 
 <style scoped lang="less">
-  .card {
+.card {
   justify-content: flex-start;
   padding: 24px 0;
   text-align: center;

@@ -4,10 +4,19 @@ import {
   Button as TinyButton,
   TimeLine as TinyTimeLine,
 } from '@opentiny/vue'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
+
+const list = computed(() => [
+  { name: t('stepForm.start.coaching') },
+  { name: t('stepForm.immediate.supervisor') },
+  { name: t('stepForm.overall.goals') },
+  { name: t('stepForm.overall.summary') },
+  { name: t('stepForm.overall.end') },
+])
+
 const active = ref(4)
 
 function handleSubmit() {
@@ -66,17 +75,7 @@ function handleFormReset() {
         <div class="result-line">
           <div>{{ $t('menu.line.process') }}</div>
           <div>
-            <TinyTimeLine
-              :data="[
-                { name: t('stepForm.start.coaching') },
-                { name: t('stepForm.immediate.supervisor') },
-                { name: t('stepForm.overall.goals') },
-                { name: t('stepForm.overall.summary') },
-                { name: t('stepForm.overall.end') },
-              ]"
-              :active="active"
-              type="normal"
-            />
+            <TinyTimeLine :data="list" :active="active" type="normal" />
           </div>
         </div>
       </div>

@@ -1,16 +1,18 @@
 <script lang="ts" setup>
 import { Modal, Button as TinyButton } from '@opentiny/vue'
-import { ref } from 'vue'
+import { defineAsyncComponent, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useUserStore } from '@/store'
-import infofilterendtime from './info-filterEndTime.vue'
-import infofilterstarttime from './info-filterStartTime.vue'
-import infofilterstatus from './info-filterStatus.vue'
-import infofiltertype from './info-filterType.vue'
 
 const props = defineProps({
   activeName: String,
 })
+
+const InfoFilterStartTime = defineAsyncComponent(() => import('./info-filterStartTime.vue'))
+const InfoFilterEndTime = defineAsyncComponent(() => import('./info-filterEndTime.vue'))
+const InfoFilterStatus = defineAsyncComponent(() => import('./info-filterStatus.vue'))
+const InfoFilterType = defineAsyncComponent(() => import('./info-filterType.vue'))
+
 const userStore = useUserStore()
 const filterstarttime = ref()
 const filterendtime = ref()
@@ -21,11 +23,11 @@ const { t } = useI18n()
 // 重置筛选项
 function reset() {
   if (props.activeName === '1') {
-    filterstarttime.value.reset()
-    filterendtime.value.reset()
+    filterstarttime.value?.reset()
+    filterendtime.value?.reset()
   }
-  filterstatus.value.reset()
-  filtertype.value.reset()
+  filterstatus.value?.reset()
+  filtertype.value?.reset()
   userStore.resetFilterInfo()
   userStore.setInfo({ reset: true })
 }
@@ -58,30 +60,21 @@ defineExpose({
 
 <template>
   <div>
-    <infofilterstarttime
-      v-if="activeName === '1'"
-      ref="filterstarttime"
-    />
-    <infofilterendtime
-      v-if="activeName === '1'"
-      ref="filterendtime"
-    />
-    <infofilterstatus ref="filterstatus" />
-    <infofiltertype ref="filtertype" />
-    <TinyButton type="primary" @click="submit">
-      {{
-        $t('userInfo.btn.search')
-      }}
-    </TinyButton>
-    <TinyButton @click="reset">
-      {{ $t('userInfo.btn.reset') }}
-    </TinyButton>
+    <InfoFilterStartTime v-if="activeName === '1'" ref="filterstarttime" />
+    <InfoFilterEndTime v-if="activeName === '1'" ref="filterendtime" />
+    <InfoFilterStatus ref="filterstatus" />
+    <InfoFilterType ref="filtertype" />
+
+    <div class="mt-8 flex items-center justify-center">
+      <TinyButton type="primary" @click="submit">
+        {{ $t('userInfo.btn.search') }}
+      </TinyButton>
+      <TinyButton @click="reset">
+        {{ $t('userInfo.btn.reset') }}
+      </TinyButton>
+    </div>
   </div>
 </template>
 
 <style scoped lang="less">
-  button {
-  margin-top: 10%;
-  margin-left: 35%;
-}
 </style>

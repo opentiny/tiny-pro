@@ -36,14 +36,8 @@ const { gridSize } = useResponsiveSize()
           </ul>
         </template>
       </TinyGridColumn>
-      <TinyGridColumn
-        field="name"
-        :title="$t('userInfo.table.columnA')"
-      />
-      <TinyGridColumn
-        field="time"
-        :title="$t('userInfo.table.columnB')"
-      />
+      <TinyGridColumn field="name" :title="$t('userInfo.table.columnA')" />
+      <TinyGridColumn field="time" :title="$t('userInfo.table.columnB')" />
       <TinyGridColumn field="type" :title="$t('userInfo.table.columnC')">
         <template #default="data">
           <span>{{ $t(`${data.row.type}`) }}</span>
@@ -59,7 +53,7 @@ const { gridSize } = useResponsiveSize()
 </template>
 
 <style scoped lang="less">
-  .table {
+.table {
   padding-bottom: 20px;
   background-color: #fff;
 }

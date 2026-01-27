@@ -28,37 +28,14 @@ defineExpose({
 </script>
 
 <template>
-  <div class="option">
-    <div class="required">
-      *
+  <div>
+    <div class="flex items-center gap-2 text-[14px]">
+      <span class="text-[140%] text-[#be1818]">*</span>
+      <span>{{ $t('userInfo.type.type') }}：</span>
     </div>
-    <span>{{ $t('userInfo.type.type') }}：</span>
-    <TinyCheckboxGroup
-      v-model="checkList"
-      type="checkbox"
-      :options="options"
-    />
+
+    <TinyCheckboxGroup v-model="checkList" type="checkbox" :options="options" />
   </div>
 </template>
 
-<style scoped lang="less">
-  .option {
-  .required {
-    margin-top: 5px;
-    color: rgb(190, 24, 24);
-    font-size: 140%;
-  }
-
-  span {
-    width: 70px;
-    height: 18px;
-    font-size: 14px;
-  }
-
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: start;
-  padding: 10px 3px;
-}
-</style>
+<style scoped lang="less"></style>

@@ -27,7 +27,7 @@ function onRemove() {
 </template>
 
 <style scoped lang="less">
-  .locale-add-btn {
+.locale-add-btn {
   padding: 10px 0 24px 10px;
 }
 </style>

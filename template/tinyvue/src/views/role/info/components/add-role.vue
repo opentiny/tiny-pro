@@ -88,10 +88,7 @@ function onConfirm() {
           </TinyFormItem>
         </TinyCol>
         <TinyCol class="w-1/2 max-sm:w-full">
-          <TinyFormItem
-            :label="$t('roleInfo.modal.input.desc')"
-            prop="permissionIds"
-          >
+          <TinyFormItem :label="$t('roleInfo.modal.input.desc')" prop="permissionIds">
             <TinySelect
               v-model="data.permissionIds"
               :placeholder="$t('baseForm.form.label.placeholder')"
@@ -113,10 +110,10 @@ function onConfirm() {
         {{ $t('menu.btn.cancel') }}
       </TinyButton>
       <TinyButton type="primary" round @click="onConfirm">
-        {{
-          $t('menu.btn.confirm')
-        }}
+        {{ $t('menu.btn.confirm') }}
       </TinyButton>
     </template>
   </TinyModal>
 </template>
+
+<style lang="less" scoped></style>

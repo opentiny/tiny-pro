@@ -27,11 +27,7 @@ onMounted(() => {
       <div class="login">
         <div class="login-header">
           <div class="login-logo">
-            <img
-              class="login-logo-img"
-              alt="Tiny Design"
-              src="@/assets/images/pro.png"
-            >
+            <img class="login-logo-img" alt="Tiny Design" src="@/assets/images/pro.png">
             <span class="login-logo-text">TinyPro of Vue</span>
           </div>
           <div class="login-desc">
@@ -48,7 +44,7 @@ onMounted(() => {
 </template>
 
 <style lang="less" scoped>
-  .container-login {
+.container-login {
   display: flex;
   flex-direction: column;
   width: 100vw;
@@ -111,10 +107,7 @@ onMounted(() => {
 :deep(.tiny-link.is-underline:hover::after) {
   border-bottom: none;
 }
-</style>
 
-<style lang="less" scoped>
-  // responsive
 @media (max-width: @screen-ms) {
   .login {
     width: 350px;

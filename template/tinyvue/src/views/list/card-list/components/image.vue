@@ -1,15 +1,10 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 
-const props = defineProps({
-  src: {
-    type: String,
-    default: 'card-list-application-default.png',
-  },
-})
+const { src = 'card-list-application-default.png' } = defineProps<{ src?: string }>()
 
 const url = computed(
-  () => new URL(`../../../../assets/images/${props.src}`, import.meta.url).href,
+  () => new URL(`../../../../assets/images/${src}`, import.meta.url).href,
 )
 </script>
 
@@ -18,7 +13,7 @@ const url = computed(
 </template>
 
 <style scoped lang="less">
-  .img {
+.img {
   width: 32px;
   height: 32px;
 }

@@ -2,9 +2,7 @@
 
 <template>
   <div class="container">
-    <Breadcrumb
-      :items="['menu.menuPage', 'menu.menuPage.second', 'menu.add.demo']"
-    />
+    <Breadcrumb :items="['menu.menuPage', 'menu.menuPage.second', 'menu.add.demo']" />
     <div class="content">
       <div class="content-main">
         <img src="@/assets/images/tiny-logo.png" class="image">
@@ -17,5 +15,5 @@
 </template>
 
 <style scoped lang="less">
-  @import '@/assets/style/exception.less'; /* 引入公共样式 */
+@import '@/assets/style/exception.less';
 </style>

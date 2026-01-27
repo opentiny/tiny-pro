@@ -6,8 +6,9 @@ const router = useRouter()
 
 function back() {
   // warning： Go to the node that has the permission
-  router.push({ name: 'Home' })
+  // router.push({ name: 'Home' })
 }
+
 onMounted(() => {
   setTimeout(() => {
     back()
@@ -16,21 +17,11 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="content">
+  <div class="h-screen w-full flex flex-col items-center justify-center">
     <h1>404</h1>
     <div>{{ $t('exception.result.404.description') }}</div>
   </div>
 </template>
 
 <style scoped lang="less">
-  .content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100vh;
-  margin: 0;
-  padding: 0;
-}
 </style>

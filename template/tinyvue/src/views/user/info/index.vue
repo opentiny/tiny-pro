@@ -1,6 +1,8 @@
 <script lang="ts" setup>
-import headtop from '../../form/step/components/head.vue'
-import infotab from './components/info-tab.vue'
+import { defineAsyncComponent } from 'vue'
+
+const Headtop = defineAsyncComponent(() => import('../../form/step/components/head.vue'))
+const Infotab = defineAsyncComponent(() => import('./components/info-tab.vue'))
 </script>
 
 <template>
@@ -9,10 +11,10 @@ import infotab from './components/info-tab.vue'
     <div class="container-info max-md:overflow-y-auto">
       <div class="general-card">
         <div class="general-top flex justify-around max-sm:flex-col max-sm:items-center max-sm:pb-[10px]">
-          <headtop />
+          <Headtop />
         </div>
         <div class="general-content max-md:overflow-y-visible!">
-          <infotab />
+          <Infotab />
         </div>
       </div>
     </div>
@@ -20,7 +22,7 @@ import infotab from './components/info-tab.vue'
 </template>
 
 <style scoped lang="less">
-  .container {
+.container {
   width: 100%;
   height: calc(100% - 48px);
 }

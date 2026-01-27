@@ -24,8 +24,6 @@ const filterDataModel = reactive({
   keywords: '',
   classify: 'all',
 })
-const cards = ref([])
-const cardLoadingState = ref(null)
 
 const pager = ref({
   currentPage: 1,
@@ -49,7 +47,7 @@ onUnmounted(() => {
 
 function handleResizePager() {
   let resizeTimer = null
-  const handleResize = (entries) => {
+  const handleResize = (entries: ResizeObserverEntry[]) => {
     clearTimeout(resizeTimer)
     resizeTimer = setTimeout(() => {
       entries.forEach((entry) => {
@@ -74,21 +72,25 @@ function handleRefresh() {
   fetchData()
 }
 
-function classifyChange(val) {
+function classifyChange(val: string) {
   filterDataModel.classify = val
   pager.value.currentPage = 1
   fetchData()
 }
 
-function currentChange(current) {
+function currentChange(current: number) {
   pager.value.currentPage = current
   fetchData()
 }
 
-function sizeChange(size) {
+function sizeChange(size: number) {
   pager.value.pageSize = size
   fetchData()
 }
+
+const cards = ref([])
+
+const cardLoadingState = ref(null)
 
 async function fetchData() {
   const queryParams = {
@@ -140,11 +142,7 @@ async function fetchData() {
       </div>
 
       <div id="card-list" class="card-container">
-        <TinyCard
-          v-for="card in cards"
-          :key="card.id"
-          custom-class="card-item"
-        >
+        <TinyCard v-for="card in cards" :key="card.id" custom-class="card-item">
           <Image :src="card.icon" />
           <div class="header mb-2 mt-2">
             {{ card.name }}
@@ -180,13 +178,14 @@ async function fetchData() {
 </template>
 
 <style scoped lang="less">
-  .container-list {
+.container-list {
   flex: 1 1 auto;
   flex-direction: column;
   justify-content: space-between;
   overflow-x: hidden;
   overflow-y: auto;
 }
+
 .content {
   display: flex;
   flex-direction: column;

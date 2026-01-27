@@ -38,36 +38,14 @@ defineExpose({
 </script>
 
 <template>
-  <div class="option">
-    <div class="required">
-      *
+  <div>
+    <div class="flex items-center gap-2 text-[14px]">
+      <span class="text-[140%] text-[#be1818]">*</span>
+      <span>{{ $t('userInfo.filter.endTime') }}：</span>
     </div>
-    <span>{{ $t('userInfo.filter.endTime') }}：</span>
-    <TinyDatePicker
-      v-model="endTime"
-      value-format="yyyy-MM-dd"
-      @blur="handleBlur"
-    />
+
+    <TinyDatePicker v-model="endTime" value-format="yyyy-MM-dd" @blur="handleBlur" />
   </div>
 </template>
 
-<style scoped lang="less">
-  .option {
-  .required {
-    margin-top: 5px;
-    color: rgb(190, 24, 24);
-    font-size: 140%;
-  }
-
-  span {
-    width: 110px;
-    height: 18px;
-    font-size: 14px;
-  }
-
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  padding: 10px 3px;
-}
-</style>
+<style scoped lang="less"></style>
