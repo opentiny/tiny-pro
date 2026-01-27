@@ -29,6 +29,7 @@ import { flushRouter } from '@/router/guard/menu'
 import { useTabStore } from '@/store'
 import { useMenuStore } from '@/store/modules/router'
 import { sleep } from '@/utils/base-utils'
+import { getIdByLabel } from  '@/utils/tree'
 import AddMenu from './add-menu.vue'
 import menuTree from './menu-tree.vue'
 import UpdateForm from './update-form.vue'
@@ -265,16 +266,17 @@ onMounted(async () => {
       inputSchema: {
         name: z.string().describe('名称'),
         order: z.number().describe('优先级').default(0),
-        parentId: z.number().describe('父菜单ID').optional(),
+        parentMenu: z.string().describe('父菜单').optional(),
         icon: z.string().describe('图标').optional().default(''),
         component: z.string().describe('组件'),
         path: z.string().describe('路径'),
         locale: z.string().describe('国际化'),
       },
     },
-    async ({ name, order, parentId, icon, component, path, locale: menuLocale }) => {
+    async ({ name, order, parentMenu, icon, component, path, locale: menuLocale }) => {
       handleAddMenu()
       await sleep(1000)
+      const parentId = getIdByLabel(i18nMenuData.value, parentMenu)
       addMenu.value.setMenuInfo({
         name,
         order,
