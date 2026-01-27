@@ -44,6 +44,11 @@ onMounted(() => {
     treeRef.value.setChecked(id, true, false)
   })
 })
+
+defineExpose({
+  onConfirm,
+  treeRef,
+})
 </script>
 
 <template>

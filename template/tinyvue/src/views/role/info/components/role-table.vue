@@ -113,6 +113,7 @@ defineExpose({
   reload: () => {
     grid.value.handleFetch()
   },
+  openMenuModal: onMenuUpdate,
 })
 </script>
 
