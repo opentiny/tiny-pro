@@ -26,13 +26,12 @@ export class TokenService {
     private redisService: RedisService,
     private jwt: JwtService,
     private cfg: ConfigService,
-    private locker: LockerService,
-    private readonly i18n: I18nService<I18nTranslations>
   ){}
 
   @WithLock({
     key(args){
-      return `lock:revokeToken:${args[0]}`
+      const {id} = this.jwt.decode(args[0]) as AccessTokenPayload;
+      return `user-token:${id}`
     }
   })
   async revokeToken(token: string) {
@@ -46,7 +45,22 @@ export class TokenService {
 
   @WithLock({
     key(args){
-      return `lock:revokeExpiredToken:${args[0]}`
+      const {id} = this.jwt.decode(args[0]) as AccessTokenPayload;
+      return `user-token:${id}`
+    }
+  })
+  async revokeRefreshToken(refreshToken: string) {
+    const {id:uid, jti} = this.jwt.decode<RefreshTokenPayload>(refreshToken);
+    const redis = this.redisService.getRedis();
+    const multi = redis.multi();
+    multi.del(`rt:${uid}:${jti}`);
+    multi.lrem(`user:${uid}:rt`, 0, jti);
+    await multi.exec();
+  }
+
+  @WithLock({
+    key(args){
+      return `user-token:${args[0]}`
     }
   })
   private async revokeExpiredToken(uid: number){
@@ -78,7 +92,7 @@ export class TokenService {
 
   @WithLock({
     key(args){
-      return `lock:revokeByUid:${args[0]}`
+      return `user-token:${args[0]}`
     }
   })
   async revokeByUid(uid: number){
@@ -101,11 +115,6 @@ export class TokenService {
     await multi.exec();
   }
 
-  @WithLock({
-    key(args){
-      return `lock:createToken:${args[0]}:${args[1]}`
-    }
-  })
   async createToken(id: number, email: string): Promise<TokenData>{
     const accessTokenTTLSeconds = this.cfg.get('REDIS_SECONDS') ?? 7200;
     const refreshTokenTTL = this.cfg.get('REFRESH_TOKEN_TTL') // ms;
@@ -147,7 +156,7 @@ export class TokenService {
 
   @WithLock({
     key(args){
-      return `lock:getLastToken:${args[0]}`
+      return `user-token:${args[0]}`
     }
   })
   // 获取最早登陆的Token
@@ -168,11 +177,10 @@ export class TokenService {
     return {accessToken, refreshToken}
 
   }
-  @WithLock({
-    key(args){
-      return `lock:accessTokenAlive:${args[0]}`
-    }
-  })
+
+  // O(N) 的时间复杂度我想应该是可以被接受的.
+  // 这里被AuthGuard调用, 是一个热点路径, exists的复杂度是O(N), N 是传入的键个数.
+  // 我们之传入了一个所以是O(1), 速度极快不需要加锁了
   async accessTokenAlive(
     token: string
   ){
@@ -183,7 +191,7 @@ export class TokenService {
 
   @WithLock({
     key(args){
-      return `lock:issueToken:${args[0]}`
+      return `user-token:${args[0]}`
     }
   })
   async issueToken(
@@ -219,7 +227,7 @@ export class TokenService {
   }
   @WithLock({
     key(args){
-      return `lock:getUserTokenCount:${args[0]}`
+      return `user-token:${args[0]}`
     }
   })
   async getUserTokenCount(
@@ -230,7 +238,7 @@ export class TokenService {
   }
   @WithLock({
     key(args){
-      return `lock:getTokenByJti:${args[0]}:${args[1]}:${args[2]}`
+      return `user-token:${args[0]}`
     }
   })
   async getTokenByJti(

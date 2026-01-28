@@ -1,7 +1,9 @@
 import {
   HttpException,
   Logger,
+  MiddlewareConsumer,
   Module,
+  NestModule,
   OnModuleInit,
 } from '@nestjs/common';
 import { UserModule } from './user/user.module';
@@ -14,10 +16,7 @@ import { PermissionGuard } from './permission/permission.guard';
 import { RoleModule } from './role/role.module';
 import { join } from 'path';
 import { readFileSync } from 'fs';
-import { UserService } from './user/user.service';
-import { RoleService } from './role/role.service';
-import { PermissionService } from './permission/permission.service';
-import { MenuService } from './menu/menu.service';
+
 import { MenuModule } from './menu/menu.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { I18Module } from './i18/i18.module';
@@ -31,13 +30,12 @@ import { MockModule } from './mock/mock.module';
 import { RejectRequestGuard } from './public/reject.guard';
 import { HealthCheckController } from './health-check.controller';
 import { ApplicationModule } from './application/application.module';
-import { ApplicationService } from './application/application.service';
 import { CONFIG_SCHEMA, Configure } from './config-schema';
 import { InstallLock } from './install-lock';
 import { RedisService } from '../libs/redis/redis.service';
 import Redis from 'ioredis';
 import { RedisModule } from '../libs/redis/redis.module';
-import { LockerModule } from '@app/locker';
+import { LockerModule,LockerDiscover, LockRequestContextMiddleware } from '@app/locker';
 import { MenuInitializer } from './menu/menu.initializer';
 import { RoleInit } from './role/role.initializer';
 import { PermissionInit } from './permission/permission.initalizer';
@@ -92,9 +90,11 @@ const MAX_RETRY = 20;
       useClass: PermissionGuard,
     },
     InstallLock,
+    LockerDiscover,
   ],
+  exports: [LockerDiscover]
 })
-export class AppModule implements OnModuleInit {
+export class AppModule implements OnModuleInit,NestModule {
   constructor(
     private lang: I18LangService,
     private i18: I18Service,
@@ -113,7 +113,13 @@ export class AppModule implements OnModuleInit {
   async setIsInstalled(redis: Redis){
     return redis.set(INSTALL_FLAG, '1');
   }
-  async onModuleInit() {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(LockRequestContextMiddleware)
+      .forRoutes('*');
+  }
+  async onModuleInit(
+  ) {
     const IS_PREVIEW_MOD = this.cfg.get('PREVIEW_MODE');
     if (IS_PREVIEW_MOD) {
       Logger.warn('You are currently in demonstration mode. All additions, deletions, and modifications request will be rejected');

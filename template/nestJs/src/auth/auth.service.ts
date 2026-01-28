@@ -12,6 +12,7 @@ import { pick } from '../../libs/utils/pick';
 import { JwtService } from '@app/jwt';
 import { ConfigService } from '@nestjs/config';
 import { Configure } from 'src/config-schema';
+import { WithLock } from '@app/locker/with-lock.decorator';
 
 @Injectable()
 export class AuthService {
@@ -42,6 +43,17 @@ export class AuthService {
     }
     return;
   }
+
+  @WithLock({
+    key(args) {
+      let uid = 'unknown';
+      try {
+        const token = this.jwtService.decode(args[0]) as any;
+        uid = token?.id;
+      } catch {}
+      return `user-token:${uid}`;
+    }
+  })
   async refreshToken(
     maybeToken: string
   ){
@@ -65,7 +77,7 @@ export class AuthService {
     if (accessToken){
       await this.tokenService.revokeToken(accessToken);
     }
-    await this.tokenService.revokeToken(refreshToken);
+    await this.tokenService.revokeRefreshToken(refreshToken);
     const tokenPair = await this.tokenService.createToken(id, email);
     // 颁发一个新的token
     // issueToken 内部会在颁发前踢出最老的会话, 也会删除过期的会话, 这里就不用调用 this.tokenService.revokeExpiredToken 了
