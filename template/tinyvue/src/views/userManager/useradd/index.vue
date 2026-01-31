@@ -34,13 +34,28 @@ onMounted(() => {
 
 const { t } = useI18n()
 
+export interface UserAddData {
+  email: string
+  password: string
+  name: string
+  address: string
+  department: string
+  roleIds: number[]
+  employeeType
+  probationDate: string[]
+  probationDuration: string
+  protocolStart: Date
+  protocolEnd: Date
+  status: string
+}
+
 // 加载效果
 const state = reactive<{
-  userData: any
+  userData: UserAddData
   roleData: any
 }>({
-  userData: {} as any,
-  roleData: [] as any,
+  userData: {},
+  roleData: [],
 })
 
 const setFormRef = ref()
@@ -80,7 +95,7 @@ async function handleSubmit() {
           message: t('baseForm.form.submit.success'),
           status: 'success',
         })
-        state.userData = {} as any
+        state.userData = {}
         emit('confirm')
       }
       catch (error) {
@@ -113,6 +128,13 @@ function handleBlur() {
     })
   }
 }
+
+defineExpose({
+  setUserInfo: (userData) => {
+    state.userData = userData
+  },
+  handleSubmit,
+})
 </script>
 
 <template>
