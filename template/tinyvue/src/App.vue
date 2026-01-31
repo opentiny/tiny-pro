@@ -28,6 +28,8 @@ const sessionId = ref('')
 const [serverTransport, clientTransport] = createMessageChannelPairTransport()
 provide('serverTransport', serverTransport)
 
+const AGENT_URL = 'https://agent.opentiny.design/api/v1/webmcp-trial/'
+
 onMounted(async () => {
   // 创建 WebMcpClient ，并与 WebAgent 连接
   const client = new WebMcpClient()
@@ -38,7 +40,7 @@ onMounted(async () => {
     // sessionId 为可选参数。若传入该参数，系统将使用指定值作为会话标识；若未传入，WebAgent 服务将自动生成一个随机的字符串作为 sessionId。为便于通过 MCP Inspector 工具进行调试，此处采用了固定的 sessionId。用户亦可通过浏览器原生提供的 crypto.randomUUID() 方法生成随机字符串作为会话标识。
     sessionId: 'd299a869-c674-4125-a84b-bb4e24079b99',
 
-    url: 'https://agent.opentiny.design/api/v1/webmcp-trial/mcp',
+    url: `${AGENT_URL}mcp`,
   })
   sessionId.value = sessionID
 })
@@ -53,7 +55,7 @@ onMounted(async () => {
     <GlobalSetting />
   </div>
   <TinyRemoter
-    agent-root="https://agent.opentiny.design/api/v1/webmcp-trial/"
+    :agent-root="AGENT_URL"
     :session-id="sessionId"
     :menu-items="[
       {
