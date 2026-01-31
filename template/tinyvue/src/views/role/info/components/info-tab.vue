@@ -71,6 +71,7 @@ const pagerConfigLg = {
 }
 const roleTableRef = ref()
 const menuDrawerRef = ref()
+const addRoleFormRef = ref()
 const allFilter = {
   inputFilter: {
     inputFilter: true,
@@ -206,10 +207,36 @@ function onRoleDelete() {
 
 onMounted(async () => {
   const server = new WebMcpServer({
-    name: 'bind-menu-mcp-server',
+    name: 'role-management-mcp-server',
     version: '1.0.0',
   })
   const serverTransport = inject<any>('serverTransport')
+
+  server.registerTool(
+    'add-role',
+    {
+      title: '添加角色',
+      description: '添加角色',
+      inputSchema: {
+        name: z.string().describe('角色名称'),
+        // TODO: 用户的语言可能是添加用户和删除用户的权限，而不是 user::add 和 user::remove 权限或者权限 ID 为 2 和 3，需要做下转换
+        permissions: z.array(z.number()).describe('角色拥有的权限'),
+      },
+    },
+    async ({ name, permissions }) => {
+      onAdd()
+      await sleep(1000)
+
+      addRoleFormRef.value.setRoleInfo({
+        name,
+        permissionIds: permissions,
+      })
+      await sleep(1000)
+
+      addRoleFormRef.value.onConfirm()
+      return { content: [{ type: 'text', text: `收到: ${name}` }] }
+    },
+  )
 
   server.registerTool(
     'bind-menu-for-role',
@@ -276,6 +303,7 @@ onMounted(async () => {
       @confirm="onConfirm"
     />
     <add-role
+      ref="addRoleFormRef"
       :visible="addModalVisible"
       :permissions="permissions"
       @hide="onAddHide"
