@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { FilterType } from '@/types/global'
+import { WebMcpServer, z } from '@opentiny/next-sdk'
 import {
   Loading,
   Button as TinyButton,
@@ -17,12 +18,13 @@ import {
   Select as TinySelect,
 } from '@opentiny/vue'
 import { iconCommission, iconDel } from '@opentiny/vue-icon'
-import { computed, reactive, ref } from 'vue'
+import { computed, inject, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getAllRole } from '@/api/role'
 import { batchDeleteUsers, deleteUser, getAllUser, updatePwdAdmin, updateUserInfo } from '@/api/user'
 import { useResponsive, useResponsiveSize } from '@/hooks/responsive'
 import { useUserStore } from '@/store'
+import { sleep } from '@/utils/base-utils'
 import { isUndefined } from '@/utils/is'
 import UserDetail from '../../user-detail/index.vue'
 import UserAdd from '../../useradd/index.vue'
@@ -34,6 +36,7 @@ const IconCommission = iconCommission()
 const IconDel = iconDel()
 const { t } = useI18n()
 const grid = ref()
+const addUserFormRef = ref()
 const state = reactive<{
   loading: any
   tableData: any
@@ -350,6 +353,48 @@ async function handleUpdate({ row, column }, { target: { value } }) {
 
 // 请求职位类型
 fetchRole()
+
+onMounted(async () => {
+  const server = new WebMcpServer({
+    name: 'user-management-mcp-server',
+    version: '1.0.0',
+  })
+  const serverTransport = inject<any>('serverTransport')
+
+  server.registerTool(
+    'add-user',
+    {
+      title: '添加用户',
+      description: '添加用户，可选参数不需要用户提供，直接根据用户提供的信息添加用户即可',
+      inputSchema: {
+        email: z.string().describe('邮箱'),
+        password: z.string().describe('密码'),
+        name: z.string().describe('用户名'),
+        address: z.string().describe('地址').optional(),
+        department: z.string().describe('所属部门').optional(),
+        roleIds: z.array(z.number()).describe('职位').optional(),
+        employeeType: z.string().describe('招聘类型').optional(),
+        probationDate: z.array(z.date()).describe('试用期起止时间').optional(),
+        probationDuration: z.string().describe('试用期时长').optional(),
+        protocolStart: z.date().describe('劳动合同开始日期').optional(),
+        protocolEnd: z.date().describe('劳动合同结束日期').optional(),
+        status: z.string().describe('状态').optional(),
+      },
+    },
+    async (userData) => {
+      handleAddUser()
+      await sleep(1000)
+
+      addUserFormRef.value.setUserInfo(userData)
+      await sleep(1000)
+
+      addUserFormRef.value.handleSubmit()
+      return { content: [{ type: 'text', text: `收到: ${userData.email}` }] }
+    },
+  )
+
+  await server.connect(serverTransport)
+})
 </script>
 
 <template>
@@ -659,6 +704,7 @@ fetchRole()
       :title="$t('userInfo.modal.title.add')"
     >
       <UserAdd
+        ref="addUserFormRef"
         :status-data="statusData"
         :project-data="projectData"
         @confirm="onAddConfirm"
