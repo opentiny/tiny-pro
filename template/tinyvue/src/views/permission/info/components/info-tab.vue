@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import type { Permission } from '@/api/permission'
 import type { FilterType, InputFilterValue, IPaginationMeta, Pager } from '@/types/global'
+import { WebMcpServer, z } from '@opentiny/next-sdk'
 import {
   Modal,
   Button as TinyButton,
@@ -16,10 +17,11 @@ import {
   Row as TinyRow,
 } from '@opentiny/vue'
 import { iconDel } from '@opentiny/vue-icon'
-import { computed, reactive, ref } from 'vue'
+import { computed, reactive, ref, onMounted, inject } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { createPermission, deletePermission, getAllPermission, updatePermission } from '@/api/permission'
 import { useResponsive, useResponsiveSize } from '@/hooks/responsive'
+import { sleep } from '@/utils/base-utils'
 
 const roleGrid = ref()
 const addForm = ref()
@@ -34,11 +36,14 @@ const IconDel = iconDel()
 // 加载效果
 const state = reactive<{
   tableData: any
-  permissionAddData: any
+  permissionAddData: {
+    name: string
+    desc: string
+  }
   isPermissionAdd: boolean
 }>({
   tableData: {} as any,
-  permissionAddData: {} as any,
+  permissionAddData: {},
   isPermissionAdd: false,
 })
 
@@ -170,7 +175,7 @@ async function handlePermissionAddSubmit() {
           status: 'success',
         })
         state.isPermissionAdd = false
-        state.permissionAddData = {} as any
+        state.permissionAddData = {}
         roleGrid.value.handleFetch()
       }
       catch (error) {
@@ -188,8 +193,39 @@ async function handlePermissionAddSubmit() {
 
 async function handlePermissionAddCancel() {
   state.isPermissionAdd = false
-  state.permissionAddData = {} as any
+  state.permissionAddData = {}
 }
+
+onMounted(async () => {
+  const server = new WebMcpServer({
+    name: 'permission-management-mcp-server',
+    version: '1.0.0',
+  })
+  const serverTransport = inject<any>('serverTransport')
+
+  server.registerTool(
+    'add-permission',
+    {
+      title: '添加权限',
+      description: '添加权限',
+      inputSchema: {
+        name: z.string().describe('权限名称'),
+        desc: z.string().describe('权限描述'),
+      },
+    },
+    async ({ name, desc }) => {
+      handleAddPermission()
+      await sleep(1000)
+      state.permissionAddData.name = name
+      state.permissionAddData.desc = desc
+      await sleep(1000)
+      handlePermissionAddSubmit()
+      return { content: [{ type: 'text', text: `收到: ${name}` }] }
+    },
+  )
+
+  await server.connect(serverTransport)
+})
 </script>
 
 <template>
