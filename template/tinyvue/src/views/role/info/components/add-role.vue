@@ -68,6 +68,14 @@ function onConfirm() {
     })
     .catch()
 }
+
+defineExpose({
+  setRoleInfo: (roleInfo: Omit<RoleAddData, 'menuIds'>) => {
+    data.name = roleInfo.name
+    data.permissionIds = roleInfo.permissionIds
+  },
+  onConfirm,
+})
 </script>
 
 <template>
