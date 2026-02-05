@@ -1,9 +1,10 @@
 <script lang="ts" setup>
 import { TinyRemoter } from '@opentiny/next-remoter'
-import { createMessageChannelPairTransport, WebMcpClient } from '@opentiny/next-sdk'
+import { createMessageChannelPairTransport, WebMcpClient, WebMcpServer, z } from '@opentiny/next-sdk'
 import { TinyConfigProvider } from '@opentiny/vue'
 import TinyThemeTool from '@opentiny/vue-theme/theme-tool'
 import { onMounted, provide, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import GlobalSetting from '@/components/global-setting/index.vue'
 import { useTheme } from './hooks/useTheme'
 import '@opentiny/next-remoter/dist/style.css'
@@ -31,6 +32,32 @@ provide('serverTransport', serverTransport)
 const AGENT_URL = 'https://agent.opentiny.design/api/v1/webmcp-trial/'
 
 onMounted(async () => {
+  const server = new WebMcpServer()
+  const $router = useRouter()
+  const $route = useRoute()
+
+  // TODO: 参数需要优化，用户不会知道具体的路由路径，用户的语言可能是：帮我打开菜单管理页面，这时应该根据名称获取路由路径，再做路由跳转
+  // 进一步优化：用户可能在任意页面直接提需求：帮我创建 xx 菜单，这时 AI 应该先跳转菜单管理页面，然后调佣创建菜单的工具
+  server.registerTool(
+    'switch-router',
+    {
+      title: '切换路由',
+      description: '切换路由',
+      inputSchema: {
+        routerPath: z.string().describe('路由路径'),
+      },
+    },
+    async ({ routerPath }) => {
+      if ($route.path === routerPath) {
+        return { content: [{ type: 'text', text: routerPath }] }
+      }
+
+      $router.push(import.meta.env.VITE_CONTEXT + routerPath)
+      return { content: [{ type: 'text', text: routerPath }] }
+    },
+  )
+  await server.connect(serverTransport)
+
   // 创建 WebMcpClient ，并与 WebAgent 连接
   const client = new WebMcpClient()
   await client.connect(clientTransport)
