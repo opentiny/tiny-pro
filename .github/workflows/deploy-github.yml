@@ -30,7 +30,7 @@ jobs:
         run: pnpm -F tiny-pro-vue build
         env:
           VITE_BASE: /tiny-pro/
-          VITE_BASE_API: https://opentiny.design/tiny-pro-vue
+          VITE_BASE_API: https://opentiny.design/tiny-pro-vue/api
           VITE_MOCK_SERVER_HOST: https://opentiny.design/tiny-pro-vue/api/mock
       - name: Setup Pages
         uses: actions/configure-pages@v2
