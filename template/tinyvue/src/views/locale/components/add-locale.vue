@@ -137,14 +137,14 @@ onMounted(async () => {
     version: '1.0.0',
   })
   const serverTransport = inject<any>('serverTransport')
-
+  
   server.registerTool(
     'add-i18n-entry',
     {
       title: '添加国际化词条',
       description: '添加国际化词条',
       inputSchema: {
-        key: z.string().describe('词条关键字'),
+        key: z.string().describe('词条关键字，请自行创建，不要询问用户'),
         content: z.string().describe('词条内容'),
         lang: z.union([z.literal(1), z.literal(2)]).describe('词条语言ID，英文 enUS 为：1，中文 zhCN 为：2'),
       },

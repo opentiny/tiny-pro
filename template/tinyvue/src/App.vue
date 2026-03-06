@@ -7,6 +7,7 @@ import { onMounted, provide, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import GlobalSetting from '@/components/global-setting/index.vue'
 import { useTheme } from './hooks/useTheme'
+import { skills } from './skills'
 import '@opentiny/next-remoter/dist/style.css'
 
 const theme = new TinyThemeTool()
@@ -29,7 +30,7 @@ const sessionId = ref('')
 const [serverTransport, clientTransport] = createMessageChannelPairTransport()
 provide('serverTransport', serverTransport)
 
-const AGENT_URL = 'https://agent.opentiny.design/api/v1/webmcp-trial/'
+const AGENT_URL = 'https://agent.opentiny.design/api/v1/webmcp-trial/' // 'http://localhost:3030/api/v1/webmcp/'
 
 onMounted(async () => {
   const server = new WebMcpServer()
@@ -98,6 +99,7 @@ onMounted(async () => {
         show: false,
       },
     ]"
+    :skills="skills"
   />
 </template>
 
