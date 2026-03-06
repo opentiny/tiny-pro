@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { FilterType } from '@/types/global'
-import { WebMcpServer, z } from '@opentiny/next-sdk'
+import { registerPageTool } from '@opentiny/next-sdk'
 import {
   Loading,
   Button as TinyButton,
@@ -18,7 +18,7 @@ import {
   Select as TinySelect,
 } from '@opentiny/vue'
 import { iconCommission, iconDel } from '@opentiny/vue-icon'
-import { computed, inject, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, onUnmounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getAllRole } from '@/api/role'
 import { batchDeleteUsers, deleteUser, getAllUser, updatePwdAdmin, updateUserInfo } from '@/api/user'
@@ -354,47 +354,26 @@ async function handleUpdate({ row, column }, { target: { value } }) {
 // 请求职位类型
 fetchRole()
 
-onMounted(async () => {
-  const server = new WebMcpServer({
-    name: 'user-management-mcp-server',
-    version: '1.0.0',
-  })
-  const serverTransport = inject<any>('serverTransport')
+let cleanupPageTool: () => void
 
-  server.registerTool(
-    'add-user',
-    {
-      title: '添加用户',
-      description: '添加用户，可选参数不需要用户提供，直接根据用户提供的信息添加用户即可',
-      inputSchema: {
-        email: z.string().describe('邮箱'),
-        password: z.string().describe('密码'),
-        name: z.string().describe('用户名'),
-        address: z.string().describe('地址').optional(),
-        department: z.string().describe('所属部门').optional(),
-        roleIds: z.array(z.number()).describe('职位').optional(),
-        employeeType: z.string().describe('招聘类型').optional(),
-        probationDate: z.array(z.date()).describe('试用期起止时间').optional(),
-        probationDuration: z.string().describe('试用期时长').optional(),
-        protocolStart: z.date().describe('劳动合同开始日期').optional(),
-        protocolEnd: z.date().describe('劳动合同结束日期').optional(),
-        status: z.string().describe('状态').optional(),
+onMounted(async () => {
+  cleanupPageTool = registerPageTool({
+    handlers: {
+      'add-user': async (userData) => {
+        handleAddUser()
+        await sleep(1000)
+
+        addUserFormRef.value.setUserInfo(userData)
+        await sleep(1000)
+
+        addUserFormRef.value.handleSubmit()
+        return { content: [{ type: 'text', text: `收到: ${userData.email}` }] }
       },
     },
-    async (userData) => {
-      handleAddUser()
-      await sleep(1000)
-
-      addUserFormRef.value.setUserInfo(userData)
-      await sleep(1000)
-
-      addUserFormRef.value.handleSubmit()
-      return { content: [{ type: 'text', text: `收到: ${userData.email}` }] }
-    },
-  )
-
-  await server.connect(serverTransport)
+  })
 })
+
+onUnmounted(() => cleanupPageTool?.())
 </script>
 
 <template>

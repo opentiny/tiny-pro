@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { WebMcpServer, z } from '@opentiny/next-sdk'
+import { registerPageTool } from '@opentiny/next-sdk'
 import type { RoleAddData } from './add-role.vue'
 import type { Permission } from '@/api/permission'
 import type { ITreeNodeData } from '@/router/guard/menu'
@@ -11,7 +11,7 @@ import {
   TinyModal,
   Pager as TinyPager,
 } from '@opentiny/vue'
-import { computed, inject, ref, onMounted } from 'vue'
+import { computed, inject, ref, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { getAllMenu } from '@/api/menu'
@@ -205,66 +205,46 @@ function onRoleDelete() {
   roleTableRef.value.reload()
 }
 
+let cleanupPageTool: () => void
+
 onMounted(async () => {
-  const server = new WebMcpServer({
-    name: 'role-management-mcp-server',
-    version: '1.0.0',
+  cleanupPageTool = registerPageTool({
+    handlers: {
+      'add-role': async ({ name, permissions }) => {
+        onAdd()
+        await sleep(1000)
+
+        addRoleFormRef.value.setRoleInfo({
+          name,
+          permissionIds: permissions,
+        })
+        await sleep(1000)
+
+        addRoleFormRef.value.onConfirm()
+        return { content: [{ type: 'text', text: `收到: ${name}` }] }
+      },
+      'bind-menu-for-role': async ({ role, menu }) => {
+        const { data } = await getAllRoleDetail()
+        const rowData = data.roleInfo.items.find(item => item.name === role)
+        if (!rowData) {
+          return { content: [{ type: 'text', text: `角色未找到: ${role}` }] }
+        }
+        roleTableRef.value.openMenuModal(rowData.menus, rowData.id, rowData)
+        await sleep(1000)
+
+        // 先从菜单名称获取菜单 ID，再勾选菜单
+        const menuId = getIdByLabel(i18MenuDatas.value, menu)
+        menuDrawerRef.value.treeRef.setChecked(menuId, true, false)
+        await sleep(1000)
+
+        menuDrawerRef.value.onConfirm()
+        return { content: [{ type: 'text', text: `收到: ${role}` }] }
+      },
+    },
   })
-  const serverTransport = inject<any>('serverTransport')
-
-  server.registerTool(
-    'add-role',
-    {
-      title: '添加角色',
-      description: '添加角色',
-      inputSchema: {
-        name: z.string().describe('角色名称'),
-        // TODO: 用户的语言可能是添加用户和删除用户的权限，而不是 user::add 和 user::remove 权限或者权限 ID 为 2 和 3，需要做下转换
-        permissions: z.array(z.number()).describe('角色拥有的权限'),
-      },
-    },
-    async ({ name, permissions }) => {
-      onAdd()
-      await sleep(1000)
-
-      addRoleFormRef.value.setRoleInfo({
-        name,
-        permissionIds: permissions,
-      })
-      await sleep(1000)
-
-      addRoleFormRef.value.onConfirm()
-      return { content: [{ type: 'text', text: `收到: ${name}` }] }
-    },
-  )
-
-  server.registerTool(
-    'bind-menu-for-role',
-    {
-      title: '绑定菜单',
-      description: '给某个角色绑定菜单',
-      inputSchema: {
-        role: z.string().describe('需要绑定菜单的角色名称'),
-        menu: z.string().describe('需要绑定的菜单名称'),
-      },
-    },
-    async ({ role, menu }) => {
-      const rowData = tableData.value.find(item => item.name === role)
-      roleTableRef.value.openMenuModal(rowData.menus, rowData.id, rowData)
-      await sleep(1000)
-
-      // 先从菜单名称获取菜单 ID，再勾选菜单
-      const menuId = getIdByLabel(i18MenuDatas.value, menu)
-      menuDrawerRef.value.treeRef.setChecked(menuId, true, false)
-      await sleep(1000)
-
-      menuDrawerRef.value.onConfirm()
-      return { content: [{ type: 'text', text: `收到: ${role}` }] }
-    },
-  )
-
-  await server.connect(serverTransport)
 })
+
+onUnmounted(() => cleanupPageTool?.())
 </script>
 
 <template>

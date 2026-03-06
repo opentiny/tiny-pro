@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { Permission } from '@/api/permission'
 import type { FilterType, InputFilterValue, IPaginationMeta, Pager } from '@/types/global'
-import { WebMcpServer, z } from '@opentiny/next-sdk'
+import { registerPageTool } from '@opentiny/next-sdk'
 import {
   Modal,
   Button as TinyButton,
@@ -17,7 +17,7 @@ import {
   Row as TinyRow,
 } from '@opentiny/vue'
 import { iconDel } from '@opentiny/vue-icon'
-import { computed, reactive, ref, onMounted, inject } from 'vue'
+import { computed, reactive, ref, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { createPermission, deletePermission, getAllPermission, updatePermission } from '@/api/permission'
 import { useResponsive, useResponsiveSize } from '@/hooks/responsive'
@@ -196,36 +196,26 @@ async function handlePermissionAddCancel() {
   state.permissionAddData = {}
 }
 
-onMounted(async () => {
-  const server = new WebMcpServer({
-    name: 'permission-management-mcp-server',
-    version: '1.0.0',
-  })
-  const serverTransport = inject<any>('serverTransport')
+let cleanupPageTool: () => void
 
-  server.registerTool(
-    'add-permission',
-    {
-      title: '添加权限',
-      description: '添加权限',
-      inputSchema: {
-        name: z.string().describe('权限名称'),
-        desc: z.string().describe('权限描述'),
+onMounted(async () => {
+  cleanupPageTool = registerPageTool({
+    handlers: {
+      // key 必须与 mcp-servers 中注册的工具名一致
+      'add-permission': async ({ name, desc }) => {
+        handleAddPermission()
+        await sleep(1000)
+        state.permissionAddData.name = name
+        state.permissionAddData.desc = desc
+        await sleep(1000)
+        handlePermissionAddSubmit()
+        return { content: [{ type: 'text', text: `收到: ${name}` }] }
       },
     },
-    async ({ name, desc }) => {
-      handleAddPermission()
-      await sleep(1000)
-      state.permissionAddData.name = name
-      state.permissionAddData.desc = desc
-      await sleep(1000)
-      handlePermissionAddSubmit()
-      return { content: [{ type: 'text', text: `收到: ${name}` }] }
-    },
-  )
-
-  await server.connect(serverTransport)
+  })
 })
+
+onUnmounted(() => cleanupPageTool?.())
 </script>
 
 <template>

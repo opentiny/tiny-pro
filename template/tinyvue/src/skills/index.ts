@@ -3,4 +3,3 @@ export const skills = import.meta.glob('./**/*', {
   import: 'default',  // 取模块的 default 导出（即文件内容字符串）
   eager: true         // 同步加载，避免异步等待
 }) as Record<string, string>
-console.log('skills:', skills);
