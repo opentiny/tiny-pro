@@ -1,5 +1,6 @@
 import TinySearchBox from '@opentiny/vue-search-box'
 import { createApp } from 'vue'
+import { setNavigator } from '@opentiny/next-sdk'
 import globalComponents from '@/components'
 import App from './App.vue'
 import directive from './directive'
@@ -22,3 +23,6 @@ app.use(directive)
 app.use(TinySearchBox)
 
 app.mount('#app')
+
+// 必须在 router 注册后调用，让 SDK 持有 router.push 的引用
+setNavigator((route) => router.push(route))

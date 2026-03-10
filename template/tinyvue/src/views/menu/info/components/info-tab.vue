@@ -4,7 +4,7 @@ import type {
 } from 'vue'
 import type { Node } from './menu-tree.vue'
 import type { ITreeNodeData } from '@/router/guard/menu'
-import { WebMcpServer, z } from '@opentiny/next-sdk'
+import { registerPageTool } from '@opentiny/next-sdk'
 import {
   Loading,
   Button as TinyButton,
@@ -14,6 +14,7 @@ import {
   computed,
   inject,
   onMounted,
+  onUnmounted,
   ref,
   watch,
 } from 'vue'
@@ -29,7 +30,7 @@ import { flushRouter } from '@/router/guard/menu'
 import { useTabStore } from '@/store'
 import { useMenuStore } from '@/store/modules/router'
 import { sleep } from '@/utils/base-utils'
-import { getIdByLabel } from  '@/utils/tree'
+import { getIdByLabel } from '@/utils/tree'
 import AddMenu from './add-menu.vue'
 import menuTree from './menu-tree.vue'
 import UpdateForm from './update-form.vue'
@@ -247,54 +248,39 @@ watch(locale, () => {
   fetchLocalItems()
 })
 
+let cleanupPageTool: () => void
+
 onMounted(async () => {
   Promise.all([fetchMenu(), fetchLocalItems()]).finally(() => {
     treeLoading.value = false
   })
 
-  const server = new WebMcpServer({
-    name: 'menu-management-mcp-server',
-    version: '1.0.0',
-  })
-  const serverTransport = inject<any>('serverTransport')
-
-  server.registerTool(
-    'add-menu',
-    {
-      title: '添加菜单',
-      description: '添加菜单',
-      inputSchema: {
-        name: z.string().describe('名称'),
-        order: z.number().describe('优先级').default(0),
-        parentMenu: z.string().describe('父菜单').optional(),
-        icon: z.string().describe('图标').optional().default(''),
-        component: z.string().describe('组件'),
-        path: z.string().describe('路径'),
-        locale: z.string().describe('国际化'),
+  cleanupPageTool = registerPageTool({
+    handlers: {
+      // key 必须与 mcp-servers 中注册的工具名一致
+      'add-menu': async ({ name, order, parentMenu, icon, component, path, locale: menuLocale }) => {
+        handleAddMenu()
+        await sleep(1000)
+        const parentId = getIdByLabel(i18nMenuData.value, parentMenu)
+        addMenu.value.setMenuInfo({
+          name,
+          order,
+          parentId,
+          icon,
+          component,
+          menuType: '/',
+          path,
+          locale: menuLocale,
+        })
+        await sleep(1000)
+        onClickAdd()
+        return { content: [{ type: 'text', text: `收到: ${name}` }] }
       },
     },
-    async ({ name, order, parentMenu, icon, component, path, locale: menuLocale }) => {
-      handleAddMenu()
-      await sleep(1000)
-      const parentId = getIdByLabel(i18nMenuData.value, parentMenu)
-      addMenu.value.setMenuInfo({
-        name,
-        order,
-        parentId,
-        icon,
-        component,
-        menuType: '/',
-        path,
-        locale: menuLocale,
-      })
-      await sleep(1000)
-      onClickAdd()
-      return { content: [{ type: 'text', text: `收到: ${name}` }] }
-    },
-  )
-
-  await server.connect(serverTransport)
+  })
 })
+
+onUnmounted(() => cleanupPageTool?.())
 </script>
 
 <template>

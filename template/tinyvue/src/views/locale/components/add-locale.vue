@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { CreateLocal } from '@/api/local'
-import { WebMcpServer, z } from '@opentiny/next-sdk'
+import { registerPageTool } from '@opentiny/next-sdk'
 import {
   Notify,
   Button as TinyButton,
@@ -12,7 +12,7 @@ import {
   Popover as TinyPopover,
   Select as TinySelect,
 } from '@opentiny/vue'
-import { computed, inject, onMounted, reactive, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { createLang } from '@/api/lang'
 import { createLocalItem } from '@/api/local'
@@ -131,38 +131,29 @@ watch(open, (value) => {
   }
 })
 
-onMounted(async () => {
-  const server = new WebMcpServer({
-    name: 'i18n-management-mcp-server',
-    version: '1.0.0',
-  })
-  const serverTransport = inject<any>('serverTransport')
+// registerPageTool 返回 cleanup 函数，在 onUnmounted 中调用
+let cleanupPageTool: () => void
 
-  server.registerTool(
-    'add-i18n-entry',
-    {
-      title: '添加国际化词条',
-      description: '添加国际化词条',
-      inputSchema: {
-        key: z.string().describe('词条关键字'),
-        content: z.string().describe('词条内容'),
-        lang: z.union([z.literal(1), z.literal(2)]).describe('词条语言ID，英文 enUS 为：1，中文 zhCN 为：2'),
+onMounted(async () => {
+  cleanupPageTool = registerPageTool({
+    handlers: {
+      // key 必须与 mcp-servers 中注册的工具名一致
+      'add-i18n-entry': async ({ key, content, lang: langId }) => {
+        onOpen()
+        await sleep(1000)
+        locale.key = key
+        locale.content = content
+        locale.lang = langId
+        await sleep(1000)
+        addLocale()
+        return { content: [{ type: 'text', text: `收到: ${key}` }] }
       },
     },
-    async ({ key, content, lang: langId }) => {
-      onOpen()
-      await sleep(1000)
-      locale.key = key
-      locale.content = content
-      locale.lang = langId
-      await sleep(1000)
-      addLocale()
-      return { content: [{ type: 'text', text: `收到: ${key}` }] }
-    },
-  )
-
-  await server.connect(serverTransport)
+  })
 })
+
+// 页面卸载时取消注册，避免内存泄漏和消息串扰
+onUnmounted(() => cleanupPageTool?.())
 </script>
 
 <template>
