@@ -1,8 +1,10 @@
 name: Playwright E2E Tests
 
 on:
-  - pull_request
-  - workflow_dispatch
+  pull_request:
+    paths:
+      - 'template/tinyvue/**'
+  workflow_dispatch:
 
 jobs:
   e2e-test:
