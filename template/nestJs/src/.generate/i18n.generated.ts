@@ -56,6 +56,7 @@ export type I18nTranslations = {
         "NOT_EMPTY": string;
         "IS_ARRAY": string;
         "NOT_EMPTY_HUMAN": string;
+        "TYPE_ERROR": string;
     };
 };
 /* prettier-ignore */
