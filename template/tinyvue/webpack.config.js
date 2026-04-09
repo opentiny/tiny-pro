@@ -114,16 +114,6 @@ module.exports = {
       },
     }),
     new DefinePlugin({
-      'process.env': JSON.stringify({ ...process.env }),
-      'import.meta.env': '""',
-      'import.meta.env.VITE_CONTEXT': '"/vue-pro/"',
-      'import.meta.env.VITE_BASE_API': '"/api"',
-      'import.meta.env.VITE_SERVER_HOST': '"http://127.0.0.1:3000"',
-      'import.meta.env.VITE_MOCK_HOST': '"http://127.0.0.1:8848"',
-      'import.meta.env.VITE_USE_MOCK': 'false',
-      'import.meta.env.VITE_MOCK_IGNORE':
-        '"/api/user/userInfo,/api/user/login,/api/user/register,/api/employee/getEmployee"',
-      'import.meta.env.VITE_MOCK_SERVER_HOST': '"/mock"',
       'BUILD_TOOLS': "'WEBPACK'",
     }),
   ],
