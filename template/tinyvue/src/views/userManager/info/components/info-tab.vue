@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import type { FilterType } from '@/types/global'
-import { registerPageTool } from '@opentiny/next-sdk'
 import {
   Loading,
   Button as TinyButton,
@@ -354,26 +353,49 @@ async function handleUpdate({ row, column }, { target: { value } }) {
 // 请求职位类型
 fetchRole()
 
-let cleanupPageTool: () => void
-
 onMounted(async () => {
-  cleanupPageTool = registerPageTool({
-    handlers: {
-      'add-user': async (userData) => {
-        handleAddUser()
-        await sleep(1000)
-
-        addUserFormRef.value.setUserInfo(userData)
-        await sleep(1000)
-
-        addUserFormRef.value.handleSubmit()
-        return { content: [{ type: 'text', text: `收到: ${userData.email}` }] }
+  navigator.modelContext.registerTool({
+    name: 'add-user',
+    title: '添加用户',
+    description: '添加用户，可选参数不需要用户提供，也不用创建表单卡片，直接根据用户提供的信息添加用户即可',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        email: { type: 'string', description: '邮箱' },
+        password: { type: 'string', description: '密码' },
+        name: { type: 'string', description: '用户名' },
+        address: { type: 'string', description: '地址' },
+        department: { type: 'string', description: '所属部门' },
+        roleIds: {
+          type: 'array',
+          items: { type: 'number' },
+          description: '职位',
+        },
+        employeeType: { type: 'string', description: '招聘类型' },
+        probationDate: {
+          type: 'array',
+          items: { type: 'string', format: 'date-time' },
+          description: '试用期起止时间',
+        },
+        probationDuration: { type: 'string', description: '试用期时长' },
+        protocolStart: { type: 'string', format: 'date-time', description: '劳动合同开始日期' },
+        protocolEnd: { type: 'string', format: 'date-time', description: '劳动合同结束日期' },
+        status: { type: 'string', description: '状态' },
       },
+      required: ['email', 'password', 'name'],
+    },
+    execute: async ({ email, password, name, address, department, roleIds, employeeType, probationDate, probationDuration, protocolStart, protocolEnd, status }) => {
+      handleAddUser()
+      await sleep(1000)
+      addUserFormRef.value.setUserInfo({ email, password, name, address, department, roleIds, employeeType, probationDate, probationDuration, protocolStart, protocolEnd, status })
+      await sleep(1000)
+      addUserFormRef.value.handleSubmit()
+      return { content: [{ type: 'text', text: `收到: ${email}` }] }
     },
   })
 })
 
-onUnmounted(() => cleanupPageTool?.())
+onUnmounted(() => navigator.modelContext.unregisterTool('add-user'))
 </script>
 
 <template>
