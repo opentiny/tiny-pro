@@ -63,12 +63,7 @@ function onAddMenuClose() {
   addModal.value = false
 }
 async function onClickAdd() {
-  try {
-    await addMenu.value.valid()
-  } catch {
-    return
-  }
-
+  await addMenu.value.valid()
   setAddLoading(true)
   try {
     const menuInfo = addMenu.value.getMenuInfo()
