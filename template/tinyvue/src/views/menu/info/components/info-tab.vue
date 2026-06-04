@@ -62,36 +62,35 @@ function handleAddMenu() {
 function onAddMenuClose() {
   addModal.value = false
 }
-function onClickAdd() {
-  addMenu.value
-    .valid()
-    .then(() => {
-      const menuInfo = addMenu.value.getMenuInfo()
-      setAddLoading(true)
-      createMenu(menuInfo)
-        .then(() => {
-          TinyModal.message({
-            message: t('menuInfo.modal.add.success'),
-            status: 'success',
-          })
-          addModal.value = false
-          return updateUserMenu()
-        })
-        .then(() => fetchMenu())
-        .catch((error) => {
-          if (error.response && error.response.data) {
-            const errorMessage = error.response.data.message || '未知错误'
-            TinyModal.message({
-              message: errorMessage,
-              status: 'error',
-            })
-          }
-        })
-        .finally(() => {
-          setAddLoading(false)
-        })
+async function onClickAdd() {
+  try {
+    await addMenu.value.valid()
+  } catch {
+    return
+  }
+
+  setAddLoading(true)
+  try {
+    const menuInfo = addMenu.value.getMenuInfo()
+    await createMenu(menuInfo)
+    TinyModal.message({
+      message: t('menuInfo.modal.add.success'),
+      status: 'success',
     })
-    .catch(() => {})
+    addModal.value = false
+    await updateUserMenu()
+    await fetchMenu()
+  } catch (error: any) {
+    if (error.response && error.response.data) {
+      const errorMessage = error.response.data.message || '未知错误'
+      TinyModal.message({
+        message: errorMessage,
+        status: 'error',
+      })
+    }
+  } finally {
+    setAddLoading(false)
+  }
 }
 function onClose() {
   activeNode.value = DEFAULT_NODE

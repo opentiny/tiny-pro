@@ -77,51 +77,57 @@ const langRule = {
   ],
 }
 
-function addLang() {
-  langForm.value.validate().then(() => {
-    createLang({ name: lang.name })
-      .then(({ data }) => {
-        locales.pushLang(data)
-        emits('langChange')
-      })
-      .catch((reason) => {
-        Notify({
-          type: 'error',
-          message: reason.response.data.message,
-        })
-      })
-      .finally(() => {
-        lang.name = ''
-        setLangPopoverClose()
-      })
-  })
+async function addLang() {
+  try {
+    await langForm.value.validate()
+  } catch {
+    return
+  }
+
+  try {
+    const { data } = await createLang({ name: lang.name })
+    locales.pushLang(data)
+    emits('langChange')
+  } catch (reason: any) {
+    Notify({
+      type: 'error',
+      message: reason.response.data.message,
+    })
+  } finally {
+    lang.name = ''
+    setLangPopoverClose()
+  }
 }
 
 const i18 = useI18n()
 
-function addLocale() {
-  localeForm.value.validate().then(() => {
-    createLocalItem(locale)
-      .then(({ data }) => {
-        locale.key = ''
-        locale.content = ''
-        locale.lang = '' as any
-        locales.pushLocale(data)
-        i18.mergeLocaleMessage(data.lang.name, {
-          [data.key]: data.content,
-        })
-        emits('localChange')
-      })
-      .catch((reason) => {
-        Notify({
-          type: 'error',
-          message: reason.response.data.message,
-        })
-      })
-      .finally(() => {
-        onClose()
-      })
-  })
+async function addLocale() {
+  try {
+    await localeForm.value.validate()
+  } catch {
+    return false
+  }
+
+  try {
+    const { data } = await createLocalItem(locale)
+    locale.key = ''
+    locale.content = ''
+    locale.lang = '' as any
+    locales.pushLocale(data)
+    i18.mergeLocaleMessage(data.lang.name, {
+      [data.key]: data.content,
+    })
+    emits('localChange')
+    return true
+  } catch (reason: any) {
+    Notify({
+      type: 'error',
+      message: reason.response.data.message,
+    })
+    return false
+  } finally {
+    onClose()
+  }
 }
 watch(open, (value) => {
   if (!value && (langPopoverOpen.value || langTableOpen.value)) {
@@ -158,8 +164,15 @@ onMounted(async () => {
       locale.content = content
       locale.lang = langId
       await sleep(1000)
-      await addLocale()
-      return { content: [{ type: 'text', text: `已添加国际化词条: ${key} 成功` }] }
+      const success = await addLocale()
+      return {
+        content: [{
+          type: 'text',
+          text: success
+            ? `已添加国际化词条: ${key} 成功`
+            : `添加国际化词条: ${key} 失败`,
+        }],
+      }
     },
   })
 })

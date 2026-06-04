@@ -385,7 +385,7 @@ onMounted(async () => {
       required: ['email', 'password', 'name'],
     },
     execute: async ({ email, password, name, address, department, roleIds, employeeType, probationDate, probationDuration, protocolStart, protocolEnd, status }) => {
-      await handleAddUser()
+      handleAddUser()
       await sleep(1000)
       await addUserFormRef.value.setUserInfo({ email, password, name, address, department, roleIds, employeeType, probationDate, probationDuration, protocolStart, protocolEnd, status })
       await sleep(1000)

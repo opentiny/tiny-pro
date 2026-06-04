@@ -135,39 +135,35 @@ function flushTabs() {
   )
   removeTabs.forEach(({ link }) => tabStore.delByLink(link))
 }
-function onConfirm(ids: number[]) {
-  updateRole({
-    id: roleId.value,
-    menuIds: ids,
-  })
-    .then(({ data }) => {
-      selectedId.value = ids
-      const itemIdx = tableData.value.findIndex(
-        item => item.id === roleId.value,
-      )
-      tableData.value.splice(itemIdx, 1, {
-        ...tableData.value[itemIdx],
-        menus: data.menus,
+async function onConfirm(ids: number[]) {
+  try {
+    const { data } = await updateRole({
+      id: roleId.value,
+      menuIds: ids,
+    })
+    selectedId.value = ids
+    const itemIdx = tableData.value.findIndex(
+      item => item.id === roleId.value,
+    )
+    tableData.value.splice(itemIdx, 1, {
+      ...tableData.value[itemIdx],
+      menus: data.menus,
+    })
+    await flushRouter()
+  } catch (error: any) {
+    if (error.response && error.response.data) {
+      const errorMessage = error.response.data.message || '未知错误'
+      TinyModal.message({
+        message: errorMessage,
+        status: 'error',
       })
-      return flushRouter()
-    })
-    .catch((error) => {
-      if (error.response && error.response.data) {
-        const errorMessage = error.response.data.message || '未知错误'
-        TinyModal.message({
-          message: errorMessage,
-          status: 'error',
-        })
-      }
-    })
-    .then(() => {
-      roleTableRef.value.reload()
-      flushTabs()
-      reloadMenu()
-    })
-    .finally(() => {
-      open.value = false
-    })
+    }
+  } finally {
+    roleTableRef.value.reload()
+    flushTabs()
+    reloadMenu()
+    open.value = false
+  }
 }
 function onAddRole(role: RoleAddData) {
   createRole(role)
