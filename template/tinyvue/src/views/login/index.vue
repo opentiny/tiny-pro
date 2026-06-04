@@ -1,17 +1,28 @@
 <script lang="ts" setup>
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import Footer from '@/components/footer/index.vue'
 import { TAB_PERSISTENCE_KEYS } from '@/store/modules/tabs'
+import { getToken } from '@/utils/auth'
 import LoginForm from './components/login-form.vue'
+
+const router = useRouter()
+const showLoginForm = ref(false)
 
 onMounted(() => {
   localStorage.removeItem(TAB_PERSISTENCE_KEYS.CURRENT)
   localStorage.removeItem(TAB_PERSISTENCE_KEYS.TABS)
+  if (getToken()) {
+    router.push('/vue-pro/board/work')
+  }
+  else {
+    showLoginForm.value = true
+  }
 })
 </script>
 
 <template>
-  <div class="container-login">
+  <div v-if="showLoginForm" class="container-login">
     <div class="content">
       <div class="login">
         <div class="login-header">

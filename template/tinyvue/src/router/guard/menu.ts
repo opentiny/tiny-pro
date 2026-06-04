@@ -96,31 +96,6 @@ export function toRoutes(menus: ITreeNodeData[]) {
   return router
 }
 
-const ROUTE_BLACKLIST = ['login', 'notFound', 'redirect', 'preview', 'root']
-
-function resolveDefaultRouteName(router: Router) {
-  if (router.hasRoute('Home')) {
-    return 'Home'
-  }
-  const routerItem = router.getRoutes().find((routeItem) => {
-    return (
-      routeItem.name
-      && !ROUTE_BLACKLIST.includes(routeItem.name.toString())
-      && routeItem.children.length === 0
-    )
-  })
-  return routerItem?.name?.toString()
-}
-
-function addMenuRoutes(router: Router, menus: ITreeNodeData[]) {
-  const routes = toRoutes(menus)
-  routes.forEach((route) => {
-    if (!router.hasRoute(route.name)) {
-      router.addRoute('root', route)
-    }
-  })
-}
-
 export function setupMenuGuard(router: Router) {
   let has404 = false
   router.beforeEach(async (to, from, next) => {
@@ -138,26 +113,17 @@ export function setupMenuGuard(router: Router) {
     }
     await nextTick()
     const menuStore = useMenuStore()
-    if (!menuStore.menuList.length) {
-      const data = await menuStore.getMenuList()
-      addMenuRoutes(router, data)
-      if (to.name === 'root') {
-        const defaultRoute = resolveDefaultRouteName(router)
-        if (defaultRoute) {
-          next({ name: defaultRoute, replace: true })
-          return
-        }
-      }
-      next({ ...to, replace: true })
+    if (menuStore.menuList.length) {
+      next()
       return
     }
-    if (to.name === 'root') {
-      const defaultRoute = resolveDefaultRouteName(router)
-      if (defaultRoute) {
-        next({ name: defaultRoute, replace: true })
-        return
+    const data = await menuStore.getMenuList()
+    const routes = toRoutes(data)
+    routes.forEach((route) => {
+      if (!router.hasRoute(route.name)) {
+        router.addRoute('root', route)
       }
-    }
-    next()
+    })
+    next({ ...to, replace: true })
   })
 }

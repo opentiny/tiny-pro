@@ -11,4 +11,3 @@ dist
 yarn.lock
 .env
 .history
-pnpm-lock.yaml

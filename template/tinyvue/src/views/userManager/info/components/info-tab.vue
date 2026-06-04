@@ -385,11 +385,11 @@ onMounted(async () => {
       required: ['email', 'password', 'name'],
     },
     execute: async ({ email, password, name, address, department, roleIds, employeeType, probationDate, probationDuration, protocolStart, protocolEnd, status }) => {
-      handleAddUser()
+      await handleAddUser()
       await sleep(1000)
-      addUserFormRef.value.setUserInfo({ email, password, name, address, department, roleIds, employeeType, probationDate, probationDuration, protocolStart, protocolEnd, status })
+      await addUserFormRef.value.setUserInfo({ email, password, name, address, department, roleIds, employeeType, probationDate, probationDuration, protocolStart, protocolEnd, status })
       await sleep(1000)
-      addUserFormRef.value.handleSubmit()
+      await addUserFormRef.value.handleSubmit()
       return { content: [{ type: 'text', text: `收到: ${email}` }] }
     },
   })

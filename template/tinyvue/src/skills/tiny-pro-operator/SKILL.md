@@ -1,6 +1,6 @@
-# TinyPro 操作指南 (tiny-pro-operator)
+# TinyPro 操作指南
 
-## 我的系统是一个 [TinyPro](http://localhost:3031/vue-pro/) 后台管理系统，使用 `navigate_url` 工具会根据对应的模块跳转到对应的路由
+## 这是一个 [TinyPro](http://localhost:3031/vue-pro/) 后台管理系统，使用 `navigate_url` 进行路由菜单跳转
 
 ## 系统管理功能一览
 
@@ -163,6 +163,22 @@
 
 ---
 
+### 6. `navigate_url` — 导航到指定URL
+
+
+| 参数                | 类型     | 必填 | 说明             |
+| ------------------- | -------- | ---- | ---------------- |
+| `url`             | string   | ✅   | 跳转的url             |
+
+**示例**：
+
+```
+用户需求：跳转到添加用户页面
+→ 调用 navigate_url({ url: "/vue-pro/userManager/allInfo" })
+```
+
+---
+
 ### 核心约束
 
-1. **路由跳转规则：** 只使用 `navigate_url` 工具会根据对应的模块跳转到对应的路由
+1. **路由跳转规则：** 只使用 `navigate_url` 工具进行路由菜单跳转

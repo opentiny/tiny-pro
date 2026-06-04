@@ -214,7 +214,7 @@ onMounted(async () => {
       state.permissionAddData.name = name
       state.permissionAddData.desc = desc
       await sleep(1000)
-      handlePermissionAddSubmit()
+      await handlePermissionAddSubmit()
       return { content: [{ type: 'text', text: `收到: ${name}` }] }
     },
   })

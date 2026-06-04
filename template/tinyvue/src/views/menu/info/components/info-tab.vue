@@ -274,7 +274,7 @@ onMounted(async () => {
       const parentId = getIdByLabel(i18nMenuData.value, parentMenu)
       addMenu.value.setMenuInfo({
         name,
-        order,
+        order: order ?? 0,
         parentId,
         icon,
         component,
@@ -283,7 +283,7 @@ onMounted(async () => {
         locale: menuLocale,
       })
       await sleep(1000)
-      onClickAdd()
+      await onClickAdd()
       return { content: [{ type: 'text', text: `收到: ${name}` }] }
     },
   })

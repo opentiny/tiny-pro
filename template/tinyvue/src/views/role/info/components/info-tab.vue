@@ -218,16 +218,14 @@ onMounted(async () => {
       required: ['name', 'permissions'],
     },
     execute: async ({ name, permissions }) => {
-      onAdd()
+      await onAdd()
       await sleep(1000)
-
-      addRoleFormRef.value.setRoleInfo({
+      await addRoleFormRef.value.setRoleInfo({
         name,
         permissionIds: permissions,
       })
       await sleep(1000)
-
-      addRoleFormRef.value.onConfirm()
+      await addRoleFormRef.value.onConfirm()
       return { content: [{ type: 'text', text: `收到: ${name}` }] }
     },
   })
@@ -250,15 +248,15 @@ onMounted(async () => {
       if (!rowData) {
         return { content: [{ type: 'text', text: `角色未找到: ${role}` }] }
       }
-      roleTableRef.value.openMenuModal(rowData.menus, rowData.id, rowData)
+      await roleTableRef.value.openMenuModal(rowData.menus, rowData.id, rowData)
       await sleep(1000)
 
       // 先从菜单名称获取菜单 ID，再勾选菜单
       const menuId = getIdByLabel(i18MenuDatas.value, menu)
-      menuDrawerRef.value.treeRef.setChecked(menuId, true, false)
+      await menuDrawerRef.value.treeRef.setChecked(menuId, true, false)
       await sleep(1000)
 
-      menuDrawerRef.value.onConfirm()
+      await menuDrawerRef.value.onConfirm()
       return { content: [{ type: 'text', text: `收到: ${role}` }] }
     },
   })

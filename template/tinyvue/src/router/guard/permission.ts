@@ -8,16 +8,6 @@ import { isLogin } from '@/utils/auth'
 export default function setupPermissionGuard(router: Router) {
   router.beforeEach(async (to, from, next) => {
     NProgress.start()
-    if (isLogin()) {
-      if (to.name === 'login') {
-        next({ name: 'root', replace: true })
-        NProgress.done()
-        return
-      }
-      next()
-      NProgress.done()
-      return
-    }
     if (!isLogin()) {
       if (to.name === 'login') {
         next()
@@ -38,6 +28,8 @@ export default function setupPermissionGuard(router: Router) {
         } as LocationQueryRaw,
       })
       NProgress.done()
+      return
     }
+    next()
   })
 }

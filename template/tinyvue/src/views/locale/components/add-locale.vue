@@ -158,7 +158,7 @@ onMounted(async () => {
       locale.content = content
       locale.lang = langId
       await sleep(1000)
-      addLocale()
+      await addLocale()
       return { content: [{ type: 'text', text: `已添加国际化词条: ${key} 成功` }] }
     },
   })

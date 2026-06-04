@@ -2,18 +2,15 @@
 
 import type { RouteRecordRaw } from 'vue-router'
 import DefaultLayout from '@/layout/default-layout.vue'
-import { isLogin } from '@/utils/auth'
-
-const loginPath = `${import.meta.env.VITE_CONTEXT}login`
 
 export default [
   {
     path: '/',
-    redirect: () => (isLogin() ? { name: 'root' } : loginPath),
+    redirect: `${import.meta.env.VITE_CONTEXT}login`,
   },
   {
     path: import.meta.env.VITE_CONTEXT,
-    redirect: () => (isLogin() ? { name: 'root' } : { path: loginPath }),
+    redirect: { path: `${import.meta.env.VITE_CONTEXT}login` },
   },
   {
     path: import.meta.env.VITE_CONTEXT + 'login',
