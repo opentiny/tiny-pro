@@ -78,11 +78,7 @@ const langRule = {
 }
 
 async function addLang() {
-  try {
-    await langForm.value.validate()
-  } catch {
-    return
-  }
+  await langForm.value.validate()
 
   try {
     const { data } = await createLang({ name: lang.name })
@@ -102,11 +98,7 @@ async function addLang() {
 const i18 = useI18n()
 
 async function addLocale() {
-  try {
-    await localeForm.value.validate()
-  } catch {
-    return false
-  }
+  await localeForm.value.validate()
 
   try {
     const { data } = await createLocalItem(locale)
