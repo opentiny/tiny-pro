@@ -4,12 +4,12 @@
 
 ## 系统管理功能一览
 
-| 模块       | 路由                                | 可用 WebMCP 工具                 | 描述                             |
-| ---------- | ----------------------------------- | -------------------------------- | -------------------------------- |
-| 菜单管理   | `/vue-pro/menu/allMenu`             | `add-menu`                       | 添加菜单           |
+| 模块       | 路由                                | 可用 WebMCP 工具                 | 描述                     |
+| ---------- | ----------------------------------- | -------------------------------- | ------------------------ |
+| 菜单管理   | `/vue-pro/menu/allMenu`             | `add-menu`                       | 添加菜单                 |
 | 权限管理   | `/vue-pro/permission/allPermission` | `add-permission`                 | 添加权限                 |
-| 角色管理   | `/vue-pro/role/allRole`             | `add-role`、`bind-menu-for-role` | 添加角色、为角色绑定菜单               |
-| 用户管理   | `/vue-pro/userManager/allInfo`      | `add-user`                       | 添加用户 |
+| 角色管理   | `/vue-pro/role/allRole`             | `add-role`、`bind-menu-for-role` | 添加角色、为角色绑定菜单 |
+| 用户管理   | `/vue-pro/userManager/allInfo`      | `add-user`                       | 添加用户                 |
 | 国际化词条 | `/vue-pro/locale`                   | `add-i18n-entry`                 | 添加国际化词条           |
 
 ## WebMCP 工具详细说明
@@ -163,12 +163,11 @@
 
 ---
 
-### 6. `navigate_url` — 导航到指定URL
+### 7. `navigate_url` — 导航到指定URL
 
-
-| 参数                | 类型     | 必填 | 说明             |
-| ------------------- | -------- | ---- | ---------------- |
-| `url`             | string   | ✅   | 跳转的url             |
+| 参数  | 类型   | 必填 | 说明      |
+| ----- | ------ | ---- | --------- |
+| `url` | string | ✅   | 跳转的url |
 
 **示例**：
 

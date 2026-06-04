@@ -31,5 +31,6 @@ export default function setupPermissionGuard(router: Router) {
       return
     }
     next()
+    NProgress.done()
   })
 }
