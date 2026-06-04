@@ -1,23 +1,13 @@
 <script lang="ts" setup>
-import type {
-  ComponentInstance,
-} from 'vue'
+import type { ComponentInstance } from 'vue'
 import type { Node } from './menu-tree.vue'
 import type { ITreeNodeData } from '@/router/guard/menu'
-import { registerPageTool } from '@opentiny/next-sdk'
 import {
   Loading,
   Button as TinyButton,
   Modal as TinyModal,
 } from '@opentiny/vue'
-import {
-  computed,
-  inject,
-  onMounted,
-  onUnmounted,
-  ref,
-  watch,
-} from 'vue'
+import { computed, inject, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { getAllLocalItems } from '@/api/local'
@@ -72,36 +62,30 @@ function handleAddMenu() {
 function onAddMenuClose() {
   addModal.value = false
 }
-function onClickAdd() {
-  addMenu.value
-    .valid()
-    .then(() => {
-      const menuInfo = addMenu.value.getMenuInfo()
-      setAddLoading(true)
-      createMenu(menuInfo)
-        .then(() => {
-          TinyModal.message({
-            message: t('menuInfo.modal.add.success'),
-            status: 'success',
-          })
-          addModal.value = false
-          return updateUserMenu()
-        })
-        .then(() => fetchMenu())
-        .catch((error) => {
-          if (error.response && error.response.data) {
-            const errorMessage = error.response.data.message || '未知错误'
-            TinyModal.message({
-              message: errorMessage,
-              status: 'error',
-            })
-          }
-        })
-        .finally(() => {
-          setAddLoading(false)
-        })
+async function onClickAdd() {
+  await addMenu.value.valid()
+  setAddLoading(true)
+  try {
+    const menuInfo = addMenu.value.getMenuInfo()
+    await createMenu(menuInfo)
+    TinyModal.message({
+      message: t('menuInfo.modal.add.success'),
+      status: 'success',
     })
-    .catch(() => {})
+    addModal.value = false
+    await updateUserMenu()
+    await fetchMenu()
+  } catch (error: any) {
+    if (error.response && error.response.data) {
+      const errorMessage = error.response.data.message || '未知错误'
+      TinyModal.message({
+        message: errorMessage,
+        status: 'error',
+      })
+    }
+  } finally {
+    setAddLoading(false)
+  }
 }
 function onClose() {
   activeNode.value = DEFAULT_NODE
@@ -248,39 +232,60 @@ watch(locale, () => {
   fetchLocalItems()
 })
 
-let cleanupPageTool: () => void
 
 onMounted(async () => {
   Promise.all([fetchMenu(), fetchLocalItems()]).finally(() => {
     treeLoading.value = false
   })
-
-  cleanupPageTool = registerPageTool({
-    handlers: {
-      // key 必须与 mcp-servers 中注册的工具名一致
-      'add-menu': async ({ name, order, parentMenu, icon, component, path, locale: menuLocale }) => {
-        handleAddMenu()
-        await sleep(1000)
-        const parentId = getIdByLabel(i18nMenuData.value, parentMenu)
-        addMenu.value.setMenuInfo({
-          name,
-          order,
-          parentId,
-          icon,
-          component,
-          menuType: '/',
-          path,
-          locale: menuLocale,
-        })
-        await sleep(1000)
-        onClickAdd()
-        return { content: [{ type: 'text', text: `收到: ${name}` }] }
+  navigator.modelContext.registerTool({
+    name: 'add-menu',
+    title: '添加菜单',
+    description: '添加菜单',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string', description: '名称' },
+        order: { type: 'number', description: '优先级，默认 0' },
+        parentMenu: { type: 'string', description: '父菜单' },
+        icon: { type: 'string', description: '图标' },
+        component: { type: 'string', description: '组件' },
+        path: { type: 'string', description: '路径' },
+        locale: { type: 'string', description: '国际化' },
       },
+      required: ['name', 'component', 'path', 'locale'],
+    },
+    execute: async ({
+      name,
+      order,
+      parentMenu,
+      icon,
+      component,
+      path,
+      locale: menuLocale,
+    }) => {
+      handleAddMenu()
+      await sleep(1000)
+      const parentId = getIdByLabel(i18nMenuData.value, parentMenu)
+      addMenu.value.setMenuInfo({
+        name,
+        order: order ?? 0,
+        parentId,
+        icon,
+        component,
+        menuType: '/',
+        path,
+        locale: menuLocale,
+      })
+      await sleep(1000)
+      await onClickAdd()
+      return { content: [{ type: 'text', text: `收到: ${name}` }] }
     },
   })
 })
 
-onUnmounted(() => cleanupPageTool?.())
+onUnmounted(() => {
+  navigator.modelContext.unregisterTool('add-menu')
+})
 </script>
 
 <template>
@@ -320,9 +325,7 @@ onUnmounted(() => cleanupPageTool?.())
         />
         <template #footer>
           <TinyButton round @click="onAddMenuClose">
-            {{
-              $t('menu.btn.cancel')
-            }}
+            {{ $t('menu.btn.cancel') }}
           </TinyButton>
           <TinyButton
             type="primary"
@@ -364,9 +367,7 @@ onUnmounted(() => cleanupPageTool?.())
             {{ $t('menu.btn.confirm') }}
           </TinyButton>
           <TinyButton v-if="!readonly" @click="onCancel">
-            {{
-              $t('menu.btn.cancel')
-            }}
+            {{ $t('menu.btn.cancel') }}
           </TinyButton>
         </template>
       </TinyModal>
@@ -393,7 +394,7 @@ onUnmounted(() => cleanupPageTool?.())
 </template>
 
 <style scoped lang="less">
-  #contain {
+#contain {
   height: 100%;
   padding: 15px;
   overflow: hidden;

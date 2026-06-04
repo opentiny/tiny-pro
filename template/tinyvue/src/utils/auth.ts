@@ -1,25 +1,31 @@
 const TOKEN_KEY = 'token'
 const REFRESH_TOKEN_KEY = 'token:refresh'
 
+const storage = localStorage
+
 function isLogin() {
-  return !!sessionStorage.getItem(TOKEN_KEY)
+  return !!storage.getItem(TOKEN_KEY)
 }
 
 function getToken() {
-  return sessionStorage.getItem(TOKEN_KEY)
+  return storage.getItem(TOKEN_KEY)
 }
-const getRefreshToken = () => sessionStorage.getItem(REFRESH_TOKEN_KEY)
+
+function getRefreshToken() {
+  return storage.getItem(REFRESH_TOKEN_KEY)
+}
 
 function setRefreshToken(token: string) {
-  sessionStorage.setItem(REFRESH_TOKEN_KEY, token)
+  storage.setItem(REFRESH_TOKEN_KEY, token)
 }
 
 function setToken(token: string) {
-  sessionStorage.setItem(TOKEN_KEY, token)
+  storage.setItem(TOKEN_KEY, token)
 }
 
 function clearToken() {
-  sessionStorage.removeItem(TOKEN_KEY)
+  storage.removeItem(TOKEN_KEY)
+  storage.removeItem(REFRESH_TOKEN_KEY)
 }
 
 export { clearToken, getRefreshToken, getToken, isLogin, setRefreshToken, setToken }

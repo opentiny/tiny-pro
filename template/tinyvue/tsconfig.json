@@ -10,7 +10,7 @@
       "@/*": ["src/*"]
     },
     "resolveJsonModule": true,
-    "types": ["vite/client", "resize-observer-browser"],
+    "types": ["vite/client", "resize-observer-browser","@mcp-b/webmcp-types"],
     "strict": false,
     "sourceMap": true,
     "esModuleInterop": true,

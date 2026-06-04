@@ -28,10 +28,9 @@ export default function setupPermissionGuard(router: Router) {
         } as LocationQueryRaw,
       })
       NProgress.done()
+      return
     }
-    else {
-      next()
-      NProgress.done()
-    }
+    next()
+    NProgress.done()
   })
 }

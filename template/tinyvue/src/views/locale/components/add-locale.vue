@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { CreateLocal } from '@/api/local'
-import { registerPageTool } from '@opentiny/next-sdk'
+
 import {
   Notify,
   Button as TinyButton,
@@ -27,9 +27,12 @@ const emits = defineEmits<{
   batchRemove: []
 }>()
 const { open, onOpen, onClose } = useDisclosure()
-const { open: langPopoverOpen, onClose: setLangPopoverClose }
-  = useDisclosure()
-const { open: langTableOpen, onOpen: setLangTableOpen, onClose: setLangTableClose } = useDisclosure()
+const { open: langPopoverOpen, onClose: setLangPopoverClose } = useDisclosure()
+const {
+  open: langTableOpen,
+  onOpen: setLangTableOpen,
+  onClose: setLangTableClose,
+} = useDisclosure()
 const localeForm = ref()
 const langForm = ref()
 const locales = useLocales()
@@ -74,55 +77,49 @@ const langRule = {
   ],
 }
 
-function addLang() {
-  langForm.value
-    .validate()
-    .then(() => {
-      createLang({ name: lang.name })
-        .then(({ data }) => {
-          locales.pushLang(data)
-          emits('langChange')
-        })
-        .catch((reason) => {
-          Notify({
-            type: 'error',
-            message: reason.response.data.message,
-          })
-        })
-        .finally(() => {
-          lang.name = ''
-          setLangPopoverClose()
-        })
+async function addLang() {
+  await langForm.value.validate()
+
+  try {
+    const { data } = await createLang({ name: lang.name })
+    locales.pushLang(data)
+    emits('langChange')
+  } catch (reason: any) {
+    Notify({
+      type: 'error',
+      message: reason.response.data.message,
     })
+  } finally {
+    lang.name = ''
+    setLangPopoverClose()
+  }
 }
 
 const i18 = useI18n()
 
-function addLocale() {
-  localeForm.value
-    .validate()
-    .then(() => {
-      createLocalItem(locale)
-        .then(({ data }) => {
-          locale.key = ''
-          locale.content = ''
-          locale.lang = '' as any
-          locales.pushLocale(data)
-          i18.mergeLocaleMessage(data.lang.name, {
-            [data.key]: data.content,
-          })
-          emits('localChange')
-        })
-        .catch((reason) => {
-          Notify({
-            type: 'error',
-            message: reason.response.data.message,
-          })
-        })
-        .finally(() => {
-          onClose()
-        })
+async function addLocale() {
+  await localeForm.value.validate()
+
+  try {
+    const { data } = await createLocalItem(locale)
+    locale.key = ''
+    locale.content = ''
+    locale.lang = '' as any
+    locales.pushLocale(data)
+    i18.mergeLocaleMessage(data.lang.name, {
+      [data.key]: data.content,
     })
+    emits('localChange')
+    return true
+  } catch (reason: any) {
+    Notify({
+      type: 'error',
+      message: reason.response.data.message,
+    })
+    return false
+  } finally {
+    onClose()
+  }
 }
 watch(open, (value) => {
   if (!value && (langPopoverOpen.value || langTableOpen.value)) {
@@ -131,29 +128,51 @@ watch(open, (value) => {
   }
 })
 
-// registerPageTool 返回 cleanup 函数，在 onUnmounted 中调用
-let cleanupPageTool: () => void
-
 onMounted(async () => {
-  cleanupPageTool = registerPageTool({
-    handlers: {
-      // key 必须与 mcp-servers 中注册的工具名一致
-      'add-i18n-entry': async ({ key, content, lang: langId }) => {
-        onOpen()
-        await sleep(1000)
-        locale.key = key
-        locale.content = content
-        locale.lang = langId
-        await sleep(1000)
-        addLocale()
-        return { content: [{ type: 'text', text: `收到: ${key}` }] }
+  navigator.modelContext.registerTool({
+    name: 'add-i18n-entry',
+    title: '添加国际化词条',
+    description: '添加国际化词条',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        key: {
+          type: 'string',
+          description: '词条关键字，请自行创建，不要询问用户',
+        },
+        content: { type: 'string', description: '词条内容' },
+        lang: {
+          type: 'number',
+          enum: [1, 2],
+          description: '词条语言ID，英文 enUS 为：1，中文 zhCN 为：2',
+        },
       },
+      required: ['key', 'content', 'lang'],
+    },
+    execute: async ({ key, content, lang: langId }) => {
+      onOpen()
+      await sleep(1000)
+      locale.key = key
+      locale.content = content
+      locale.lang = langId
+      await sleep(1000)
+      const success = await addLocale()
+      return {
+        content: [{
+          type: 'text',
+          text: success
+            ? `已添加国际化词条: ${key} 成功`
+            : `添加国际化词条: ${key} 失败`,
+        }],
+      }
     },
   })
 })
 
 // 页面卸载时取消注册，避免内存泄漏和消息串扰
-onUnmounted(() => cleanupPageTool?.())
+onUnmounted(() => {
+  navigator.modelContext.unregisterTool('add-i18n-entry')
+})
 </script>
 
 <template>
@@ -161,7 +180,11 @@ onUnmounted(() => cleanupPageTool?.())
     <TinyButton show-footer type="primary" round @click="onOpen">
       {{ $t('locale.add.btn') }}
     </TinyButton>
-    <TinyButton v-permission="'i18n::batch-remove'" round @click="onBatchRemove">
+    <TinyButton
+      v-permission="'i18n::batch-remove'"
+      round
+      @click="onBatchRemove"
+    >
       {{ $t('locale.batchRemove') }}
     </TinyButton>
     <TinyDialogBox
@@ -194,7 +217,12 @@ onUnmounted(() => cleanupPageTool?.())
           </TinySelect>
           <TinyPopover v-model="langPopoverOpen" trigger="manual">
             <div>
-              <TinyForm ref="langForm" :model="lang" :rules="langRule" label-width="90px">
+              <TinyForm
+                ref="langForm"
+                :model="lang"
+                :rules="langRule"
+                label-width="90px"
+              >
                 <TinyFormItem :label="$t('lang.add.title')" prop="name">
                   <TinyInput v-model="lang.name" />
                 </TinyFormItem>

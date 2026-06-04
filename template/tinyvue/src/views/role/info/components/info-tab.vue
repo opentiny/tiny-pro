@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { registerPageTool } from '@opentiny/next-sdk'
 import type { RoleAddData } from './add-role.vue'
 import type { Permission } from '@/api/permission'
 import type { ITreeNodeData } from '@/router/guard/menu'
@@ -11,7 +10,7 @@ import {
   TinyModal,
   Pager as TinyPager,
 } from '@opentiny/vue'
-import { computed, inject, ref, onMounted, onUnmounted } from 'vue'
+import { computed, inject, onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { getAllMenu } from '@/api/menu'
@@ -136,39 +135,35 @@ function flushTabs() {
   )
   removeTabs.forEach(({ link }) => tabStore.delByLink(link))
 }
-function onConfirm(ids: number[]) {
-  updateRole({
-    id: roleId.value,
-    menuIds: ids,
-  })
-    .then(({ data }) => {
-      selectedId.value = ids
-      const itemIdx = tableData.value.findIndex(
-        item => item.id === roleId.value,
-      )
-      tableData.value.splice(itemIdx, 1, {
-        ...tableData.value[itemIdx],
-        menus: data.menus,
+async function onConfirm(ids: number[]) {
+  try {
+    const { data } = await updateRole({
+      id: roleId.value,
+      menuIds: ids,
+    })
+    selectedId.value = ids
+    const itemIdx = tableData.value.findIndex(
+      item => item.id === roleId.value,
+    )
+    tableData.value.splice(itemIdx, 1, {
+      ...tableData.value[itemIdx],
+      menus: data.menus,
+    })
+    await flushRouter()
+  } catch (error: any) {
+    if (error.response && error.response.data) {
+      const errorMessage = error.response.data.message || '未知错误'
+      TinyModal.message({
+        message: errorMessage,
+        status: 'error',
       })
-      return flushRouter()
-    })
-    .catch((error) => {
-      if (error.response && error.response.data) {
-        const errorMessage = error.response.data.message || '未知错误'
-        TinyModal.message({
-          message: errorMessage,
-          status: 'error',
-        })
-      }
-    })
-    .then(() => {
-      roleTableRef.value.reload()
-      flushTabs()
-      reloadMenu()
-    })
-    .finally(() => {
-      open.value = false
-    })
+    }
+  } finally {
+    roleTableRef.value.reload()
+    flushTabs()
+    reloadMenu()
+    open.value = false
+  }
 }
 function onAddRole(role: RoleAddData) {
   createRole(role)
@@ -205,46 +200,68 @@ function onRoleDelete() {
   roleTableRef.value.reload()
 }
 
-let cleanupPageTool: () => void
-
 onMounted(async () => {
-  cleanupPageTool = registerPageTool({
-    handlers: {
-      'add-role': async ({ name, permissions }) => {
-        onAdd()
-        await sleep(1000)
-
-        addRoleFormRef.value.setRoleInfo({
-          name,
-          permissionIds: permissions,
-        })
-        await sleep(1000)
-
-        addRoleFormRef.value.onConfirm()
-        return { content: [{ type: 'text', text: `收到: ${name}` }] }
+  navigator.modelContext.registerTool({
+    name: 'add-role',
+    title: '添加角色',
+    description: '添加角色，不需要生成角色卡片',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string', description: '角色名称' },
+        permissions: { type: 'array', items: { type: 'number' }, description: '角色拥有的权限' },
       },
-      'bind-menu-for-role': async ({ role, menu }) => {
-        const { data } = await getAllRoleDetail()
-        const rowData = data.roleInfo.items.find(item => item.name === role)
-        if (!rowData) {
-          return { content: [{ type: 'text', text: `角色未找到: ${role}` }] }
-        }
-        roleTableRef.value.openMenuModal(rowData.menus, rowData.id, rowData)
-        await sleep(1000)
+      required: ['name', 'permissions'],
+    },
+    execute: async ({ name, permissions }) => {
+      await onAdd()
+      await sleep(1000)
+      await addRoleFormRef.value.setRoleInfo({
+        name,
+        permissionIds: permissions,
+      })
+      await sleep(1000)
+      await addRoleFormRef.value.onConfirm()
+      return { content: [{ type: 'text', text: `收到: ${name}` }] }
+    },
+  })
 
-        // 先从菜单名称获取菜单 ID，再勾选菜单
-        const menuId = getIdByLabel(i18MenuDatas.value, menu)
-        menuDrawerRef.value.treeRef.setChecked(menuId, true, false)
-        await sleep(1000)
-
-        menuDrawerRef.value.onConfirm()
-        return { content: [{ type: 'text', text: `收到: ${role}` }] }
+  navigator.modelContext.registerTool({
+    name: 'bind-menu-for-role',
+    title: '绑定菜单',
+    description: '给某个角色绑定菜单',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        role: { type: 'string', description: '需要绑定菜单的角色名称' },
+        menu: { type: 'string', description: '需要绑定的菜单名称' },
       },
+      required: ['role', 'menu'],
+    },
+    execute: async ({ role, menu }) => {
+      const { data } = await getAllRoleDetail()
+      const rowData = data.roleInfo.items.find(item => item.name === role)
+      if (!rowData) {
+        return { content: [{ type: 'text', text: `角色未找到: ${role}` }] }
+      }
+      await roleTableRef.value.openMenuModal(rowData.menus, rowData.id, rowData)
+      await sleep(1000)
+
+      // 先从菜单名称获取菜单 ID，再勾选菜单
+      const menuId = getIdByLabel(i18MenuDatas.value, menu)
+      await menuDrawerRef.value.treeRef.setChecked(menuId, true, false)
+      await sleep(1000)
+
+      await menuDrawerRef.value.onConfirm()
+      return { content: [{ type: 'text', text: `收到: ${role}` }] }
     },
   })
 })
 
-onUnmounted(() => cleanupPageTool?.())
+onUnmounted(() => {
+  navigator.modelContext.unregisterTool('add-role')
+  navigator.modelContext.unregisterTool('bind-menu-for-role')
+})
 </script>
 
 <template>
