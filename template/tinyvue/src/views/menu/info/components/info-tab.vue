@@ -62,13 +62,13 @@ function handleAddMenu() {
 function onAddMenuClose() {
   addModal.value = false
 }
-function onClickAdd() {
-  addMenu.value
+async function onClickAdd() {
+  return addMenu.value
     .valid()
     .then(() => {
       const menuInfo = addMenu.value.getMenuInfo()
       setAddLoading(true)
-      createMenu(menuInfo)
+      return createMenu(menuInfo)
         .then(() => {
           TinyModal.message({
             message: t('menuInfo.modal.add.success'),
@@ -283,11 +283,11 @@ onMounted(async () => {
         locale: menuLocale,
       })
       await sleep(1000)
-      onClickAdd()
+      await onClickAdd()
       return { content: [{ type: 'text', text: `收到: ${name}` }] }
     },
   })
-})
+
 
 onUnmounted(() => {
   navigator.modelContext.unregisterTool('add-menu')
