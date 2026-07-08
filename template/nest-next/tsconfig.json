@@ -21,12 +21,19 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
+    "types": ["@type/node", "@type/express"],
     "paths": {
       "@app/configure": [
         "libs/configure/src"
       ],
       "@app/configure/*": [
         "libs/configure/src/*"
+      ],
+      "@app/shared": [
+        "libs/shared/src"
+      ],
+      "@app/shared/*": [
+        "libs/shared/src/*"
       ]
     }
   }

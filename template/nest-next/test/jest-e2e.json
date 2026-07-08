@@ -11,6 +11,7 @@
     "^.+\\.(t|j)s$": "ts-jest"
   },
   "moduleNameMapper": {
-    "^@app/configure(|/.*)$": "<rootDir>/../libs/configure/src/$1"
+    "^@app/configure(|/.*)$": "<rootDir>/../libs/configure/src/$1",
+    "^@app/shared(|/.*)$": "<rootDir>/../libs/shared/src/$1"
   }
 }

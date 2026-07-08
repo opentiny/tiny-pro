@@ -5,6 +5,7 @@
   "compilerOptions": {
     "webpack": true,
     "assets": [
+      "./i18n",
       {
         "include": "../configs/*",
         "outDir": "./dist/config"
@@ -21,6 +22,15 @@
       "sourceRoot": "libs/configure/src",
       "compilerOptions": {
         "tsConfigPath": "libs/configure/tsconfig.lib.json"
+      }
+    },
+    "shared": {
+      "type": "library",
+      "root": "libs/shared",
+      "entryFile": "index",
+      "sourceRoot": "libs/shared/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/shared/tsconfig.lib.json"
       }
     }
   }

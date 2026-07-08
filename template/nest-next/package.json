@@ -29,6 +29,7 @@
     "@nestjs/core": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/swagger": "8.1.1",
+    "nestjs-i18n": "^10.5.1",
     "reflect-metadata": "^0.2.2",
     "rimraf": "5.0.1",
     "rxjs": "^7.8.1",
@@ -42,7 +43,7 @@
     "@nestjs/cli": "^11.0.0",
     "@nestjs/schematics": "^11.0.0",
     "@nestjs/testing": "^11.0.1",
-    "@types/express": "^5.0.0",
+    "@types/express": "^5.0.6",
     "@types/jest": "^30.0.0",
     "@types/node": "^24.0.0",
     "@types/supertest": "^7.0.0",
@@ -82,7 +83,8 @@
       "<rootDir>/libs/"
     ],
     "moduleNameMapper": {
-      "^@app/configure(|/.*)$": "<rootDir>/libs/configure/src/$1"
+      "^@app/configure(|/.*)$": "<rootDir>/libs/configure/src/$1",
+      "^@app/shared(|/.*)$": "<rootDir>/libs/shared/src/$1"
     }
   }
 }
