@@ -3,6 +3,7 @@ import {
   Catch,
   ExceptionFilter,
   Injectable,
+  Logger,
 } from '@nestjs/common';
 import { DomainError } from './error.base';
 import { I18nService } from 'nestjs-i18n';
@@ -12,9 +13,10 @@ import { I18nTranslations } from './.generate/i18n.generated';
 @Catch(Error)
 @Injectable()
 export class GlobalExceptionFilter implements ExceptionFilter<Error> {
+  private readonly logger: Logger = new Logger(GlobalExceptionFilter.name);
   constructor(private readonly i18n: I18nService<I18nTranslations>) {}
   catch(exception: any, host: ArgumentsHost) {
-    console.log(exception);
+    this.logger.error(exception);
     const ctx = host.switchToHttp();
     const response: Response = ctx.getResponse();
     const request: Request = ctx.getRequest();
