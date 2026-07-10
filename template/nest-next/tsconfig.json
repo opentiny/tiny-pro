@@ -21,7 +21,8 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
-    "types": ["@type/node", "@type/express"],
+    "types": ["@types/node", "@types/express", "@types/jest"],
+    "strictPropertyInitialization": false,
     "paths": {
       "@app/configure": [
         "libs/configure/src"

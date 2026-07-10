@@ -1,12 +1,14 @@
 import { defineConfig } from '@mikro-orm/core';
 import { MySqlDriver } from '@mikro-orm/mysql';
+import { Permission } from './src/permission';
+import config from './configs/config.json';
 
 export default defineConfig({
-  entities: [],
-  host: process.env.HOST_NAME,
-  port: 3306,
+  entities: [Permission],
+  host: config.database.host,
+  port: config.database.port,
   driver: MySqlDriver,
-  user: process.env.USER_NAME,
-  password: process.env.PASSWORD,
-  dbName: process.env.DB_NAME,
+  user: config.database.user,
+  password: config.database.password,
+  dbName: config.database.dbName,
 });

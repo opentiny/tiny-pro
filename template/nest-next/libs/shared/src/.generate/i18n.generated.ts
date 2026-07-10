@@ -9,6 +9,9 @@ export type I18nTranslations = {
         "common": {
             "INTERNAL_ERROR": string;
         };
+        "permission": {
+            "NOT_FOUND": string;
+        };
     };
     "validation": {
         "NOT_EMPTY": string;
