@@ -2,12 +2,13 @@
 
 /* eslint-disable */
 /* prettier-ignore */
-import { Path } from "nestjs-i18n";
+import type { Path } from "nestjs-i18n";
 /* prettier-ignore */
 export type I18nTranslations = {
     "exception": {
         "common": {
             "INTERNAL_ERROR": string;
+            "REJECT_REQUEST": string;
         };
         "permission": {
             "NOT_FOUND": string;

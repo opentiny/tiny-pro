@@ -1,6 +1,7 @@
 {
   "common":{
-    "INTERNAL_ERROR": "Internal Error"
+    "INTERNAL_ERROR": "Internal Error",
+    "REJECT_REQUEST": "The server rejected this request, and modification, addition, or deletion of data is not allowed in demonstration mode"
   },
   "permission":{
     "NOT_FOUND": "Permission not found"

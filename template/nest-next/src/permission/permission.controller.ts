@@ -24,6 +24,7 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { RemovePermissionResponse } from './dto/remove-permission.dto';
+import { Reject } from '@app/shared/decorator';
 
 @Controller('permission')
 export class PermissionController {

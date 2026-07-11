@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigureModule, ConfigureService } from '@app/configure';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { GlobalExceptionFilter } from '@app/shared';
 import { HeaderResolver, I18nModule } from 'nestjs-i18n';
 import { join } from 'path';
@@ -9,6 +9,7 @@ import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { MySqlDriver } from '@mikro-orm/mysql';
 import { Permission } from './permission';
 import { CqrsModule } from '@nestjs/cqrs';
+import { RejectRequestGuard } from '@app/shared/guards/reject.guard';
 
 @Module({
   imports: [
@@ -46,9 +47,12 @@ import { CqrsModule } from '@nestjs/cqrs';
   providers: [
     {
       provide: APP_FILTER,
-
       useClass: GlobalExceptionFilter,
     },
+    {
+      provide: APP_GUARD,
+      useClass: RejectRequestGuard
+    }
   ],
 })
 export class AppModule {}
