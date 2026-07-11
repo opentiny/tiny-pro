@@ -9,6 +9,8 @@ import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { MySqlDriver } from '@mikro-orm/mysql';
 import { Permission } from './permission';
 import { CqrsModule } from '@nestjs/cqrs';
+import { MenuModule } from './menu/menu.module';
+import { Menu } from './menu/menu.entity';
 
 @Module({
   imports: [
@@ -33,7 +35,7 @@ import { CqrsModule } from '@nestjs/cqrs';
       imports: [ConfigureModule],
       inject: [ConfigureService],
       useFactory: (configService: ConfigureService) => ({
-        entities: [Permission],
+        entities: [Menu, Permission],
         host: configService.get('database.host'),
         port: configService.get('database.port'),
         driver: MySqlDriver,
@@ -42,6 +44,7 @@ import { CqrsModule } from '@nestjs/cqrs';
         dbName: configService.get('database.dbName'),
       }),
     }),
+    MenuModule,
   ],
   providers: [
     {
