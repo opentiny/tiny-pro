@@ -9,6 +9,7 @@ import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { MySqlDriver } from '@mikro-orm/mysql';
 import { Permission } from './permission';
 import { CqrsModule } from '@nestjs/cqrs';
+import { RejectRequestGuard } from '@app/shared/guards/reject.guard';
 import { MenuModule } from './menu/menu.module';
 import { Menu } from './menu/menu.entity';
 import { RejectRequestGuard } from '@app/shared/guards/reject.guard';

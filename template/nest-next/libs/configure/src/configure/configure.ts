@@ -8,4 +8,5 @@ export type Configure = {
   feature: FeatureConfig
   redis: RedisConfigure;
   swagger?: SwaggerConfigure;
+  feature: FeatureConfig
 };
