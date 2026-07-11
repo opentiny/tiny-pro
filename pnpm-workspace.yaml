@@ -1,2 +1,16 @@
 packages:
   - template/*
+allowBuilds:
+  '@nestjs/core': set this to true or false
+  '@scarf/scarf': true
+  core-js: set this to true or false
+  cwebp-bin: set this to true or false
+  ejs: set this to true or false
+  esbuild: set this to true or false
+  gifsicle: set this to true or false
+  jpegtran-bin: set this to true or false
+  mozjpeg: set this to true or false
+  optipng-bin: set this to true or false
+  pngquant-bin: set this to true or false
+  unrs-resolver: true
+  vue-demi: set this to true or false

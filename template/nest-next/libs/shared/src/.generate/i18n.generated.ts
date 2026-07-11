@@ -2,7 +2,7 @@
 
 /* eslint-disable */
 /* prettier-ignore */
-import { Path } from "nestjs-i18n";
+import type { Path } from "nestjs-i18n";
 /* prettier-ignore */
 export type I18nTranslations = {
     "exception": {
@@ -10,6 +10,10 @@ export type I18nTranslations = {
             "INTERNAL_ERROR": string;
         };
         "permission": {
+            "NOT_FOUND": string;
+        };
+        "menu": {
+            "EXISTS": string;
             "NOT_FOUND": string;
         };
     };
