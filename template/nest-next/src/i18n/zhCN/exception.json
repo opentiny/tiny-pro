@@ -1,5 +1,12 @@
 {
   "common":{
     "INTERNAL_ERROR": "内部错误"
+  },
+  "permission":{
+    "NOT_FOUND": "权限不存在"
+  },
+  "menu":{
+    "EXISTS": "{name}已存在",
+    "NOT_FOUND": "菜单不存在"
   }
 }

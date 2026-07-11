@@ -13,6 +13,10 @@ export type I18nTranslations = {
         "permission": {
             "NOT_FOUND": string;
         };
+        "menu": {
+            "EXISTS": string;
+            "NOT_FOUND": string;
+        };
     };
     "validation": {
         "NOT_EMPTY": string;

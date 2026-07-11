@@ -5,5 +5,9 @@
   },
   "permission":{
     "NOT_FOUND": "Permission not found"
+  },
+  "menu":{
+    "EXISTS": "Menu {name} Exists",
+    "NOT_FOUND": "Menu Not Found"
   }
 }
