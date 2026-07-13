@@ -11,6 +11,7 @@ import { Permission } from './permission';
 import { CqrsModule } from '@nestjs/cqrs';
 import { MenuModule } from './menu/menu.module';
 import { Menu } from './menu/menu.entity';
+import { RoleModule } from './role/role.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { Menu } from './menu/menu.entity';
       }),
     }),
     MenuModule,
+    RoleModule,
   ],
   providers: [
     {

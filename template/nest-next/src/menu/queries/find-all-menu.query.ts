@@ -1,7 +1,7 @@
-import { IQueryHandler, Query, QueryHandler } from "@nestjs/cqrs";
-import { Menu } from "../menu.entity";
-import { InjectRepository } from "@mikro-orm/nestjs";
-import { EntityRepository } from "@mikro-orm/core";
+import { IQueryHandler, Query, QueryHandler } from '@nestjs/cqrs';
+import { Menu } from '../menu.entity';
+import { InjectRepository } from '@mikro-orm/nestjs';
+import { EntityRepository } from '@mikro-orm/core';
 
 export interface ITreeNodeData {
   // node-key='id' 设置节点的唯一标识
@@ -26,7 +26,7 @@ export interface ITreeNodeData {
   locale: string;
 }
 
-const toNode = (menu: Menu): ITreeNodeData => {
+export const toNode = (menu: Menu): ITreeNodeData => {
   return {
     label: menu.name,
     id: menu.id,
@@ -43,7 +43,7 @@ const toNode = (menu: Menu): ITreeNodeData => {
 
 export const convertToTree = (
   menus: Menu[],
-  parentId: number | null = null
+  parentId: number | null = null,
 ): ITreeNodeData[] => {
   const map = new Map<number | null, Menu[]>();
   for (const menu of menus) {
@@ -67,19 +67,17 @@ export const convertToTree = (
 };
 
 export class FindAllMenu extends Query<ITreeNodeData[]> {
-  constructor(){
-    super()
+  constructor() {
+    super();
   }
 }
 
 @QueryHandler(FindAllMenu)
-export class FindAllMenuQueryHandler implements IQueryHandler<FindAllMenu>{
+export class FindAllMenuQueryHandler implements IQueryHandler<FindAllMenu> {
   constructor(
     @InjectRepository(Menu)
-    private readonly menuRepo: EntityRepository<Menu>
-  ){
-
-  }
+    private readonly menuRepo: EntityRepository<Menu>,
+  ) {}
   async execute(_: FindAllMenu): Promise<ITreeNodeData[]> {
     const menus = await this.menuRepo.findAll();
     return convertToTree(menus);
