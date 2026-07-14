@@ -5,13 +5,14 @@ import { EntityRepository } from '@mikro-orm/mysql';
 import { RoleNotFound } from '../errors';
 import { EntityManager } from '@mikro-orm/core';
 import type { PermissionId } from '../../permission';
+import { MenuId } from 'src/menu';
 
 export class UpdateRoleCommand extends Command<RoleId> {
   constructor(
     public readonly id: RoleId,
     public readonly name?: string,
     public readonly permissionIds?: PermissionId[],
-    public readonly menuIds?: number[],
+    public readonly menuIds?: MenuId[],
   ) {
     super();
   }

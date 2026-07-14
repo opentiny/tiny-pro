@@ -1,15 +1,13 @@
-import { Command, CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { CreateMenuDto } from "../dto/create-menu.dto";
-import { EntityRepository } from "@mikro-orm/core";
-import { Menu } from "../menu.entity";
-import { InjectRepository } from "@mikro-orm/nestjs";
-import { MenuExists } from "../errors/menu-exists";
-import { MenuInfo } from "../dto/menu-info.dto";
+import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CreateMenuDto } from '../dto/create-menu.dto';
+import { EntityRepository } from '@mikro-orm/core';
+import { Menu } from '../menu.entity';
+import { InjectRepository } from '@mikro-orm/nestjs';
+import { MenuExists } from '../errors/menu-exists';
+import { MenuInfo } from '../dto/menu-info.dto';
 
-export class CreateMenu extends Command<MenuInfo>{
-  constructor(
-    public readonly dto: CreateMenuDto
-  ){
+export class CreateMenu extends Command<MenuInfo> {
+  constructor(public readonly dto: CreateMenuDto) {
     super();
   }
 }
@@ -20,10 +18,10 @@ export class CreateMenuHandler implements ICommandHandler<CreateMenu> {
     @InjectRepository(Menu)
     private readonly menuRepo: EntityRepository<Menu>,
   ) {}
-  async execute({dto}: CreateMenu): Promise<MenuInfo> {
+  async execute({ dto }: CreateMenu): Promise<MenuInfo> {
     const existingMenu = await this.menuRepo.findOne({
-      ...dto
-    })
+      ...dto,
+    });
     if (existingMenu) {
       throw new MenuExists(existingMenu.name);
     }
@@ -35,7 +33,7 @@ export class CreateMenuHandler implements ICommandHandler<CreateMenu> {
       icon: dto.icon,
       component: dto.component,
       path: dto.path,
-      locale: dto.locale
+      locale: dto.locale,
     });
     await this.menuRepo.upsert(menu);
     return menu;

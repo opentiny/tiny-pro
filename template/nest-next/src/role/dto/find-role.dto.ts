@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { type RoleId } from '../role.entity';
-import type { PermissionId } from 'src/permission';
+import type { PermissionId } from '../../permission';
+import type { MenuId } from '../../menu';
 
 export class FindRolePermission {
   @ApiProperty({ description: '权限ID' })
@@ -16,7 +17,7 @@ export class FindRolePermission {
 
 export class FindRoleMenu {
   @ApiProperty({ description: '唯一ID' })
-  id: string | number;
+  id: MenuId;
   @ApiProperty({ description: '标签' })
   label: string;
   @ApiProperty({ description: '子菜单', type: [FindRoleMenu] })
@@ -30,7 +31,7 @@ export class FindRoleMenu {
   @ApiProperty({ description: '菜单类型' })
   menuType: string;
   @ApiProperty({ description: '父级ID' })
-  parentId?: number | null;
+  parentId?: MenuId | null;
   @ApiProperty({ description: '排序' })
   order: number;
   @ApiProperty({ description: '国际化字段' })

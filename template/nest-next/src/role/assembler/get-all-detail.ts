@@ -1,6 +1,6 @@
 import { Permission, PermissionId } from '../../permission';
 import { Role, RoleId } from '../role.entity';
-import { convertToTree, ITreeNodeData, Menu } from '../../menu';
+import { convertToTree, ITreeNodeData, Menu, MenuId } from '../../menu';
 import { RoleInfo as RoleInfoItem } from '../dto/role-info';
 import { GetRoleDetail, GetRoleInfo } from '../dto/get-role-detail.dto';
 import { PaginationMeta } from '@app/shared';
@@ -8,9 +8,9 @@ import { PaginationMeta } from '@app/shared';
 export const assembleGetDetail = (
   roles: Role[],
   permissionIdMap: Map<RoleId, PermissionId[]>,
-  menuIdMap: Map<RoleId, number[]>,
+  menuIdMap: Map<RoleId, MenuId[]>,
   permMap: Map<PermissionId, Permission>,
-  menuMap: Map<string | number, Menu>,
+  menuMap: Map<MenuId, Menu>,
   total: number,
   page?: number,
   size?: number,

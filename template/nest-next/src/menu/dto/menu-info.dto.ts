@@ -1,10 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
+import type { MenuId } from '../menu.entity';
 
 export class MenuInfo {
   @ApiProperty({
     description: '菜单ID',
   })
-  id: number;
+  id: MenuId;
 
   @ApiProperty({
     description: '菜单名',
@@ -20,7 +21,7 @@ export class MenuInfo {
     description: '菜单父级',
     nullable: true,
   })
-  parentId: number | null;
+  parentId: MenuId | null;
 
   @ApiProperty({
     description: '菜单类型',
