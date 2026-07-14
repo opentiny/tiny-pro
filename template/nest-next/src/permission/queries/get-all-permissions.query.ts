@@ -26,9 +26,11 @@ export class GetAllPermissionQueryHandler implements IQueryHandler<GetAllPermiss
   ) {}
   async execute(query: GetAllPermissionQuery): Promise<GetPermissionResponse> {
     const [items, total] = await this.permissionRepo.findAndCount(
-      {
-        name: { $like: `%${query.name}%` },
-      },
+      query.name
+        ? {
+            name: { $like: query.name },
+          }
+        : {},
       {
         offset: (query.page - 1) * query.size,
         limit: query.size,

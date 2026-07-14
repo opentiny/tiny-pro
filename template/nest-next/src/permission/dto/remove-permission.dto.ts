@@ -1,6 +1,6 @@
 import { I18nTranslations } from '@app/shared';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 import { i18nValidationMessage } from 'nestjs-i18n';
 import type { PermissionId } from '../permission.entry';
 
@@ -9,18 +9,12 @@ export class RemovePermissionRequest {
   @IsNotEmpty({
     message: i18nValidationMessage<I18nTranslations>('validation.NOT_EMPTY'),
   })
-  @IsNumber(
-    {},
-    {
-      message: i18nValidationMessage<I18nTranslations>(
-        'validation.TYPE_ERROR',
-        {
-          type: 'string',
-          property: 'id',
-        },
-      ),
-    },
-  )
+  @IsString({
+    message: i18nValidationMessage<I18nTranslations>('validation.TYPE_ERROR', {
+      type: 'string',
+      property: 'id',
+    }),
+  })
   id: PermissionId;
 }
 
