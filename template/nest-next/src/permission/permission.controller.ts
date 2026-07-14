@@ -23,8 +23,10 @@ import {
   ApiParam,
   ApiQuery,
 } from '@nestjs/swagger';
-import { RemovePermissionResponse } from './dto/remove-permission.dto';
-import type { PermissionId } from './permission.entry';
+import {
+  RemovePermissionRequest,
+  RemovePermissionResponse,
+} from './dto/remove-permission.dto';
 
 @Controller('permission')
 export class PermissionController {
@@ -60,10 +62,14 @@ export class PermissionController {
   }
 
   @ApiOperation({ summary: '删除权限字段' })
-  @ApiParam({ name: 'id', description: '你想删除的权限字段的数据库主键' })
+  @ApiParam({
+    name: 'id',
+    description: '你想删除的权限字段的数据库主键',
+    type: String,
+  })
   @ApiOkResponse({ type: RemovePermissionResponse })
   @Delete(':id')
-  remove(@Param('id') id: PermissionId) {
+  remove(@Param() { id }: RemovePermissionRequest) {
     return this.permissionService.remove(id);
   }
 }
