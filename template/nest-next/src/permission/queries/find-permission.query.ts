@@ -1,10 +1,10 @@
 import { IQueryHandler, Query, QueryHandler } from '@nestjs/cqrs';
-import { Permission } from '../permission.entry';
+import { Permission, PermissionId } from '../permission.entry';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository } from '@mikro-orm/core';
 
 export class FindPermission extends Query<Readonly<Permission[]>> {
-  constructor(public readonly id: number[]) {
+  constructor(public readonly id: PermissionId[]) {
     super();
   }
 }

@@ -22,7 +22,7 @@ export class GetAllPermissionQuery extends Query<GetPermissionResponse> {
 export class GetAllPermissionQueryHandler implements IQueryHandler<GetAllPermissionQuery> {
   constructor(
     @InjectRepository(Permission)
-    private readonly permissionRepo: EntityRepository<Permission>
+    private readonly permissionRepo: EntityRepository<Permission>,
   ) {}
   async execute(query: GetAllPermissionQuery): Promise<GetPermissionResponse> {
     const [items, total] = await this.permissionRepo.findAndCount(

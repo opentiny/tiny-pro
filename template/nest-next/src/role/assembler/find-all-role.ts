@@ -1,13 +1,13 @@
 import { Menu } from '../../menu';
 import { Role, RoleId } from '../role.entity';
-import { Permission } from '../../permission';
+import { Permission, PermissionId } from '../../permission';
 import { FindAllRoleItem } from '../dto/find-all-role.dto';
 
 export const findAllRole = (
   roles: Role[],
-  permissionIdMap: Map<RoleId, number[]>,
+  permissionIdMap: Map<RoleId, PermissionId[]>,
   menuIdMap: Map<RoleId, number[]>,
-  permMap: Map<number, Permission>,
+  permMap: Map<PermissionId, Permission>,
   menuMap: Map<string | number, Menu>,
 ) => {
   const findAllRoleItem: FindAllRoleItem[] = [];

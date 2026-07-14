@@ -1,5 +1,6 @@
 import { Opt } from '@mikro-orm/core';
 import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/legacy';
+import type { PermissionId } from 'src/permission';
 import { v7 } from 'uuid';
 
 export type RoleId = string & { readonly __brand: unique symbol };
@@ -16,14 +17,18 @@ export class Role {
 
 @Entity({ tableName: 'role_permission' })
 export class RolePermission {
+  @PrimaryKey({ type: 'uuid' })
+  id: string = v7();
   @Property({ type: 'uuid', index: true })
   roleId: RoleId;
-  @Property({ type: 'int', index: true })
-  permissionId: number;
+  @Property({ type: 'uuid', index: true })
+  permissionId: PermissionId;
 }
 
 @Entity({ tableName: 'role_menu' })
 export class RoleMenu {
+  @PrimaryKey({ type: 'uuid' })
+  id: string = v7();
   @Property({ type: 'uuid', index: true })
   roleId: RoleId;
   @Property({ type: 'int', index: true })

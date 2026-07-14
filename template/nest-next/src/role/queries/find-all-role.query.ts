@@ -19,7 +19,7 @@ export class FindAllRoleHandler implements IQueryHandler<FindAllRole> {
     @InjectRepository(Role)
     private readonly roleRepo: EntityRepository<Role>,
   ) {}
-  execute(query: FindAllRole): Promise<Role[]> {
+  async execute(query: FindAllRole): Promise<Role[]> {
     const filter =
       query.page && query.limit
         ? {
@@ -29,13 +29,11 @@ export class FindAllRoleHandler implements IQueryHandler<FindAllRole> {
         : {};
     return this.roleRepo.findAll({
       ...filter,
-      where: {
-        name: query.name
-          ? {
-              $like: `${query.name}`,
-            }
-          : undefined,
-      },
+      where: query.name
+        ? {
+            name: query.name,
+          }
+        : undefined,
     });
   }
 }

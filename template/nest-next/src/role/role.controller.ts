@@ -94,7 +94,7 @@ export class RoleController {
     type: [RoleInfo],
   })
   @ApiParam({
-    type: Number,
+    type: String,
     description: '角色ID',
     name: 'id',
   })
@@ -105,7 +105,7 @@ export class RoleController {
 
   @ApiOperation({ summary: '获取角色信息' })
   @ApiParam({
-    type: Number,
+    type: String,
     description: '角色ID',
     name: 'id',
   })

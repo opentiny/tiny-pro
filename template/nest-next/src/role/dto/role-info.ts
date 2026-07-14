@@ -1,11 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { type RoleId } from '../role.entity';
+import type { PermissionId } from '../../permission';
 
 export class RolePermission {
   @ApiProperty({
     description: '权限ID',
   })
-  id: number;
+  id: PermissionId;
 
   @ApiProperty({
     description: '权限简介',
@@ -16,7 +17,7 @@ export class RolePermission {
   })
   name: string;
 
-  constructor(id: number, desc: string, name: string) {
+  constructor(id: PermissionId, desc: string, name: string) {
     this.id = id;
     this.desc = desc;
     this.name = name;
@@ -50,7 +51,7 @@ export class RoleMenu {
   menuType: string;
   @ApiProperty({
     description: '菜单图标',
-    nullable: true
+    nullable: true,
   })
   icon: string | null;
 

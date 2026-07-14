@@ -16,6 +16,9 @@ export type I18nTranslations = {
             "EXISTS": string;
             "NOT_FOUND": string;
         };
+        "role": {
+            "NOT_FOUND": string;
+        };
     };
     "validation": {
         "NOT_EMPTY": string;

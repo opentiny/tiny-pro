@@ -2,10 +2,12 @@ import { IQueryHandler, Query, QueryHandler } from '@nestjs/cqrs';
 import { Role, RoleId, RoleMenu, RolePermission } from '../role.entity';
 import { RoleInfo } from '../dto/role-info';
 import { EntityRepository } from '@mikro-orm/mysql';
+import { InjectRepository } from '@mikro-orm/nestjs';
+import type { PermissionId } from '../../permission';
 
 export type FindRoleResponse = {
   role: Role | null;
-  permission: number[];
+  permission: PermissionId[];
   menu: number[];
 };
 
@@ -16,10 +18,13 @@ export class FindRole extends Query<FindRoleResponse> {
 }
 
 @QueryHandler(FindRole)
-export class FindRoleQuery implements IQueryHandler<RoleInfo> {
+export class FindRoleHandler implements IQueryHandler<RoleInfo> {
   constructor(
+    @InjectRepository(Role)
     private readonly repo: EntityRepository<Role>,
+    @InjectRepository(RolePermission)
     private readonly rolePermissionRepo: EntityRepository<RolePermission>,
+    @InjectRepository(RoleMenu)
     private readonly roleMenuRepo: EntityRepository<RoleMenu>,
   ) {}
   async execute(query: RoleInfo): Promise<FindRoleResponse> {

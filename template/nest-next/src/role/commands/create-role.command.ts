@@ -32,7 +32,7 @@ export class CreateRoleHandler implements ICommandHandler<CreateRole> {
     this.redis = this.redisService.getOrThrow();
   }
   execute({ data }: CreateRole): Promise<RoleId> {
-    const { name, permissionIds, menuIds } = data;
+    const { name, permissionIds, menuIds=[] } = data;
     const role = this.role.create({ name });
     const rolePermission = permissionIds.map((id) => {
       return this.permission.create({ roleId: role.id, permissionId: id });

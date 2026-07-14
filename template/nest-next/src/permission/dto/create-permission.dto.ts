@@ -2,6 +2,7 @@ import { IsNotEmpty } from 'class-validator';
 import { i18nValidationMessage } from 'nestjs-i18n';
 import { I18nTranslations } from '../../.generate/i18n.generated';
 import { ApiProperty } from '@nestjs/swagger';
+import type { PermissionId } from '../permission.entry';
 
 export class CreatePermissionDto {
   @ApiProperty({
@@ -23,13 +24,13 @@ export class CreatePermissionDto {
 
 export class CreatePermissionResponse {
   @ApiProperty()
-  id: number;
+  id: PermissionId;
   @ApiProperty()
   desc: string;
   @ApiProperty()
   name: string;
 
-  constructor(id: number, desc: string, name: string) {
+  constructor(id: PermissionId, desc: string, name: string) {
     this.id = id;
     this.desc = desc;
     this.name = name;

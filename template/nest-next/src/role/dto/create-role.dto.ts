@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsArray, IsNotEmpty } from 'class-validator';
+import { PermissionId } from '../../permission';
 
 export class CreateRoleDto {
   @ApiProperty({
@@ -9,16 +10,16 @@ export class CreateRoleDto {
   name: string;
   @ApiProperty({
     description: '权限ID',
-    type: [Number],
+    type: [String],
   })
   @IsArray()
   @IsNotEmpty()
-  permissionIds: number[];
+  permissionIds: PermissionId[] = [];
   @ApiProperty({
     description: '菜单ID',
     type: [Number],
   })
   @IsArray()
   @IsNotEmpty()
-  menuIds: number[];
+  menuIds: number[] = [];
 }

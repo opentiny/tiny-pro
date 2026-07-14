@@ -4,9 +4,10 @@ import { Permission } from './src/permission';
 import { Menu } from './src/menu';
 import { SeedManager } from '@mikro-orm/seeder';
 import config from './configs/config.json';
+import { Role, RoleMenu, RolePermission } from './src/role';
 
 export default defineConfig({
-  entities: [Permission, Menu],
+  entities: [Permission, Menu, Role, RolePermission, RoleMenu],
   host: config.database.host,
   port: config.database.port,
   driver: MySqlDriver,

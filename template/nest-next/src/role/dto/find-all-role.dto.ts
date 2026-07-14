@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import type { RoleId } from '../role.entity';
+import type { PermissionId } from '../../permission';
 
 export class FindAllRoleItemMenu {
   @ApiProperty({
@@ -53,7 +54,7 @@ export class FindAllRoleItemPermission {
   @ApiProperty({
     description: '权限ID',
   })
-  id: number;
+  id: PermissionId;
   @ApiProperty({
     description: '权限描述',
   })
