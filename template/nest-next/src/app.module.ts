@@ -12,6 +12,9 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { MenuModule } from './menu/menu.module';
 import { Menu } from './menu/menu.entity';
 import { RejectRequestGuard } from '@app/shared/guards/reject.guard';
+import { RoleModule } from './role/role.module';
+import { RedisModule } from '@liaoliaots/nestjs-redis';
+import { Role, RoleMenu, RolePermission } from './role';
 
 @Module({
   imports: [
@@ -36,7 +39,7 @@ import { RejectRequestGuard } from '@app/shared/guards/reject.guard';
       imports: [ConfigureModule],
       inject: [ConfigureService],
       useFactory: (configService: ConfigureService) => ({
-        entities: [Menu, Permission],
+        entities: [Menu, Permission, Role, RoleMenu, RolePermission],
         host: configService.get('database.host'),
         port: configService.get('database.port'),
         driver: MySqlDriver,
@@ -45,7 +48,23 @@ import { RejectRequestGuard } from '@app/shared/guards/reject.guard';
         dbName: configService.get('database.dbName'),
       }),
     }),
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unnecessary-type-assertion
+    RedisModule.forRootAsync({
+      imports: [ConfigureModule],
+      inject: [ConfigureService],
+      useFactory: (configService: ConfigureService) => {
+        return {
+          config: {
+            host: configService.get('redis.host'),
+            user: configService.get('redis.user'),
+            password: configService.get('redis.password'),
+            db: configService.get('redis.db'),
+          },
+        };
+      },
+    } as any),
     MenuModule,
+    RoleModule,
   ],
   providers: [
     {

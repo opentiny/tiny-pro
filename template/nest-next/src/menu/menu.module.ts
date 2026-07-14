@@ -6,7 +6,7 @@ import {
   RemoveMenuCommandHandler,
   UpdateMenuCommandHandler,
 } from './commands';
-import { FindAllMenuQueryHandler } from './queries';
+import { FindAllMenuQueryHandler, FindMenuHandler } from './queries';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { Menu } from './menu.entity';
 
@@ -19,6 +19,7 @@ import { Menu } from './menu.entity';
     RemoveMenuCommandHandler,
     UpdateMenuCommandHandler,
     FindAllMenuQueryHandler,
+    FindMenuHandler
   ],
 })
 export class MenuModule {}

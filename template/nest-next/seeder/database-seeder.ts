@@ -1,9 +1,13 @@
 import type { EntityManager } from '@mikro-orm/core';
 import { Seeder } from '@mikro-orm/seeder';
-import { MenuSeeder } from './MenuSeeder';
+import { MenuSeeder } from './menu-seeder';
+import { PermissionSeeder } from './permission-seeder';
+import { RoleSeeder } from './role-seeder';
 
 export class DatabaseSeeder extends Seeder {
   async run(em: EntityManager): Promise<void> {
-    await this.call(em, [MenuSeeder]);
+    await em.transactional(async (em) => {
+      await this.call(em, [MenuSeeder, PermissionSeeder, RoleSeeder]);
+    });
   }
 }

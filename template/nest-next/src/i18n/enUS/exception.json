@@ -9,5 +9,8 @@
   "menu":{
     "EXISTS": "Menu {name} Exists",
     "NOT_FOUND": "Menu Not Found"
+  },
+  "role":{
+    "NOT_FOUND": "Role not found"
   }
 }
