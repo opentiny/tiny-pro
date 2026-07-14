@@ -23,9 +23,11 @@ import {
   ApiParam,
   ApiQuery,
 } from '@nestjs/swagger';
-import { RemovePermissionResponse } from './dto/remove-permission.dto';
+import {
+  RemovePermissionRequest,
+  RemovePermissionResponse,
+} from './dto/remove-permission.dto';
 import { Reject } from '@app/shared/decorator';
-import type { PermissionId } from './permission.entry';
 
 @Controller('permission')
 export class PermissionController {
@@ -50,7 +52,7 @@ export class PermissionController {
   @ApiOperation({ summary: '分页查询权限' })
   @ApiQuery({ name: 'page', description: '页码, 必须是一个正整数' })
   @ApiQuery({ name: 'limit', description: '页大小, 必须是一个正整数' })
-  @ApiQuery({ name: 'name', description: '模糊查找条件' })
+  @ApiQuery({ name: 'name', description: '模糊查找条件', required: false })
   @Get()
   findAllPermission(
     @Query('page', new DefaultValuePipe('1'), ParseIntPipe) page: number,
@@ -61,10 +63,14 @@ export class PermissionController {
   }
 
   @ApiOperation({ summary: '删除权限字段' })
-  @ApiParam({ name: 'id', description: '你想删除的权限字段的数据库主键' })
+  @ApiParam({
+    name: 'id',
+    description: '你想删除的权限字段的数据库主键',
+    type: String,
+  })
   @ApiOkResponse({ type: RemovePermissionResponse })
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: PermissionId) {
+  remove(@Param() { id }: RemovePermissionRequest) {
     return this.permissionService.remove(id);
   }
 }
