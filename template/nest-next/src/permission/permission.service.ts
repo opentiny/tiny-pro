@@ -8,6 +8,7 @@ import {
   UpdatePermission,
 } from './commands';
 import { CreatePermissionDto } from './dto/create-permission.dto';
+import { PermissionId } from './permission.entry';
 
 @Injectable()
 export class PermissionService {
@@ -28,7 +29,7 @@ export class PermissionService {
     return this.qb.execute(new GetAllPermissionQuery(page, size, name));
   }
 
-  remove(id: number) {
+  remove(id: PermissionId) {
     return this.cb.execute(new RemovePermissionCommand(id));
   }
 }
