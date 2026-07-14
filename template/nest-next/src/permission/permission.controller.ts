@@ -49,7 +49,7 @@ export class PermissionController {
   @ApiOperation({ summary: '分页查询权限' })
   @ApiQuery({ name: 'page', description: '页码, 必须是一个正整数' })
   @ApiQuery({ name: 'limit', description: '页大小, 必须是一个正整数' })
-  @ApiQuery({ name: 'name', description: '模糊查找条件' })
+  @ApiQuery({ name: 'name', description: '模糊查找条件', required: false })
   @Get()
   findAllPermission(
     @Query('page', new DefaultValuePipe('1'), ParseIntPipe) page: number,
@@ -63,7 +63,7 @@ export class PermissionController {
   @ApiParam({ name: 'id', description: '你想删除的权限字段的数据库主键' })
   @ApiOkResponse({ type: RemovePermissionResponse })
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: PermissionId) {
+  remove(@Param('id') id: PermissionId) {
     return this.permissionService.remove(id);
   }
 }
