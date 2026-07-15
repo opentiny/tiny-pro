@@ -1,6 +1,6 @@
 import type { EntityManager } from '@mikro-orm/core';
 import { Seeder } from '@mikro-orm/seeder';
-import { Menu } from '../src/menu';
+import { Menu, MenuId } from '../src/menu';
 
 type RawMenuData = {
   label: string;
@@ -281,7 +281,7 @@ export class MenuSeeder extends Seeder {
     const dfs = async (
       data: RawMenuData,
       level: number,
-      parentId: number | null = null,
+      parentId: MenuId | null = null,
     ) => {
       const menu = new Menu();
       menu.component = data.component;

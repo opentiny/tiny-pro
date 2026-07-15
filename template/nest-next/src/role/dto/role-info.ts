@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { type RoleId } from '../role.entity';
 import type { PermissionId } from '../../permission';
+import type { MenuId } from '../../menu';
 
 export class RolePermission {
   @ApiProperty({
@@ -28,7 +29,7 @@ export class RoleMenu {
   @ApiProperty({
     description: '菜单ID',
   })
-  id: string | number;
+  id: MenuId;
 
   @ApiProperty({
     description: '菜单名',
@@ -43,7 +44,7 @@ export class RoleMenu {
     description: '菜单父级',
     nullable: true,
   })
-  parentId: string | number | null | undefined;
+  parentId: MenuId | null | undefined;
 
   @ApiProperty({
     description: '菜单类型',
@@ -71,10 +72,10 @@ export class RoleMenu {
   locale: string;
 
   constructor(
-    id: string | number,
+    id: MenuId,
     name: string,
     order: number,
-    parentId: string | number | null | undefined,
+    parentId: MenuId | null | undefined,
     menuType: string,
     icon: string | null,
     component: string,

@@ -1,10 +1,10 @@
 import { IQueryHandler, Query, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { Menu } from '../menu.entity';
+import { Menu, MenuId } from '../menu.entity';
 import { EntityRepository } from '@mikro-orm/core';
 
 export class FindMenu extends Query<Menu[]> {
-  constructor(public readonly id: number[]) {
+  constructor(public readonly id: MenuId[]) {
     super();
   }
 }

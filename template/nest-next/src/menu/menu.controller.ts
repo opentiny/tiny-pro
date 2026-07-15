@@ -4,8 +4,8 @@ import {
   Post,
   Body,
   Patch,
-  Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { MenuService } from './menu.service';
 import { CreateMenuDto } from './dto/create-menu.dto';
@@ -18,6 +18,7 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { TreeNode } from './types/tree-node';
+import type { MenuId } from './menu.entity';
 
 @Controller('menu')
 export class MenuController {
@@ -46,10 +47,15 @@ export class MenuController {
 
   @ApiOperation({ summary: '删除菜单' })
   @ApiQuery({ name: 'id', description: '菜单id' })
-  @ApiQuery({ name: 'parentId', description: '菜单父级ID', deprecated: true })
+  @ApiQuery({
+    name: 'parentId',
+    description: '菜单父级ID',
+    deprecated: true,
+    required: false,
+  })
   @ApiOkResponse({ type: MenuInfo })
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.menuService.remove(+id);
+  @Delete()
+  remove(@Query('id') id: MenuId) {
+    return this.menuService.remove(id);
   }
 }

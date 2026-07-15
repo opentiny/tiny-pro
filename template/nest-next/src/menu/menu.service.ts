@@ -4,6 +4,7 @@ import { UpdateMenuDto } from './dto/update-menu.dto';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CreateMenu, RemoveMenu, UpdateMenu } from './commands';
 import { FindAllMenu } from './queries';
+import { MenuId } from './menu.entity';
 
 @Injectable()
 export class MenuService {
@@ -23,7 +24,7 @@ export class MenuService {
     return this.cb.execute(new UpdateMenu(updateMenuDto));
   }
 
-  remove(id: number) {
+  remove(id: MenuId) {
     return this.cb.execute(new RemoveMenu(id));
   }
 }

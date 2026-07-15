@@ -1,5 +1,6 @@
 import { Opt } from '@mikro-orm/core';
 import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/legacy';
+import { type MenuId } from '../menu';
 import type { PermissionId } from 'src/permission';
 import { v7 } from 'uuid';
 
@@ -31,6 +32,6 @@ export class RoleMenu {
   id: string = v7();
   @Property({ type: 'uuid', index: true })
   roleId: RoleId;
-  @Property({ type: 'int', index: true })
-  menuId: number;
+  @Property({ type: 'uuid', index: true })
+  menuId: MenuId;
 }
