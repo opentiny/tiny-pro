@@ -1,12 +1,15 @@
 import { IQueryHandler, Query, QueryHandler } from '@nestjs/cqrs';
-import { GetAllUserRequest, UserItem, UserList } from '../dto/get-all-user.dto';
+import { GetAllUserRequest, UserList } from '../dto/get-all-user.dto';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { User } from '../user.entity';
+import { User, UserRole } from '../user.entity';
 import { EntityRepository, FilterQuery } from '@mikro-orm/core';
 import { RedisService } from '@liaoliaots/nestjs-redis';
 import Redis from 'ioredis';
 import { PaginationMeta, userTotal } from '@app/shared';
-import { formatDateToDay } from '../utils';
+import { Menu } from '../../menu';
+import { Permission } from '../../permission';
+import { Role, RolePermission, RoleMenu } from '../../role';
+import { RoleInfo, UserInfo } from '../dto/get-user-info.dto';
 
 export class GetAllUserQuery extends Query<UserList> {
   constructor(public readonly dto: GetAllUserRequest) {
@@ -20,6 +23,18 @@ export class GetAllUserQueryHandler implements IQueryHandler<GetAllUserQuery> {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: EntityRepository<User>,
+    @InjectRepository(UserRole)
+    private readonly userRoleRepository: EntityRepository<UserRole>,
+    @InjectRepository(Role)
+    private readonly roleRepo: EntityRepository<Role>,
+    @InjectRepository(RolePermission)
+    private readonly rolePermissionRepo: EntityRepository<RolePermission>,
+    @InjectRepository(RoleMenu)
+    private readonly roleMenuRepo: EntityRepository<RoleMenu>,
+    @InjectRepository(Permission)
+    private readonly permissionRepo: EntityRepository<Permission>,
+    @InjectRepository(Menu)
+    private readonly menuRepo: EntityRepository<Menu>,
     redisService: RedisService,
   ) {
     this.redis = redisService.getOrThrow();
@@ -31,53 +46,65 @@ export class GetAllUserQueryHandler implements IQueryHandler<GetAllUserQuery> {
     if (name) whereCondition.name = { $like: name };
     if (role?.length) whereCondition.role = { $in: role };
     if (email) whereCondition.email = { $like: email };
-    const user = await this.userRepository.find(whereCondition, {
+    const users = await this.userRepository.find(whereCondition, {
       limit,
       offset: (page - 1) * limit,
-      fields: [
-        'id',
-        'name',
-        'email',
-        'department',
-        'employeeType',
-        'protocolStart',
-        'protocolEnd',
-        'probationEnd',
-        'probationStart',
-        'probationDuration',
-        'address',
-        'status',
-      ],
     });
+
+    const infos: UserInfo[] = [];
+
+    for (const user of users) {
+      const uid = user.id;
+      const roleIds = await this.userRoleRepository.find({
+        userId: uid,
+      });
+      const roles = await this.roleRepo.find({
+        id: {
+          $in: roleIds.map((resp) => resp.roleId),
+        },
+      });
+      const roleInfos: RoleInfo[] = [];
+      for (const role of roles) {
+        const permissionsIds = await this.rolePermissionRepo.find({
+          roleId: role.id,
+        });
+        const permissions = await this.permissionRepo.find({
+          id: {
+            $in: permissionsIds.map((resp) => resp.permissionId),
+          },
+        });
+        const menusIds = await this.roleMenuRepo.find({
+          roleId: role.id,
+        });
+        const menus = await this.menuRepo.find({
+          id: {
+            $in: menusIds.map((resp) => resp.menuId),
+          },
+        });
+        const roleInfo = new RoleInfo(role.id, role.name, permissions, menus);
+        roleInfos.push(roleInfo);
+      }
+      const info = new UserInfo({
+        id: uid,
+        name: user.name,
+        email: user.email,
+        department: user.department,
+        employeeType: user.employeeType,
+        protocolStart: user.protocolStart,
+        protocolEnd: user.protocolEnd,
+        probationEnd: user.probationEnd,
+        probationStart: user.probationStart,
+        probationDuration: user.probationDuration,
+        address: user.address,
+        status: user.status,
+        role: roleInfos,
+      });
+      infos.push(info);
+    }
     const total = await this.redis
       .get(userTotal())
       .then((value) => (!value ? 0 : Number.parseInt(value)));
     const meta = new PaginationMeta(limit, total, limit, page);
-    const items = user.map(
-      (user) =>
-        new UserItem(
-          user.id,
-          user.name,
-          user.email,
-          user.department,
-          user.employeeType,
-          user.protocolStart
-            ? formatDateToDay(new Date(user.protocolStart))
-            : user.protocolStart,
-          user.protocolEnd
-            ? formatDateToDay(new Date(user.protocolEnd))
-            : user.protocolEnd,
-          user.probationEnd
-            ? formatDateToDay(new Date(user.probationEnd))
-            : user.probationEnd,
-          user.probationStart
-            ? formatDateToDay(new Date(user.probationStart))
-            : user.probationStart,
-          user.probationDuration,
-          user.address,
-          user.status,
-        ),
-    );
-    return new UserList(items, meta);
+    return new UserList(infos, meta);
   }
 }
