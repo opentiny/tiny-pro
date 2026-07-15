@@ -11,6 +11,7 @@
     "NOT_FOUND": "Menu Not Found"
   },
   "role":{
-    "NOT_FOUND": "Role not found"
+    "NOT_FOUND": "Role not found",
+    "EXISTS": "Role {name} Exists"
   }
 }
