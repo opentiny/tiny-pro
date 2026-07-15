@@ -4,11 +4,12 @@ import { RoleInfo } from '../dto/role-info';
 import { EntityRepository } from '@mikro-orm/mysql';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import type { PermissionId } from '../../permission';
+import { MenuId } from '../../menu';
 
 export type FindRoleResponse = {
   role: Role | null;
   permission: PermissionId[];
-  menu: number[];
+  menu: MenuId[];
 };
 
 export class FindRole extends Query<FindRoleResponse> {

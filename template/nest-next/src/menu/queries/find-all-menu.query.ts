@@ -1,11 +1,11 @@
 import { IQueryHandler, Query, QueryHandler } from '@nestjs/cqrs';
-import { Menu } from '../menu.entity';
+import { Menu, MenuId } from '../menu.entity';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository } from '@mikro-orm/core';
 
 export interface ITreeNodeData {
   // node-key='id' 设置节点的唯一标识
-  id: number | string;
+  id: MenuId;
   // 节点显示文本
   label: string;
   // 子节点
@@ -19,7 +19,7 @@ export interface ITreeNodeData {
   //类型
   menuType: string;
   //父节点
-  parentId?: number | null;
+  parentId?: MenuId | null;
   //排序
   order: number;
   //国际化
@@ -43,9 +43,9 @@ export const toNode = (menu: Menu): ITreeNodeData => {
 
 export const convertToTree = (
   menus: Menu[],
-  parentId: number | null = null,
+  parentId: MenuId | null = null,
 ): ITreeNodeData[] => {
-  const map = new Map<number | null, Menu[]>();
+  const map = new Map<MenuId | null, Menu[]>();
   for (const menu of menus) {
     const key = menu.parentId ?? null;
     if (!map.has(key)) {
@@ -54,7 +54,7 @@ export const convertToTree = (
     map.get(key)!.push(menu);
   }
 
-  const build = (pid: number | null): ITreeNodeData[] => {
+  const build = (pid: MenuId | null): ITreeNodeData[] => {
     const childrenMenus = map.get(pid) || [];
     return childrenMenus.map((menu) => {
       const node = toNode(menu);

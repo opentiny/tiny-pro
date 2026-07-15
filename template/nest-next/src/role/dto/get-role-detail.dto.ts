@@ -2,10 +2,11 @@ import { PaginationMeta } from '@app/shared';
 import { RoleInfo as RoleInfoItem } from './role-info';
 import { ApiProperty } from '@nestjs/swagger';
 import { ITreeNodeData } from '../../menu/types';
+import type { MenuId } from '../../menu';
 
 export class RoleMenuTreeNode implements ITreeNodeData {
   @ApiProperty({ description: '唯一ID' })
-  id: string | number;
+  id: MenuId;
   @ApiProperty({ description: '标签' })
   label: string;
   @ApiProperty({ description: '子菜单', type: [RoleMenuTreeNode] })
@@ -19,20 +20,20 @@ export class RoleMenuTreeNode implements ITreeNodeData {
   @ApiProperty({ description: '菜单类型' })
   menuType: string;
   @ApiProperty({ description: '父级ID' })
-  parentId?: number | null;
+  parentId?: MenuId | null;
   @ApiProperty({ description: '排序' })
   order: number;
   @ApiProperty({ description: '国际化字段' })
   locale: string;
 
   constructor(
-    id: string | number,
+    id: MenuId,
     label: string,
     url: string,
     component: string,
     customIcon: string,
     menuType: string,
-    parentId: number,
+    parentId: MenuId,
     order: number,
     locale: string,
     children?: ITreeNodeData[],
