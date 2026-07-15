@@ -7,6 +7,7 @@ import { EntityManager } from '@mikro-orm/core';
 import { RedisService } from '@liaoliaots/nestjs-redis';
 import Redis from 'ioredis';
 import { roleTotal } from '@app/shared';
+import { RoleExistsError } from '../errors';
 
 export class CreateRoleRequest extends CreateRoleDto {}
 
@@ -31,8 +32,12 @@ export class CreateRoleHandler implements ICommandHandler<CreateRole> {
   ) {
     this.redis = this.redisService.getOrThrow();
   }
-  execute({ data }: CreateRole): Promise<RoleId> {
-    const { name, permissionIds, menuIds=[] } = data;
+  async execute({ data }: CreateRole): Promise<RoleId> {
+    const { name, permissionIds = [], menuIds = [] } = data;
+    const exists = await this.role.findOne({ name });
+    if (exists) {
+      throw new RoleExistsError(name);
+    }
     const role = this.role.create({ name });
     const rolePermission = permissionIds.map((id) => {
       return this.permission.create({ roleId: role.id, permissionId: id });
