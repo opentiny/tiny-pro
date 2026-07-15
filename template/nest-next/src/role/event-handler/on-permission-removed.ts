@@ -1,5 +1,5 @@
 import { CommandBus, EventsHandler, IEventHandler } from '@nestjs/cqrs';
-import { PermissionRemoved } from 'src/permission';
+import { PermissionRemoved } from '../../permission';
 import { UnbindPermission } from '../commands';
 
 @EventsHandler(PermissionRemoved)
