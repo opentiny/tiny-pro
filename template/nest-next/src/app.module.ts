@@ -14,6 +14,7 @@ import { Menu } from './menu/menu.entity';
 import { RoleModule } from './role/role.module';
 import { RedisModule } from '@liaoliaots/nestjs-redis';
 import { Role, RoleMenu, RolePermission } from './role';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -64,6 +65,7 @@ import { Role, RoleMenu, RolePermission } from './role';
     } as any),
     MenuModule,
     RoleModule,
+    UserModule,
   ],
   providers: [
     {

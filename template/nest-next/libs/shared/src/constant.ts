@@ -1,1 +1,2 @@
-export const roleTotal = () => `tinypro:role:total`;
+export const roleTotal = () => `tinypro:v1:role:total`;
+export const userTotal = () => `tinypro:v1:user:total`;
