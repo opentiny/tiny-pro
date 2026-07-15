@@ -13,10 +13,12 @@ import {
 import {
   CreateRoleHandler,
   RemoveRoleHandler,
+  UnbindMenuCommandHandler,
   UnbindPermissionHandler,
   UpdateRoleHandler,
 } from './commands';
 import { OnPermissionRemoved } from './event-handler';
+import { OnMenuRemoved } from './event-handler/on-menu-removed';
 
 @Module({
   imports: [MikroOrmModule.forFeature([Role, RoleMenu, RolePermission])],
@@ -32,7 +34,9 @@ import { OnPermissionRemoved } from './event-handler';
     UpdateRoleHandler,
     RemoveRoleHandler,
     UnbindPermissionHandler,
+    UnbindMenuCommandHandler,
     OnPermissionRemoved,
+    OnMenuRemoved,
   ],
 })
 export class RoleModule {}
