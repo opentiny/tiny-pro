@@ -5,21 +5,21 @@ import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository } from '@mikro-orm/mysql';
 import { Role } from '../../role';
 
-export class UserCreateCommand extends Command<UserId> {
+export class CreateUserCommand extends Command<UserId> {
   constructor(public data: CreateUserDto) {
     super();
   }
 }
 
-@CommandHandler(UserCreateCommand)
-export class UserCreateService implements ICommandHandler<UserCreateCommand> {
+@CommandHandler(CreateUserCommand)
+export class CreateUserService implements ICommandHandler<CreateUserCommand> {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: EntityRepository<User>,
     @InjectRepository(Role)
     private readonly roleRepository: EntityRepository<Role>,
   ) {}
-  async execute({ data }: UserCreateCommand): Promise<UserId> {
+  async execute({ data }: CreateUserCommand): Promise<UserId> {
     const {
       email,
       password,

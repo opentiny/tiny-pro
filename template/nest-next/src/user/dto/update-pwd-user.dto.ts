@@ -5,7 +5,7 @@ import { i18nValidationMessage } from 'nestjs-i18n';
 import { I18nTranslations } from '../../.generate/i18n.generated';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-export class UpdatePwdUserDto extends PartialType(CreateUserDto) {
+export class UpdatePwdUserDto {
   @ApiPropertyOptional({
     description: '电子邮箱'
   })
@@ -29,5 +29,5 @@ export class UpdatePwdUserDto extends PartialType(CreateUserDto) {
   @IsNotEmpty({
     message: i18nValidationMessage<I18nTranslations>('validation.NOT_EMPTY'),
   })
-  oldPassword?: string;
+  oldPassword: string;
 }

@@ -5,7 +5,8 @@ import {
   ChangePasswordService,
   UpdateUserInfoService,
   UpdateUserPasswordService,
-  UserCreateService,
+  CreateUserService,
+  BatchRemoveUserService,
 } from './command';
 import { GetAllUserService, GetUserInfoService } from './query';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
@@ -31,11 +32,12 @@ import { Menu } from '../menu';
     UserService,
     ChangePasswordService,
     UpdateUserPasswordService,
-    UserCreateService,
+    CreateUserService,
     UpdateUserInfoService,
     UpdateUserPasswordService,
     GetUserInfoService,
     GetAllUserService,
+    BatchRemoveUserService
   ],
 })
 export class UserModule {}
