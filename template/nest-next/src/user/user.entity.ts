@@ -6,10 +6,12 @@ import {
   BeforeCreate,
   BeforeUpdate,
   OneToMany,
+  ManyToOne,
 } from '@mikro-orm/decorators/legacy';
 import { Cascade, Collection, Opt } from '@mikro-orm/core';
 import { v7 } from 'uuid';
 import type { RoleId } from '../role';
+import { RoleNotFound } from 'src/role/errors';
 
 export const encry = (value: string, salt: string) =>
   crypto.pbkdf2Sync(value, salt, 1000, 18, 'sha256').toString('hex');
@@ -25,26 +27,28 @@ export class User {
   @PrimaryKey({ type: 'uuid' })
   id: UserId & Opt = createUserId();
 
-  @Property()
+  @Property({ type: 'text' })
   name: string;
 
-  @Property({ index: true, type: 'text' })
+  @Property({ index: true, type: 'string' })
   email: string;
 
-  @OneToMany(() => UserRole, (ur) => ur.userId, {
-    hidden: true,
+  @OneToMany({
+    entity: () => UserRole,
     cascade: [Cascade.ALL],
     orphanRemoval: true,
+    eager: false,
+    mappedBy: 'user',
   })
   role = new Collection<UserRole>(this);
 
-  @Property({ index: true, type: 'text' })
+  @Property({ index: true, type: 'string' })
   password: string;
 
-  @Property({ nullable: true })
+  @Property({ type: 'text', nullable: true })
   department: string;
 
-  @Property({ nullable: true })
+  @Property({ type: 'text', nullable: true })
   employeeType: string;
 
   @Property({ type: 'timestamp', nullable: true })
@@ -53,7 +57,7 @@ export class User {
   @Property({ type: 'timestamp', nullable: true })
   probationEnd: string;
 
-  @Property({ nullable: true })
+  @Property({ type: 'text', nullable: true })
   probationDuration: string;
 
   @Property({ type: 'timestamp', nullable: true })
@@ -62,10 +66,10 @@ export class User {
   @Property({ type: 'timestamp', nullable: true })
   protocolEnd: string;
 
-  @Property({ nullable: true })
+  @Property({ type: 'text', nullable: true })
   address: string;
 
-  @Property({ nullable: true })
+  @Property({ type: 'int', nullable: true })
   status: number;
 
   @Property({ type: 'datetime' })
@@ -74,26 +78,35 @@ export class User {
   @Property({ type: 'datetime' })
   updateTime: Date & Opt;
 
-  @Property()
+  @Property({ type: 'text' })
   salt: string;
 
-  @Property({ type: 'timestamp' })
-  create_time: Date & Opt;
-  @Property({ type: 'timestamp' })
-  update_time: Date & Opt;
+  removeRole(roleId: RoleId) {
+    const exists = this.role.find((ur) => ur.roleId === roleId);
+    if (!exists) {
+      throw new RoleNotFound();
+    }
+    this.role.remove(exists);
+    return true;
+  }
+  hasRole(roleId: RoleId): boolean {
+    return this.role.getItems().some((ur) => ur.roleId === roleId);
+  }
+
+  getRoleIds(): RoleId[] {
+    return this.role.getItems().map((ur) => ur.roleId);
+  }
 
   @BeforeCreate()
   beforeCreate() {
     this.salt = crypto.randomBytes(4).toString('base64');
     this.password = encry(this.password, this.salt);
     this.createTime = new Date();
-    this.create_time = new Date();
   }
 
   @BeforeUpdate()
   beforeUpdate() {
     this.updateTime = new Date();
-    this.update_time = new Date();
   }
 
   verifyPassword(plain: string) {
@@ -102,35 +115,22 @@ export class User {
   changePassword(newPassword: string) {
     this.password = encry(newPassword, this.salt);
   }
-
-  assignRole(roleId: RoleId) {
-    const hasRole = this.role.getItems().some((r) => r.roleId === roleId);
-    if (!hasRole) {
-      const userRole = new UserRole(this.id, roleId);
-      this.role.add(userRole);
-    }
-  }
-
-  removeRole(roleId: RoleId) {
-    const roleToRemove = this.role.getItems().find((r) => r.roleId === roleId);
-    if (roleToRemove) {
-      this.role.remove(roleToRemove);
-    }
-  }
 }
 
 @Entity({ tableName: 'user_role' })
 export class UserRole {
   @PrimaryKey({ type: 'uuid' })
   id: string = v7();
-  @Property({ type: 'uuid', index: true })
-  userId: UserId;
+  @ManyToOne(() => User, {
+    joinColumn: 'user_id',
+  })
+  user: User;
   @Property({ type: 'uuid', index: true })
   roleId: RoleId;
 
-  constructor(userId: UserId, roleId: RoleId) {
+  constructor(user: User, roleId: RoleId) {
     this.id = v7();
-    this.userId = userId;
+    this.user = user;
     this.roleId = roleId;
   }
 }

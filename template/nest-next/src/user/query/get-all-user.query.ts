@@ -59,18 +59,17 @@ export class GetAllUserQueryHandler implements IQueryHandler<GetAllUserQuery> {
     const users = await this.userRepository.find(whereCondition, {
       limit,
       offset: (page - 1) * limit,
+      populate: ['role'],
     });
 
     const infos: UserInfo[] = [];
 
     for (const user of users) {
       const uid = user.id;
-      const roleIds = await this.userRoleRepository.find({
-        userId: uid,
-      });
+
       const roles = await this.roleRepo.find({
         id: {
-          $in: roleIds.map((resp) => resp.roleId),
+          $in: user.getRoleIds(),
         },
       });
       const roleInfos: RoleInfo[] = [];
