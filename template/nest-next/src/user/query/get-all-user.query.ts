@@ -5,7 +5,7 @@ import { User, UserRole } from '../user.entity';
 import { EntityRepository, FilterQuery } from '@mikro-orm/core';
 import { RedisService } from '@liaoliaots/nestjs-redis';
 import Redis from 'ioredis';
-import { PaginationMeta, userTotal } from '@app/shared';
+import { md5, PaginationMeta, userTotal } from '@app/shared';
 import { Menu } from '../../menu';
 import { Permission } from '../../permission';
 import { Role, RolePermission, RoleMenu } from '../../role';
@@ -43,9 +43,19 @@ export class GetAllUserQueryHandler implements IQueryHandler<GetAllUserQuery> {
     dto: { name, role, email, page = 1, limit = 10 },
   }: GetAllUserQuery): Promise<UserList> {
     const whereCondition: FilterQuery<User> = {};
-    if (name) whereCondition.name = { $like: name };
-    if (role?.length) whereCondition.role = { $in: role };
-    if (email) whereCondition.email = { $like: email };
+    const conditions: string[] = [];
+    if (name) {
+      whereCondition.name = { $like: name };
+      conditions.push(name);
+    }
+    if (role?.length) {
+      whereCondition.role = { $in: role };
+      role.forEach((val) => conditions.push(val));
+    }
+    if (email) {
+      whereCondition.email = { $like: email };
+      conditions.push(email);
+    }
     const users = await this.userRepository.find(whereCondition, {
       limit,
       offset: (page - 1) * limit,
@@ -101,8 +111,12 @@ export class GetAllUserQueryHandler implements IQueryHandler<GetAllUserQuery> {
       });
       infos.push(info);
     }
+    if (conditions.length) {
+      const cnt = await this.userRepository.count({ ...whereCondition });
+      await this.redis.set(userTotal(md5(conditions)), cnt);
+    }
     const total = await this.redis
-      .get(userTotal())
+      .get(userTotal(conditions.length ? md5(conditions) : undefined))
       .then((value) => (!value ? 0 : Number.parseInt(value)));
     const meta = new PaginationMeta(limit, total, limit, page);
     return new UserList(infos, meta);
