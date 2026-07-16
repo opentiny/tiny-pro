@@ -129,11 +129,11 @@ export class RoleInfo {
 }
 
 export class UserInfo {
-  @ApiProperty()
+  @ApiProperty({ name: '用户ID' })
   id: UserId;
-  @ApiProperty()
+  @ApiProperty({ name: '用户名' })
   name: string;
-  @ApiProperty()
+  @ApiProperty({ name: '用户邮箱' })
   email: string;
   @ApiProperty({ nullable: true })
   department: string | null;
