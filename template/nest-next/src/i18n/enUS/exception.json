@@ -12,5 +12,10 @@
   "role":{
     "NOT_FOUND": "Role not found",
     "EXISTS": "Role {name} Exists"
+  },
+  "user":{
+    "NOT_FOUND": "User not found",
+    "EXISTS": "User {email} Exists",
+    "PASSWORD_INCORRECT": "Password Incorrect"
   }
 }

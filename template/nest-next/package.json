@@ -33,6 +33,7 @@
     "@nestjs/config": "^3.3.0",
     "@nestjs/core": "^11.0.1",
     "@nestjs/cqrs": "^11.0.3",
+    "@nestjs/mapped-types": "^2.1.1",
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/swagger": "11.4.5",
     "class-transformer": "^0.5.1",

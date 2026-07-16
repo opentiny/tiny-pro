@@ -8,7 +8,7 @@ import {
   OneToMany,
   ManyToOne,
 } from '@mikro-orm/decorators/legacy';
-import { Cascade, Collection, Opt } from '@mikro-orm/core';
+import { Cascade, Collection, type Opt } from '@mikro-orm/core';
 import { v7 } from 'uuid';
 import type { RoleId } from '../role';
 import { RoleNotFound } from 'src/role/errors';
@@ -46,31 +46,31 @@ export class User {
   password: string;
 
   @Property({ type: 'text', nullable: true })
-  department: string;
+  department: Opt<string>;
 
   @Property({ type: 'text', nullable: true })
-  employeeType: string;
+  employeeType: Opt<string>;
 
   @Property({ type: 'timestamp', nullable: true })
-  probationStart: string;
+  probationStart: Opt<string>;
 
   @Property({ type: 'timestamp', nullable: true })
-  probationEnd: string;
+  probationEnd: Opt<string>;
 
   @Property({ type: 'text', nullable: true })
-  probationDuration: string;
+  probationDuration: Opt<string>;
 
   @Property({ type: 'timestamp', nullable: true })
-  protocolStart: string;
+  protocolStart: Opt<string>;
 
   @Property({ type: 'timestamp', nullable: true })
-  protocolEnd: string;
+  protocolEnd: Opt<string>;
 
   @Property({ type: 'text', nullable: true })
-  address: string;
+  address: Opt<string>;
 
   @Property({ type: 'int', nullable: true })
-  status: number;
+  status: Opt<number>;
 
   @Property({ type: 'datetime' })
   createTime: Date & Opt;
@@ -79,7 +79,7 @@ export class User {
   updateTime: Date & Opt;
 
   @Property({ type: 'text' })
-  salt: string;
+  salt: Opt<string>;
 
   removeRole(roleId: RoleId) {
     const exists = this.role.find((ur) => ur.roleId === roleId);

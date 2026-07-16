@@ -15,6 +15,7 @@ import { RoleModule } from './role/role.module';
 import { RedisModule } from '@liaoliaots/nestjs-redis';
 import { Role, RoleMenu, RolePermission } from './role';
 import { UserModule } from './user/user.module';
+import { User, UserRole } from './user';
 
 @Module({
   imports: [
@@ -39,7 +40,15 @@ import { UserModule } from './user/user.module';
       imports: [ConfigureModule],
       inject: [ConfigureService],
       useFactory: (configService: ConfigureService) => ({
-        entities: [Menu, Permission, Role, RoleMenu, RolePermission],
+        entities: [
+          Menu,
+          Permission,
+          Role,
+          RoleMenu,
+          RolePermission,
+          User,
+          UserRole,
+        ],
         host: configService.get('database.host'),
         port: configService.get('database.port'),
         driver: MySqlDriver,

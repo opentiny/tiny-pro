@@ -1,7 +1,7 @@
 import { IQueryHandler, Query, QueryHandler } from '@nestjs/cqrs';
 import { GetAllUserRequest, UserList } from '../dto/get-all-user.dto';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { User, UserRole } from '../user.entity';
+import { User } from '../user.entity';
 import { EntityRepository, FilterQuery } from '@mikro-orm/core';
 import { RedisService } from '@liaoliaots/nestjs-redis';
 import Redis from 'ioredis';
@@ -18,13 +18,11 @@ export class GetAllUserQuery extends Query<UserList> {
 }
 
 @QueryHandler(GetAllUserQuery)
-export class GetAllUserQueryHandler implements IQueryHandler<GetAllUserQuery> {
+export class GetAllUserService implements IQueryHandler<GetAllUserQuery> {
   private redis: Redis;
   constructor(
     @InjectRepository(User)
     private readonly userRepository: EntityRepository<User>,
-    @InjectRepository(UserRole)
-    private readonly userRoleRepository: EntityRepository<UserRole>,
     @InjectRepository(Role)
     private readonly roleRepo: EntityRepository<Role>,
     @InjectRepository(RolePermission)

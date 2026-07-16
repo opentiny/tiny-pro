@@ -15,7 +15,7 @@ export class GetUserInfo extends Query<UserInfo> {
 }
 
 @QueryHandler(GetUserInfo)
-export class GetUserInfoQueryHandler implements IQueryHandler<GetUserInfo> {
+export class GetUserInfoService implements IQueryHandler<GetUserInfo> {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: EntityRepository<User>,
@@ -58,7 +58,9 @@ export class GetUserInfoQueryHandler implements IQueryHandler<GetUserInfo> {
       throw new UserNotFound();
     }
     const roles = await this.userRoleRepository.find({
-      userId: user.id,
+      user: {
+        id: user.id,
+      },
     });
     const roleIds = roles.map((role) => role.roleId);
     const roleInfos: RoleInfo[] = [];
