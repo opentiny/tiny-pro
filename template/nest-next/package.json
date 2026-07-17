@@ -23,7 +23,6 @@
     "seeder:run": "mikro-orm seeder:run"
   },
   "dependencies": {
-    "@gaonengwww/jose": "^6.1.0",
     "@liaoliaots/nestjs-redis": "^10.0.0",
     "@mikro-orm/core": "^7.1.5",
     "@mikro-orm/decorators": "^7.1.5",
@@ -33,6 +32,7 @@
     "@nestjs/config": "^3.3.0",
     "@nestjs/core": "^11.0.1",
     "@nestjs/cqrs": "^11.0.3",
+    "@nestjs/jwt": "^11.0.2",
     "@nestjs/mapped-types": "^2.1.1",
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/swagger": "11.4.5",
