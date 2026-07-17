@@ -16,6 +16,7 @@ import { RedisModule } from '@liaoliaots/nestjs-redis';
 import { Role, RoleMenu, RolePermission } from './role';
 import { UserModule } from './user/user.module';
 import { User, UserRole } from './user';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -75,6 +76,7 @@ import { User, UserRole } from './user';
     MenuModule,
     RoleModule,
     UserModule,
+    AuthModule,
   ],
   providers: [
     {
