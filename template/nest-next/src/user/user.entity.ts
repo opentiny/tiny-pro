@@ -75,7 +75,7 @@ export class User {
   @Property({ type: 'datetime' })
   createTime: Date & Opt;
 
-  @Property({ type: 'datetime' })
+  @Property({ type: 'datetime', nullable: true })
   updateTime: Date & Opt;
 
   @Property({ type: 'text' })
