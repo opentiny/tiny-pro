@@ -1,13 +1,16 @@
 import { PaginationMeta, PaginationQueryDto } from '@app/shared';
-import { IsString } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 import { RoleId } from 'src/role';
 import { UserInfo } from './get-user-info.dto';
 
 export class GetAllUserRequest extends PaginationQueryDto {
+  @IsOptional()
   @IsString()
   name?: string;
+  @IsOptional()
   @IsString({ each: true })
   role?: RoleId[];
+  @IsOptional()
   @IsString()
   email?: string;
 }

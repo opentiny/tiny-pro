@@ -180,5 +180,6 @@ export class UserInfo {
     this.probationDuration = props.probationDuration;
     this.address = props.address;
     this.status = props.status;
+    this.role = props.role;
   }
 }

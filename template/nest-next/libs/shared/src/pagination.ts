@@ -1,4 +1,4 @@
-import { IsOptional } from 'class-validator';
+import { IsNumber, IsOptional } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -9,7 +9,8 @@ export class PaginationQueryDto {
     type: Number,
   })
   @IsOptional()
-  @Transform((value) => (isNaN(Number(value)) ? 1 : Number(value)))
+  @IsNumber()
+  @Transform(({value}) => (isNaN(Number(value)) ? 1 : Number(value)))
   page?: number = Number(process.env.PAGITION_PAGE);
 
   @ApiProperty({
@@ -18,7 +19,8 @@ export class PaginationQueryDto {
     type: Number,
   })
   @IsOptional()
-  @Transform((value) => (isNaN(Number(value)) ? 10 : Number(value)))
+  @IsNumber()
+  @Transform(({value}) => (isNaN(Number(value)) ? 10 : Number(value)))
   limit?: number = Number(process.env.PAGITION_PAGE);
 }
 

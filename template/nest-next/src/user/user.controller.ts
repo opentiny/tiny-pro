@@ -39,7 +39,7 @@ export class UserController {
 
   // TODO: 如果登陆了就从request.user.email里面拿，否则从param里面拿
   // TODO: Auth还没写完，等写完了处理一下注释
-  @Get('/info/:email?')
+  @Get('/info/{:email}')
   async getUserInfo(
     // @I18n() i18n: I18nContext<I18nTranslations>,
     // @Req() request: Request & RequestUser,

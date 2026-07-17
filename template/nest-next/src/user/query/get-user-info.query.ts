@@ -52,7 +52,7 @@ export class GetUserInfoService implements IQueryHandler<GetUserInfo> {
     }
     const users = await this.userRepository.findAll(
       {
-        where: whereCondition,
+        where:whereCondition,
         fields: [
           'id',
           'name',
@@ -70,7 +70,7 @@ export class GetUserInfoService implements IQueryHandler<GetUserInfo> {
         populate: ['role']
       },
     );
-    if (users.length) {
+    if (!users.length) {
       throw new UserNotFound();
     }
     const roleMap = new Map(
