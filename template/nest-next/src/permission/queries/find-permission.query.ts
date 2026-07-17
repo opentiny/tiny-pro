@@ -3,7 +3,7 @@ import { Permission, PermissionId } from '../permission.entry';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository } from '@mikro-orm/core';
 
-export class FindPermission extends Query<Readonly<Permission[]>> {
+export class FindPermission extends Query<Permission[]> {
   constructor(public readonly id: PermissionId[]) {
     super();
   }
@@ -15,7 +15,7 @@ export class FindPermissionHandler implements IQueryHandler<FindPermission> {
     @InjectRepository(Permission)
     private readonly permissionRepo: EntityRepository<Permission>,
   ) {}
-  async execute(query: FindPermission): Promise<readonly Permission[]> {
+  async execute(query: FindPermission): Promise<Permission[]> {
     return this.permissionRepo.find({
       id: {
         $in: query.id,

@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { INestApplication, VersioningType } from '@nestjs/common';
 import { ConfigureService, SwaggerConfigure } from '@app/configure';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { I18nValidationPipe } from 'nestjs-i18n';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -10,6 +11,8 @@ async function bootstrap() {
     type: VersioningType.MEDIA_TYPE,
     key: 'v=',
   });
+
+  app.useGlobalPipes(new I18nValidationPipe({ transform: true }));
 
   const configureService = app.get(ConfigureService);
 

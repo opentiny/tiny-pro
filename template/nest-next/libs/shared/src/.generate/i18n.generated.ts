@@ -20,6 +20,11 @@ export type I18nTranslations = {
             "NOT_FOUND": string;
             "EXISTS": string;
         };
+        "user": {
+            "NOT_FOUND": string;
+            "EXISTS": string;
+            "PASSWORD_INCORRECT": string;
+        };
     };
     "validation": {
         "NOT_EMPTY": string;
