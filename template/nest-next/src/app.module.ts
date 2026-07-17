@@ -15,6 +15,8 @@ import { RejectRequestGuard } from '@app/shared/guards/reject.guard';
 import { RoleModule } from './role/role.module';
 import { RedisModule } from '@liaoliaots/nestjs-redis';
 import { Role, RoleMenu, RolePermission } from './role';
+import { UserModule } from './user/user.module';
+import { User, UserRole } from './user';
 
 @Module({
   imports: [
@@ -39,7 +41,15 @@ import { Role, RoleMenu, RolePermission } from './role';
       imports: [ConfigureModule],
       inject: [ConfigureService],
       useFactory: (configService: ConfigureService) => ({
-        entities: [Menu, Permission, Role, RoleMenu, RolePermission],
+        entities: [
+          Menu,
+          Permission,
+          Role,
+          RoleMenu,
+          RolePermission,
+          User,
+          UserRole,
+        ],
         host: configService.get('database.host'),
         port: configService.get('database.port'),
         driver: MySqlDriver,
@@ -65,6 +75,7 @@ import { Role, RoleMenu, RolePermission } from './role';
     } as any),
     MenuModule,
     RoleModule,
+    UserModule,
   ],
   providers: [
     {
