@@ -25,6 +25,10 @@ export type I18nTranslations = {
             "EXISTS": string;
             "PASSWORD_INCORRECT": string;
         };
+        "auth": {
+            "INVALID_TOKEN": string;
+            "TOKEN_EXPIRED": string;
+        };
     };
     "validation": {
         "NOT_EMPTY": string;

@@ -17,5 +17,10 @@
     "NOT_FOUND": "User not found",
     "EXISTS": "User {email} Exists",
     "PASSWORD_INCORRECT": "Password Incorrect"
+  },
+  "auth":{
+    "INVALID_TOKEN": "Invalid Token",
+    "TOKEN_EXPIRED": "Token Expired",
+    "SESSION_EXPIRED": "Session Expired"
   }
 }

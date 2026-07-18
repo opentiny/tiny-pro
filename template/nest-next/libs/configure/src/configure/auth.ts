@@ -6,4 +6,5 @@ export type AuthConfigure = {
   session_limit: number;
   accessTokenTTL: number;
   refreshTokenTTL: number;
-}
+  apiTokenTTL: number;
+};
