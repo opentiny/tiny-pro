@@ -1,4 +1,4 @@
-import { Command, ICommandHandler } from '@nestjs/cqrs';
+import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UserId } from '../../user';
 import { RedisSessionRepository } from '../repository/redis-session.repository';
 
@@ -8,6 +8,7 @@ export class RevokeAllUserSession extends Command<void> {
   }
 }
 
+@CommandHandler(RevokeAllUserSession)
 export class RevokeAllUserSessionService implements ICommandHandler<RevokeAllUserSession> {
   constructor(private readonly sessionRepository: RedisSessionRepository) {}
 

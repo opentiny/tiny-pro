@@ -37,7 +37,7 @@ export class UserService {
   }
 
   async changePassword(dto: UpdatePwdUserDto){
-    await this.cb.execute(new ChangePassword(dto.email, dto.newPassword, dto.oldPassword))
+    await this.cb.execute(new ChangePassword(dto.email, dto.oldPassword, dto.newPassword))
   }
   async resetPassword(dto: UpdatePwdAdminDto){
     await this.cb.execute(new UpdateUserPassword(dto.email, dto.newPassword));
