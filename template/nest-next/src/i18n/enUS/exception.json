@@ -25,5 +25,15 @@
   },
   "preview":{
     "REJECT_THIS_REQUEST": "The server rejected this request, and modification, addition, or deletion of data is not allowed in demonstration mode"
+  },
+  "lang": {
+    "NOT_EXISTS": "{lang} not found",
+    "EXISTS": "{name} exists",
+    "NOT_EXISTS_COMMON": "Not found",
+    "DELETE_LANG_CONFLICT": "Please clear all language records under {name} first"
+  },
+  "i18":{
+    "EXISTS": "I18n field exists",
+    "NOT_FOUND": "Not Found"
   }
 }
