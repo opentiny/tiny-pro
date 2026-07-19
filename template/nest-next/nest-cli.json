@@ -9,6 +9,10 @@
       {
         "include": "../configs/*",
         "outDir": "./dist/config"
+      },
+      {
+        "include": "../lua",
+        "outDir": "./dist/lua"
       }
     ],
     "watchAssets": true,
