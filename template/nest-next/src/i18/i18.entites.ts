@@ -33,7 +33,7 @@ export class I18n {
   id: Opt<I18nRecordId> = createI18nRecordId();
   @Property({ type: 'text' })
   key: string;
-  @Property({ type: 'longtext' })
+  @Property({ columnType: 'longtext', type: 'longtext' })
   content: string;
   @ManyToOne(() => Lang)
   lang: Lang;

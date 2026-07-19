@@ -6,9 +6,20 @@ import { SeedManager } from '@mikro-orm/seeder';
 import config from './configs/config.json';
 import { Role, RoleMenu, RolePermission } from './src/role';
 import { User, UserRole } from './src/user';
+import { I18n, Lang } from './src/i18';
 
 export default defineConfig({
-  entities: [Permission, Menu, Role, RolePermission, RoleMenu, User, UserRole],
+  entities: [
+    Permission,
+    Menu,
+    Role,
+    RolePermission,
+    RoleMenu,
+    User,
+    UserRole,
+    Lang,
+    I18n,
+  ],
   host: config.database.host,
   port: config.database.port,
   driver: MySqlDriver,
