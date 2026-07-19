@@ -5,6 +5,7 @@ import { RedisSessionRepository } from './repository/redis-session.repository';
 import {
   IssueApiTokenService,
   IssueTokenSerivce,
+  RevokeAllUserSessionService,
   RevokeApiTokenService,
   RevokeTokenService,
 } from './commands';
@@ -20,6 +21,7 @@ import { GetTokenService } from './queries/get-token';
 import { TokenRepository } from './repository/token.repository';
 import { ApiTokenService } from './api-token.service';
 import { RefreshTokenService } from './commands/refresh-token.command';
+import { KickoutUserEventHandler } from './event-handler';
 
 @Module({
   imports: [MikroOrmModule.forFeature([User])],
@@ -39,7 +41,9 @@ import { RefreshTokenService } from './commands/refresh-token.command';
     GetTokenService,
     RevokeTokenService,
     GetApiTokenService,
+    RevokeAllUserSessionService,
     RefreshTokenService,
+    KickoutUserEventHandler,
   ],
   exports: [AuthService, ApiTokenService],
 })
