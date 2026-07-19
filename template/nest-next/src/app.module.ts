@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigureModule, ConfigureService } from '@app/configure';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { GlobalExceptionFilter } from '@app/shared';
 import { HeaderResolver, I18nModule } from 'nestjs-i18n';
 import { join } from 'path';
@@ -17,10 +17,40 @@ import { Role, RoleMenu, RolePermission } from './role';
 import { UserModule } from './user/user.module';
 import { User, UserRole } from './user';
 import { AuthModule } from './auth/auth.module';
+import { AuthGuard } from './auth';
+import { JwtModule } from '@nestjs/jwt';
+import { readFileSync } from 'fs';
+import { randomBytes } from 'crypto';
 
 @Module({
   imports: [
     ConfigureModule,
+    JwtModule.registerAsync({
+      inject: [ConfigureService],
+      imports: [ConfigureModule],
+      useFactory: (configService: ConfigureService) => {
+        const jwtConfig = configService.get('auth.jwt');
+        if (jwtConfig.mode === 'secret') {
+          const secret = jwtConfig.secret
+            ? jwtConfig.secret
+            : randomBytes(128).toString('hex');
+          if (!jwtConfig.secret) {
+            console.log('JWT secret is not set, using random secret');
+            console.log('JWT secret: ' + secret);
+          }
+          return {
+            global: true,
+            secret,
+          };
+        }
+        return {
+          global: true,
+          publicKeyPath: readFileSync(jwtConfig.publicKeyPath).toString(),
+          privateKeyPath: readFileSync(jwtConfig.privateKeyPath).toString(),
+        };
+      },
+      global: true,
+    }),
     CqrsModule.forRoot({
       rethrowUnhandled: true,
     }),
@@ -81,8 +111,11 @@ import { AuthModule } from './auth/auth.module';
   providers: [
     {
       provide: APP_FILTER,
-
       useClass: GlobalExceptionFilter,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
     },
   ],
 })

@@ -14,20 +14,15 @@ import {
   GetApiTokenService,
   GetTokenDataService,
 } from './queries';
-import { JwtModule } from '@nestjs/jwt';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { User } from '../user';
 import { GetTokenService } from './queries/get-token';
 import { TokenRepository } from './repository/token.repository';
 import { ApiTokenService } from './api-token.service';
+import { RefreshTokenService } from './commands/refresh-token.command';
 
 @Module({
-  imports: [
-    MikroOrmModule.forFeature([User]),
-    JwtModule.register({
-      secret: 'test',
-    }),
-  ],
+  imports: [MikroOrmModule.forFeature([User])],
   controllers: [AuthController],
   providers: [
     AuthService,
@@ -44,6 +39,8 @@ import { ApiTokenService } from './api-token.service';
     GetTokenService,
     RevokeTokenService,
     GetApiTokenService,
+    RefreshTokenService,
   ],
+  exports: [AuthService, ApiTokenService],
 })
 export class AuthModule {}

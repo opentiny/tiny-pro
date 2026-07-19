@@ -1,28 +1,33 @@
 import { Injectable } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { CreateApiTokenDto, LoginDto } from './dto';
-import { TokenPair, TokenPayload } from './entity';
-import { FindUserForAuthenticationQuery, GetTokenDataQuery } from './queries';
+import { LoginDto } from './dto';
 import {
-  IssueApiToken,
-  IssueToken,
-  RevokeApiToken,
-  RevokeToken,
-} from './commands';
+  AccessTokenPayload,
+  Jti,
+  RefreshTokenPayload,
+  TokenPair,
+  TokenPayload,
+} from './entity';
+import { FindUserForAuthenticationQuery, GetTokenDataQuery } from './queries';
+import { IssueToken, RevokeToken } from './commands';
 import { TokenExpired } from './errors/token-expired.error';
 import { PasswordIncorrect } from '../user';
-import { ApiTokenService } from './api-token.service';
-import { JwtService } from '@nestjs/jwt';
+import {
+  JsonWebTokenError,
+  JwtService,
+  NotBeforeError,
+  TokenExpiredError,
+} from '@nestjs/jwt';
 import { InvalidToken } from './errors';
-import { toUserId } from 'src/user/user.entity';
+import { toUserId, UserId } from 'src/user/user.entity';
 import { RefreshToken } from './commands/refresh-token.command';
+import { GetToken } from './queries/get-token';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly cb: CommandBus,
     private readonly qb: QueryBus,
-    private readonly apiTokenService: ApiTokenService,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -54,31 +59,6 @@ export class AuthService {
     }
   }
 
-  async issueApiToken(body: CreateApiTokenDto) {
-    const user = await this.qb.execute(
-      new FindUserForAuthenticationQuery(body.email),
-    );
-    if (!user.verifyPassword(body.password)) {
-      throw new PasswordIncorrect();
-    }
-    const apiTokenDetail = this.apiTokenService.createApiTokenDetail(
-      body.email,
-      body.tokenName,
-    );
-    await this.cb.execute(
-      new IssueApiToken(
-        body.email,
-        apiTokenDetail.tokenId,
-        apiTokenDetail.token,
-        apiTokenDetail.expiresIn,
-      ),
-    );
-    return apiTokenDetail;
-  }
-  async revokeApiToken(email: string, tokenId: string) {
-    await this.cb.execute(new RevokeApiToken(email, tokenId));
-  }
-
   async refreshToken(maybeToken: string) {
     const tokenPayload = this.jwtService.decode<TokenPayload>(maybeToken);
     if (!('accessTokenJti' in tokenPayload)) {
@@ -92,5 +72,22 @@ export class AuthService {
     return this.cb.execute(
       new RefreshToken(tokenData, sessionId, toUserId(uid)),
     );
+  }
+
+  async tokenAlive(userToken: string) {
+    await this.jwtService.verifyAsync(userToken).catch((reason) => {
+      const err = reason as JsonWebTokenError;
+      if (err instanceof TokenExpiredError) {
+        throw new TokenExpired();
+      }
+      if (err instanceof NotBeforeError) {
+        throw new InvalidToken();
+      }
+    });
+    const { jti } = this.jwtService.decode<
+      RefreshTokenPayload | AccessTokenPayload
+    >(userToken);
+    const token = await this.qb.execute(new GetToken({ jti }));
+    return Boolean(token);
   }
 }

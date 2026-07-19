@@ -10,6 +10,7 @@ import { GetAllUserQuery } from './query';
 import { GetAllUserRequest } from './dto/get-all-user.dto';
 import { UpdatePwdAdminDto } from './dto/update-pwd-admin.dto';
 import { UpdatePwdUserDto } from './dto/update-pwd-user.dto';
+import { TokenPayload } from 'src/auth/deocrators';
 
 @Controller('user')
 export class UserController {

@@ -9,10 +9,15 @@ import {
 } from './dto';
 import { ApiCreatedResponse, ApiOperation } from '@nestjs/swagger';
 import { ApiToken, TokenPair } from './entity';
+import { ApiTokenService } from './api-token.service';
+import { Public } from './deocrators';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly apiTokenService: ApiTokenService,
+  ) {}
 
   @ApiOperation({
     summary: '刷新令牌对',
@@ -21,7 +26,7 @@ export class AuthController {
   @ApiCreatedResponse({
     type: TokenPair,
   })
-  // @Public()
+  @Public()
   @Post('/token/refresh')
   async refreshToken(@Body() body: RefreshTokenDTO) {
     return this.authService.refreshToken(body.token);
@@ -33,6 +38,7 @@ export class AuthController {
   @ApiCreatedResponse({
     type: TokenPair,
   })
+  @Public()
   @Post('login')
   async login(@Body() body: LoginDto) {
     return this.authService.login(body);
@@ -54,10 +60,10 @@ export class AuthController {
     type: ApiToken,
   })
   // 生成API Token，用于外部系统调用
-  // @Public()
+  @Public()
   @Post('api-token')
   async generateApiToken(@Body() body: CreateApiTokenDto) {
-    return this.authService.issueApiToken(body);
+    return this.apiTokenService.issueApiToken(body);
   }
 
   @ApiOperation({
@@ -65,8 +71,7 @@ export class AuthController {
     description: '用于外部系统调用',
   })
   @Post('revoke-api-token')
-  // @UseGuards(AuthGuard)
   async revokeApiToken(@Body() body: RevokeApiTokenDto) {
-    return this.authService.revokeApiToken(body.email, body.tokenId);
+    return this.apiTokenService.revokeApiToken(body.email, body.tokenId);
   }
 }

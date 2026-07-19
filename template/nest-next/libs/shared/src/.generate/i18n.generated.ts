@@ -28,6 +28,10 @@ export type I18nTranslations = {
         "auth": {
             "INVALID_TOKEN": string;
             "TOKEN_EXPIRED": string;
+            "SESSION_EXPIRED": string;
+        };
+        "preview": {
+            "REJECT_THIS_REQUEST": string;
         };
     };
     "validation": {
