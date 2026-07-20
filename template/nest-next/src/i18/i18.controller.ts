@@ -134,7 +134,7 @@ export class I18Controller {
   @Reject()
   @Permission('i18n::remove')
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: I18nRecordId) {
+  remove(@Param('id') id: I18nRecordId) {
     return this.i18Service.remove(id);
   }
 
@@ -145,7 +145,7 @@ export class I18Controller {
   @Reject()
   @Permission('i18n::batch-remove')
   @Post('/batch')
-  batchRemove(@Body() body: BatchRemoveI18Records) {
-    return this.i18Service.batchRemove(body.ids);
+  batchRemove(@Body() body: I18nRecordId[]) {
+    return this.i18Service.batchRemove(body);
   }
 }
