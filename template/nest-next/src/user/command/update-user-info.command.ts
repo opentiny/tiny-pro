@@ -25,7 +25,10 @@ export class UpdateUserInfoService implements ICommandHandler<UpdateUserInfo> {
   ) {}
   async execute({ dto }: UpdateUserInfo): Promise<UserId> {
     const { email, roleIds } = dto;
-    const user = await this.userRepository.findOneOrFail({ email });
+    const user = await this.userRepository.findOneOrFail(
+      { email },
+      { populate: ['role'] },
+    );
     for (const key of Object.keys(dto)) {
       if (key === 'email' || key === 'roleIds') {
         continue;

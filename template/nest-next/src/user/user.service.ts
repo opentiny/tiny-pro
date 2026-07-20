@@ -37,7 +37,7 @@ export class UserService {
   }
 
   async updateUserInfo(dto: UpdateUserDto) {
-    const id = await this.qb.execute(new UpdateUserInfo(dto));
+    const id = await this.cb.execute(new UpdateUserInfo(dto));
     const [userInfo] = await this.qb.execute(new GetUserInfo({ id: [id] }));
     return userInfo;
   }
