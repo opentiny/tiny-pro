@@ -33,6 +33,16 @@ export type I18nTranslations = {
         "preview": {
             "REJECT_THIS_REQUEST": string;
         };
+        "lang": {
+            "NOT_EXISTS": string;
+            "EXISTS": string;
+            "NOT_EXISTS_COMMON": string;
+            "DELETE_LANG_CONFLICT": string;
+        };
+        "i18": {
+            "EXISTS": string;
+            "NOT_FOUND": string;
+        };
     };
     "validation": {
         "NOT_EMPTY": string;

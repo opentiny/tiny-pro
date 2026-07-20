@@ -21,6 +21,8 @@ import { AuthGuard } from './auth';
 import { JwtModule } from '@nestjs/jwt';
 import { readFileSync } from 'fs';
 import { randomBytes } from 'crypto';
+import { I18Module } from './i18/i18.module';
+import { I18n, Lang } from './i18';
 
 @Module({
   imports: [
@@ -79,6 +81,8 @@ import { randomBytes } from 'crypto';
           RolePermission,
           User,
           UserRole,
+          Lang,
+          I18n,
         ],
         host: configService.get('database.host'),
         port: configService.get('database.port'),
@@ -107,16 +111,17 @@ import { randomBytes } from 'crypto';
     RoleModule,
     UserModule,
     AuthModule,
+    I18Module,
   ],
   providers: [
     {
       provide: APP_FILTER,
       useClass: GlobalExceptionFilter,
     },
-    // {
-    //   provide: APP_GUARD,
-    //   useClass: AuthGuard,
-    // },
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
   ],
 })
 export class AppModule {}
