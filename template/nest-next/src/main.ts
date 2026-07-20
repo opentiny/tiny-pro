@@ -38,4 +38,4 @@ function setupSwagger(app: INestApplication, configure: SwaggerConfigure = {}) {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 }
-bootstrap();
+bootstrap().catch(console.error);

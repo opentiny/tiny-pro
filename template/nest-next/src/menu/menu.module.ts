@@ -19,7 +19,7 @@ import { Menu } from './menu.entity';
     RemoveMenuCommandHandler,
     UpdateMenuCommandHandler,
     FindAllMenuQueryHandler,
-    FindMenuHandler
+    FindMenuHandler,
   ],
 })
 export class MenuModule {}

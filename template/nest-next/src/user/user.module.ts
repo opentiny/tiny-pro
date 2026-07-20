@@ -37,7 +37,7 @@ import { Menu } from '../menu';
     UpdateUserPasswordService,
     GetUserInfoService,
     GetAllUserService,
-    BatchRemoveUserService
+    BatchRemoveUserService,
   ],
 })
 export class UserModule {}

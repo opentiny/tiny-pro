@@ -3,7 +3,6 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { LoginDto } from './dto';
 import {
   AccessTokenPayload,
-  Jti,
   RefreshTokenPayload,
   TokenPair,
   TokenPayload,
@@ -19,7 +18,7 @@ import {
   TokenExpiredError,
 } from '@nestjs/jwt';
 import { InvalidToken } from './errors';
-import { toUserId, UserId } from 'src/user/user.entity';
+import { toUserId } from 'src/user/user.entity';
 import { RefreshToken } from './commands/refresh-token.command';
 import { GetToken } from './queries/get-token';
 

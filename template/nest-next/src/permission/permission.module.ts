@@ -19,7 +19,7 @@ import { FindPermissionHandler, GetAllPermissionQueryHandler } from './queries';
     CreatePermissionHandler,
     UpdatePermissionHandler,
     GetAllPermissionQueryHandler,
-    FindPermissionHandler
+    FindPermissionHandler,
   ],
 })
 export class PermissionModule {}

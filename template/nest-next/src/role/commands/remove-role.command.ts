@@ -20,7 +20,7 @@ export class RemoveRoleHandler implements ICommandHandler<RemoveRoleCommand> {
     private readonly em: EntityManager,
     @InjectRepository(Role)
     private readonly role: EntityRepository<Role>,
-    private readonly redisService: RedisService
+    private readonly redisService: RedisService,
   ) {
     this.redis = this.redisService.getOrThrow();
   }

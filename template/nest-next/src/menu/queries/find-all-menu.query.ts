@@ -78,7 +78,7 @@ export class FindAllMenuQueryHandler implements IQueryHandler<FindAllMenu> {
     @InjectRepository(Menu)
     private readonly menuRepo: EntityRepository<Menu>,
   ) {}
-  async execute(_: FindAllMenu): Promise<ITreeNodeData[]> {
+  async execute(): Promise<ITreeNodeData[]> {
     const menus = await this.menuRepo.findAll();
     return convertToTree(menus);
   }

@@ -14,7 +14,7 @@ describe('PermissionController (e2e)', () => {
     await e2e.clearData();
   });
   it('/permission (GET) - 初始状态应为空', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-argument
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     return request(e2e.app.getHttpServer())
       .get('/permission')
       .expect(200)
