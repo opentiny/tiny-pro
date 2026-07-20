@@ -2,24 +2,24 @@ import { IQueryHandler, Query, QueryHandler } from '@nestjs/cqrs';
 import { RoleInfo, UserInfo } from '../dto/get-user-info.dto';
 import { User, UserId, UserRole } from '../user.entity';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { EntityRepository, FilterOptions, FilterQuery } from '@mikro-orm/core';
+import { EntityRepository, FilterQuery } from '@mikro-orm/core';
 import { UserNotFound } from '../error';
 import { Role, RoleMenu, RolePermission } from '../../role';
 import { Permission } from '../../permission';
 import { Menu } from '../../menu';
 
-export type GetUserInfoRequest = {
-  email: string[];
-  id?: never;
-} | {
-  email?: never;
-  id: UserId[]
-}
+export type GetUserInfoRequest =
+  | {
+      email: string[];
+      id?: never;
+    }
+  | {
+      email?: never;
+      id: UserId[];
+    };
 
 export class GetUserInfo extends Query<UserInfo[]> {
-  constructor(
-    public readonly request: GetUserInfoRequest
-  ) {
+  constructor(public readonly request: GetUserInfoRequest) {
     super();
   }
 }
@@ -41,7 +41,7 @@ export class GetUserInfoService implements IQueryHandler<GetUserInfo> {
     private readonly permissionRepo: EntityRepository<Permission>,
     @InjectRepository(Menu)
     private readonly menuRepo: EntityRepository<Menu>,
-  ) { }
+  ) {}
   async execute(query: GetUserInfo): Promise<UserInfo[]> {
     const whereCondition: FilterQuery<User> = {};
     if (query.request.email) {
@@ -50,41 +50,39 @@ export class GetUserInfoService implements IQueryHandler<GetUserInfo> {
     if (query.request.id) {
       whereCondition['id'] = { $in: query.request.id };
     }
-    const users = await this.userRepository.findAll(
-      {
-        where:whereCondition,
-        fields: [
-          'id',
-          'name',
-          'email',
-          'department',
-          'employeeType',
-          'protocolStart',
-          'protocolEnd',
-          'probationEnd',
-          'probationStart',
-          'probationDuration',
-          'address',
-          'status',
-        ],
-        populate: ['role']
-      },
-    );
+    const users = await this.userRepository.findAll({
+      where: whereCondition,
+      fields: [
+        'id',
+        'name',
+        'email',
+        'department',
+        'employeeType',
+        'protocolStart',
+        'protocolEnd',
+        'probationEnd',
+        'probationStart',
+        'probationDuration',
+        'address',
+        'status',
+      ],
+      populate: ['role'],
+    });
     if (!users.length) {
       throw new UserNotFound();
     }
     const roleMap = new Map(
       users.map((user) => {
         return [user.id, user.role.map((role) => role.roleId)];
-      })
+      }),
     );
     const userInfos: UserInfo[] = [];
     for (const user of users) {
       const roleIds = roleMap.get(user.id) ?? [];
       const roles = await this.roleRepo.findAll({
         where: {
-          id: { $in: roleIds }
-        }
+          id: { $in: roleIds },
+        },
       });
       const roleInfos: RoleInfo[] = [];
       for (const role of roles) {
@@ -123,8 +121,8 @@ export class GetUserInfoService implements IQueryHandler<GetUserInfo> {
           address: user.address,
           status: user.status,
           role: roleInfos,
-        })
-      )
+        }),
+      );
     }
     return userInfos;
   }

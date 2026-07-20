@@ -10,7 +10,7 @@ export class PaginationQueryDto {
   })
   @IsOptional()
   @IsNumber()
-  @Transform(({value}) => (isNaN(Number(value)) ? 1 : Number(value)))
+  @Transform(({ value }) => (isNaN(Number(value)) ? 1 : Number(value)))
   page?: number = Number(process.env.PAGITION_PAGE);
 
   @ApiProperty({
@@ -20,7 +20,7 @@ export class PaginationQueryDto {
   })
   @IsOptional()
   @IsNumber()
-  @Transform(({value}) => (isNaN(Number(value)) ? 10 : Number(value)))
+  @Transform(({ value }) => (isNaN(Number(value)) ? 10 : Number(value)))
   limit?: number = Number(process.env.PAGITION_PAGE);
 }
 

@@ -3,19 +3,19 @@ import { IsEmail, IsString, IsOptional } from 'class-validator';
 
 export class CreateApiTokenDto {
   @ApiProperty({
-    description: '邮箱'
+    description: '邮箱',
   })
   @IsEmail()
   email: string;
 
   @ApiProperty({
-    description: '密码'
+    description: '密码',
   })
   @IsString()
   password: string;
 
   @ApiProperty({
-    description: '令牌名称'
+    description: '令牌名称',
   })
   @IsOptional()
   @IsString()

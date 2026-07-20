@@ -27,7 +27,7 @@ export class ChangePasswordService implements ICommandHandler<ChangePassword> {
     if (!user) {
       throw new UserNotFound();
     }
-    console.log(command.password)
+    console.log(command.password);
     if (!user.verifyPassword(command.password)) {
       throw new PasswordIncorrect();
     }
