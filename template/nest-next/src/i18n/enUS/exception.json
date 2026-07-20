@@ -1,6 +1,7 @@
 {
   "common":{
-    "INTERNAL_ERROR": "Internal Error"
+    "INTERNAL_ERROR": "Internal Error",
+    "FORBIDDEN": "Forbidden"
   },
   "permission":{
     "NOT_FOUND": "Permission not found"

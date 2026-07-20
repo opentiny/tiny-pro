@@ -7,7 +7,7 @@ import { join } from 'path';
 import { PermissionModule } from './permission/permission.module';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { MySqlDriver } from '@mikro-orm/mysql';
-import { Permission } from './permission';
+import { Permission, PermissionGuard } from './permission';
 import { CqrsModule } from '@nestjs/cqrs';
 import { MenuModule } from './menu/menu.module';
 import { Menu } from './menu/menu.entity';
@@ -23,6 +23,7 @@ import { readFileSync } from 'fs';
 import { randomBytes } from 'crypto';
 import { I18Module } from './i18/i18.module';
 import { I18n, Lang } from './i18';
+import { RejectRequestGuard } from '@app/shared';
 
 @Module({
   imports: [
@@ -121,6 +122,14 @@ import { I18n, Lang } from './i18';
     {
       provide: APP_GUARD,
       useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: PermissionGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RejectRequestGuard,
     },
   ],
 })

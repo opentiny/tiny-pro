@@ -7,6 +7,7 @@ import { v7 } from 'uuid';
 export type RoleId = string & { readonly __brand: unique symbol };
 
 export const createRoleId = (): RoleId => v7() as RoleId;
+export const toRoleId = (id: string): RoleId => id as RoleId;
 
 @Entity({ tableName: 'role' })
 export class Role {

@@ -8,10 +8,16 @@ import {
 } from './commands';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { Permission } from './permission.entry';
-import { FindPermissionHandler, GetAllPermissionQueryHandler } from './queries';
+import {
+  FindPermissionHandler,
+  GetAllPermissionQueryHandler,
+  UserHasPermissionService,
+} from './queries';
+import { UserRole } from '../user';
+import { RolePermission } from '../role';
 
 @Module({
-  imports: [MikroOrmModule.forFeature([Permission])],
+  imports: [MikroOrmModule.forFeature([UserRole, Permission, RolePermission])],
   controllers: [PermissionController],
   providers: [
     PermissionService,
@@ -20,6 +26,7 @@ import { FindPermissionHandler, GetAllPermissionQueryHandler } from './queries';
     UpdatePermissionHandler,
     GetAllPermissionQueryHandler,
     FindPermissionHandler,
+    UserHasPermissionService,
   ],
 })
 export class PermissionModule {}

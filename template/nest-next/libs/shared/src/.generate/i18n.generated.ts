@@ -7,6 +7,7 @@ export type I18nTranslations = {
     "exception": {
         "common": {
             "INTERNAL_ERROR": string;
+            "FORBIDDEN": string;
         };
         "permission": {
             "NOT_FOUND": string;

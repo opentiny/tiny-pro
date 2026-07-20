@@ -4,3 +4,4 @@ export * from './errors';
 export * from './commands';
 export * from './permission.entry';
 export * from './events';
+export * from './permission.guard';
