@@ -15,6 +15,7 @@ import { RemoveUser } from './command/remove-user.command';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdatePwdUserDto } from './dto/update-pwd-user.dto';
 import { UpdatePwdAdminDto } from './dto/update-pwd-admin.dto';
+import { PasswordNotMatchError } from './error/password-not-match.error';
 
 @Injectable()
 export class UserService {
@@ -43,8 +44,16 @@ export class UserService {
   }
 
   async changePassword(dto: UpdatePwdUserDto) {
+    if (dto.confirmNewPassword !== dto.newPassword) {
+      throw new PasswordNotMatchError();
+    }
     await this.cb.execute(
-      new ChangePassword(dto.email, dto.oldPassword, dto.newPassword),
+      new ChangePassword(
+        dto.email,
+        dto.oldPassword,
+        dto.newPassword,
+        dto.confirmNewPassword,
+      ),
     );
   }
   async resetPassword(dto: UpdatePwdAdminDto) {

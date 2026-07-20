@@ -46,8 +46,8 @@ export class GetAllUserService implements IQueryHandler<GetAllUserQuery> {
       whereCondition.name = { $like: name };
       conditions.push(name);
     }
-    if (role?.length) {
-      whereCondition.role = { $in: role };
+    if (role && role.length) {
+      whereCondition.role = { roleId: { $in: role } };
       role.forEach((val) => conditions.push(val));
     }
     if (email) {
