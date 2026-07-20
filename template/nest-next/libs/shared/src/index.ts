@@ -6,3 +6,4 @@ export * from './pagination';
 export * from './constant';
 export * from './md5';
 export * from './decorator';
+export * from './guard';
