@@ -27,6 +27,7 @@ import {
   RemovePermissionRequest,
   RemovePermissionResponse,
 } from './dto/remove-permission.dto';
+import { Permission, Reject } from '@app/shared';
 
 @Controller('permission')
 export class PermissionController {
@@ -37,6 +38,7 @@ export class PermissionController {
     description: '创建的权限',
     type: CreatePermissionResponse,
   })
+  @Permission('permission::add')
   @Post('')
   create(@Body() dto: CreatePermissionDto) {
     return this.permissionService.create(dto);
@@ -44,6 +46,8 @@ export class PermissionController {
 
   @ApiOperation({ summary: '修改一个权限字段' })
   @Patch()
+  @Reject()
+  @Permission('permission::update')
   update(@Body() dto: UpdatePermissionDto) {
     return this.permissionService.updatePermission(dto);
   }
@@ -53,6 +57,7 @@ export class PermissionController {
   @ApiQuery({ name: 'limit', description: '页大小, 必须是一个正整数' })
   @ApiQuery({ name: 'name', description: '模糊查找条件', required: false })
   @Get()
+  @Permission('permission::get')
   findAllPermission(
     @Query('page', new DefaultValuePipe('1'), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe('0'), ParseIntPipe) limit: number,
@@ -69,6 +74,8 @@ export class PermissionController {
   })
   @ApiOkResponse({ type: RemovePermissionResponse })
   @Delete(':id')
+  @Reject()
+  @Permission('permission::remove')
   remove(@Param() { id }: RemovePermissionRequest) {
     return this.permissionService.remove(id);
   }

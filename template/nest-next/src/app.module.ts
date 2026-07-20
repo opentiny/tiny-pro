@@ -130,7 +130,7 @@ import { RejectRequestGuard } from '@app/shared';
     {
       provide: APP_GUARD,
       useClass: RejectRequestGuard,
-    }
+    },
   ],
 })
 export class AppModule {}

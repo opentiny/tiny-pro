@@ -36,7 +36,7 @@ export class UserController {
   })
   @ApiBearerAuth()
   @Post('reg')
-  // @Permission('user::add')
+  @Permission('user::add')
   async register(@Body() body: CreateUserDto) {
     return this.userService.createUser(body);
   }

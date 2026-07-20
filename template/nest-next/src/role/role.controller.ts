@@ -25,6 +25,7 @@ import { RoleInfo } from './dto/role-info';
 import { FindAllRoleItem } from './dto/find-all-role.dto';
 import { GetRoleDetail } from './dto/get-role-detail.dto';
 import type { RoleId } from './role.entity';
+import { Permission, Reject } from '@app/shared';
 
 @Controller('role')
 export class RoleController {
@@ -35,6 +36,7 @@ export class RoleController {
     type: RoleInfo,
   })
   @Post()
+  @Permission('role::add')
   create(@Body() createRoleDto: CreateRoleDto) {
     return this.roleService.createRole(createRoleDto);
   }
@@ -43,6 +45,7 @@ export class RoleController {
   @ApiOkResponse({
     type: [FindAllRoleItem],
   })
+  @Permission('role::query')
   @Get()
   getAllRole() {
     return this.roleService.findAll();
@@ -66,6 +69,7 @@ export class RoleController {
   })
   @ApiOperation({ summary: '分页查询角色' })
   @ApiOkResponse({ type: GetRoleDetail })
+  @Permission('role::query')
   @Get('/detail')
   getAllRoleDetail(
     @Query('page', new DefaultValuePipe('1'), ParseIntPipe) page?: number,
@@ -85,6 +89,8 @@ export class RoleController {
     type: [RoleInfo],
   })
   @Patch()
+  @Reject()
+  @Permission('role::update')
   updateRole(@Body() dto: UpdateRoleDto) {
     return this.roleService.updateRole(dto);
   }
@@ -99,6 +105,8 @@ export class RoleController {
     name: 'id',
   })
   @Delete('/:id')
+  @Reject()
+  @Permission('role::remove')
   deleteRole(@Param('id') id: RoleId) {
     return this.roleService.remove(id);
   }
