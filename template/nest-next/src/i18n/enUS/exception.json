@@ -18,7 +18,8 @@
   "user":{
     "NOT_FOUND": "User not found",
     "EXISTS": "User {email} Exists",
-    "PASSWORD_INCORRECT": "Password Incorrect"
+    "PASSWORD_INCORRECT": "Password Incorrect",
+    "PASSWORD_NOT_MATCH": "Password not match"
   },
   "auth":{
     "INVALID_TOKEN": "Invalid Token",

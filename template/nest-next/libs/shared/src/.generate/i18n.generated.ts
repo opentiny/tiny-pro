@@ -26,6 +26,7 @@ export type I18nTranslations = {
             "NOT_FOUND": string;
             "EXISTS": string;
             "PASSWORD_INCORRECT": string;
+            "PASSWORD_NOT_MATCH": string;
         };
         "auth": {
             "INVALID_TOKEN": string;
