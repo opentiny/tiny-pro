@@ -31,7 +31,7 @@ export class FindAllRoleHandler implements IQueryHandler<FindAllRole> {
       ...filter,
       where: query.name
         ? {
-            name: query.name,
+            name: { $like: query.name },
           }
         : undefined,
     });

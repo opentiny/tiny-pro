@@ -22,7 +22,6 @@ import {
 import { I18 } from './dto/i18n-info.dto';
 import { Permission, Reject } from '@app/shared';
 import { CreateI18Dto } from './dto/create-i18.dto';
-import { BatchRemoveI18Records } from './dto/batch-remove-i18.dto';
 import { UpdateI18Dto } from './dto/update-i18.dto';
 import type { I18nRecordId, LangId } from './i18.entites';
 import { FindAllI18n } from './dto/find-all-i18n.dto';

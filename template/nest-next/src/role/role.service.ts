@@ -82,7 +82,7 @@ export class RoleService {
     const [permissionIdMap, menuIdMap, total] = await Promise.all([
       this.qb.execute(new FindRolePermissionId(roleIds)),
       this.qb.execute(new FindRoleMenuId(roleIds)),
-      this.qb.execute(new GetRoleTotal()),
+      this.qb.execute(new GetRoleTotal(name)),
     ]);
     const allPermIds = [...permissionIdMap.values()].flat();
     const allMenuIds = [...menuIdMap.values()].flat();
