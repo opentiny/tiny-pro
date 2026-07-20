@@ -12,7 +12,8 @@
   },
   "role":{
     "NOT_FOUND": "Role not found",
-    "EXISTS": "Role {name} Exists"
+    "EXISTS": "Role {name} Exists",
+    "NOT_EMPTY": "There are users under the role, please clear them"
   },
   "user":{
     "NOT_FOUND": "User not found",

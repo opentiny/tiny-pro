@@ -28,8 +28,9 @@ export class RoleService {
   ) {}
 
   async remove(id: RoleId) {
-    const roleId = await this.cb.execute(new RemoveRoleCommand(id));
-    return this.findRole(roleId);
+    const roleInfo = await this.findRole(id);
+    await this.cb.execute(new RemoveRoleCommand(id));
+    return roleInfo;
   }
 
   async updateRole(dto: UpdateRoleDto) {

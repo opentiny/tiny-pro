@@ -63,8 +63,8 @@ export class UserService {
   }
 
   async batchRemove(email: string[]) {
-    const userIds = await this.cb.execute(new BatchRemoveUser(email));
-    const userInfos = await this.qb.execute(new GetUserInfo({ id: userIds }));
+    const userInfos = await this.qb.execute(new GetUserInfo({ email }));
+    await this.cb.execute(new BatchRemoveUser(email));
     return userInfos;
   }
 }

@@ -16,10 +16,10 @@ export class GetAllUserRequest extends PaginationQueryDto {
 }
 
 export class UserList {
-  item: UserInfo[];
+  items: UserInfo[];
   meta: PaginationMeta;
   constructor(item: UserInfo[], meta: PaginationMeta) {
-    this.item = item;
+    this.items = item;
     this.meta = meta;
   }
 }

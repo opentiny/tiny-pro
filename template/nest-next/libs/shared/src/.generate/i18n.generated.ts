@@ -20,6 +20,7 @@ export type I18nTranslations = {
         "role": {
             "NOT_FOUND": string;
             "EXISTS": string;
+            "NOT_EMPTY": string;
         };
         "user": {
             "NOT_FOUND": string;
