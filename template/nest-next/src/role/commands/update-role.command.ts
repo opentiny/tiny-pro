@@ -31,7 +31,7 @@ export class UpdateRoleHandler implements ICommandHandler<UpdateRoleCommand> {
   ) {}
   async execute(command: UpdateRoleCommand): Promise<RoleId> {
     const { id, name } = command;
-    const role = await this.role.findOne(id);
+    const role = await this.role.findOne({ id });
     if (!role) {
       throw new RoleNotFound();
     }
@@ -39,13 +39,23 @@ export class UpdateRoleHandler implements ICommandHandler<UpdateRoleCommand> {
       role.name = name;
     }
     if (command.permissionIds) {
+      await this.rolePermission.nativeDelete(
+        {
+          roleId: id,
+        },
+        { logging: { debugMode: ['info'], enabled: true } },
+      );
       command.permissionIds
         .map((pm) => {
           return this.rolePermission.create({ roleId: id, permissionId: pm });
         })
-        .forEach((perm) => this.em.persist(perm));
+        .map((pm) => this.em.persist(pm));
     }
     if (command.menuIds) {
+      await this.roleMenu.nativeDelete(
+        { roleId: id },
+        { logging: { debugMode: ['info'], enabled: true } },
+      );
       command.menuIds
         .map((menuId) => this.roleMenu.create({ roleId: id, menuId }))
         .forEach((menu) => this.em.persist(menu));

@@ -24,9 +24,14 @@ export class GetRoleTotalHandler implements IQueryHandler<GetRoleTotal> {
   }
   async execute(query: GetRoleTotal): Promise<number> {
     if (!query.name) {
-      const cnt = await this.roleRepo.count({
-        name: query.name ? { $like: `${query.name}` } : undefined,
-      });
+      const cnt = await this.roleRepo.count(
+        query.name
+          ? {
+              name: { $like: `${query.name}` },
+            }
+          : {},
+      );
+      await this.redis.set(roleTotal(), cnt);
       return cnt;
     }
     return this.redis.get(roleTotal()).then((val) => (val ? Number(val) : 1));

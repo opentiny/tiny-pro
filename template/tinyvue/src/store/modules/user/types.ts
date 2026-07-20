@@ -1,13 +1,13 @@
 export type RoleType = '' | '*' | 'admin' | 'user'
 export interface Role {
-  id: number
+  id: string
   name: string
   permission: {
     name: string
     desc: string
-    id: number
+    id: string
   }[]
-  menus: { id: number, name: string }[]
+  menus: { id: string, name: string }[]
 }
 export interface UserInfo {
   id: string

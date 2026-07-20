@@ -76,6 +76,7 @@ defineExpose({
   },
   onConfirm,
 })
+
 </script>
 
 <template>
@@ -105,7 +106,7 @@ defineExpose({
               <TinyOption
                 v-for="item in props.permissions"
                 :key="item.id"
-                :label="$t(item.name)"
+                :label="item.name"
                 :value="item.id"
               />
             </TinySelect>
@@ -124,4 +125,3 @@ defineExpose({
   </TinyModal>
 </template>
 
-<style lang="less" scoped></style>

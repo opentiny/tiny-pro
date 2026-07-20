@@ -31,10 +31,12 @@ export class GetAllPermissionQueryHandler implements IQueryHandler<GetAllPermiss
             name: { $like: query.name },
           }
         : {},
-      {
-        offset: (query.page - 1) * query.size,
-        limit: query.size,
-      },
+      query.page && query.size
+        ? {
+            offset: (query.page - 1) * query.size,
+            limit: query.size,
+          }
+        : undefined,
     );
     const meta = new PaginationMeta(
       items.length,

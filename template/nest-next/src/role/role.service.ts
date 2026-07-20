@@ -91,6 +91,7 @@ export class RoleService {
     ]);
     const permMap = new Map(permissions.map((p) => [p.id, p]));
     const menuMap = new Map(menus.map((m) => [m.id, m]));
+
     const roleDetail = assembleGetDetail(
       roles,
       permissionIdMap,

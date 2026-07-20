@@ -32,7 +32,7 @@ export function updateRole(data: any) {
   return axios.patch(`${import.meta.env.VITE_BASE_API}/role`, data)
 }
 
-export function deleteRole(id: number) {
+export function deleteRole(id: string) {
   return axios.delete(`${import.meta.env.VITE_BASE_API}/role/${id}`)
 }
 
