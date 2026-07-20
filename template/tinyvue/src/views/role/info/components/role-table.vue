@@ -87,7 +87,6 @@ function getPermission(row: any) {
 function onUpdate(args: any) {
   const menuIds = args.row.menus.map(menu => menu.id)
   const permissionIds = args.row.permissionIds.map(item => item)
-  console.log(permissionIds);
   updateRole({
     id: args.row.id,
     name: args.row.name,
