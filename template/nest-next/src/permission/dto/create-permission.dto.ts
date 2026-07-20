@@ -1,4 +1,4 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, ValidateIf } from 'class-validator';
 import { i18nValidationMessage } from 'nestjs-i18n';
 import { I18nTranslations } from '../../.generate/i18n.generated';
 import { ApiProperty } from '@nestjs/swagger';

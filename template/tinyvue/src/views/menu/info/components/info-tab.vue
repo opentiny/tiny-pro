@@ -122,8 +122,7 @@ function onDelete(data: Node) {
   if (node.parentId === null) {
     node.parentId = -1
   }
-
-  deleteMenu(Number(node.id.toString()), node.parentId)
+  deleteMenu(node.id.toString(), node.parentId)
     .then(() => {
       TinyModal.message({
         message: '删除成功',

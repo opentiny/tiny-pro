@@ -48,7 +48,7 @@ export class FindRoleResponse {
   @ApiProperty({ description: '角色名称' })
   name: string;
   @ApiProperty({ description: '角色所拥有的权限', type: [FindRolePermission] })
-  permissions: FindRolePermission[];
+  permission: FindRolePermission[];
   @ApiProperty({ description: '角色所拥有的菜单', type: [FindRoleMenu] })
   menus: FindRoleMenu[];
   constructor(props: FindRoleResponse) {
