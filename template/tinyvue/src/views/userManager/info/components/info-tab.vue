@@ -10,6 +10,7 @@ import {
   Grid as TinyGrid,
   GridColumn as TinyGridColumn,
   Input as TinyInput,
+  Layout as TinyLayout,
   Modal as TinyModal,
   Pager as TinyPager,
   Popconfirm as TinyPopconfirm,
@@ -727,7 +728,7 @@ onUnmounted(() => navigator.modelContext.unregisterTool('add-user'))
       :title="$t('userInfo.modal.title.pwdUpdate')"
     >
       <template #default>
-        <tiny-layout>
+        <TinyLayout>
           <TinyForm
             :model="state.pwdData"
             :rules="rules"
@@ -771,7 +772,7 @@ onUnmounted(() => navigator.modelContext.unregisterTool('add-user'))
               </TinyCol>
             </TinyRow>
           </TinyForm>
-        </tiny-layout>
+        </TinyLayout>
       </template>
       <template #footer>
         <TinyButton type="primary" @click="handlePwdUpdateSubmit">
