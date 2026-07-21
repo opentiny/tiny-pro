@@ -251,7 +251,7 @@ onUnmounted(() => {
           >
             <TinyGridColumn field="id" :title="$t('permissionInfo.table.id')" width="10%">
               <template #default="data">
-                <span>{{ $t(`${data.row.id}`) }}</span>
+                <span>{{ data.row.id }}</span>
               </template>
             </TinyGridColumn>
             <TinyGridColumn
@@ -261,7 +261,7 @@ onUnmounted(() => {
               :editor="{ component: 'input', autoselect: true }"
             >
               <template #default="data">
-                <span>{{ $t(`${data.row.name}`) }}</span>
+                <span>{{ data.row.name }}</span>
               </template>
             </TinyGridColumn>
             <TinyGridColumn
@@ -270,7 +270,7 @@ onUnmounted(() => {
               :editor="{ component: 'input', autoselect: true }"
             >
               <template #default="data">
-                <span>{{ $t(`${data.row.desc}`) }}</span>
+                <span>{{ data.row.desc }}</span>
               </template>
             </TinyGridColumn>
             <TinyGridColumn :title="$t('permissionInfo.table.operations')">

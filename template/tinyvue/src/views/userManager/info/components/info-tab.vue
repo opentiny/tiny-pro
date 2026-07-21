@@ -450,7 +450,7 @@ onUnmounted(() => toolAbortController.abort())
             show-overflow="tooltip"
           >
             <template #default="{ row, skip }">
-              <span v-if="!skip">{{ $t(`${row.id}`) }}</span>
+              <span v-if="!skip">{{ row.id }}</span>
             </template>
           </TinyGridColumn>
           <TinyGridColumn
@@ -468,7 +468,7 @@ onUnmounted(() => toolAbortController.abort())
             }"
           >
             <template #default="{ row, skip }">
-              <span v-if="!skip">{{ $t(`${row.name}`) }}</span>
+              <span v-if="!skip">{{ row.name }}</span>
             </template>
           </TinyGridColumn>
           <TinyGridColumn
@@ -478,7 +478,7 @@ onUnmounted(() => toolAbortController.abort())
             show-overflow="tooltip"
           >
             <template #default="{ row, skip }">
-              <span v-if="!skip">{{ $t(`${row.email}`) }}</span>
+              <span v-if="!skip">{{ row.email }}</span>
             </template>
           </TinyGridColumn>
           <TinyGridColumn
@@ -496,7 +496,7 @@ onUnmounted(() => toolAbortController.abort())
           >
             <template #default="{ row, skip }">
               <span v-if="!skip && row.department !== null">{{
-                $t(`${row.department}`)
+                row.department
               }}</span>
             </template>
           </TinyGridColumn>
@@ -519,7 +519,7 @@ onUnmounted(() => toolAbortController.abort())
           >
             <template #default="{ row, skip }">
               <span v-if="!skip && row.employeeType !== null">{{
-                $t(`${row.employeeType}`)
+                row.employeeType
               }}</span>
             </template>
           </TinyGridColumn>
@@ -548,7 +548,7 @@ onUnmounted(() => toolAbortController.abort())
             }"
           >
             <template #default="{ row, skip }">
-              <span v-if="!skip && row.role?.[0]">{{ $t(`${row.role[0]?.name}`) }}</span>
+              <span v-if="!skip && row.role?.[0]">{{ row.role[0]?.name }}</span>
             </template>
           </TinyGridColumn>
           <TinyGridColumn
@@ -567,7 +567,7 @@ onUnmounted(() => toolAbortController.abort())
           >
             <template #default="{ row, skip }">
               <span v-if="!skip && row.probationStart !== null">{{
-                $t(`${row.probationStart}`)
+                row.probationStart
               }}</span>
             </template>
           </TinyGridColumn>
@@ -587,7 +587,7 @@ onUnmounted(() => toolAbortController.abort())
           >
             <template #default="{ row, skip }">
               <span v-if="!skip && row.probationEnd !== null">{{
-                $t(`${row.probationEnd}`)
+                row.probationEnd
               }}</span>
             </template>
           </TinyGridColumn>
@@ -605,7 +605,7 @@ onUnmounted(() => toolAbortController.abort())
             }"
           >
             <template #default="{ row, skip }">
-              <span v-if="!skip && row.probationDuration !== null">{{ $t(`${row.probationDuration}`)
+              <span v-if="!skip && row.probationDuration !== null">{{ row.probationDuration
               }}{{ $t('userInfo.day') }}</span>
             </template>
           </TinyGridColumn>
@@ -624,7 +624,7 @@ onUnmounted(() => toolAbortController.abort())
           >
             <template #default="{ row, skip }">
               <span v-if="!skip && row.address !== null">{{
-                $t(`${row.address}`)
+                row.address
               }}</span>
             </template>
           </TinyGridColumn>
