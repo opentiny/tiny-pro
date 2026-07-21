@@ -2,6 +2,7 @@ import {
   ArgumentsHost,
   Catch,
   ExceptionFilter,
+  HttpException,
   Injectable,
   Logger,
 } from '@nestjs/common';
@@ -28,6 +29,13 @@ export class GlobalExceptionFilter implements ExceptionFilter<Error> {
         statusCode: code,
         message: translatedMessage,
         details,
+      });
+    }
+    if (exception instanceof HttpException && exception.getStatus() !== 500) {
+      const msg = exception.message;
+      return response.status(exception.getStatus()).json({
+        statusCode: exception.getStatus(),
+        message: msg,
       });
     }
     return response.status(500).json({

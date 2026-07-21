@@ -5,9 +5,9 @@ import setupPermissionGuard from './permission'
 import { setupTabsGuard } from './tabs'
 
 function setupPageGuard(router: Router) {
+  setupMenuGuard(router)
   setupPermissionGuard(router)
   setupInfoGuard(router)
-  setupMenuGuard(router)
   setupTabsGuard(router)
 }
 

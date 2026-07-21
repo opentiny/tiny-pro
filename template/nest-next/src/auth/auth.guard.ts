@@ -6,6 +6,7 @@ import { TokenPayload } from './entity';
 import { AuthService } from './auth.service';
 import { ApiTokenService } from './api-token.service';
 import { InvalidToken } from './errors';
+import { DomainError } from '@app/shared';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -43,10 +44,12 @@ export class AuthGuard implements CanActivate {
       }
       await this.authService.tokenAlive(token);
       return true;
-    } catch {
+    } catch (error) {
+      if (error instanceof DomainError) {
+        throw error;
+      }
       throw new InvalidToken();
     }
-    return true;
   }
   private extractToken(ctx: ExecutionContext): string {
     const request: Request = ctx.switchToHttp().getRequest();

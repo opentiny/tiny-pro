@@ -55,6 +55,7 @@ axios.interceptors.response.use(
     return res
   },
   (error) => {
+    debugger;
     const { status, data } = error.response
     if (status === 403 && error.config.method.toLowerCase() === 'get') {
       Modal.message({
@@ -72,16 +73,16 @@ axios.interceptors.response.use(
         router.replace({ name: 'login' })
         return;
       }
-      flushToken({
+      return flushToken({
         token: getRefreshToken()
       })
       .then((data) => {
         setToken(data.data.accessToken);
         setRefreshToken(data.data.refreshToken);
+        router.go(0);
       })
-      .catch(()=>{
-        clearToken()
-        router.replace({ name: 'login' })
+      .catch((err)=>{
+        return Promise.reject(err)
       })
     }
     if (status === 400) {
