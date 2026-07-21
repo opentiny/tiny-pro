@@ -24,6 +24,7 @@ import { randomBytes } from 'crypto';
 import { I18Module } from './i18/i18.module';
 import { I18n, Lang } from './i18';
 import { RejectRequestGuard } from '@app/shared';
+import { MockModule } from './mock/mock.module';
 
 @Module({
   imports: [
@@ -113,6 +114,7 @@ import { RejectRequestGuard } from '@app/shared';
     UserModule,
     AuthModule,
     I18Module,
+    MockModule,
   ],
   providers: [
     {
