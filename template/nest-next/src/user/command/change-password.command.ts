@@ -33,7 +33,7 @@ export class ChangePasswordService implements ICommandHandler<ChangePassword> {
     }
     user.changePassword(command.password);
     await this.userRepository.upsert(user);
-    this.eventBus.publish(new UserPasswordChangedEvent(user.id));
+    await this.eventBus.publish(new UserPasswordChangedEvent(user.id));
     return user.id;
   }
   constructor(

@@ -3,7 +3,8 @@ import { Modal } from '@opentiny/vue'
 import locale from '@opentiny/vue-locale'
 import axios from 'axios'
 import router from '@/router'
-import { clearToken, getToken } from '@/utils/auth'
+import { clearToken, getRefreshToken, getToken, setRefreshToken, setToken } from '@/utils/auth'
+import { flushToken } from './user'
 
 export interface HttpResponse<T = unknown> {
   errMsg: string
@@ -11,11 +12,11 @@ export interface HttpResponse<T = unknown> {
   data: T
 }
 
-const { VITE_API_BASE_URL, VITE_BASE_API, VITE_MOCK_IGNORE } = import.meta
+const { VITE_BASE_API, VITE_MOCK_IGNORE } = import.meta
   .env || { VITE_BASE_API: '', VITE_MOCK_IGNORE: '' }
 
-if (VITE_API_BASE_URL) {
-  axios.defaults.baseURL = VITE_API_BASE_URL
+if (VITE_BASE_API) {
+  axios.defaults.baseURL = VITE_BASE_API
 }
 
 const ignoreMockApiList = VITE_MOCK_IGNORE?.split(',') || []
@@ -66,8 +67,22 @@ axios.interceptors.response.use(
         message: locale.t('http.error.TokenExpire'),
         status: 'error',
       })
-      clearToken()
-      router.replace({ name: 'login' })
+      if (!getRefreshToken()) {
+        clearToken()
+        router.replace({ name: 'login' })
+        return;
+      }
+      flushToken({
+        token: getRefreshToken()
+      })
+      .then((data) => {
+        setToken(data.data.accessToken);
+        setRefreshToken(data.data.refreshToken);
+      })
+      .catch(()=>{
+        clearToken()
+        router.replace({ name: 'login' })
+      })
     }
     if (status === 400) {
       data.message = error.response.data.errors?.[0] ?? data.message

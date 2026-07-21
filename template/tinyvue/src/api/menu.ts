@@ -35,21 +35,21 @@ export interface CreateMenuDto {
 }
 
 export function getAllMenu() {
-  return axios.get<ITreeNodeData[]>(`${import.meta.env.VITE_BASE_API}/menu`)
+  return axios.get<ITreeNodeData[]>(`/menu`)
 }
 
 export function getRoleMenu(email: string) {
-  return axios.get(`${import.meta.env.VITE_BASE_API}/menu/role/${email}`)
+  return axios.get(`/menu/role/${email}`)
 }
 
 export function updateMenu(data: any) {
-  return axios.patch(`${import.meta.env.VITE_BASE_API}/menu`, data)
+  return axios.patch(`/menu`, data)
 }
 
 export function deleteMenu(id: number, parentId: number) {
-  return axios.delete(`${import.meta.env.VITE_BASE_API}/menu?id=${id}&parentId=${parentId}`)
+  return axios.delete(`/menu?id=${id}&parentId=${parentId}`)
 }
 
 export function createMenu(data: any) {
-  return axios.post(`${import.meta.env.VITE_BASE_API}/menu`, data)
+  return axios.post(`/menu`, data)
 }

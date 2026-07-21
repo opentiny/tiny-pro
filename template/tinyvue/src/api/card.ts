@@ -7,7 +7,7 @@ export interface QueryTaskParams {
 }
 
 export function getServicesList(params: QueryTaskParams) {
-  return axios.get(`${import.meta.env.VITE_BASE_API}/application`, {
+  return axios.get(`/application`, {
     params,
   })
 }

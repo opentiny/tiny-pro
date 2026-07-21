@@ -4,6 +4,7 @@ import { CreateUserDto } from '../dto/create-user.dto';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository } from '@mikro-orm/mysql';
 import { Role } from '../../role';
+import { UserExistsError } from '../error/user-exists.error';
 
 export class CreateUserCommand extends Command<UserId> {
   constructor(public data: CreateUserDto) {
@@ -35,6 +36,12 @@ export class CreateUserService implements ICommandHandler<CreateUserCommand> {
       address,
       status,
     } = data;
+    const dbUser = await this.userRepository.findOne({
+      email,
+    });
+    if (dbUser) {
+      throw new UserExistsError(dbUser.email);
+    }
     const roles = await this.roleRepository.findAll({
       where: {
         id: {

@@ -39,12 +39,9 @@ export class UpdateRoleHandler implements ICommandHandler<UpdateRoleCommand> {
       role.name = name;
     }
     if (command.permissionIds) {
-      await this.rolePermission.nativeDelete(
-        {
-          roleId: id,
-        },
-        { logging: { debugMode: ['info'], enabled: true } },
-      );
+      await this.rolePermission.nativeDelete({
+        roleId: id,
+      });
       command.permissionIds
         .map((pm) => {
           return this.rolePermission.create({ roleId: id, permissionId: pm });
@@ -52,10 +49,7 @@ export class UpdateRoleHandler implements ICommandHandler<UpdateRoleCommand> {
         .map((pm) => this.em.persist(pm));
     }
     if (command.menuIds) {
-      await this.roleMenu.nativeDelete(
-        { roleId: id },
-        { logging: { debugMode: ['info'], enabled: true } },
-      );
+      await this.roleMenu.nativeDelete({ roleId: id });
       command.menuIds
         .map((menuId) => this.roleMenu.create({ roleId: id, menuId }))
         .forEach((menu) => this.em.persist(menu));

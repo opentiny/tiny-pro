@@ -108,13 +108,7 @@ export class GetAllUserService implements IQueryHandler<GetAllUserQuery> {
       });
       infos.push(info);
     }
-    if (conditions.length) {
-      const cnt = await this.userRepository.count({ ...whereCondition });
-      await this.redis.set(userTotal(md5(conditions)), cnt);
-    }
-    const total = await this.redis
-      .get(userTotal(conditions.length ? md5(conditions) : undefined))
-      .then((value) => (!value ? 0 : Number.parseInt(value)));
+    const total = await this.userRepository.count({ ...whereCondition });
     const meta = new PaginationMeta(limit, total, limit, page);
     return new UserList(infos, meta);
   }

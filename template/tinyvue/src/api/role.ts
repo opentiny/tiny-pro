@@ -19,27 +19,27 @@ export interface GetAllRoleDetailRet {
 }
 
 export function getAllRole() {
-  return axios.get(`${import.meta.env.VITE_BASE_API}/role`)
+  return axios.get(`/role`)
 }
 
 export function getAllRoleDetail(page = 1, limit = 10, name?: string) {
-  return axios.get<GetAllRoleDetailRet>(`${import.meta.env.VITE_BASE_API}/role/detail`, {
+  return axios.get<GetAllRoleDetailRet>(`/role/detail`, {
     params: { page, limit, name },
   })
 }
 
 export function updateRole(data: any) {
-  return axios.patch(`${import.meta.env.VITE_BASE_API}/role`, data)
+  return axios.patch(`/role`, data)
 }
 
 export function deleteRole(id: string) {
-  return axios.delete(`${import.meta.env.VITE_BASE_API}/role/${id}`)
+  return axios.delete(`/role/${id}`)
 }
 
 export function createRole(data: any) {
-  return axios.post(`${import.meta.env.VITE_BASE_API}/role`, data)
+  return axios.post(`/role`, data)
 }
 
 export function getRoleInfo(id: number) {
-  return axios.get(`${import.meta.env.VITE_BASE_API}/role/info/${id}`)
+  return axios.get(`/role/info/${id}`)
 }

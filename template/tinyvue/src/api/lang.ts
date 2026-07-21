@@ -9,16 +9,16 @@ export interface CreateLangDTO {
 }
 
 export function getAllLang() {
-  return axios.get<Lang[]>(`${import.meta.env.VITE_BASE_API}/lang`)
+  return axios.get<Lang[]>(`/lang`)
 }
 export function createLang(data: CreateLangDTO) {
-  return axios.post<Lang>(`${import.meta.env.VITE_BASE_API}/lang`, data)
+  return axios.post<Lang>(`/lang`, data)
 }
 
 export function patchLang(data: Partial<CreateLangDTO>, id: number) {
-  return axios.patch<Lang>(`${import.meta.env.VITE_BASE_API}/lang/${id}`, data)
+  return axios.patch<Lang>(`/lang/${id}`, data)
 }
 
 export function deleteLang(id: number) {
-  return axios.delete<{ name: string }>(`${import.meta.env.VITE_BASE_API}/lang/${id}`)
+  return axios.delete<{ name: string }>(`/lang/${id}`)
 }

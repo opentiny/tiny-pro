@@ -26,14 +26,15 @@ export class UserService {
 
   async createUser(dto: CreateUserDto) {
     const userId = await this.cb.execute(new CreateUserCommand(dto));
-
     const [userInfo] = await this.qb.execute(new GetUserInfo({ id: [userId] }));
     return userInfo;
   }
 
   async removeUser(email: string) {
-    const id = await this.cb.execute(new RemoveUser(email));
-    const [userInfo] = await this.qb.execute(new GetUserInfo({ id: [id] }));
+    const [userInfo] = await this.qb.execute(
+      new GetUserInfo({ email: [email] }),
+    );
+    await this.cb.execute(new RemoveUser(email));
     return userInfo;
   }
 
