@@ -51,8 +51,8 @@ watch(
       :title="$t('menuInfo.table.name')"
       tree-node
     >
-      <template #default="{ row }">
-        {{ $t(row.locale) }}
+      <template #default="{ row, skip }">
+        <span v-if="!skip">{{ $t(row.locale) }}</span>
       </template>
     </TinyGridColumn>
     <TinyGridColumn field="id" title="ID" />
@@ -62,34 +62,36 @@ watch(
     />
     <TinyGridColumn field="order" :title="$t('menuInfo.table.order')" />
     <TinyGridColumn field="customIcon" :title="$t('menuInfo.table.icon')">
-      <template #default="{ row }">
-        {{ row.customIcon }}
+      <template #default="{ row, skip }">
+        <span v-if="!skip">{{ row.customIcon }}</span>
       </template>
     </TinyGridColumn>
     <TinyGridColumn field="component" :title="$t('menuInfo.table.component')" />
     <TinyGridColumn field="url" :title="$t('menuInfo.table.path')" />
     <TinyGridColumn field="locale" :title="$t('menuInfo.table.locale')" />
     <TinyGridColumn :title="$t('permissionInfo.table.operations')" width="200">
-      <template #default="{ row }">
-        <IconEdit class="del-icon" />
-        <a
-          v-permission="'menu::update'"
-          class="operation-update"
-          @click="emits('update', row)"
-        >
-          {{ $t('menuInfo.table.operations.update') }}
-        </a>
-        <TinyPopconfirm :title="$t('menuInfo.modal.title.confirm')" type="warning" trigger="click" @confirm="confirm(row)">
-          <template #reference>
-            <IconDel class="del-icon" />
-            <a
-              v-permission="'menu::remove'"
-              class="operation-update"
-            >
-              {{ $t('menuInfo.table.operations.delete') }}
-            </a>
-          </template>
-        </TinyPopconfirm>
+      <template #default="{ row, skip }">
+        <template v-if="!skip">
+          <IconEdit class="del-icon" />
+          <a
+            v-permission="'menu::update'"
+            class="operation-update"
+            @click="emits('update', row)"
+          >
+            {{ $t('menuInfo.table.operations.update') }}
+          </a>
+          <TinyPopconfirm :title="$t('menuInfo.modal.title.confirm')" type="warning" trigger="click" @confirm="confirm(row)">
+            <template #reference>
+              <IconDel class="del-icon" />
+              <a
+                v-permission="'menu::remove'"
+                class="operation-update"
+              >
+                {{ $t('menuInfo.table.operations.delete') }}
+              </a>
+            </template>
+          </TinyPopconfirm>
+        </template>
       </template>
     </TinyGridColumn>
   </TinyGrid>

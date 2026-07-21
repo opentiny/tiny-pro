@@ -432,8 +432,9 @@ onUnmounted(() => navigator.modelContext.unregisterTool('add-user'))
         >
           <TinyGridColumn type="selection" width="30px" />
           <TinyGridColumn type="expand" width="10px">
-            <template #default="{ row }">
+            <template #default="{ row, skip }">
               <UserDetail
+                v-if="!skip"
                 :email="row.email"
                 :status-map="statusMap"
                 @confirm="(props, value) => row[props] = value"
@@ -445,8 +446,8 @@ onUnmounted(() => navigator.modelContext.unregisterTool('add-user'))
             :title="$t('userInfo.table.id')"
             show-overflow="tooltip"
           >
-            <template #default="data">
-              <span>{{ $t(`${data.row.id}`) }}</span>
+            <template #default="{ row, skip }">
+              <span v-if="!skip">{{ $t(`${row.id}`) }}</span>
             </template>
           </TinyGridColumn>
           <TinyGridColumn
@@ -463,8 +464,8 @@ onUnmounted(() => navigator.modelContext.unregisterTool('add-user'))
               },
             }"
           >
-            <template #default="data">
-              <span>{{ $t(`${data.row.name}`) }}</span>
+            <template #default="{ row, skip }">
+              <span v-if="!skip">{{ $t(`${row.name}`) }}</span>
             </template>
           </TinyGridColumn>
           <TinyGridColumn
@@ -473,8 +474,8 @@ onUnmounted(() => navigator.modelContext.unregisterTool('add-user'))
             :title="$t('userInfo.table.email')"
             show-overflow="tooltip"
           >
-            <template #default="data">
-              <span>{{ $t(`${data.row.email}`) }}</span>
+            <template #default="{ row, skip }">
+              <span v-if="!skip">{{ $t(`${row.email}`) }}</span>
             </template>
           </TinyGridColumn>
           <TinyGridColumn
@@ -490,9 +491,9 @@ onUnmounted(() => navigator.modelContext.unregisterTool('add-user'))
               },
             }"
           >
-            <template #default="data">
-              <span v-if="data.row.department !== null">{{
-                $t(`${data.row.department}`)
+            <template #default="{ row, skip }">
+              <span v-if="!skip && row.department !== null">{{
+                $t(`${row.department}`)
               }}</span>
             </template>
           </TinyGridColumn>
@@ -513,9 +514,9 @@ onUnmounted(() => navigator.modelContext.unregisterTool('add-user'))
               },
             }"
           >
-            <template #default="data">
-              <span v-if="data.row.employeeType !== null">{{
-                $t(`${data.row.employeeType}`)
+            <template #default="{ row, skip }">
+              <span v-if="!skip && row.employeeType !== null">{{
+                $t(`${row.employeeType}`)
               }}</span>
             </template>
           </TinyGridColumn>
@@ -543,8 +544,8 @@ onUnmounted(() => navigator.modelContext.unregisterTool('add-user'))
               },
             }"
           >
-            <template #default="data">
-              <span v-if="data.row.role[0]">{{ $t(`${data.row.role[0]?.name}`) }}</span>
+            <template #default="{ row, skip }">
+              <span v-if="!skip && row.role?.[0]">{{ $t(`${row.role[0]?.name}`) }}</span>
             </template>
           </TinyGridColumn>
           <TinyGridColumn
@@ -561,9 +562,9 @@ onUnmounted(() => navigator.modelContext.unregisterTool('add-user'))
               },
             }"
           >
-            <template #default="data">
-              <span v-if="data.row.probationStart !== null">{{
-                $t(`${data.row.probationStart}`)
+            <template #default="{ row, skip }">
+              <span v-if="!skip && row.probationStart !== null">{{
+                $t(`${row.probationStart}`)
               }}</span>
             </template>
           </TinyGridColumn>
@@ -581,9 +582,9 @@ onUnmounted(() => navigator.modelContext.unregisterTool('add-user'))
               },
             }"
           >
-            <template #default="data">
-              <span v-if="data.row.probationEnd !== null">{{
-                $t(`${data.row.probationEnd}`)
+            <template #default="{ row, skip }">
+              <span v-if="!skip && row.probationEnd !== null">{{
+                $t(`${row.probationEnd}`)
               }}</span>
             </template>
           </TinyGridColumn>
@@ -600,8 +601,8 @@ onUnmounted(() => navigator.modelContext.unregisterTool('add-user'))
               },
             }"
           >
-            <template #default="data">
-              <span v-if="data.row.probationDuration !== null">{{ $t(`${data.row.probationDuration}`)
+            <template #default="{ row, skip }">
+              <span v-if="!skip && row.probationDuration !== null">{{ $t(`${row.probationDuration}`)
               }}{{ $t('userInfo.day') }}</span>
             </template>
           </TinyGridColumn>
@@ -618,9 +619,9 @@ onUnmounted(() => navigator.modelContext.unregisterTool('add-user'))
               },
             }"
           >
-            <template #default="data">
-              <span v-if="data.row.address !== null">{{
-                $t(`${data.row.address}`)
+            <template #default="{ row, skip }">
+              <span v-if="!skip && row.address !== null">{{
+                $t(`${row.address}`)
               }}</span>
             </template>
           </TinyGridColumn>
@@ -641,24 +642,24 @@ onUnmounted(() => navigator.modelContext.unregisterTool('add-user'))
               },
             }"
           >
-            <template #default="data">
-              <div class="tiny-col-status">
+            <template #default="{ row, skip }">
+              <div v-if="!skip" class="tiny-col-status">
                 <img
-                  v-if="data.row.status === 1"
+                  v-if="row.status === 1"
                   src="@/assets/images/success.png"
                   alt="success"
                 >
                 <img
-                  v-else-if="data.row.status === 2"
+                  v-else-if="row.status === 2"
                   src="@/assets/images/error.png"
                   alt="error"
                 >
                 <img
-                  v-else-if="data.row.status === 3"
+                  v-else-if="row.status === 3"
                   src="@/assets/images/tip2.png"
                   alt="tip"
                 >
-                <span>{{ statusMap[data.row.status] }}</span>
+                <span>{{ statusMap[row.status] }}</span>
               </div>
             </template>
           </TinyGridColumn>
@@ -666,31 +667,33 @@ onUnmounted(() => navigator.modelContext.unregisterTool('add-user'))
             :title="$t('userInfo.table.operations')"
             show-overflow="tooltip"
           >
-            <template #default="data">
-              <a
-                v-permission="'user::password::force-update'"
-                class="operation-pwd-update"
-                @click="handlePwdUpdate(data.row.email)"
-              >
-                <IconCommission class="operation-icon" />
-                {{ $t('userInfo.table.operations.pwdUpdate') }}
-              </a>
-              <TinyPopconfirm
-                title="确定要删除此用户吗？"
-                type="info"
-                trigger="click"
-                @confirm="handleDelete(data.row.email)"
-              >
-                <template #reference>
-                  <a
-                    v-permission="'user::remove'"
-                    class="operation-delete"
-                  >
-                    <IconDel class="operation-icon" />
-                    {{ $t('userInfo.table.operations.delete') }}
-                  </a>
-                </template>
-              </TinyPopconfirm>
+            <template #default="{ row, skip }">
+              <template v-if="!skip">
+                <a
+                  v-permission="'user::password::force-update'"
+                  class="operation-pwd-update"
+                  @click="handlePwdUpdate(row.email)"
+                >
+                  <IconCommission class="operation-icon" />
+                  {{ $t('userInfo.table.operations.pwdUpdate') }}
+                </a>
+                <TinyPopconfirm
+                  title="确定要删除此用户吗？"
+                  type="info"
+                  trigger="click"
+                  @confirm="handleDelete(row.email)"
+                >
+                  <template #reference>
+                    <a
+                      v-permission="'user::remove'"
+                      class="operation-delete"
+                    >
+                      <IconDel class="operation-icon" />
+                      {{ $t('userInfo.table.operations.delete') }}
+                    </a>
+                  </template>
+                </TinyPopconfirm>
+              </template>
             </template>
           </TinyGridColumn>
         </TinyGrid>
