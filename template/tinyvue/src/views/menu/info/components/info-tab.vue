@@ -233,6 +233,8 @@ watch(locale, () => {
 })
 
 
+const toolAbortController = new AbortController()
+
 onMounted(async () => {
   Promise.all([fetchMenu(), fetchLocalItems()]).finally(() => {
     treeLoading.value = false
@@ -280,11 +282,11 @@ onMounted(async () => {
       await onClickAdd()
       return { content: [{ type: 'text', text: `收到: ${name}` }] }
     },
-  })
+  }, { signal: toolAbortController.signal })
 })
 
 onUnmounted(() => {
-  navigator.modelContext.unregisterTool('add-menu')
+  toolAbortController.abort()
 })
 </script>
 

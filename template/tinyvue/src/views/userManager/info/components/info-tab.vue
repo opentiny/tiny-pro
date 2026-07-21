@@ -354,6 +354,8 @@ async function handleUpdate({ row, column }, { target: { value } }) {
 // 请求职位类型
 fetchRole()
 
+const toolAbortController = new AbortController()
+
 onMounted(async () => {
   navigator.modelContext.registerTool({
     name: 'add-user',
@@ -393,10 +395,10 @@ onMounted(async () => {
       await addUserFormRef.value.handleSubmit()
       return { content: [{ type: 'text', text: `收到: ${email}` }] }
     },
-  })
+  }, { signal: toolAbortController.signal })
 })
 
-onUnmounted(() => navigator.modelContext.unregisterTool('add-user'))
+onUnmounted(() => toolAbortController.abort())
 </script>
 
 <template>

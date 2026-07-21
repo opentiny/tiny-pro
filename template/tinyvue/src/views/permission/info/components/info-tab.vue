@@ -195,6 +195,8 @@ async function handlePermissionAddCancel() {
   state.permissionAddData = {}
 }
 
+const toolAbortController = new AbortController()
+
 onMounted(async () => {
   navigator.modelContext.registerTool({
     name: 'add-permission',
@@ -217,11 +219,11 @@ onMounted(async () => {
       await handlePermissionAddSubmit()
       return { content: [{ type: 'text', text: `收到: ${name}` }] }
     },
-  })
+  }, { signal: toolAbortController.signal })
 })
 
 onUnmounted(() => {
-  navigator.modelContext.unregisterTool('add-permission')
+  toolAbortController.abort()
 })
 </script>
 
