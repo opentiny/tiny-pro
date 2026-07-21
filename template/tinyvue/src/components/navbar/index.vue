@@ -241,7 +241,7 @@ async function handlePwdUpdateSubmit() {
   </div>
   <div v-if="state.isPwdUpdate">
     <TinyModal
-      v-model="state.isPwdUpdate" :lock-scroll="true" show-header show-footer mask-closable="true"
+      v-model="state.isPwdUpdate" :lock-scroll="true" show-header show-footer :mask-closable="true"
       height="auto" :width="modalSize" :title="$t('userInfo.modal.title.pwdUpdate')"
     >
       <template #default>

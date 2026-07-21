@@ -724,7 +724,7 @@ onUnmounted(() => toolAbortController.abort())
       :lock-scroll="true"
       show-header
       show-footer
-      mask-closable="true"
+      :mask-closable="true"
       height="auto"
       :width="modalSize"
       :title="$t('userInfo.modal.title.pwdUpdate')"
