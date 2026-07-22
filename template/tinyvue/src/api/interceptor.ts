@@ -20,6 +20,9 @@ if (VITE_BASE_API) {
 }
 
 const ignoreMockApiList = VITE_MOCK_IGNORE?.split(',') || []
+
+let refreshPromise: Promise<string> | null = null
+
 axios.interceptors.request.use(
   (config: AxiosRequestConfig): any => {
     const isProxy = ignoreMockApiList.includes(config.url)
@@ -41,11 +44,10 @@ axios.interceptors.request.use(
     return config
   },
   (error) => {
-    // do something
     return Promise.reject(error)
   },
 )
-// add response interceptors
+
 axios.interceptors.response.use(
   (response: AxiosResponse<HttpResponse>) => {
     const res = response
@@ -63,22 +65,58 @@ axios.interceptors.response.use(
       })
     }
     if (status === 401) {
-      Modal.message({
-        message: locale.t('http.error.TokenExpire'),
-        status: 'error',
-      })
+      const originalRequest = error.config
+      if (originalRequest._retry) {
+        clearToken()
+        router.replace({ name: 'login' })
+        Modal.message({
+          message: locale.t('http.error.TokenExpire'),
+          status: 'error',
+        })
+        return Promise.reject(error)
+      }
+
+      originalRequest._retry = true
       if (!getRefreshToken()) {
         clearToken()
         router.replace({ name: 'login' })
-        return
+        Modal.message({
+          message: locale.t('http.error.TokenExpire'),
+          status: 'error',
+        })
+        return Promise.reject(error)
       }
-      return flushToken({
-        token: getRefreshToken(),
-      })
-        .then((data) => {
-          setToken(data.data.accessToken)
-          setRefreshToken(data.data.refreshToken)
-          router.go(0)
+
+      if (!refreshPromise) {
+        refreshPromise = flushToken({ token: getRefreshToken() })
+          .then((res) => {
+            const newAccessToken = res.data.accessToken
+            const newRefreshToken = res.data.refreshToken
+            setToken(newAccessToken)
+            setRefreshToken(newRefreshToken)
+            return newAccessToken
+          })
+          .catch((err) => {
+            clearToken()
+            router.replace({ name: 'login' })
+            Modal.message({
+              message: locale.t('http.error.TokenExpire'),
+              status: 'error',
+            })
+            return Promise.reject(err)
+          })
+          .finally(() => {
+            refreshPromise = null
+          })
+      }
+
+      return refreshPromise
+        .then((newToken) => {
+          if (!originalRequest.headers) {
+            originalRequest.headers = {}
+          }
+          originalRequest.headers.Authorization = `Bearer ${newToken}`
+          return axios.request(originalRequest)
         })
         .catch((err) => {
           return Promise.reject(err)
