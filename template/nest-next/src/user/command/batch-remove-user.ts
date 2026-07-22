@@ -32,13 +32,16 @@ export class BatchRemoveUserService implements ICommandHandler<BatchRemoveUser> 
     });
     const userIds = removedUser.map((user) => user.id);
     await this.userRepo.getEntityManager().transactional(async (em) => {
-      await this.userRoleRepo.nativeDelete({
-        user: {
-          id: {
-            $in: userIds,
+      await this.userRoleRepo.nativeDelete(
+        {
+          user: {
+            id: {
+              $in: userIds,
+            },
           },
         },
-      });
+        { em },
+      );
       await this.userRepo.nativeDelete(
         {
           id: {
