@@ -987,6 +987,7 @@
     "menu.user.setting": "用户设置",
     "userSetting.save": "保存",
     "userSetting.cancel": "取消",
+    "userSetting.reset": "重置",
     "userSetting.department": "所属部门:",
     "userSetting.position": "职位:",
     "userSetting.type": "招聘类型:",

@@ -150,7 +150,8 @@ async function onConfirm(ids: number[]) {
       menus: data.menus,
     })
     await flushRouter()
-  } catch (error: any) {
+  }
+  catch (error: any) {
     if (error.response && error.response.data) {
       const errorMessage = error.response.data.message || '未知错误'
       TinyModal.message({
@@ -158,7 +159,8 @@ async function onConfirm(ids: number[]) {
         status: 'error',
       })
     }
-  } finally {
+  }
+  finally {
     roleTableRef.value.reload()
     flushTabs()
     reloadMenu()
@@ -200,8 +202,10 @@ function onRoleDelete() {
   roleTableRef.value.reload()
 }
 
+const toolAbortController = new AbortController()
+
 onMounted(async () => {
-  navigator.modelContext.registerTool({
+  document.modelContext.registerTool({
     name: 'add-role',
     title: '添加角色',
     description: '添加角色，不需要生成角色卡片',
@@ -224,9 +228,9 @@ onMounted(async () => {
       await addRoleFormRef.value.onConfirm()
       return { content: [{ type: 'text', text: `收到: ${name}` }] }
     },
-  })
+  }, { signal: toolAbortController.signal })
 
-  navigator.modelContext.registerTool({
+  document.modelContext.registerTool({
     name: 'bind-menu-for-role',
     title: '绑定菜单',
     description: '给某个角色绑定菜单',
@@ -255,12 +259,11 @@ onMounted(async () => {
       await menuDrawerRef.value.onConfirm()
       return { content: [{ type: 'text', text: `收到: ${role}` }] }
     },
-  })
+  }, { signal: toolAbortController.signal })
 })
 
 onUnmounted(() => {
-  navigator.modelContext.unregisterTool('add-role')
-  navigator.modelContext.unregisterTool('bind-menu-for-role')
+  toolAbortController.abort()
 })
 </script>
 

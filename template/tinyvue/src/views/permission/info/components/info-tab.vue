@@ -195,8 +195,10 @@ async function handlePermissionAddCancel() {
   state.permissionAddData = {}
 }
 
+const toolAbortController = new AbortController()
+
 onMounted(async () => {
-  navigator.modelContext.registerTool({
+  document.modelContext.registerTool({
     name: 'add-permission',
     title: '添加权限',
     description: '添加权限',
@@ -217,11 +219,11 @@ onMounted(async () => {
       await handlePermissionAddSubmit()
       return { content: [{ type: 'text', text: `收到: ${name}` }] }
     },
-  })
+  }, { signal: toolAbortController.signal })
 })
 
 onUnmounted(() => {
-  navigator.modelContext.unregisterTool('add-permission')
+  toolAbortController.abort()
 })
 </script>
 
@@ -249,7 +251,7 @@ onUnmounted(() => {
           >
             <TinyGridColumn field="id" :title="$t('permissionInfo.table.id')" width="10%">
               <template #default="data">
-                <span>{{ $t(`${data.row.id}`) }}</span>
+                <span>{{ data.row.id }}</span>
               </template>
             </TinyGridColumn>
             <TinyGridColumn
@@ -259,7 +261,7 @@ onUnmounted(() => {
               :editor="{ component: 'input', autoselect: true }"
             >
               <template #default="data">
-                <span>{{ $t(`${data.row.name}`) }}</span>
+                <span>{{ data.row.name }}</span>
               </template>
             </TinyGridColumn>
             <TinyGridColumn
@@ -268,7 +270,7 @@ onUnmounted(() => {
               :editor="{ component: 'input', autoselect: true }"
             >
               <template #default="data">
-                <span>{{ $t(`${data.row.desc}`) }}</span>
+                <span>{{ data.row.desc }}</span>
               </template>
             </TinyGridColumn>
             <TinyGridColumn :title="$t('permissionInfo.table.operations')">

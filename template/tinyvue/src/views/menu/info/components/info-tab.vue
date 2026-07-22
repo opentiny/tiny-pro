@@ -27,7 +27,7 @@ import UpdateForm from './update-form.vue'
 
 const { modalSize } = useResponsiveSize()
 
-const { t } = useI18n()
+const { t, te } = useI18n()
 const vLoading = Loading.directive
 const rawMenuData = ref<ITreeNodeData[]>([])
 const localeData = ref<{ value: string, label: string }[]>([])
@@ -75,7 +75,8 @@ async function onClickAdd() {
     addModal.value = false
     await updateUserMenu()
     await fetchMenu()
-  } catch (error: any) {
+  }
+  catch (error: any) {
     if (error.response && error.response.data) {
       const errorMessage = error.response.data.message || '未知错误'
       TinyModal.message({
@@ -83,7 +84,8 @@ async function onClickAdd() {
         status: 'error',
       })
     }
-  } finally {
+  }
+  finally {
     setAddLoading(false)
   }
 }
@@ -221,7 +223,7 @@ function fetchLocalItems() {
     localeData.value = data.items.map((item) => {
       return {
         value: item.key,
-        label: t(item.key),
+        label: te(item.key) ? t(item.key) : item.key,
       }
     })
   })
@@ -232,12 +234,13 @@ watch(locale, () => {
   fetchLocalItems()
 })
 
+const toolAbortController = new AbortController()
 
 onMounted(async () => {
   Promise.all([fetchMenu(), fetchLocalItems()]).finally(() => {
     treeLoading.value = false
   })
-  navigator.modelContext.registerTool({
+  document.modelContext.registerTool({
     name: 'add-menu',
     title: '添加菜单',
     description: '添加菜单',
@@ -280,11 +283,11 @@ onMounted(async () => {
       await onClickAdd()
       return { content: [{ type: 'text', text: `收到: ${name}` }] }
     },
-  })
+  }, { signal: toolAbortController.signal })
 })
 
 onUnmounted(() => {
-  navigator.modelContext.unregisterTool('add-menu')
+  toolAbortController.abort()
 })
 </script>
 
