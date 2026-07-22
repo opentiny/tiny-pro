@@ -7,6 +7,7 @@ import config from './configs/config.json';
 import { Role, RoleMenu, RolePermission } from './src/role';
 import { User, UserRole } from './src/user';
 import { I18n, Lang } from './src/i18';
+import { Migrator } from '@mikro-orm/migrations';
 
 export default defineConfig({
   entities: [
@@ -20,14 +21,17 @@ export default defineConfig({
     Lang,
     I18n,
   ],
-  host: config.database.host,
-  port: config.database.port,
+  host: process.env.DATABASE_HOST || config.database.host,
+  port: Number(process.env.DATABASE_PORT) || config.database.port,
   driver: MySqlDriver,
-  user: config.database.user,
-  password: config.database.password,
-  dbName: config.database.dbName,
-  extensions: [SeedManager],
+  user: process.env.DATABASE_USER || config.database.user,
+  password: process.env.DATABASE_PASSWORD || config.database.password,
+  dbName: process.env.DATABASE_DB_NAME || config.database.dbName,
+  extensions: [SeedManager, Migrator],
   seeder: {
     path: './seeder',
+  },
+  migrations: {
+    path: './migrations',
   },
 });

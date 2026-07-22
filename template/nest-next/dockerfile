@@ -1,0 +1,51 @@
+FROM node:20-alpine AS base
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME/bin:$PATH"
+RUN corepack enable
+RUN apk add --no-cache wait4x \
+    --repository https://mirrors.aliyun.com/alpine/v3.20/main \
+    --repository https://mirrors.aliyun.com/alpine/v3.20/community
+COPY . /app
+WORKDIR /app
+RUN apk add wait4x
+
+FROM base as prod-deps
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install
+
+FROM base as builder
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install
+RUN pnpm run build
+
+FROM base as migrator
+
+ENV DATABASE_HOST=""
+ENV DATABASE_PORT=""
+ENV DATABASE_USERNAME=""
+ENV DATABASE_PASSWORD=""
+ENV DATABASE_NAME=""
+
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install
+CMD ["sh", "./bash/migrator.sh"]
+
+FROM base as seeder
+
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install
+
+ENV DATABASE_HOST=""
+ENV DATABASE_PORT=""
+ENV DATABASE_USERNAME=""
+ENV DATABASE_PASSWORD=""
+ENV DATABASE_NAME=""
+
+CMD ["sh", "./bash/seeder.sh"]
+
+FROM base as final
+
+COPY --from=prod-deps /app/node_modules /app/node_modules
+COPY --from=builder /app/dist /app/dist
+
+EXPOSE 3000
+
+VOLUME [ "/app/dist/config", "/app/dist/i18n" ]
+
+CMD ["sh", "./bash/run.sh"]
