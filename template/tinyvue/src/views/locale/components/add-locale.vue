@@ -128,6 +128,8 @@ watch(open, (value) => {
   }
 })
 
+const toolAbortController = new AbortController()
+
 onMounted(async () => {
   navigator.modelContext.registerTool({
     name: 'add-i18n-entry',
@@ -166,12 +168,12 @@ onMounted(async () => {
         }],
       }
     },
-  })
+  }, { signal: toolAbortController.signal })
 })
 
 // 页面卸载时取消注册，避免内存泄漏和消息串扰
 onUnmounted(() => {
-  navigator.modelContext.unregisterTool('add-i18n-entry')
+  toolAbortController.abort()
 })
 </script>
 

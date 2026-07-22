@@ -5,6 +5,7 @@ import {
   Form as TinyForm,
   FormItem as TinyFormItem,
   Input as TinyInput,
+  Layout as TinyLayout,
   Modal as TinyModal,
   Row as TinyRow,
   UserHead as TinyUserHead,
@@ -240,11 +241,11 @@ async function handlePwdUpdateSubmit() {
   </div>
   <div v-if="state.isPwdUpdate">
     <TinyModal
-      v-model="state.isPwdUpdate" :lock-scroll="true" show-header show-footer mask-closable="true"
+      v-model="state.isPwdUpdate" :lock-scroll="true" show-header show-footer :mask-closable="true"
       height="auto" :width="modalSize" :title="$t('userInfo.modal.title.pwdUpdate')"
     >
       <template #default>
-        <tiny-layout>
+        <TinyLayout>
           <TinyForm :model="state.pwdData" :rules="rules" label-width="120px" :label-align="true" label-position="left">
             <TinyRow :flex="true">
               <TinyCol :span="10" label-width="100px">
@@ -278,7 +279,7 @@ async function handlePwdUpdateSubmit() {
               </TinyCol>
             </TinyRow>
           </TinyForm>
-        </tiny-layout>
+        </TinyLayout>
       </template>
       <template #footer>
         <TinyButton type="primary" @click="handlePwdUpdateSubmit">

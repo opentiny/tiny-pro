@@ -242,7 +242,7 @@ watch(appStore.$state, (newValue) => {
     </div>
     <div v-if="disTheme">
       <tiny-modal
-        v-model="disTheme" show-header show-footer :title="$t('theme.title.main')" mask-closable="true"
+        v-model="disTheme" show-header show-footer :title="$t('theme.title.main')" :mask-closable="true"
         height="auto" :width="modalSize"
       >
         <template #default>

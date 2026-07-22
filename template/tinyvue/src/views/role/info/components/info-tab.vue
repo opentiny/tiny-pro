@@ -200,6 +200,8 @@ function onRoleDelete() {
   roleTableRef.value.reload()
 }
 
+const toolAbortController = new AbortController()
+
 onMounted(async () => {
   navigator.modelContext.registerTool({
     name: 'add-role',
@@ -224,7 +226,7 @@ onMounted(async () => {
       await addRoleFormRef.value.onConfirm()
       return { content: [{ type: 'text', text: `收到: ${name}` }] }
     },
-  })
+  }, { signal: toolAbortController.signal })
 
   navigator.modelContext.registerTool({
     name: 'bind-menu-for-role',
@@ -255,12 +257,11 @@ onMounted(async () => {
       await menuDrawerRef.value.onConfirm()
       return { content: [{ type: 'text', text: `收到: ${role}` }] }
     },
-  })
+  }, { signal: toolAbortController.signal })
 })
 
 onUnmounted(() => {
-  navigator.modelContext.unregisterTool('add-role')
-  navigator.modelContext.unregisterTool('bind-menu-for-role')
+  toolAbortController.abort()
 })
 </script>
 

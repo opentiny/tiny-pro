@@ -77,9 +77,9 @@ function onRoleDelete(id: number, row) {
 }
 function getPermission(row: any) {
   let permissionDate = ''
-  if (row?.permission.length) {
-    row?.permission.forEach((item, index) => {
-      permissionDate = `${permissionDate} ${row?.permission[index].name}`
+  if (row?.permission?.length) {
+    row.permission.forEach((item, index) => {
+      permissionDate = `${permissionDate} ${row.permission[index].name}`
     })
   }
   return permissionDate
@@ -132,8 +132,8 @@ defineExpose({
     @edit-closed="onUpdate"
   >
     <TinyGridColumn type="expand" width="5%">
-      <template #default="data">
-        <permission-table :permission="data.row.permission" />
+      <template #default="{ row, skip }">
+        <permission-table v-if="!skip" :permission="row.permission" />
       </template>
     </TinyGridColumn>
     <TinyGridColumn field="id" width="20%" :title="$t('roleInfo.table.id')" />
@@ -159,34 +159,36 @@ defineExpose({
         },
       }"
     >
-      <template #default="data">
-        {{ getPermission(data.row) }}
+      <template #default="{ row, skip }">
+        <span v-if="!skip">{{ getPermission(row) }}</span>
       </template>
     </TinyGridColumn>
     <TinyGridColumn :title="$t('roleInfo.table.operations')">
-      <template #default="data">
-        <IconCueL class="del-icon" />
-        <a
-          v-permission="'role::update'"
-          class="operation-update"
-          @click="onMenuUpdate(data.row.menus, data.row.id, data.row)"
-        >
-          {{ $t('roleInfo.table.bind') }}
-        </a>
-        <TinyPopconfirm
-          :title="$t('menuInfo.modal.title.confirm')"
-          type="warning"
-          trigger="click"
-          @confirm="onRoleDelete(data.row.id, data.row)"
-        >
-          <template #reference>
-            <IconDel class="del-icon" />
+      <template #default="{ row, skip }">
+        <template v-if="!skip">
+          <IconCueL class="del-icon" />
+          <a
+            v-permission="'role::update'"
+            class="operation-update"
+            @click="onMenuUpdate(row.menus, row.id, row)"
+          >
+            {{ $t('roleInfo.table.bind') }}
+          </a>
+          <TinyPopconfirm
+            :title="$t('menuInfo.modal.title.confirm')"
+            type="warning"
+            trigger="click"
+            @confirm="onRoleDelete(row.id, row)"
+          >
+            <template #reference>
+              <IconDel class="del-icon" />
 
-            <a v-permission="'role::remove'" class="operation-update">
-              {{ $t('roleInfo.table.operations.delete') }}
-            </a>
-          </template>
-        </TinyPopconfirm>
+              <a v-permission="'role::remove'" class="operation-update">
+                {{ $t('roleInfo.table.operations.delete') }}
+              </a>
+            </template>
+          </TinyPopconfirm>
+        </template>
       </template>
     </TinyGridColumn>
   </TinyGrid>

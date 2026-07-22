@@ -105,7 +105,7 @@ defineExpose({
               <TinyOption
                 v-for="item in props.permissions"
                 :key="item.id"
-                :label="$t(item.name)"
+                :label="item.desc || item.name"
                 :value="item.id"
               />
             </TinySelect>
