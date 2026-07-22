@@ -98,7 +98,7 @@ export class I18Controller {
   })
   @Permission('i18n::query')
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: I18nRecordId) {
+  findOne(@Param('id') id: I18nRecordId) {
     return this.i18Service.findOne(id);
   }
 
@@ -114,10 +114,7 @@ export class I18Controller {
   @Reject()
   @Permission('i18n::update')
   @Patch(':id')
-  update(
-    @Param('id', ParseIntPipe) id: I18nRecordId,
-    @Body() updateI18Dto: UpdateI18Dto,
-  ) {
+  update(@Param('id') id: I18nRecordId, @Body() updateI18Dto: UpdateI18Dto) {
     return this.i18Service.update(id, updateI18Dto);
   }
 
