@@ -54,13 +54,11 @@ const chartSettings = ref({
   zoom: 1.2,
   top: '30px',
   itemStyle: {
-    normal: {
-      borderColor: 'skyblue',
-      borderWidth: 1,
-      shadowColor: '#ccc',
-      shadowBlur: 30,
-      opacity: 1,
-    },
+    borderColor: 'skyblue',
+    borderWidth: 1,
+    shadowColor: '#ccc',
+    shadowBlur: 30,
+    opacity: 1,
   },
   label: {
     show: true,

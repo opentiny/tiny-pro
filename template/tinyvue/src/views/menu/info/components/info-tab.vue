@@ -27,7 +27,7 @@ import UpdateForm from './update-form.vue'
 
 const { modalSize } = useResponsiveSize()
 
-const { t } = useI18n()
+const { t, te } = useI18n()
 const vLoading = Loading.directive
 const rawMenuData = ref<ITreeNodeData[]>([])
 const localeData = ref<{ value: string, label: string }[]>([])
@@ -221,7 +221,7 @@ function fetchLocalItems() {
     localeData.value = data.items.map((item) => {
       return {
         value: item.key,
-        label: t(item.key),
+        label: te(item.key) ? t(item.key) : item.key,
       }
     })
   })
@@ -232,6 +232,8 @@ watch(locale, () => {
   fetchLocalItems()
 })
 
+
+const toolAbortController = new AbortController()
 
 onMounted(async () => {
   Promise.all([fetchMenu(), fetchLocalItems()]).finally(() => {
@@ -280,11 +282,11 @@ onMounted(async () => {
       await onClickAdd()
       return { content: [{ type: 'text', text: `收到: ${name}` }] }
     },
-  })
+  }, { signal: toolAbortController.signal })
 })
 
 onUnmounted(() => {
-  navigator.modelContext.unregisterTool('add-menu')
+  toolAbortController.abort()
 })
 </script>
 
