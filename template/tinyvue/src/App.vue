@@ -7,7 +7,6 @@ import GlobalSetting from '@/components/global-setting/index.vue'
 import { tinyProOperatorSkillText } from '@/skills'
 import { sleep } from '@/utils/base-utils'
 import { useTheme } from './hooks/useTheme'
-import '@opentiny/next-remoter/dist/style.css'
 
 const theme = new TinyThemeTool()
 useTheme(theme)
