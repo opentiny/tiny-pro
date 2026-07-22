@@ -1,12 +1,42 @@
 {
-  "common":{
-    "INTERNAL_ERROR": "内部错误"
+  "common": {
+    "INTERNAL_ERROR": "内部错误",
+    "FORBIDDEN": "禁止访问"
   },
-  "permission":{
+  "permission": {
     "NOT_FOUND": "权限不存在"
   },
-  "menu":{
-    "EXISTS": "{name}已存在",
+  "menu": {
+    "EXISTS": "菜单 {name} 已存在",
     "NOT_FOUND": "菜单不存在"
+  },
+  "role": {
+    "NOT_FOUND": "角色不存在",
+    "EXISTS": "角色 {name} 已存在",
+    "NOT_EMPTY": "该角色下仍存在用户，请先清除用户"
+  },
+  "user": {
+    "NOT_FOUND": "用户不存在",
+    "EXISTS": "用户 {email} 已存在",
+    "PASSWORD_INCORRECT": "密码错误",
+    "PASSWORD_NOT_MATCH": "密码不匹配"
+  },
+  "auth": {
+    "INVALID_TOKEN": "无效的令牌",
+    "TOKEN_EXPIRED": "令牌已过期",
+    "SESSION_EXPIRED": "会话已过期"
+  },
+  "preview": {
+    "REJECT_THIS_REQUEST": "服务器拒绝了该请求，演示模式下不允许修改、新增或删除数据"
+  },
+  "lang": {
+    "NOT_EXISTS": "{lang} 不存在",
+    "EXISTS": "{name} 已存在",
+    "NOT_EXISTS_COMMON": "不存在",
+    "DELETE_LANG_CONFLICT": "请先清除 {name} 下的所有语言记录"
+  },
+  "i18n": {
+    "EXISTS": "国际化字段已存在",
+    "NOT_FOUND": "未找到"
   }
 }
