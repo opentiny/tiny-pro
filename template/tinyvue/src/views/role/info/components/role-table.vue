@@ -86,7 +86,7 @@ function getPermission(row: any) {
 }
 function onUpdate(args: any) {
   const menuIds = args.row.menus.map(menu => menu.id)
-  const permissionIds = args.row.permissionIds.map(item => item)
+  const permissionIds = args.row.permissionIds
   updateRole({
     id: args.row.id,
     name: args.row.name,
@@ -160,7 +160,6 @@ defineExpose({
           'text-field': 'name',
           'value-field': 'id',
         },
-        events:{change: onPermissionChange}
       }"
     >
       <template #default="data">
