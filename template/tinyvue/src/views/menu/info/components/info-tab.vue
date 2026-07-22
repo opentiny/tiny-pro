@@ -75,7 +75,8 @@ async function onClickAdd() {
     addModal.value = false
     await updateUserMenu()
     await fetchMenu()
-  } catch (error: any) {
+  }
+  catch (error: any) {
     if (error.response && error.response.data) {
       const errorMessage = error.response.data.message || '未知错误'
       TinyModal.message({
@@ -83,7 +84,8 @@ async function onClickAdd() {
         status: 'error',
       })
     }
-  } finally {
+  }
+  finally {
     setAddLoading(false)
   }
 }
@@ -232,14 +234,13 @@ watch(locale, () => {
   fetchLocalItems()
 })
 
-
 const toolAbortController = new AbortController()
 
 onMounted(async () => {
   Promise.all([fetchMenu(), fetchLocalItems()]).finally(() => {
     treeLoading.value = false
   })
-  navigator.modelContext.registerTool({
+  document.modelContext.registerTool({
     name: 'add-menu',
     title: '添加菜单',
     description: '添加菜单',
