@@ -84,12 +84,14 @@ async function addLang() {
     const { data } = await createLang({ name: lang.name })
     locales.pushLang(data)
     emits('langChange')
-  } catch (reason: any) {
+  }
+  catch (reason: any) {
     Notify({
       type: 'error',
       message: reason.response.data.message,
     })
-  } finally {
+  }
+  finally {
     lang.name = ''
     setLangPopoverClose()
   }
@@ -111,13 +113,15 @@ async function addLocale() {
     })
     emits('localChange')
     return true
-  } catch (reason: any) {
+  }
+  catch (reason: any) {
     Notify({
       type: 'error',
       message: reason.response.data.message,
     })
     return false
-  } finally {
+  }
+  finally {
     onClose()
   }
 }
@@ -131,7 +135,7 @@ watch(open, (value) => {
 const toolAbortController = new AbortController()
 
 onMounted(async () => {
-  navigator.modelContext.registerTool({
+  document.modelContext.registerTool({
     name: 'add-i18n-entry',
     title: '添加国际化词条',
     description: '添加国际化词条',

@@ -198,7 +198,7 @@ async function handlePermissionAddCancel() {
 const toolAbortController = new AbortController()
 
 onMounted(async () => {
-  navigator.modelContext.registerTool({
+  document.modelContext.registerTool({
     name: 'add-permission',
     title: '添加权限',
     description: '添加权限',

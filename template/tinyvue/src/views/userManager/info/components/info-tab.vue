@@ -357,7 +357,7 @@ fetchRole()
 const toolAbortController = new AbortController()
 
 onMounted(async () => {
-  navigator.modelContext.registerTool({
+  document.modelContext.registerTool({
     name: 'add-user',
     title: '添加用户',
     description: '添加用户，可选参数不需要用户提供，也不用创建表单卡片，直接根据用户提供的信息添加用户即可',

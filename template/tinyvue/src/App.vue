@@ -7,7 +7,6 @@ import GlobalSetting from '@/components/global-setting/index.vue'
 import { tinyProOperatorSkillText } from '@/skills'
 import { sleep } from '@/utils/base-utils'
 import { useTheme } from './hooks/useTheme'
-import '@opentiny/next-remoter/dist/style.css'
 
 const theme = new TinyThemeTool()
 useTheme(theme)
@@ -25,7 +24,7 @@ const design = {
   },
 }
 onMounted(() => {
-  navigator.modelContext.registerTool({
+  document.modelContext.registerTool({
     name: 'navigate_url',
     title: '导航到指定URL',
     description:  '当需要的工具在当前页面不可用时，使用此工具跳转到特定页面。例如：要跳转到 "/vue-pro/order/allOrder"，要创建价保时跳转到 "/vue-pro/price-protection/allPriceProtection"。',
@@ -43,7 +42,7 @@ onMounted(() => {
     },
   })
 
-  navigator.modelContext.registerTool({
+  document.modelContext.registerTool({
     name: 'system-overview',
     title: '系统概览',
     description: '整体介绍网站的模块、路由、页面工具、使用规范等等内容',
