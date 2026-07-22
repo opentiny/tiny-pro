@@ -17,11 +17,11 @@ export class AuthGuard implements CanActivate {
     private readonly apiTokenService: ApiTokenService,
   ) {}
   async canActivate(ctx: ExecutionContext): Promise<boolean> {
-    const isPubblic = this.reflector.getAllAndOverride<boolean>('isPublic', [
+    const isPublic = this.reflector.getAllAndOverride<boolean>('isPublic', [
       ctx.getHandler(),
       ctx.getClass(),
     ]);
-    if (isPubblic) {
+    if (isPublic) {
       return true;
     }
     const token = this.extractToken(ctx);
