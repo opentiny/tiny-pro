@@ -17,12 +17,11 @@ const proxyConfig = {
     target: env.VITE_SERVER_HOST,
     changeOrigin: true,
     logLevel: 'debug',
-    rewrite: (path: string) => {
-      return path.replace(
+    rewrite: (path: string) =>
+      path.replace(
         new RegExp(`${env.VITE_BASE_API}`),
         '',
-      )
-    },
+      ),
   },
   [env.VITE_MOCK_SERVER_HOST]: {
     target: env.VITE_SERVER_HOST,
