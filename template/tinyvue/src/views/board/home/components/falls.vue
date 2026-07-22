@@ -70,6 +70,7 @@ const options = ref({
   xAxis: {
     type: 'value',
     show: false,
+    boundaryGap: ['0%', '0%'],
   },
   yAxis: {
     type: 'category',
@@ -101,6 +102,10 @@ const options = ref({
   },
 })
 const chartExtend = ref({
+  xAxis: {
+    type: 'value',
+    boundaryGap: ['0%', '0%'],
+  },
   tooltip: {
     trigger: 'axis',
     axisPointer: {
@@ -141,7 +146,7 @@ const chartExtend = ref({
       stack: 'Total',
       itemStyle: {
         color: '#4e85f4',
-        barBorderRadius: [2, 2, 2, 2],
+        borderRadius: [2, 2, 2, 2],
       },
       label: {
         show: false,
@@ -154,7 +159,7 @@ const chartExtend = ref({
       stack: 'Total',
       itemStyle: {
         color: '#5f45ff',
-        barBorderRadius: [5, 5, 5, 5],
+        borderRadius: [5, 5, 5, 5],
       },
       label: {
         show: false,
@@ -167,7 +172,7 @@ const chartExtend = ref({
       stack: 'Total',
       itemStyle: {
         color: '#e2b525 ',
-        barBorderRadius: [5, 5, 5, 5],
+        borderRadius: [5, 5, 5, 5],
       },
       label: {
         show: false,

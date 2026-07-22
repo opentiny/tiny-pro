@@ -84,12 +84,14 @@ async function addLang() {
     const { data } = await createLang({ name: lang.name })
     locales.pushLang(data)
     emits('langChange')
-  } catch (reason: any) {
+  }
+  catch (reason: any) {
     Notify({
       type: 'error',
       message: reason.response.data.message,
     })
-  } finally {
+  }
+  finally {
     lang.name = ''
     setLangPopoverClose()
   }
@@ -111,13 +113,15 @@ async function addLocale() {
     })
     emits('localChange')
     return true
-  } catch (reason: any) {
+  }
+  catch (reason: any) {
     Notify({
       type: 'error',
       message: reason.response.data.message,
     })
     return false
-  } finally {
+  }
+  finally {
     onClose()
   }
 }
@@ -128,8 +132,10 @@ watch(open, (value) => {
   }
 })
 
+const toolAbortController = new AbortController()
+
 onMounted(async () => {
-  navigator.modelContext.registerTool({
+  document.modelContext.registerTool({
     name: 'add-i18n-entry',
     title: '添加国际化词条',
     description: '添加国际化词条',
@@ -166,12 +172,12 @@ onMounted(async () => {
         }],
       }
     },
-  })
+  }, { signal: toolAbortController.signal })
 })
 
 // 页面卸载时取消注册，避免内存泄漏和消息串扰
 onUnmounted(() => {
-  navigator.modelContext.unregisterTool('add-i18n-entry')
+  toolAbortController.abort()
 })
 </script>
 
