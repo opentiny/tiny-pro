@@ -21,7 +21,9 @@ export class GlobalExceptionFilter implements ExceptionFilter<Error> {
     const ctx = host.switchToHttp();
     const response: Response = ctx.getResponse();
     const request: Request = ctx.getRequest();
-    const lang = request.headers['accept-language']?.split(',')[0] || 'enUS';
+    const lang =
+      request.headers['accept-language']?.replace('-', '').split(',')[0] ||
+      'enUS';
     if (exception instanceof DomainError) {
       const { code, message, details, args } = exception;
       const translatedMessage = this.i18n.translate(message, { args, lang });
