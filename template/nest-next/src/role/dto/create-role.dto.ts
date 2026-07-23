@@ -15,12 +15,12 @@ export class CreateRoleDto {
   })
   @IsArray()
   @IsNotEmpty()
-  permissionIds: PermissionId[] = [];
+  permissionIds: PermissionId[];
   @ApiProperty({
     description: '菜单ID',
     type: [String],
   })
   @IsArray()
   @IsNotEmpty()
-  menuIds: MenuId[] = [];
+  menuIds: MenuId[];
 }

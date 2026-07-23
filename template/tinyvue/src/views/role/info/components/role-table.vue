@@ -49,7 +49,7 @@ function onMenuUpdate(data: ITreeNodeData[], roldId: number, role: Role) {
   emits('menuUpdate', data, roldId, role)
 }
 
-function onRoleDelete(id: number, row) {
+function onRoleDelete(id: string, row) {
   setLoading(true)
   deleteRole(id)
     .then(() => {
@@ -86,8 +86,11 @@ function getPermission(row: any) {
 }
 function onUpdate(args: any) {
   const menuIds = args.row.menus.map(menu => menu.id)
+  const permissionIds = args.row.permissionIds
   updateRole({
-    ...args.row,
+    id: args.row.id,
+    name: args.row.name,
+    permissionIds,
     menuIds,
   })
     .then(() => {
@@ -154,8 +157,8 @@ defineExpose({
           'collapse-tags': true,
           'value-key': 'id',
           'options': props.permissions,
-          'textField': 'name',
-          'valueField': 'id',
+          'text-field': 'name',
+          'value-field': 'id',
         },
       }"
     >

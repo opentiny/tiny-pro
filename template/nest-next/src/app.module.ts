@@ -24,6 +24,9 @@ import { randomBytes } from 'crypto';
 import { I18Module } from './i18/i18.module';
 import { I18n, Lang } from './i18';
 import { RejectRequestGuard } from '@app/shared';
+import { MockModule } from './mock/mock.module';
+import { ApplicationModule } from './application/application.module';
+import { Application } from './application';
 
 @Module({
   imports: [
@@ -84,6 +87,7 @@ import { RejectRequestGuard } from '@app/shared';
           UserRole,
           Lang,
           I18n,
+          Application,
         ],
         host: configService.get('database.host'),
         port: configService.get('database.port'),
@@ -113,6 +117,8 @@ import { RejectRequestGuard } from '@app/shared';
     UserModule,
     AuthModule,
     I18Module,
+    MockModule,
+    ApplicationModule,
   ],
   providers: [
     {

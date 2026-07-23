@@ -4,7 +4,7 @@ import {
   EventBus,
   ICommandHandler,
 } from '@nestjs/cqrs';
-import { User, UserId } from '../user.entity';
+import { User, UserId, UserRole } from '../user.entity';
 import { EntityRepository } from '@mikro-orm/mysql';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { UserRemovedEvent } from '../events';
@@ -20,6 +20,8 @@ export class BatchRemoveUserService implements ICommandHandler<BatchRemoveUser> 
   constructor(
     @InjectRepository(User)
     private readonly userRepo: EntityRepository<User>,
+    @InjectRepository(UserRole)
+    private readonly userRoleRepo: EntityRepository<UserRole>,
     private readonly eventBus: EventBus,
   ) {}
   async execute(command: BatchRemoveUser): Promise<UserId[]> {
@@ -30,6 +32,16 @@ export class BatchRemoveUserService implements ICommandHandler<BatchRemoveUser> 
     });
     const userIds = removedUser.map((user) => user.id);
     await this.userRepo.getEntityManager().transactional(async (em) => {
+      await this.userRoleRepo.nativeDelete(
+        {
+          user: {
+            id: {
+              $in: userIds,
+            },
+          },
+        },
+        { em },
+      );
       await this.userRepo.nativeDelete(
         {
           id: {

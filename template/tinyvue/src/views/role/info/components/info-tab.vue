@@ -58,7 +58,7 @@ getAllMenu()
     setLoading(false)
   })
 getAllPermission().then(({ data }) => {
-  permissions.value = data
+  permissions.value = data.items
 })
 const pagerConfigSm = {
   component: TinyPager,

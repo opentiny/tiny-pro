@@ -41,23 +41,20 @@ export class UserHasPermissionService implements IQueryHandler<UserHasPermission
       return false;
     }
     const rolePermissions = await this.rolePermissionRepository.find({
-      roleId: { $in: roles.map((item) => toRoleId(item.id)) },
+      roleId: { $in: roles.map((item) => toRoleId(item.roleId)) },
     });
     const rolePermissionIds = rolePermissions.map((item) => item.permissionId);
     const permissions = await this.permissionRepository.find({
       id: { $in: rolePermissionIds },
     });
-
     if (!permissions.length) {
       return false;
     }
-
     if (permissions.find((perm) => perm.name === '*')) {
       return true;
     }
     return permissionName.every(
       (name) => permissions.find((perm) => perm.name === name) !== undefined,
     );
-    // return permissions.every((perm) => permissionName.includes(perm.name));
   }
 }

@@ -19,12 +19,9 @@ export class I18Service {
     @InjectRepository(Lang) private readonly lang: EntityRepository<Lang>,
   ) {}
   async getFormat(lang: string) {
-    const data = await this.lang.find(
-      { name: lang ? lang : undefined },
-      {
-        populate: ['i18n'],
-      },
-    );
+    const data = await this.lang.find(lang ? { name: lang } : {}, {
+      populate: ['i18n'],
+    });
     const ret: Record<string, Record<string, string>> = {};
     for (let i = 0; i < data.length; i++) {
       const { name, i18n } = data[i];

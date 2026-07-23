@@ -6,6 +6,7 @@ import { TokenPayload } from './entity';
 import { AuthService } from './auth.service';
 import { ApiTokenService } from './api-token.service';
 import { InvalidToken } from './errors';
+import { DomainError } from '@app/shared';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -16,11 +17,11 @@ export class AuthGuard implements CanActivate {
     private readonly apiTokenService: ApiTokenService,
   ) {}
   async canActivate(ctx: ExecutionContext): Promise<boolean> {
-    const isPubblic = this.reflector.getAllAndOverride<boolean>('isPublic', [
+    const isPublic = this.reflector.getAllAndOverride<boolean>('isPublic', [
       ctx.getHandler(),
       ctx.getClass(),
     ]);
-    if (isPubblic) {
+    if (isPublic) {
       return true;
     }
     const token = this.extractToken(ctx);
@@ -42,10 +43,13 @@ export class AuthGuard implements CanActivate {
         return true;
       }
       await this.authService.tokenAlive(token);
-    } catch {
+      return true;
+    } catch (error) {
+      if (error instanceof DomainError) {
+        throw error;
+      }
       throw new InvalidToken();
     }
-    return true;
   }
   private extractToken(ctx: ExecutionContext): string {
     const request: Request = ctx.switchToHttp().getRequest();

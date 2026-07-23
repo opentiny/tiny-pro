@@ -76,6 +76,7 @@ defineExpose({
   },
   onConfirm,
 })
+
 </script>
 
 <template>
@@ -124,4 +125,3 @@ defineExpose({
   </TinyModal>
 </template>
 
-<style lang="less" scoped></style>

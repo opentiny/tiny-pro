@@ -31,27 +31,31 @@ export class UpdateRoleHandler implements ICommandHandler<UpdateRoleCommand> {
   ) {}
   async execute(command: UpdateRoleCommand): Promise<RoleId> {
     const { id, name } = command;
-    const role = await this.role.findOne(id);
-    if (!role) {
-      throw new RoleNotFound();
-    }
-    if (name) {
-      role.name = name;
-    }
-    if (command.permissionIds) {
-      command.permissionIds
-        .map((pm) => {
-          return this.rolePermission.create({ roleId: id, permissionId: pm });
-        })
-        .forEach((perm) => this.em.persist(perm));
-    }
-    if (command.menuIds) {
-      command.menuIds
-        .map((menuId) => this.roleMenu.create({ roleId: id, menuId }))
-        .forEach((menu) => this.em.persist(menu));
-    }
-    this.em.persist(role);
-    await this.em.flush();
-    return role.id;
+    return this.em.transactional(async (em) => {
+      const role = await this.role.findOne({ id }, { em });
+      if (!role) {
+        throw new RoleNotFound();
+      }
+      if (name) {
+        role.name = name;
+      }
+      if (command.permissionIds) {
+        await em.nativeDelete(RolePermission, { roleId: id });
+        command.permissionIds
+          .map((pm) => {
+            return em.create(RolePermission, { roleId: id, permissionId: pm });
+          })
+          .forEach((pm) => em.persist(pm));
+      }
+      if (command.menuIds) {
+        await em.nativeDelete(RoleMenu, { roleId: id });
+        command.menuIds
+          .map((menuId) => em.create(RoleMenu, { roleId: id, menuId }))
+          .forEach((menu) => em.persist(menu));
+      }
+      em.persist(role);
+      await em.flush();
+      return role.id;
+    });
   }
 }

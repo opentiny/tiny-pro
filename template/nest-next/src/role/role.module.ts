@@ -19,9 +19,12 @@ import {
 } from './commands';
 import { OnPermissionRemoved } from './event-handler';
 import { OnMenuRemoved } from './event-handler/on-menu-removed';
+import { UserRole } from '../user';
 
 @Module({
-  imports: [MikroOrmModule.forFeature([Role, RoleMenu, RolePermission])],
+  imports: [
+    MikroOrmModule.forFeature([Role, RoleMenu, RolePermission, UserRole]),
+  ],
   controllers: [RoleController],
   providers: [
     RoleService,

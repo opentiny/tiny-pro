@@ -7,6 +7,7 @@ import config from './configs/config.json';
 import { Role, RoleMenu, RolePermission } from './src/role';
 import { User, UserRole } from './src/user';
 import { I18n, Lang } from './src/i18';
+import { Application } from './src/application';
 
 export default defineConfig({
   entities: [
@@ -19,6 +20,7 @@ export default defineConfig({
     UserRole,
     Lang,
     I18n,
+    Application,
   ],
   host: config.database.host,
   port: config.database.port,

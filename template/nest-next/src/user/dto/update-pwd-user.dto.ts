@@ -28,4 +28,11 @@ export class UpdatePwdUserDto {
     message: i18nValidationMessage<I18nTranslations>('validation.NOT_EMPTY'),
   })
   oldPassword: string;
+  @ApiProperty({
+    description: '确认新密码',
+  })
+  @IsNotEmpty({
+    message: i18nValidationMessage<I18nTranslations>('validation.NOT_EMPTY'),
+  })
+  confirmNewPassword: string;
 }

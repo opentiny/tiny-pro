@@ -4,7 +4,6 @@ import Redis from 'ioredis';
 import { Role } from '../role.entity';
 import { EntityRepository } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { roleTotal } from '@app/shared';
 
 export class GetRoleTotal extends Query<number> {
   constructor(public readonly name?: string) {
@@ -23,12 +22,13 @@ export class GetRoleTotalHandler implements IQueryHandler<GetRoleTotal> {
     this.redis = this.redisService.getOrThrow();
   }
   async execute(query: GetRoleTotal): Promise<number> {
-    if (!query.name) {
-      const cnt = await this.roleRepo.count({
-        name: query.name ? { $like: `${query.name}` } : undefined,
-      });
-      return cnt;
-    }
-    return this.redis.get(roleTotal()).then((val) => (val ? Number(val) : 1));
+    const cnt = await this.roleRepo.count(
+      query.name
+        ? {
+            name: { $like: `${query.name}` },
+          }
+        : {},
+    );
+    return cnt;
   }
 }
