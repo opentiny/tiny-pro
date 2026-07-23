@@ -22,7 +22,6 @@ import {
 import { I18 } from './dto/i18n-info.dto';
 import { Permission, Reject } from '@app/shared';
 import { CreateI18Dto } from './dto/create-i18.dto';
-import { BatchRemoveI18Records } from './dto/batch-remove-i18.dto';
 import { UpdateI18Dto } from './dto/update-i18.dto';
 import type { I18nRecordId, LangId } from './i18.entites';
 import { FindAllI18n } from './dto/find-all-i18n.dto';
@@ -99,7 +98,7 @@ export class I18Controller {
   })
   @Permission('i18n::query')
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: I18nRecordId) {
+  findOne(@Param('id') id: I18nRecordId) {
     return this.i18Service.findOne(id);
   }
 
@@ -115,10 +114,7 @@ export class I18Controller {
   @Reject()
   @Permission('i18n::update')
   @Patch(':id')
-  update(
-    @Param('id', ParseIntPipe) id: I18nRecordId,
-    @Body() updateI18Dto: UpdateI18Dto,
-  ) {
+  update(@Param('id') id: I18nRecordId, @Body() updateI18Dto: UpdateI18Dto) {
     return this.i18Service.update(id, updateI18Dto);
   }
 
@@ -134,7 +130,7 @@ export class I18Controller {
   @Reject()
   @Permission('i18n::remove')
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: I18nRecordId) {
+  remove(@Param('id') id: I18nRecordId) {
     return this.i18Service.remove(id);
   }
 
@@ -145,7 +141,7 @@ export class I18Controller {
   @Reject()
   @Permission('i18n::batch-remove')
   @Post('/batch')
-  batchRemove(@Body() body: BatchRemoveI18Records) {
-    return this.i18Service.batchRemove(body.ids);
+  batchRemove(@Body() body: I18nRecordId[]) {
+    return this.i18Service.batchRemove(body);
   }
 }

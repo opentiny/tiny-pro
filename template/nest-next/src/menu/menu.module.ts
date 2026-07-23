@@ -6,12 +6,18 @@ import {
   RemoveMenuCommandHandler,
   UpdateMenuCommandHandler,
 } from './commands';
-import { FindAllMenuQueryHandler, FindMenuHandler } from './queries';
+import {
+  FindAllMenuQueryHandler,
+  FindMenuHandler,
+  GetUserMenuService,
+} from './queries';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { Menu } from './menu.entity';
+import { User } from '../user';
+import { RoleMenu } from '../role';
 
 @Module({
-  imports: [MikroOrmModule.forFeature([Menu])],
+  imports: [MikroOrmModule.forFeature([Menu, User, RoleMenu])],
   controllers: [MenuController],
   providers: [
     MenuService,
@@ -20,6 +26,7 @@ import { Menu } from './menu.entity';
     UpdateMenuCommandHandler,
     FindAllMenuQueryHandler,
     FindMenuHandler,
+    GetUserMenuService,
   ],
 })
 export class MenuModule {}

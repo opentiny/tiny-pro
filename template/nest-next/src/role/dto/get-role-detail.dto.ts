@@ -55,13 +55,13 @@ export class GetRoleInfo {
   @ApiProperty({
     type: [RoleInfoItem],
   })
-  item: RoleInfoItem[];
+  items: RoleInfoItem[];
   @ApiProperty({
     type: PaginationMeta,
   })
   meta: PaginationMeta;
   constructor(item: RoleInfoItem[], meta: PaginationMeta) {
-    this.item = item;
+    this.items = item;
     this.meta = meta;
   }
 }

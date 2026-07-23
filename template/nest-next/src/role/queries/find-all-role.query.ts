@@ -23,7 +23,7 @@ export class FindAllRoleHandler implements IQueryHandler<FindAllRole> {
     const filter =
       query.page && query.limit
         ? {
-            page: query.page,
+            offset: (query.page - 1) * query.limit,
             limit: query.limit,
           }
         : {};
@@ -31,7 +31,7 @@ export class FindAllRoleHandler implements IQueryHandler<FindAllRole> {
       ...filter,
       where: query.name
         ? {
-            name: query.name,
+            name: { $like: query.name },
           }
         : undefined,
     });

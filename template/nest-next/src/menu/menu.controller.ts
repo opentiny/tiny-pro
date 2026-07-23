@@ -53,7 +53,7 @@ export class MenuController {
 
   @ApiOperation({ summary: '菜单修改' })
   @ApiOkResponse({ type: UpdateMenuResponse })
-  @Patch(':id')
+  @Patch('')
   @Reject()
   @Permission('menu::update')
   update(@Body() updateMenuDto: UpdateMenuDto) {

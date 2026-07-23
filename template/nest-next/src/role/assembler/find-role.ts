@@ -12,7 +12,7 @@ export const assembleFindRole = (
   return new FindRoleResponse({
     id: role.id,
     name: role.name,
-    permissions: [...permission],
+    permission: [...permission],
     menus: menuTree,
   });
 };

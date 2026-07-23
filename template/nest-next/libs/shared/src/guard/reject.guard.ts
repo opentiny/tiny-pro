@@ -9,6 +9,7 @@ import { Reflector } from '@nestjs/core';
 import { I18nTranslations } from '../.generate/i18n.generated';
 import { I18nContext } from 'nestjs-i18n';
 import { ConfigureService } from '@app/configure';
+import { DomainError } from '../error.base';
 
 @Injectable()
 export class RejectRequestGuard implements CanActivate {
@@ -31,11 +32,15 @@ export class RejectRequestGuard implements CanActivate {
     if (!i18n) {
       return Promise.resolve(false);
     }
-    throw new HttpException(
-      i18n.t('exception.preview.REJECT_THIS_REQUEST', {
-        lang: I18nContext?.current()?.lang || 'enUS',
-      }),
-      HttpStatus.BAD_REQUEST,
-    );
+    throw new RejectRequest();
+  }
+}
+
+export class RejectRequest extends DomainError {
+  constructor() {
+    super({
+      message: 'exception.preview.REJECT_THIS_REQUEST',
+      code: HttpStatus.BAD_REQUEST,
+    })
   }
 }

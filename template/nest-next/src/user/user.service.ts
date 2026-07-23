@@ -15,6 +15,7 @@ import { RemoveUser } from './command/remove-user.command';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdatePwdUserDto } from './dto/update-pwd-user.dto';
 import { UpdatePwdAdminDto } from './dto/update-pwd-admin.dto';
+import { PasswordNotMatchError } from './error/password-not-match.error';
 
 @Injectable()
 export class UserService {
@@ -25,26 +26,35 @@ export class UserService {
 
   async createUser(dto: CreateUserDto) {
     const userId = await this.cb.execute(new CreateUserCommand(dto));
-
     const [userInfo] = await this.qb.execute(new GetUserInfo({ id: [userId] }));
     return userInfo;
   }
 
   async removeUser(email: string) {
-    const id = await this.cb.execute(new RemoveUser(email));
-    const [userInfo] = await this.qb.execute(new GetUserInfo({ id: [id] }));
+    const [userInfo] = await this.qb.execute(
+      new GetUserInfo({ email: [email] }),
+    );
+    await this.cb.execute(new RemoveUser(email));
     return userInfo;
   }
 
   async updateUserInfo(dto: UpdateUserDto) {
-    const id = await this.qb.execute(new UpdateUserInfo(dto));
+    const id = await this.cb.execute(new UpdateUserInfo(dto));
     const [userInfo] = await this.qb.execute(new GetUserInfo({ id: [id] }));
     return userInfo;
   }
 
   async changePassword(dto: UpdatePwdUserDto) {
+    if (dto.confirmNewPassword !== dto.newPassword) {
+      throw new PasswordNotMatchError();
+    }
     await this.cb.execute(
-      new ChangePassword(dto.email, dto.oldPassword, dto.newPassword),
+      new ChangePassword(
+        dto.email,
+        dto.oldPassword,
+        dto.newPassword,
+        dto.confirmNewPassword,
+      ),
     );
   }
   async resetPassword(dto: UpdatePwdAdminDto) {
@@ -63,8 +73,8 @@ export class UserService {
   }
 
   async batchRemove(email: string[]) {
-    const userIds = await this.cb.execute(new BatchRemoveUser(email));
-    const userInfos = await this.qb.execute(new GetUserInfo({ id: userIds }));
+    const userInfos = await this.qb.execute(new GetUserInfo({ email }));
+    await this.cb.execute(new BatchRemoveUser(email));
     return userInfos;
   }
 }

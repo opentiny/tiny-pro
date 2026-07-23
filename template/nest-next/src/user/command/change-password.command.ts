@@ -13,6 +13,7 @@ import { UserPasswordChangedEvent } from '../events';
 export class ChangePassword extends Command<UserId> {
   constructor(
     public readonly email: string,
+    public readonly oldPassword: string,
     public readonly password: string,
     public readonly confirmPassword: string,
   ) {
@@ -27,13 +28,15 @@ export class ChangePasswordService implements ICommandHandler<ChangePassword> {
     if (!user) {
       throw new UserNotFound();
     }
-    console.log(command.password);
-    if (!user.verifyPassword(command.password)) {
+    if (
+      !user.verifyPassword(command.oldPassword) ||
+      command.oldPassword !== command.confirmPassword
+    ) {
       throw new PasswordIncorrect();
     }
     user.changePassword(command.password);
     await this.userRepository.upsert(user);
-    this.eventBus.publish(new UserPasswordChangedEvent(user.id));
+    await this.eventBus.publish(new UserPasswordChangedEvent(user.id));
     return user.id;
   }
   constructor(

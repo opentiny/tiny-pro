@@ -40,23 +40,23 @@ async function fetchData(email: string) {
     </li>
     <li>
       <span class="title">{{ $t('userInfo.table.name') }}：</span><!-- 使用一个ref来控制输入框的显示与隐藏 -->
-      <span class="desc">{{ $t(`${state.userData.name}`) }}</span>
+      <span class="desc">{{ state.userData.name }}</span>
     </li>
     <li>
       <span class="title">{{ $t('userInfo.table.email') }}：</span>
-      <span class="desc">{{ $t(`${state.userData.email}`) }}</span>
+      <span class="desc">{{ state.userData.email }}</span>
     </li>
     <li>
       <span class="title">{{ $t('userInfo.table.department') }}：</span>
-      <span class="desc">{{ $t(`${state.userData.department}`) }}</span>
+      <span class="desc">{{ state.userData.department }}</span>
     </li>
     <li>
       <span class="title">{{ $t('userInfo.table.employeeType') }}：</span>
-      <span class="desc">{{ $t(`${state.userData.employeeType}`) }}</span>
+      <span class="desc">{{ state.userData.employeeType }}</span>
     </li>
     <li>
       <span class="title">{{ $t('userInfo.table.job') }}：</span>
-      <span v-if="state.userData.role && state.userData.role[0]" class="desc">{{ $t(`${state.userData.role[0].name}`) }}</span>
+      <span v-if="state.userData.role && state.userData.role[0]" class="desc">{{ state.userData.role[0].name }}</span>
     </li>
     <li>
       <span class="title">{{ $t('userInfo.table.probationStart') }}：</span>
@@ -68,11 +68,11 @@ async function fetchData(email: string) {
     </li>
     <li>
       <span class="title">{{ $t('userInfo.table.probationDuration') }}：</span>
-      <span class="desc">{{ $t(`${state.userData.probationDuration}`) }}{{ $t('userInfo.day') }}</span>
+      <span class="desc">{{ state.userData.probationDuration }}{{ $t('userInfo.day') }}</span>
     </li>
     <li>
       <span class="title">{{ $t('userInfo.table.address') }}：</span>
-      <span class="desc">{{ $t(`${state.userData.address}`) }}</span>
+      <span class="desc">{{ state.userData.address }}</span>
     </li>
     <li>
       <span class="title">{{ $t('userInfo.table.status') }}：</span>

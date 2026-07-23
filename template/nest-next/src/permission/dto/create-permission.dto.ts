@@ -16,10 +16,7 @@ export class CreatePermissionDto {
   @ApiProperty({
     description: '权限在后台, 人类可读的短简介',
   })
-  @IsNotEmpty({
-    message: i18nValidationMessage<I18nTranslations>('validation.NOT_EMPTY'),
-  })
-  desc: string;
+  desc: string = '';
 }
 
 export class CreatePermissionResponse {

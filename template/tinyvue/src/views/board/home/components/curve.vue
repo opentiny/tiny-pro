@@ -65,6 +65,7 @@ const options = ref({
       min: 0,
       max: 50,
       interval: 5,
+      boundaryGap: ['0%', '0%'],
       axisLabel: {
         formatter: '{value} s',
       },
@@ -74,6 +75,7 @@ const options = ref({
       min: 0,
       max: 30,
       interval: 5,
+      boundaryGap: ['0%', '0%'],
       axisLabel: {
         formatter: '{value}',
       },
@@ -82,6 +84,22 @@ const options = ref({
 })
 const chartExtend = ref({
   legend: getLegendConfig(),
+  xAxis: [
+    {
+      type: 'category',
+      boundaryGap: true,
+    },
+  ],
+  yAxis: [
+    {
+      type: 'value',
+      boundaryGap: ['0%', '0%'],
+    },
+    {
+      type: 'value',
+      boundaryGap: ['0%', '0%'],
+    },
+  ],
   tooltip: {
     trigger: 'axis',
     axisPointer: {
@@ -101,7 +119,7 @@ const chartExtend = ref({
       barWidth: 12,
       itemStyle: {
         color: '#4e85f4',
-        barBorderRadius: [5, 5, 0, 0],
+        borderRadius: [5, 5, 0, 0],
       },
       tooltip: {
         valueFormatter(value: any) {
@@ -154,9 +172,7 @@ const chartExtend = ref({
       showSymbol: false,
       yAxisIndex: 1,
       lineStyle: {
-        normal: {
-          color: '#5f45ff',
-        },
+        color: '#5f45ff',
       },
       // 区域填充样式
       areaStyle: {
@@ -230,9 +246,7 @@ const chartExtend = ref({
       showSymbol: false,
       yAxisIndex: 1,
       lineStyle: {
-        normal: {
-          color: '#ff9e03',
-        },
+        color: '#ff9e03',
       },
       areaStyle: {
         color: {

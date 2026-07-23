@@ -20,7 +20,7 @@ const props = defineProps<{
 
 interface TreeSelectMenu {
   label: string
-  id: number
+  id: string;
   children: TreeSelectMenu[]
 }
 
@@ -52,7 +52,7 @@ function cover(data: ITreeNodeData[]) {
   const dfs = (menu: ITreeNodeData) => {
     const ret: TreeSelectMenu = {
       label: menu.label,
-      id: Number(menu.id),
+      id: menu.id.toString(),
       children: [],
     }
     for (let i = 0; i < menu.children.length; i += 1) {

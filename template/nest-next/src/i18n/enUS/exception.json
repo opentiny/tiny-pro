@@ -12,12 +12,14 @@
   },
   "role":{
     "NOT_FOUND": "Role not found",
-    "EXISTS": "Role {name} Exists"
+    "EXISTS": "Role {name} Exists",
+    "NOT_EMPTY": "There are users under the role, please clear them"
   },
   "user":{
     "NOT_FOUND": "User not found",
     "EXISTS": "User {email} Exists",
-    "PASSWORD_INCORRECT": "Password Incorrect"
+    "PASSWORD_INCORRECT": "Password Incorrect",
+    "PASSWORD_NOT_MATCH": "Password not match"
   },
   "auth":{
     "INVALID_TOKEN": "Invalid Token",

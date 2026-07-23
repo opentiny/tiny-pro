@@ -28,8 +28,9 @@ export class RoleService {
   ) {}
 
   async remove(id: RoleId) {
-    const roleId = await this.cb.execute(new RemoveRoleCommand(id));
-    return this.findRole(roleId);
+    const roleInfo = await this.findRole(id);
+    await this.cb.execute(new RemoveRoleCommand(id));
+    return roleInfo;
   }
 
   async updateRole(dto: UpdateRoleDto) {
@@ -81,7 +82,7 @@ export class RoleService {
     const [permissionIdMap, menuIdMap, total] = await Promise.all([
       this.qb.execute(new FindRolePermissionId(roleIds)),
       this.qb.execute(new FindRoleMenuId(roleIds)),
-      this.qb.execute(new GetRoleTotal()),
+      this.qb.execute(new GetRoleTotal(name)),
     ]);
     const allPermIds = [...permissionIdMap.values()].flat();
     const allMenuIds = [...menuIdMap.values()].flat();
@@ -91,6 +92,7 @@ export class RoleService {
     ]);
     const permMap = new Map(permissions.map((p) => [p.id, p]));
     const menuMap = new Map(menus.map((m) => [m.id, m]));
+
     const roleDetail = assembleGetDetail(
       roles,
       permissionIdMap,
