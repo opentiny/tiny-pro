@@ -1,8 +1,10 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20260722053021 extends Migration {
+export class Migration20260723130302 extends Migration {
 
   override up(): void | Promise<void> {
+    this.addSql(`create table \`application\` (\`id\` varchar(36) not null, \`name\` text not null, \`description\` text not null, \`icon\` text not null, \`tag\` text not null, \`classify\` text not null, primary key (\`id\`)) default character set utf8mb4 engine = InnoDB;`);
+
     this.addSql(`create table \`lang\` (\`id\` varchar(36) not null, \`name\` text not null, primary key (\`id\`)) default character set utf8mb4 engine = InnoDB;`);
 
     this.addSql(`create table \`i18\` (\`id\` varchar(36) not null, \`key\` text not null, \`content\` longtext not null, \`lang_id\` varchar(36) not null, primary key (\`id\`)) default character set utf8mb4 engine = InnoDB;`);
@@ -40,6 +42,7 @@ export class Migration20260722053021 extends Migration {
     this.addSql(`alter table \`i18\` drop foreign key \`i18_lang_id_foreign\`;`);
     this.addSql(`alter table \`user_role\` drop foreign key \`user_role_user_id_foreign\`;`);
 
+    this.addSql(`drop table if exists \`application\`;`);
     this.addSql(`drop table if exists \`lang\`;`);
     this.addSql(`drop table if exists \`i18\`;`);
     this.addSql(`drop table if exists \`menu\`;`);

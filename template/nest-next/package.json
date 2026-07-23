@@ -22,8 +22,8 @@
     "schema:update": "mikro-orm schema:update --run",
     "seeder:create": "mikro-orm seeder:create",
     "seeder:run": "mikro-orm seeder:run",
-    "migrate:create": "mikro-orm migrations:create",
-    "migrate:run": "mikro-orm migrations:up"
+    "migrate:create": "mikro-orm migration:create",
+    "migrate:run": "mikro-orm migration:up"
   },
   "dependencies": {
     "@liaoliaots/nestjs-redis": "^10.0.0",
