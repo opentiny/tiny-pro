@@ -48,6 +48,8 @@ axios.interceptors.request.use(
   },
 )
 
+let retry = false
+
 axios.interceptors.response.use(
   (response: AxiosResponse<HttpResponse>) => {
     const res = response
@@ -65,10 +67,12 @@ axios.interceptors.response.use(
       })
     }
     if (status === 401) {
-      const originalRequest = error.config
-      if (originalRequest._retry) {
+      if (retry) {
+        retry = false
         clearToken()
-        router.replace({ name: 'login' })
+        setTimeout(() => {
+          router.replace({ name: 'login' })
+        }, 0)
         Modal.message({
           message: locale.t('http.error.TokenExpire'),
           status: 'error',
@@ -76,10 +80,12 @@ axios.interceptors.response.use(
         return Promise.reject(error)
       }
 
-      originalRequest._retry = true
+      retry = true
       if (!getRefreshToken()) {
         clearToken()
-        router.replace({ name: 'login' })
+        setTimeout(() => {
+          router.replace({ name: 'login' })
+        }, 0)
         Modal.message({
           message: locale.t('http.error.TokenExpire'),
           status: 'error',
@@ -109,14 +115,13 @@ axios.interceptors.response.use(
             refreshPromise = null
           })
       }
-
       return refreshPromise
         .then((newToken) => {
-          if (!originalRequest.headers) {
-            originalRequest.headers = {}
+          if (!error.config.headers) {
+            error.config.headers = {}
           }
-          originalRequest.headers.Authorization = `Bearer ${newToken}`
-          return axios.request(originalRequest)
+          error.config.headers.Authorization = `Bearer ${newToken}`
+          return axios.request(error.config)
         })
         .catch((err) => {
           return Promise.reject(err)
