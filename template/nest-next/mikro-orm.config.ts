@@ -28,7 +28,7 @@ export default defineConfig({
   driver: MySqlDriver,
   user: process.env.DATABASE_USER || config.database.user,
   password: process.env.DATABASE_PASSWORD || config.database.password,
-  dbName: process.env.DATABASE_DB_NAME || config.database.dbName,
+  dbName: process.env.DATABASE_NAME || config.database.dbName,
   extensions: [SeedManager, Migrator],
   seeder: {
     path: './seeder',

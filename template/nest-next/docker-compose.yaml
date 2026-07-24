@@ -1,6 +1,6 @@
 services:
   mysql:
-    image: mysql:8.0
+    image: mysql:8
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
@@ -38,16 +38,23 @@ services:
       DATABASE_PASSWORD: root
       DATABASE_NAME: demo_tiny_pro
     depends_on:
-      - mysql
-      - db_deploy
+      db_deploy:
+        condition: service_completed_successfully
   srv:
     build:
       context: .
       dockerfile: dockerfile
       target: final
-
+    environment:
+      DATABASE_HOST: mysql
+      DATABASE_PORT: 3306
+      DATABASE_USERNAME: root
+      DATABASE_PASSWORD: root
+      DATABASE_NAME: demo_tiny_pro
+    ports:
+      - "3000:3000"
     depends_on:
-      - mysql
-      - redis
+      seeder:
+        condition: service_completed_successfully
     volumes:
       - ./config:/app/dist/config
