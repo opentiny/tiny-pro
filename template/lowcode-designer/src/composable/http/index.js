@@ -1,8 +1,9 @@
 import { createApp } from 'vue'
-import { HttpService } from '@opentiny/tiny-engine'
 import { useBroadcastChannel } from '@vueuse/core'
 import { constants } from '@opentiny/tiny-engine-utils'
+import HttpService from './httpServices'
 import Login from './Login.vue'
+import mockConfig from '../../routes'
 
 const LOGIN_EXPIRED_CODE = 401
 const { BROADCAST_CHANNEL } = constants
@@ -41,7 +42,7 @@ const preRequest = (config) => {
 
 const preResponse = (res) => {
   if (res.data?.error) {
-    showError(res.config?.url, res?.data?.error?.message)
+    showError(res.config?.url, res?.data?.error?.message || res?.data?.error)
 
     return Promise.reject(res.data.error)
   }
@@ -81,7 +82,6 @@ const openLogin = () => {
 }
 
 const errorResponse = (error) => {
-  // 用户信息失效时，弹窗提示登录
   const { response } = error
 
   if (response?.status === LOGIN_EXPIRED_CODE) {
@@ -124,7 +124,9 @@ const customizeHttpService = () => {
     interceptors: {
       request: [preRequest],
       response: [[preResponse, errorResponse]]
-    }
+    },
+    mockConfig,
+    enableMock: true
   }
 
   HttpService.apis.setOptions(options)

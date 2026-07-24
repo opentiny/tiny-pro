@@ -22,7 +22,12 @@
     "@opentiny/vue-locale": "~3.20.0",
     "@opentiny/vue-renderless": "~3.20.0",
     "@opentiny/vue-theme": "~3.20.0",
+    "@opentiny/vue-theme-mobile": "~3.20.0",
     "@vueuse/core": "^9.6.0",
+    "dexie": "^4.2.2",
+    "monaco-editor": "0.51.0",
+    "axios": "^1.12.0",
+    "axios-mock-adapter": "^2.1.0",
     "vue": "^3.4.21"
   },
   "devDependencies": {

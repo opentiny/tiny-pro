@@ -47,6 +47,7 @@
   "scripts": {
     "dev": "pnpm -F tiny-pro-vue start",
     "dev:backend": "pnpm -F tinyui-nestjs-server start",
+    "dev:designer": "pnpm -F template/lowcode-designer dev",
     "describe": "npm-scripts-info",
     "build": "run-s build:*",
     "build:main": "tsc -p tsconfig.json",
