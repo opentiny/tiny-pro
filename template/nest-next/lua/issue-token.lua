@@ -13,7 +13,9 @@ local sessionLimit = tonumber(ARGV[10])
 local totalSession = redis.call('ZCARD', 'user:' .. uid .. ':session')
 local removeCount = totalSession - sessionLimit + 1
 
-if removeCount > 0 then
+
+-- 如果限制了数量且需要移除旧会话，则移除旧会话
+if removeCount > 0 and sessionLimit ~= -1 then
 
   local removed = redis.call('zpopmin', 'user:' .. uid .. ':session', removeCount)
 
