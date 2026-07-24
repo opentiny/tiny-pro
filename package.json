@@ -59,6 +59,7 @@
     "test:unit:backend": "pnpm -F tinyui-nestjs-server test",
     "test:cov:backend": "pnpm -F tinyui-nestjs-server test:cov",
     "test:e2e": "playwright test",
+    "test:cli": "vitest",
     "watch": "run-s clean build:main && run-p \"build:main -- -w\"  ",
     "cov": "run-s build test:unit cov:html && open-cli coverage/index.html",
     "cov:html": "nyc report --reporter=html",
@@ -118,7 +119,8 @@
     "tslint-config-airbnb": "^5.11.1",
     "tslint-config-prettier": "^1.18.0",
     "tslint-immutable": "^6.0.1",
-    "typescript": "^5.1.6"
+    "typescript": "^5.1.6",
+    "vitest": "^4.1.10"
   },
   "ava": {
     "failFast": true,
