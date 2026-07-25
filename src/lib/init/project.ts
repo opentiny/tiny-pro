@@ -100,20 +100,23 @@ const configureEnvFile = (answers: ProjectInfo, to: string) => {
 
 export const createProjectSync = async (answers: ProjectInfo) => {
   const { name, serverConfirm } = answers;
-  // const templatePath = VueVersion.Vue3;
-  // const from = utils.getTemplatePath(templatePath);
-  // const to = utils.getDistPath(serverConfirm ? `${name}/web` : name);
-
-  // fs.copyTpl(from, to);
-
-  // configurePackageJson(answers, to);
-  // configureEnvFile(answers, to);
+  const templatePath = VueVersion.Vue3;
+  const from = utils.getTemplatePath(templatePath);
+  const to = utils.getDistPath(serverConfirm ? `${name}/web` : name);
 
   if (serverConfirm) {
     await createServerSync(answers);
   }
+  copySync(from, to, {
+    filter: (src) => {
+      return !src.includes('node_modules')
+    }
+  })
 
-  // createLowcodeDesignerSync(answers);
+  configurePackageJson(answers, to);
+  configureEnvFile(answers, to);
+
+  createLowcodeDesignerSync(answers);
 };
 
 const runNpmInstall = (cwd: string, label: string) => {

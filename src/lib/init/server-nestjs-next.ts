@@ -2,6 +2,8 @@ import inquirer, { QuestionCollection } from "inquirer";
 import { ProjectInfo } from "../interfaces";
 import utils from "../utils";
 import { writeFileSync } from "fs";
+import { objToEnv } from "./env-config";
+import { copySync } from "fs-extra";
 
 interface DatabaseConfig {
   /** 数据库主机地址 */
@@ -143,7 +145,7 @@ export const getAuthConfigure = () => {
       prefix: '*'
     },
     {
-      type: 'password',
+      type: 'list',
       name: 'jwt.mode',
       message: 'JWT模式',
       default: 'secret',
@@ -182,7 +184,7 @@ export const getAuthConfigure = () => {
 }
 
 export const createNextNestjsServer = async (answer: ProjectInfo) => {
-  const { name, host, port, database, username, password, redisHost, redisPort } = answer;,
+  const { name, host, port, database, username, password, redisHost, redisPort } = answer;
   const from = utils.getTemplatePath('nest-next');
   const to = utils.getDistPath(`${name}/nest`);
   const configPath = utils.getDistPath(`${name}/nest/configs/config.json`);
@@ -200,5 +202,8 @@ export const createNextNestjsServer = async (answer: ProjectInfo) => {
     },
     ...authConfigure
   };
+  copySync(from, to, {filter: (src) =>{
+    return !src.includes('node_modules')
+  }});
   writeFileSync(configPath, JSON.stringify(config, null, 2));
 }

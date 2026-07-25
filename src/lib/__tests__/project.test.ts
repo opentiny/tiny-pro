@@ -141,36 +141,38 @@ describe('createProjectSync', () => {
     });
   });
 
-  it('should copy Vue3 template to dist path', () => {
-    createProjectSync({
+  it('should copy Vue3 template to dist path', async () => {
+    await createProjectSync({
       name: 'my-project',
       serverConfirm: false,
       lowcodeEngine: LowcodeEngine.Skip,
       serverFramework: ServerFrameworks.Skip,
     } as any);
 
-    expect(cliFs.copyTpl).toHaveBeenCalledWith(
+    expect(mockCopySync).toHaveBeenCalledWith(
       `/template/${VueVersion.Vue3}`,
-      `/dist/my-project`
+      `/dist/my-project`,
+      expect.objectContaining({ filter: expect.any(Function) })
     );
   });
 
-  it('should copy to web subdirectory when serverConfirm is true', () => {
-    createProjectSync({
+  it('should copy to web subdirectory when serverConfirm is true', async () => {
+    await createProjectSync({
       name: 'my-project',
       serverConfirm: true,
       lowcodeEngine: LowcodeEngine.Skip,
       serverFramework: ServerFrameworks.NestJs,
     } as any);
 
-    expect(cliFs.copyTpl).toHaveBeenCalledWith(
+    expect(mockCopySync).toHaveBeenCalledWith(
       `/template/${VueVersion.Vue3}`,
-      `/dist/my-project/web`
+      `/dist/my-project/web`,
+      expect.objectContaining({ filter: expect.any(Function) })
     );
   });
 
-  it('should call createServerSync when serverConfirm is true', () => {
-    createProjectSync({
+  it('should call createServerSync when serverConfirm is true', async () => {
+    await createProjectSync({
       name: 'my-project',
       serverConfirm: true,
       lowcodeEngine: LowcodeEngine.Skip,
@@ -206,8 +208,8 @@ describe('createProjectSync', () => {
     );
   });
 
-  it('should configure env file and set lowcode enabled to true', () => {
-    createProjectSync({
+  it('should configure env file and set lowcode enabled to true', async () => {
+    await createProjectSync({
       name: 'my-project',
       serverConfirm: true,
       lowcodeEngine: LowcodeEngine.Include,
@@ -221,8 +223,8 @@ describe('createProjectSync', () => {
     expect(writeCall).toBeDefined();
   });
 
-  it('should configure env file and keep lowcode disabled when Skip', () => {
-    createProjectSync({
+  it('should configure env file and keep lowcode disabled when Skip', async () => {
+    await createProjectSync({
       name: 'my-project',
       serverConfirm: true,
       lowcodeEngine: LowcodeEngine.Skip,
@@ -252,8 +254,8 @@ describe('createProjectSync', () => {
     expect(writeCall).toBeDefined();
   });
 
-  it('should not configure packageJson when serverFramework is not NestJs', () => {
-    createProjectSync({
+  it('should not configure packageJson when serverFramework is not NestJs', async () => {
+    await createProjectSync({
       name: 'my-project',
       serverConfirm: true,
       lowcodeEngine: LowcodeEngine.Skip,
