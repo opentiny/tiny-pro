@@ -21,12 +21,15 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "schema:update": "mikro-orm schema:update --run",
     "seeder:create": "mikro-orm seeder:create",
-    "seeder:run": "mikro-orm seeder:run"
+    "seeder:run": "mikro-orm seeder:run",
+    "migrate:create": "mikro-orm migration:create",
+    "migrate:run": "mikro-orm migration:up"
   },
   "dependencies": {
     "@liaoliaots/nestjs-redis": "^10.0.0",
     "@mikro-orm/core": "^7.1.5",
     "@mikro-orm/decorators": "^7.1.5",
+    "@mikro-orm/migrations": "^7.1.5",
     "@mikro-orm/mysql": "^7.1.5",
     "@mikro-orm/nestjs": "^7.0.2",
     "@nestjs/common": "^11.0.1",

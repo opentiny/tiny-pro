@@ -119,6 +119,8 @@ axios.interceptors.response.use(
           return axios.request(originalRequest)
         })
         .catch((err) => {
+          clearToken()
+          router.replace({ name: 'login' })
           return Promise.reject(err)
         })
     }
