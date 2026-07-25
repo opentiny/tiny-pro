@@ -1,20 +1,25 @@
 import * as winston from 'winston';
 import 'winston-daily-rotate-file';
 import { utilities, WinstonModule } from 'nest-winston';
-
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { INestApplication, VersioningType } from '@nestjs/common';
+import {
+  INestApplication,
+  RequestMethod,
+  VersioningType,
+} from '@nestjs/common';
 import { ConfigureService, SwaggerConfigure } from '@app/configure';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { I18nValidationPipe } from 'nestjs-i18n';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
     logger: WinstonModule.createLogger({
       instance: setupLogger(),
     }),
+  });
+  app.setGlobalPrefix('/api', {
+    exclude: [{ path: 'healthCheck', method: RequestMethod.GET }],
   });
   app.enableVersioning({
     type: VersioningType.MEDIA_TYPE,
@@ -57,7 +62,7 @@ function setupLogger() {
         // 字符串拼接
         format: winston.format.combine(
           winston.format.timestamp(),
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+
           utilities.format.nestLike(),
         ),
       }),

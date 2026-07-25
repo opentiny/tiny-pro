@@ -1,0 +1,72 @@
+services:
+  mysql:
+    image: mysql:8
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: demo_tiny_pro
+    ports:
+      - "3306:3306"
+    command:
+      - --mysql-native-password=ON
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+  db_deploy:
+    build:
+      context: ./nest-next
+      dockerfile: dockerfile
+      target: migrator
+    environment:
+      DATABASE_HOST: mysql
+      DATABASE_PORT: 3306
+      DATABASE_USERNAME: root
+      DATABASE_PASSWORD: root
+      DATABASE_NAME: demo_tiny_pro
+    depends_on:
+      - mysql
+  seeder:
+    build:
+      context: ./nest-next
+      dockerfile: dockerfile
+      target: seeder
+    environment:
+      DATABASE_HOST: mysql
+      DATABASE_PORT: 3306
+      DATABASE_USERNAME: root
+      DATABASE_PASSWORD: root
+      DATABASE_NAME: demo_tiny_pro
+    depends_on:
+      db_deploy:
+        condition: service_completed_successfully
+  srv:
+    build:
+      context: ./nest-next
+      dockerfile: dockerfile
+      target: final
+    environment:
+      DATABASE_HOST: mysql
+      DATABASE_PORT: 3306
+      DATABASE_USERNAME: root
+      DATABASE_PASSWORD: root
+      DATABASE_NAME: demo_tiny_pro
+    ports:
+      - "3000:3000"
+    depends_on:
+      seeder:
+        condition: service_completed_successfully
+    volumes:
+      - ./nest-next/configs:/app/dist/config
+  web:
+    build:
+      context: ./tinyvue
+      dockerfile: dockerfile
+      target: final
+    ports:
+      - "80:80"
+    environment:
+      BACKEND_HOST: http://srv:3000
+    depends_on:
+      srv:
+        condition: service_started
