@@ -39,6 +39,7 @@ export const getProjectInfo = (): Promise<ProjectInfo> => {
       choices: [
         { name: 'SpringBoot', value: ServerFrameworks.SpringBoot },
         { name: 'Nest.js', value: ServerFrameworks.NestJs },
+        { name: 'Nest.js Next', value: ServerFrameworks.NestJsNext },
         { name: '暂不配置', value: ServerFrameworks.Skip },
       ],
       default: ServerFrameworks.NestJs,

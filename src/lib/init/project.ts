@@ -14,6 +14,7 @@ import utils from '../utils';
 import { createSpringBootServer } from './server-springboot';
 import { createNestJsServer } from './server-nestjs';
 import { packageJsonProcess } from './package-json';
+import { createNextNestjsServer } from './server-nestjs-next';
 
 const log = logs('tiny-toolkit-pro');
 
@@ -30,13 +31,15 @@ export const createLowcodeDesignerSync = (answers: ProjectInfo) => {
   log.success('低代码设计器模板复制成功');
 };
 
-export const createServerSync = (answers: ProjectInfo) => {
+export const createServerSync = async (answers: ProjectInfo) => {
   const { serverFramework } = answers;
 
   if (serverFramework === ServerFrameworks.SpringBoot) {
     createSpringBootServer(answers);
   } else if (serverFramework === ServerFrameworks.NestJs) {
     createNestJsServer(answers);
+  } else if (serverFramework === ServerFrameworks.NestJsNext) {
+    await createNextNestjsServer(answers);
   }
 };
 
@@ -95,22 +98,22 @@ const configureEnvFile = (answers: ProjectInfo, to: string) => {
   }
 };
 
-export const createProjectSync = (answers: ProjectInfo) => {
+export const createProjectSync = async (answers: ProjectInfo) => {
   const { name, serverConfirm } = answers;
-  const templatePath = VueVersion.Vue3;
-  const from = utils.getTemplatePath(templatePath);
-  const to = utils.getDistPath(serverConfirm ? `${name}/web` : name);
+  // const templatePath = VueVersion.Vue3;
+  // const from = utils.getTemplatePath(templatePath);
+  // const to = utils.getDistPath(serverConfirm ? `${name}/web` : name);
 
-  fs.copyTpl(from, to);
+  // fs.copyTpl(from, to);
 
-  configurePackageJson(answers, to);
-  configureEnvFile(answers, to);
+  // configurePackageJson(answers, to);
+  // configureEnvFile(answers, to);
 
   if (serverConfirm) {
-    createServerSync(answers);
+    await createServerSync(answers);
   }
 
-  createLowcodeDesignerSync(answers);
+  // createLowcodeDesignerSync(answers);
 };
 
 const runNpmInstall = (cwd: string, label: string) => {

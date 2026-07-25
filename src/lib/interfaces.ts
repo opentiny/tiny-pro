@@ -19,6 +19,7 @@ export enum ServerFrameworks {
   SpringCloud = 'springCloud',
   Skip = '',
   SpringBoot = 'springboot',
+  NestJsNext = 'nestJsNext',
 }
 
 /**
