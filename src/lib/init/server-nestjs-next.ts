@@ -91,22 +91,10 @@ interface AuthConfigure {
   jwt: SecretConfigure | LocalKeyConfigure;
 }
 
-/**
- * 根配置对象
- */
-interface Configure {
-  database: DatabaseConfig;
-  redis: RedisConfigure;
-  feature: FeatureConfigure;
-  /** Swagger 配置（可选） */
-  swagger?: SwaggerConfigure;
-  auth: AuthConfigure;
-}
-
-export const getFeatrueConfigrue = () => {
-  const question:QuestionCollection = [
+export const getFeatureConfigure = () => {
+  const question:QuestionCollection<FeatureConfigure> = [
     {
-      type: 'checkbox',
+      type: 'confirm',
       name: 'preview',
       default: false,
       message: '是否开启预览功能 (如果开启会关闭写入和删除功能)',
@@ -189,6 +177,8 @@ export const createNextNestjsServer = async (answer: ProjectInfo) => {
   const to = utils.getDistPath(`${name}/nest`);
   const configPath = utils.getDistPath(`${name}/nest/configs/config.json`);
   const authConfigure = {auth: await getAuthConfigure()};
+  const featureConfigure = {feature: await getFeatureConfigure()};
+
   const config = {
     database: {
       host, port, user: username, password, dbName: database,
@@ -198,7 +188,7 @@ export const createNextNestjsServer = async (answer: ProjectInfo) => {
       user: 'root', password: 'root', db: 0,
     },
     feature: {
-      preview: false
+      preview: featureConfigure.feature.preview
     },
     ...authConfigure
   };

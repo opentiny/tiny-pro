@@ -9,7 +9,7 @@ export { createLowcodeDesignerSync, createServerSync, createProjectSync, install
 
 const log = logs('tiny-toolkit-pro');
 
-const f = async () => {
+export default async () => {
   let projectInfo;
 
   try {
@@ -22,5 +22,3 @@ const f = async () => {
   }
   log.info('初始化成功，请运行npm i或tiny i 安装依赖');
 };
-
-f();
