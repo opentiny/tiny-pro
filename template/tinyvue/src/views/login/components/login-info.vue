@@ -14,7 +14,6 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import useLoading from '@/hooks/loading'
 import { useUserStore } from '@/store'
-import { setToken } from '@/utils/auth'
 
 const router = useRouter()
 const { t } = useI18n()
@@ -42,7 +41,7 @@ const rules = computed(() => {
 })
 
 const loginInfo = reactive({
-  username: 'admin',
+  username: 'admin@no-reply.com',
   password: 'admin',
   rememberPassword: true,
 })
@@ -58,20 +57,6 @@ function handleSubmit() {
     if (!valid) {
       return
     }
-    if (!import.meta.env.VITE_USE_MOCK) {
-      window.localStorage.setItem('userRole', 'admin')
-      setToken('12345')
-
-      const { redirect, ...othersQuery } = router.currentRoute.value.query
-      router.push({
-        name: (redirect as string) || 'Home',
-        query: {
-          ...othersQuery,
-        },
-      })
-      setLoading(false)
-      return
-    }
     setLoading(true)
 
     try {
@@ -84,9 +69,8 @@ function handleSubmit() {
         status: 'success',
       })
 
-      const { redirect, ...othersQuery } = router.currentRoute.value.query ?? { redirect: 'Home' }
-      router.replace({ name: redirect?.toString() ?? 'Home' })
-      router.push({
+      const { redirect, ...othersQuery } = router.currentRoute.value.query
+      await router.replace({
         name: (redirect as string) || 'Home',
         query: {
           ...othersQuery,
