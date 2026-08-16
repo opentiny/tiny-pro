@@ -64,7 +64,7 @@ export const generateMigration = async (
 
   const config = await prettier.resolveConfig(process.cwd());
 
-  const formatted = prettier.format(code, {
+  const formatted = await prettier.format(code, {
     ...config,
     parser: 'babel-ts',
   });
