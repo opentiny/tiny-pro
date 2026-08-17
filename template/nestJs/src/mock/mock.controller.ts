@@ -1,10 +1,12 @@
 import {
   Controller,
+  Delete,
   Get,
   HttpException,
   HttpStatus,
   Param,
   Post,
+  Query,
   Req,
 } from '@nestjs/common';
 import { MockService } from './mock.service';
@@ -40,5 +42,17 @@ export class MockController {
       throw new HttpException('not found', HttpStatus.NOT_FOUND);
     }
     return item[0].response({ body: req.body });
+  }
+
+  @Delete('*')
+  async deleteMock(@Req() req: Request) {
+    const path = req.path.replace(process.env.MOCK_REGEX || '/mock', '');
+    const item = data.filter(
+      (dataItem) => dataItem.method === 'delete' && dataItem.url === path
+    );
+    if (!item.length) {
+      throw new HttpException('not found', HttpStatus.NOT_FOUND);
+    }
+    return item[0].response({ body: null, query: req.query });
   }
 }

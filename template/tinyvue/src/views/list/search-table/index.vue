@@ -398,11 +398,12 @@
     },
   });
   const handleDelete = (id: string) => {
-    deleteEmployee(id).then((res) => {
+    deleteEmployee(id).then(() => {
       Modal.message({
         message: '已删除',
         status: 'success',
       });
+      taskGrid?.value.handleFetch('reload');
     });
   };
   function getStatusText(status: string) {

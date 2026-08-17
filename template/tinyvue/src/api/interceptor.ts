@@ -53,6 +53,9 @@ axios.interceptors.response.use(
     return res;
   },
   (error) => {
+    if (!error.response) {
+      return Promise.reject(error);
+    }
     const { status, data } = error.response;
     if (status === 403 && error.config.method.toLowerCase() === 'get') {
       Modal.message({

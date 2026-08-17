@@ -15,16 +15,14 @@ const initTabs = () => {
   const tabs = JSON.parse(
     localStorage.getItem(TAB_PERSISTENCE_KEYS.TABS) ?? '[]',
   ) as Tab[];
-  const routes = useRouter()
-    .getRoutes()
-    .map((route) => route.path);
-  const i18n = useRouter().getRoutes();
+  const allRoutes = useRouter().getRoutes();
+  const routePaths = allRoutes.map((route) => route.path);
   return tabs
-    .filter((tab) => routes.includes(tab.link))
+    .filter((tab) => routePaths.includes(tab.link))
     .map((item) => {
-      const i18route = i18n.filter((route) => route.path === item.link)[0];
+      const matched = allRoutes.filter((route) => route.path === item.link)[0];
       return {
-        name: i18route.meta.locale ?? item.name ?? '',
+        name: matched?.meta.locale ?? item.name ?? '',
         link: item.link,
       };
     });

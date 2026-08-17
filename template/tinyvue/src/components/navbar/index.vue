@@ -271,15 +271,6 @@
     };
   });
 
-  const switchRoles = async () => {
-    const res = await userStore.switchRoles();
-
-    TinyModal.message({
-      message: res as string,
-      status: 'success',
-    });
-  };
-
   const switchUser = (e: number) => {
     switch (e) {
       case 1:

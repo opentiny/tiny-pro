@@ -48,4 +48,9 @@ export default [
       return successResponseWrap(data);
     },
   },
+  {
+    url: '/api/employee/delete',
+    method: 'delete',
+    response: () => successResponseWrap(true),
+  },
 ] as any;
