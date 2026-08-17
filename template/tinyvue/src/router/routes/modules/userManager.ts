@@ -26,18 +26,6 @@ export default {
       },
     },
     {
-      path: 'allSetting',
-      name: 'AllSetting',
-      id: 'AllSetting',
-      label: 'AllSetting',
-      component: () => import('@/views/userManager/setting/index.vue'),
-      meta: {
-        locale: 'menu.userManager.setting',
-        requiresAuth: true,
-        roles: [RoleType.admin],
-      },
-    },
-    {
       path: 'userAdd',
       name: 'UserAdd',
       id: 'UserAdd',

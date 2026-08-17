@@ -6,8 +6,9 @@ export function useI18nMenu(data: ITreeNodeData[], t: (key: string) => string) {
   const dfs = (menu: ITreeNodeData) => {
     menu.oldLabel = menu.label
     menu.label = t(menu.locale).toString()
-    for (let i = 0; i < menu.children.length; i += 1) {
-      const item = menu.children[i]
+    const children = menu.children ?? []
+    for (let i = 0; i < children.length; i += 1) {
+      const item = children[i]
       dfs(item)
     }
   }
