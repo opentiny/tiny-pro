@@ -1,5 +1,6 @@
 package com.TinyPro.entity.dto;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -14,8 +15,8 @@ public class CreateApplicationDto {
   @Schema(description = "描述")
   private String description;
 
-  @Schema(description = "标签（JSON 字符串）")
-  private String tag;
+  @Schema(description = "标签数组或 JSON 字符串")
+  private JsonNode tag;
 
   @Schema(description = "图标")
   private String icon;

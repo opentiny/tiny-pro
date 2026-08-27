@@ -5,6 +5,10 @@ import com.TinyPro.entity.dto.PaginationQueryDto;
 import com.TinyPro.entity.po.Application;
 import com.TinyPro.entity.vo.ApplicationVo;
 import com.TinyPro.jpa.ApplicationRepository;
+import com.TinyPro.service.ApplicationService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -25,10 +29,11 @@ import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
-public class ApplicationServiceImpl {
+public class ApplicationServiceImpl implements ApplicationService {
 
   private final ApplicationRepository applicationRepository;
   private final MessageSource messageSource;
+  private final ObjectMapper objectMapper;
 
   // 分页查询
   public ApplicationVo findAllApplication(PaginationQueryDto searchInfo) {
@@ -36,7 +41,6 @@ public class ApplicationServiceImpl {
     int limit = searchInfo.getLimit();
     String keywords = searchInfo.getKeywords();
     String classify = searchInfo.getClassify();
-
     Pageable pageable = PageRequest.of(page - 1, limit);
 
     Specification<Application> spec = (root, query, cb) -> {
@@ -50,7 +54,7 @@ public class ApplicationServiceImpl {
         predicates.add(cb.or(namePred, descPred, tagPred));
       }
 
-      if (!"all".equalsIgnoreCase(classify)) {
+      if (classify != null && !classify.isBlank() && !"all".equalsIgnoreCase(classify)) {
         predicates.add(cb.equal(root.get("classify"), classify));
       }
 
@@ -97,10 +101,24 @@ public class ApplicationServiceImpl {
     Application newApp = new Application(
       dto.getName(),
       dto.getDescription(),
-      dto.getTag(),
+      serializeTag(dto.getTag()),
       dto.getIcon(),
       dto.getClassify()
     );
     return applicationRepository.save(newApp);
+  }
+
+  private String serializeTag(JsonNode tag) {
+    if (tag == null || tag.isNull()) {
+      return null;
+    }
+    if (tag.isTextual()) {
+      return tag.textValue();
+    }
+    try {
+      return objectMapper.writeValueAsString(tag);
+    } catch (JsonProcessingException ex) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid tag format", ex);
+    }
   }
 }

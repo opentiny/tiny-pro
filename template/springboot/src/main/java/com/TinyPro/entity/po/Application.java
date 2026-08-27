@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.data.annotation.Id;
 
 import java.time.LocalDateTime;
 
@@ -21,7 +20,7 @@ public class Application {
   private String name;
 
   private String description;
-
+  @Lob
   @Column(columnDefinition = "TEXT")
   private String tag;
 
@@ -43,6 +42,9 @@ public class Application {
     this.classify = classify;
   }
 
+  public Application() {
+
+  }
 
 
   // 安全解析 tag（非持久化方法）
@@ -54,4 +56,6 @@ public class Application {
       return new Object[0];
     }
   }
+
+
 }

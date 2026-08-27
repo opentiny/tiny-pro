@@ -21,5 +21,6 @@ public class Permission implements Serializable {
     private Integer id;
 
     private String name;
+    @Column(name = "`desc`")
     private String desc;
 }

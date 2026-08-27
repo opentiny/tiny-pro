@@ -4,6 +4,7 @@ import com.TinyPro.entity.dto.CreateApplicationDto;
 import com.TinyPro.entity.dto.PaginationQueryDto;
 import com.TinyPro.entity.po.Application;
 import com.TinyPro.entity.vo.ApplicationVo;
+import com.TinyPro.entity.vo.I18Vo;
 import com.TinyPro.service.ApplicationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -13,6 +14,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -28,8 +31,9 @@ public class ApplicationController {
       content = @Content(schema = @Schema(implementation = ApplicationVo.class)))
   })
   @GetMapping
-  public ApplicationVo getAllApplication(PaginationQueryDto searchInfo) {
-    return applicationService.findAllApplication(searchInfo);
+  public ResponseEntity<ApplicationVo> getAllApplication(
+      @Valid @RequestBody PaginationQueryDto searchInfo) {
+    return new ResponseEntity<>(applicationService.findAllApplication(searchInfo), HttpStatus.OK);
   }
 
   @Operation(summary = "创建应用", description = "创建新应用，支持初始化模式（已存在则返回）")

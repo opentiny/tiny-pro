@@ -51,6 +51,8 @@ public class DataInitializer implements CommandLineRunner {
     private LangRepository langRepository;
     @Autowired
     private I18Repository i18Repository;
+    @Autowired
+    private ApplicationRepository applicationRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -67,6 +69,9 @@ public class DataInitializer implements CommandLineRunner {
 
         // 初始化国际化信息
         initI18n();
+
+        // 初始化应用
+        initApplications();
 
         // 初始化权限
         initPermissions();
@@ -90,9 +95,17 @@ public class DataInitializer implements CommandLineRunner {
         try (InputStream is = pathResource.getInputStream()) {
             String json = new String(is.readAllBytes(), StandardCharsets.UTF_8);
             Map<String, Map<String, String>> i18nData = JSON.parseObject(json, Map.class);
+            Set<String> existingLangNames = langRepository.findAll()
+                    .stream()
+                    .map(Lang::getName)
+                    .collect(Collectors.toSet());
             // 遍历外层 Map
             for (Map.Entry<String, Map<String, String>> outerEntry : i18nData.entrySet()) {
                 String langName = outerEntry.getKey(); // 外层键作为 Lang 的 name
+                if (existingLangNames.contains(langName)) {
+                    logger.info("语言 {} 已存在，跳过初始化", langName);
+                    continue;
+                }
                 Lang lang = new Lang();
                 lang.setName(langName);
                 List<I18> i18List = new ArrayList<>();
@@ -123,6 +136,104 @@ public class DataInitializer implements CommandLineRunner {
         }
     }
 
+    private void initApplications() {
+        List<Application> applicationData = List.of(
+                new Application(
+                        "Tiny Design 设计体系",
+                        "华为云产品和服务的规范体系，包括交互视觉设计、业务流程、国际化、术语词条。",
+                        "[{ \"type\": \"\", \"value\": \"机会点定义\" }, { \"type\": \"danger\", \"value\": \"交互设计\" }]",
+                        "card-list-application-default.png",
+                        "design"
+                ),
+                new Application(
+                        "Tiny DesignLink 设计流水线工具",
+                        "设计+协同+资源管理，一个工具就够了，在线原型设计、设计过程融入DevOps流程。",
+                        "[{ \"type\": \"error\", \"value\": \"交互设计\" }, { \"type\": \"warning\", \"value\": \"视觉设计\" }]",
+                        "card-list-application-default.png",
+                        "design"
+                ),
+                new Application(
+                        "TinyUI3.0 开发工具 ",
+                        "Cloud Design System 提供了丰富的规范文档及开发组件。",
+                        "[{ \"type\": \"success\", \"value\": \"开发\" }]",
+                        "card-list-application-default.png",
+                        "dev"
+                ),
+                new Application(
+                        "TinyPlus3.0 开发工具",
+                        "TinyPlus3.0 是基于Angular + Typescript的Web前端云业务组件库。",
+                        "[{ \"type\": \"success\", \"value\": \"开发\" }]",
+                        "card-list-tiny-plus.png",
+                        "dev"
+                ),
+                new Application(
+                        "Tiny Stage 工程工具 ",
+                        "一个跨平台的前端工程化cli工具，为开发提供一系列开发套件和工程插件",
+                        "[{ \"type\": \"success\", \"value\": \"开发\" }]",
+                        "card-list-console-framework.png",
+                        "dev"
+                ),
+                new Application(
+                        "Tiny Flow 接口编排工具 ",
+                        "端到端的API编排解决方案，通过可视化编程的方式快速生成、发布、调试的API编排。",
+                        "[{ \"type\": \"success\", \"value\": \"开发\" }]",
+                        "card-list-console-framework.png",
+                        "dev"
+                ),
+                new Application(
+                        "Tiny Gate 门禁系统",
+                        "门禁系统，通过卡点方式集成到伏羲流水线，在服务发布时生成预览页面。",
+                        "[{ \"type\": \"info\", \"value\": \"测试验证\" }]",
+                        "card-list-console-framework.png",
+                        "dev"
+                ),
+                new Application(
+                        "Console Framework 控制台框架",
+                        "华为云各服务快速构建管理控制台的平台。",
+                        "[{ \"type\": \"success\", \"value\": \"开发\" },{ \"type\": \"info\", \"value\": \"测试验证\" },{ \"type\": \"warning\", \"value\": \"上线\" }]",
+                        "card-list-console-framework.png",
+                        "dev"
+                ),
+                new Application(
+                        "Nodejs Framework Nodejs应用",
+                        "基于egg的定制化web服务框架，让你快速上手Nodejs做BFF意见微服务。",
+                        "[{ \"type\": \"success\", \"value\": \"开发\" },{ \"type\": \"info\", \"value\": \"测试验证\" }]",
+                        "card-list-console-framework.png",
+                        "dev"
+                ),
+                new Application(
+                        "Furion 前端体验监控",
+                        "提供端到端前端用户体验度量，让产品用户体验可度量、可监控、可优化。",
+                        "[{ \"type\": \"\", \"value\": \"机会点定义\" }]",
+                        "card-list-furion.png",
+                        "dev"
+                ),
+                new Application(
+                        "Tiny Mock API 管理",
+                        "功能强大的API管理平台，旨在为开发、产品、测试人员提供更优雅的接口管理服务。",
+                        "[{ \"type\": \"success\", \"value\": \"开发\" },{ \"type\": \"warning\", \"value\": \"视觉设计\" }]",
+                        "card-list-application-default.png",
+                        "dev"
+                )
+        );
+
+        Set<String> existingAppNames = applicationRepository.findAll()
+                .stream()
+                .map(Application::getName)
+                .collect(Collectors.toSet());
+        List<Application> newApplications = applicationData.stream()
+                .filter(app -> !existingAppNames.contains(app.getName()))
+                .collect(Collectors.toList());
+
+        if (newApplications.isEmpty()) {
+            logger.info("没有新应用需要导入，数据库已存在所有应用");
+            return;
+        }
+
+        applicationRepository.saveAll(newApplications);
+        logger.info("成功导入 {} 个新应用", newApplications.size());
+    }
+
     private void initPermissions() {
         Map<String, String[]> permissions = new HashMap<>();
         permissions.put("user", new String[]{"add", "remove", "update", "query", "password::force-update","batch-remove"});
@@ -132,32 +243,31 @@ public class DataInitializer implements CommandLineRunner {
         permissions.put("i18n", new String[]{"add", "remove", "update", "query","batch-remove"});
         permissions.put("lang", new String[]{"add", "remove", "update", "query"});
 
-        Permission superPermission = new Permission();
-        superPermission.setName("*");
-        superPermission.setDesc("super permission");
-        try {
-            permissionRepository.save(superPermission);
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            logger.error("Please clear the database and try again");
-            System.exit(-1);
-        }
+        createPermissionIfAbsent("*", "super permission");
 
         for (Map.Entry<String, String[]> entry : permissions.entrySet()) {
             String module = entry.getKey();
             String[] actions = entry.getValue();
             for (String action : actions) {
-                Permission permission = new Permission();
-                permission.setName(module + "::" + action);
-                permission.setDesc("");
-                try {
-                    permissionRepository.save(permission);
-                } catch (Exception e) {
-                    logger.error(e.getMessage());
-                    logger.error("Please clear the database and try again");
-                    System.exit(-1);
-                }
+                createPermissionIfAbsent(module + "::" + action, "");
             }
+        }
+    }
+
+    private void createPermissionIfAbsent(String name, String desc) {
+        if (permissionRepository.existsByName(name)) {
+            return;
+        }
+
+        Permission permission = new Permission();
+        permission.setName(name);
+        permission.setDesc(desc);
+        try {
+            permissionRepository.save(permission);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            logger.error("Please clear the database and try again");
+            System.exit(-1);
         }
     }
 
@@ -222,14 +332,21 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private Role initRole() {
-        Role role = new Role();
-        role.setName("admin");
-
-        Set<Permission> permissions = permissionRepository.findByDesc("super permission")
+        Role role = roleRepository.findAllByName(Contants.ADMIN)
                 .stream()
-                .collect(Collectors.toSet());  // Java 17+ 不可变列表
+                .findFirst()
+                .orElseGet(() -> {
+                    Role newRole = new Role();
+                    newRole.setName(Contants.ADMIN);
+                    return newRole;
+                });
 
-        role.setPermission(permissions);
+        Permission superPermission = permissionRepository.findAllByName("*")
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("super permission not initialized"));
+
+        role.setPermission(new HashSet<>(List.of(superPermission)));
 
         Set<Menu> all = menuRepository.findAll().stream().collect(Collectors.toSet());
         role.setMenus(all);
@@ -238,6 +355,11 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void initUser(Role role) {
+        if (!userRepository.findAllByEmail("admin@no-reply.com").isEmpty()) {
+            logger.info("[APP]: admin user exists, skip create");
+            return;
+        }
+
         User user = new User();
         user.setEmail("admin@no-reply.com");
         String password;
@@ -250,14 +372,11 @@ public class DataInitializer implements CommandLineRunner {
         user.setName(Contants.ADMIN);
         user.setSalt(Contants.PUBLICK_SALT);
         user.setStatus(Contants.USER_STATUS_YES);
-        Optional<Role> optionalRole = roleRepository.findByName(Contants.ADMIN);
-        Role adminRole = optionalRole.get();
-        List<Role> roleList = List.of(adminRole);
+        List<Role> roleList = List.of(role);
         user.setRole(roleList);
         user = userRepository.save(user);
         logger.info("[APP]: create admin user success");
-        logger.info("[APP]: email: {}", user.getEmail());
-        logger.info("[APP]: password: 'admin'");
+        logger.info("[APP]: default admin credentials created; password omitted from logs");
         logger.info("Enjoy!");
     }
 

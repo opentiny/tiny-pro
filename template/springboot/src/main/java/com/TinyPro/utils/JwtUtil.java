@@ -1,9 +1,9 @@
 package com.TinyPro.utils;
 
+import com.TinyPro.config.TinyProProperties;
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -18,10 +18,15 @@ public class JwtUtil {
 
     private final Key secretKey;
 
-    @Value("${jwt.secret}")
-    private String secretString;
+    @Autowired
+    public JwtUtil(TinyProProperties properties) {
+        this(properties.getJwt().getSecret());
+    }
 
-    public JwtUtil(@Value("${jwt.secret}") String secretString) {
+    /**
+     * Kept for callers that construct this utility directly in tests or integrations.
+     */
+    public JwtUtil(String secretString) {
         try {
             // 使用 SHA-256 哈希算法将字符串转换为字节数组
             MessageDigest digest = MessageDigest.getInstance("SHA-256");

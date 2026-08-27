@@ -23,6 +23,7 @@ public class Menu implements Serializable {
     private Integer id;
 
     private String name;
+    @Column(name = "`order`")
     @TableField("'order'")
     private Integer order;
     private Integer parentId;
