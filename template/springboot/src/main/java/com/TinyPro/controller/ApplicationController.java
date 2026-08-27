@@ -32,7 +32,7 @@ public class ApplicationController {
   })
   @GetMapping
   public ResponseEntity<ApplicationVo> getAllApplication(
-      @Valid @RequestBody PaginationQueryDto searchInfo) {
+      @Valid @ModelAttribute PaginationQueryDto searchInfo) {
     return new ResponseEntity<>(applicationService.findAllApplication(searchInfo), HttpStatus.OK);
   }
 
