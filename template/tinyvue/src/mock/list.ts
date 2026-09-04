@@ -41,11 +41,25 @@ export default [
       treeData = taskList.list.slice(offset, count)
 
       const data = Mock.mock({
-        total: 60,
+        total: taskList.list.length,
         data: treeData,
       })
 
       return successResponseWrap(data)
+    },
+  },
+  {
+    url: '/api/employee/delete',
+    method: 'delete',
+    response: ({ query }: { query: URLSearchParams }) => {
+      const id = query.get('id')
+      if (id) {
+        const index = taskList.list.findIndex(item => item.id === id)
+        if (index > -1) {
+          taskList.list.splice(index, 1)
+        }
+      }
+      return successResponseWrap(true)
     },
   },
 ] as any

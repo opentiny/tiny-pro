@@ -155,17 +155,18 @@ function handleDelete(id: string) {
       message: '已删除',
       status: 'success',
     })
+    taskGrid?.value?.handleFetch?.('reload')
   })
 }
 
 // form的button
 function reloadGrid(filters) {
   filterOptions.value = filters
-  taskGrid?.value.handleFetch('reload')
+  taskGrid?.value?.handleFetch?.('reload')
 }
 
 function handleRefresh() {
-  taskGrid?.value.handleFetch('reload')
+  taskGrid?.value?.handleFetch?.('reload')
 }
 
 const statusOptions = reactive([

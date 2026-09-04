@@ -90,6 +90,7 @@ onMounted(() => {
 
   onUnmounted(() => {
     window.removeEventListener('resize', resizeHandler)
+    observer?.disconnect()
   })
   setTimeout(() => {
     ringRef.value?.resize()
