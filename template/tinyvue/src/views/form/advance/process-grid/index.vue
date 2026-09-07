@@ -1,5 +1,19 @@
 <script lang="ts" setup>
+import {
+  TinyInput,
+  TinySelect,
+  TinyGrid,
+  TinyGridColumn,
+  TinyButton,
+  TinyPopconfirm,
+  Modal,
+  TinyDatePicker,
+} from '@opentiny/vue'
+import { iconSave, iconDel, iconEdit } from '@opentiny/vue-icon'
+import { t } from '@opentiny/vue-locale'
 import { ref } from 'vue'
+import StatusRender from './status-render.vue'
+import SelectRender from './select-render.vue'
 
 interface CompProps {
   options?: {
@@ -8,6 +22,11 @@ interface CompProps {
   }
 }
 defineProps<CompProps>()
+
+const gridRef = ref()
+const IconDel = iconDel()
+const IconSave = iconSave()
+const IconEdit = iconEdit()
 
 const gridTable = ref({
   data: [
@@ -22,11 +41,34 @@ const gridTable = ref({
   ],
 })
 
-function defaultRender(h, { row, column }) {
-  return row[column.property] ?? '--'
+const defaultRender = (h, { row, column }) => row[column.property] ?? '--'
+
+const addRow = () => {
+  if (gridRef.value.getActiveRow()) {
+    Modal.message({
+      message: t('advanceForm.form.validError.add'),
+      status: 'warning',
+    })
+    return
+  }
+  gridRef.value.insert({}).then((res) => {
+    gridRef.value.setActiveRow(res.row)
+  })
 }
 
-function resetGrid() {
+const saveRow = (row) => {
+  gridRef.value.clearActived()
+}
+
+const deleteRow = (row) => {
+  gridRef.value.remove(row)
+}
+
+const editRow = (row) => {
+  gridRef.value.setActiveRow(row)
+}
+
+const resetGrid = () => {
   gridTable.value.data = []
 }
 
@@ -147,14 +189,14 @@ defineExpose({
       >
         <template #default="data">
           <a
-            v-if="$refs.gridRef && $refs.gridRef.hasActiveRow(data.row)"
+            v-if="gridRef && gridRef.hasActiveRow(data.row)"
             class="mr-2"
             @click="saveRow(data.row)"
           >
             <IconSave class="operation-icon" />{{ $t('advanceForm.form.process.save') }}
           </a>
           <a
-            v-if="!$refs.gridRef.hasActiveRow(data.row)"
+            v-if="gridRef && !gridRef.hasActiveRow(data.row)"
             class="mr-2"
             @click="editRow(data.row)"
           >
