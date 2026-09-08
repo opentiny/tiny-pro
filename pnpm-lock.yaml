@@ -352,9 +352,6 @@ importers:
       '@babel/core':
         specifier: ^7.25.2
         version: 7.26.10
-      '@gaonengwww/mock-server':
-        specifier: ^1.0.5
-        version: 1.0.5
       '@mcp-b/webmcp-polyfill':
         specifier: ^3.0.0
         version: 3.0.0
@@ -527,6 +524,9 @@ importers:
       mockjs:
         specifier: ^1.1.0
         version: 1.1.0
+      npm-run-all:
+        specifier: ^4.1.5
+        version: 4.1.5
       rollup-plugin-visualizer:
         specifier: ^5.12.0
         version: 5.14.0(rollup@2.79.2)
@@ -2124,10 +2124,6 @@ packages:
 
   '@gaonengwww/jose@6.1.0':
     resolution: {integrity: sha512-4LLQNSYJH/EnEd9IPZpgVL72i9FKjyY19iNaII9gsF7yzWs8uFXeI5xaEL6rWlM0YyUDHP76PjFU5vkVkh9kmA==}
-
-  '@gaonengwww/mock-server@1.0.5':
-    resolution: {integrity: sha512-Od/7ks6OIcvYqpzJe3lprI2aCJE8cSbiZ5QleIISaJtHf6/xe4dPSEp9Yd/kR5o7OyGiMKTxe9oViyx3vGMT8g==}
-    hasBin: true
 
   '@gar/promisify@1.1.3':
     resolution: {integrity: sha512-k2Ty1JcVojjJFwrg/ThKi2ujJ7XNLYaFGNB/bWT9wGR+oSMJHMa5w+CUq6p/pVrKeNNgA7pCqEcjSnHVoqJQFw==}
@@ -7173,10 +7169,6 @@ packages:
   commander@10.0.1:
     resolution: {integrity: sha512-y4Mg2tXshplEbSGzx7amzPwKKOCGuoSRP/CjEdwwk0FOGlUbq6lKuoyDZTNZkmxHdJtp54hdfY/JUrdL7Xfdug==}
     engines: {node: '>=14'}
-
-  commander@12.1.0:
-    resolution: {integrity: sha512-Vw8qHK3bZM9y/P10u3Vib8o/DdkvA2OtPtZvD871QKjy74Wj1WSKFILMPRPSdUSx5RFK1arlJzEtA4PkFgnbuA==}
-    engines: {node: '>=18'}
 
   commander@2.15.1:
     resolution: {integrity: sha512-VlfT9F3V0v+jr4yxPc5gg9s62/fIVWsd2Bk2iD435um1NlGMYdVCq+MjcXnhYq2icNOizHr1kK+5TI6H0Hy0ag==}
@@ -17946,11 +17938,6 @@ snapshots:
       - unrun
       - vue-tsc
 
-  '@gaonengwww/mock-server@1.0.5':
-    dependencies:
-      commander: 12.1.0
-      fast-glob: 3.3.3
-
   '@gar/promisify@1.1.3': {}
 
   '@hapi/address@5.1.1':
@@ -27873,8 +27860,6 @@ snapshots:
       delayed-stream: 1.0.0
 
   commander@10.0.1: {}
-
-  commander@12.1.0: {}
 
   commander@2.15.1: {}
 
