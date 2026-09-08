@@ -14,15 +14,27 @@
 npm i
 ```
 
-### 启动开发环境
+### 启动开发环境（含 Mock）
+
+`npm start` 会同时启动 Mock 服务和前端开发服务，无需单独启动后端即可访问。
 
 ```bash
-npm run dev
+npm start
 ```
 
-### 启动mock服务
+启动成功后访问：[http://localhost:3031/](http://localhost:3031/)
 
-部分场景使用了mock数据, 所以请确保您启动了mock服务
+### 连接真实后端
+
+若已启动 NestJS / Spring Boot 后端，可关闭 Mock，将接口代理到真实服务：
+
+```bash
+npm run dev:full
+```
+
+### 单独启动 Mock 服务
+
+如需单独启动 Mock 服务：
 
 ```bash
 npm run mock
