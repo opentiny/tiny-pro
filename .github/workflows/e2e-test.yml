@@ -30,19 +30,29 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Set up Docker Compose
+        uses: docker/setup-compose-action@v1
       - name: Start Backend Services
+        working-directory: ./template/nestJs
+        env:
+          COMPOSE_BAKE: "false"
         run: |
-          cd template/nestJs
           cp .env.example .env
           docker compose up -d
       - name: Wait for Backend Services
+        working-directory: ./template/nestJs
         run: |
           echo "Waiting for Backend Services to start..."
-          cd template/nestJs
           timeout 120s bash -c 'until curl -f http://localhost:3000/healthCheck 2>/dev/null; do
             echo "Backend API not ready yet..."
             sleep 3
           done'
           echo "Backend Services are ready!"
+      - name: Dump backend logs
+        if: failure()
+        working-directory: ./template/nestJs
+        run: docker compose logs
       - name: Run E2E tests
         run: pnpm test:e2e
