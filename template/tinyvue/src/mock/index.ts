@@ -1,4 +1,5 @@
 import froms from '../views/form/step/mock'
+import application from './application'
 import { createBackendMocks } from './backend'
 import board from './board'
 import list from './list'
@@ -13,6 +14,7 @@ const mockData = [
   ...profile,
   ...board,
   ...user,
+  ...application,
 ] as any
 
 startMockServer(mockData)
