@@ -69,16 +69,45 @@ npm i && npm start
 
 ## 前端启动
 
+前端支持 **Mock 独立启动** 与 **连接真实后端** 两种方式。
+
+### Mock 独立启动（推荐快速体验）
+
 在 `tiny-pro/web` 下依次执行以下命令：
 
 - 安装依赖：`npm i`
 - 启动前端项目：`npm start`
 
+`npm start` 会同时拉起 Mock 服务和 Vite 开发服务，无需启动后端即可访问 [http://localhost:3031/](http://localhost:3031/)。
+
+### 连接真实后端
+
+请先按上文启动后端服务，然后在 `tiny-pro/web` 下执行：
+
+```bash
+npm run dev:full
+```
+
 更详细的文档请参考 TinyPro 官网：[https://opentiny.design/vue-pro](https://opentiny.design/vue-pro)
 
 ## 本地启动
 
-如果你有意愿参与本项目的贡献，可以通过以下方式启动前后端（前提是 MySQL/Redis 服务已成功启动），并进行项目开发和调试。
+如果你有意愿参与本项目的贡献，可以通过以下方式启动项目。
+
+### 仅启动前端（Mock）
+
+无需 MySQL / Redis / 后端，适合前端开发与调试：
+
+```shell
+pnpm i
+pnpm dev
+```
+
+`pnpm dev` 会调用前端的 `start` 脚本，同时启动 Mock 与 Vite。启动成功之后，会自动打开浏览器，并访问：[http://localhost:3031/](http://localhost:3031/)。
+
+### 启动前后端联调
+
+前提是 MySQL / Redis 服务已成功启动。
 
 1. 创建一个空的 MySQL 数据库 `demo_tiny_pro`
 
@@ -131,8 +160,8 @@ pnpm i
 # 启动后端，执行该命令之后，会初始化 MySQL 数据库 demo_tiny_pro 的表结构，并填充表数据
 pnpm dev:backend
 
-# 启动前端
-pnpm dev
+# 启动前端（关闭 Mock，代理到真实后端）
+pnpm -F tiny-pro-vue dev:full
 ```
 
 启动成功之后，会自动打开浏览器，并访问：[http://localhost:3031/](http://localhost:3031/)。
