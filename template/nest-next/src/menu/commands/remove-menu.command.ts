@@ -1,0 +1,46 @@
+import {
+  Command,
+  CommandHandler,
+  EventBus,
+  ICommandHandler,
+} from '@nestjs/cqrs';
+import { MenuInfo } from '../dto/menu-info.dto';
+import { InjectRepository } from '@mikro-orm/nestjs';
+import { Menu, MenuId } from '../menu.entity';
+import { EntityRepository } from '@mikro-orm/core';
+import { MenuNotFound } from '../errors/menu-not-found';
+import { MenuRemoved } from '../events';
+
+export class RemoveMenu extends Command<MenuInfo> {
+  constructor(public id: MenuId) {
+    super();
+  }
+}
+
+@CommandHandler(RemoveMenu)
+export class RemoveMenuCommandHandler implements ICommandHandler<RemoveMenu> {
+  constructor(
+    @InjectRepository(Menu)
+    private readonly menu: EntityRepository<Menu>,
+    private readonly eventBus: EventBus,
+  ) {}
+  async execute({ id }: RemoveMenu): Promise<MenuInfo> {
+    const menu = await this.menu.findOne({ id });
+    if (!menu) {
+      throw new MenuNotFound();
+    }
+    const menuChildren = await this.menu.find({
+      parentId: menu.id,
+    });
+    if (menuChildren.length) {
+      menuChildren.forEach((child) => {
+        child.parentId = menu.parentId;
+      });
+      await this.menu.upsertMany(menuChildren);
+    }
+    await this.menu.nativeDelete({ id: menu.id });
+    this.menu.getEntityManager().clear();
+    this.eventBus.publish(new MenuRemoved(id));
+    return menu;
+  }
+}

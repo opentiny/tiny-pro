@@ -1,2 +1,16 @@
 packages:
   - template/*
+allowBuilds:
+  '@nestjs/core': true
+  '@scarf/scarf': true
+  core-js: true
+  cwebp-bin: true
+  ejs: true
+  esbuild: true
+  gifsicle: true
+  jpegtran-bin: true
+  mozjpeg: true
+  optipng-bin: true
+  pngquant-bin: true
+  unrs-resolver: true
+  vue-demi: true

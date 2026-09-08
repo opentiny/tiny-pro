@@ -3,7 +3,8 @@ import { Modal } from '@opentiny/vue'
 import locale from '@opentiny/vue-locale'
 import axios from 'axios'
 import router from '@/router'
-import { clearToken, getToken } from '@/utils/auth'
+import { clearToken, getRefreshToken, getToken, setRefreshToken, setToken } from '@/utils/auth'
+import { flushToken } from './user'
 
 export interface HttpResponse<T = unknown> {
   errMsg: string
@@ -11,14 +12,17 @@ export interface HttpResponse<T = unknown> {
   data: T
 }
 
-const { VITE_API_BASE_URL, VITE_BASE_API, VITE_MOCK_IGNORE } = import.meta
+const { VITE_BASE_API, VITE_MOCK_IGNORE } = import.meta
   .env || { VITE_BASE_API: '', VITE_MOCK_IGNORE: '' }
 
-if (VITE_API_BASE_URL) {
-  axios.defaults.baseURL = VITE_API_BASE_URL
+if (VITE_BASE_API) {
+  axios.defaults.baseURL = VITE_BASE_API
 }
 
 const ignoreMockApiList = VITE_MOCK_IGNORE?.split(',') || []
+
+let refreshPromise: Promise<string> | null = null
+
 axios.interceptors.request.use(
   (config: AxiosRequestConfig): any => {
     const isProxy = ignoreMockApiList.includes(config.url)
@@ -40,11 +44,10 @@ axios.interceptors.request.use(
     return config
   },
   (error) => {
-    // do something
     return Promise.reject(error)
   },
 )
-// add response interceptors
+
 axios.interceptors.response.use(
   (response: AxiosResponse<HttpResponse>) => {
     const res = response
@@ -65,12 +68,64 @@ axios.interceptors.response.use(
       })
     }
     if (status === 401) {
-      Modal.message({
-        message: locale.t('http.error.TokenExpire'),
-        status: 'error',
-      })
-      clearToken()
-      router.replace({ name: 'login' })
+      const originalRequest = error.config
+      if (originalRequest._retry) {
+        clearToken()
+        router.replace({ name: 'login' })
+        Modal.message({
+          message: locale.t('http.error.TokenExpire'),
+          status: 'error',
+        })
+        return Promise.reject(error)
+      }
+
+      originalRequest._retry = true
+      if (!getRefreshToken()) {
+        clearToken()
+        router.replace({ name: 'login' })
+        Modal.message({
+          message: locale.t('http.error.TokenExpire'),
+          status: 'error',
+        })
+        return Promise.reject(error)
+      }
+
+      if (!refreshPromise) {
+        refreshPromise = flushToken({ token: getRefreshToken() })
+          .then((res) => {
+            const newAccessToken = res.data.accessToken
+            const newRefreshToken = res.data.refreshToken
+            setToken(newAccessToken)
+            setRefreshToken(newRefreshToken)
+            return newAccessToken
+          })
+          .catch((err) => {
+            clearToken()
+            router.replace({ name: 'login' })
+            Modal.message({
+              message: locale.t('http.error.TokenExpire'),
+              status: 'error',
+            })
+            return Promise.reject(err)
+          })
+          .finally(() => {
+            refreshPromise = null
+          })
+      }
+
+      return refreshPromise
+        .then((newToken) => {
+          if (!originalRequest.headers) {
+            originalRequest.headers = {}
+          }
+          originalRequest.headers.Authorization = `Bearer ${newToken}`
+          return axios.request(originalRequest)
+        })
+        .catch((err) => {
+          clearToken()
+          router.replace({ name: 'login' })
+          return Promise.reject(err)
+        })
     }
     if (status === 400) {
       data.message = error.response.data.errors?.[0] ?? data.message

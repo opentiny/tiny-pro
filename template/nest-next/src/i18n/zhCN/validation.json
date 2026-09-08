@@ -1,0 +1,6 @@
+{
+  "NOT_EMPTY": "{property} 不能为空",
+  "IS_ARRAY": "{property} 应该为数组",
+  "NOT_EMPTY_HUMAN": "{name} 不能为空",
+  "TYPE_ERROR": "{property} 应该为 {type}"
+}

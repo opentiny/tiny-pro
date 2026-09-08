@@ -1,0 +1,42 @@
+{
+  "common":{
+    "INTERNAL_ERROR": "Internal Error",
+    "FORBIDDEN": "Forbidden"
+  },
+  "permission":{
+    "NOT_FOUND": "Permission not found"
+  },
+  "menu":{
+    "EXISTS": "Menu {name} Exists",
+    "NOT_FOUND": "Menu Not Found"
+  },
+  "role":{
+    "NOT_FOUND": "Role not found",
+    "EXISTS": "Role {name} Exists",
+    "NOT_EMPTY": "There are users under the role, please clear them"
+  },
+  "user":{
+    "NOT_FOUND": "User not found",
+    "EXISTS": "User {email} Exists",
+    "PASSWORD_INCORRECT": "Password Incorrect",
+    "PASSWORD_NOT_MATCH": "Password not match"
+  },
+  "auth":{
+    "INVALID_TOKEN": "Invalid Token",
+    "TOKEN_EXPIRED": "Token Expired",
+    "SESSION_EXPIRED": "Session Expired"
+  },
+  "preview":{
+    "REJECT_THIS_REQUEST": "The server rejected this request, and modification, addition, or deletion of data is not allowed in demonstration mode"
+  },
+  "lang": {
+    "NOT_EXISTS": "{lang} not found",
+    "EXISTS": "{name} exists",
+    "NOT_EXISTS_COMMON": "Not found",
+    "DELETE_LANG_CONFLICT": "Please clear all language records under {name} first"
+  },
+  "i18":{
+    "EXISTS": "I18n field exists",
+    "NOT_FOUND": "Not Found"
+  }
+}

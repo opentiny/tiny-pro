@@ -19,7 +19,7 @@ export interface DataChainGrowthRes {
   }
 }
 export function queryDataChainGrowth(data: DataChainGrowth) {
-  return axios.post<DataChainGrowthRes>(`${import.meta.env.VITE_BASE_API}/data-chain-growth`, data)
+  return axios.post<DataChainGrowthRes>(`/data-chain-growth`, data)
 }
 
 export interface PopularAuthorRes {
@@ -32,7 +32,7 @@ export interface PopularAuthorRes {
 }
 
 export function queryPopularAuthor() {
-  return axios.get<PopularAuthorRes>(`${import.meta.env.VITE_BASE_API}/popular-author/list`)
+  return axios.get<PopularAuthorRes>(`/popular-author/list`)
 }
 
 export interface ContentPublishRecord {
@@ -42,11 +42,11 @@ export interface ContentPublishRecord {
 }
 
 export function queryContentPublish() {
-  return axios.get<ContentPublishRecord[]>(`${import.meta.env.VITE_BASE_API}/content-publish`)
+  return axios.get<ContentPublishRecord[]>(`/content-publish`)
 }
 
 export function queryContentPeriodAnalysis() {
-  return axios.post<GeneralChart>(`${import.meta.env.VITE_BASE_API}/content-period-analysis`)
+  return axios.post<GeneralChart>(`/content-period-analysis`)
 }
 
 export interface PublicOpinionAnalysis {
@@ -59,7 +59,7 @@ export interface PublicOpinionAnalysisRes {
 }
 export function queryPublicOpinionAnalysis(data: DataChainGrowth) {
   return axios.post<PublicOpinionAnalysisRes>(
-    `${import.meta.env.VITE_BASE_API}/public-opinion-analysis`,
+    `/public-opinion-analysis`,
     data,
   )
 }
@@ -69,5 +69,5 @@ export interface DataOverviewRes {
 }
 
 export function queryDataOverview() {
-  return axios.post<DataOverviewRes>(`${import.meta.env.VITE_BASE_API}/data-overview`)
+  return axios.post<DataOverviewRes>(`/data-overview`)
 }

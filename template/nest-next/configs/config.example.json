@@ -1,0 +1,30 @@
+{
+  "$schema": "./config.schema.json",
+  "database":{
+    "host": "localhost",
+    "port": 3306,
+    "user": "root",
+    "password": "root",
+    "dbName": "tinypro"
+  },
+  "redis": {
+    "host": "localhost",
+    "port": 6379,
+    "password": "root",
+    "user": "root",
+    "db": 0
+  },
+  "auth":{
+    "accessTokenTTL": 300,
+    "refreshTokenTTL": 86400,
+    "session_limit": 2,
+    "apiTokenTTL": 604800,
+    "jwt":{
+      "mode": "secret",
+      "secret": "tinypro"
+    }
+  },
+  "feature": {
+    "preview": false
+  }
+}

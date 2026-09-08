@@ -1,0 +1,108 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Configure",
+  "type": "object",
+  "required": ["database", "redis", "feature", "auth"],
+  "properties": {
+    "database": { "$ref": "#/definitions/DatabaseConfig" },
+    "redis": { "$ref": "#/definitions/RedisConfigure" },
+    "feature": { "$ref": "#/definitions/FeatureConfigure" },
+    "swagger": { "$ref": "#/definitions/SwaggerConfigure" },
+    "auth": { "$ref": "#/definitions/AuthConfigure" }
+  },
+  "definitions": {
+    "DatabaseConfig": {
+      "type": "object",
+      "required": ["host", "port", "user", "password", "dbName"],
+      "properties": {
+        "host": { "type": "string", "description": "数据库主机地址" },
+        "port": { "type": "integer", "description": "数据库端口" },
+        "user": { "type": "string", "description": "数据库用户名" },
+        "password": { "type": "string", "description": "数据库密码" },
+        "dbName": { "type": "string", "description": "数据库名称" }
+      }
+    },
+    "RedisConfigure": {
+      "type": "object",
+      "required": ["host", "port", "user", "password", "db"],
+      "properties": {
+        "host": { "type": "string", "description": "Redis主机地址" },
+        "port": { "type": "integer", "description": "Redis端口" },
+        "user": { "type": "string", "description": "Redis用户名" },
+        "password": { "type": "string", "description": "Redis密码" },
+        "db": { "type": "integer", "description": "Redis数据库编号" }
+      }
+    },
+    "FeatureConfigure": {
+      "type": "object",
+      "required": ["preview"],
+      "properties": {
+        "preview": { "type": "boolean", "description": "预览功能开关" }
+      }
+    },
+    "SwaggerConfigure": {
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "Swagger文档标题" },
+        "version": { "type": "string", "description": "API版本号" },
+        "description": { "type": "string", "description": "Swagger文档描述" }
+      }
+    },
+    "AuthConfigure": {
+      "type": "object",
+      "required": [
+        "session_limit",
+        "accessTokenTTL",
+        "refreshTokenTTL",
+        "apiTokenTTL",
+        "jwt"
+      ],
+      "properties": {
+        "device_limit": {
+          "type": "integer",
+          "description": "设备限制数量",
+          "deprecated": true
+        },
+        "session_limit": { "type": "integer", "description": "会话限制数量" },
+        "accessTokenTTL": {
+          "type": "integer",
+          "description": "访问令牌过期时间(秒)"
+        },
+        "refreshTokenTTL": {
+          "type": "integer",
+          "description": "刷新令牌过期时间(秒)"
+        },
+        "apiTokenTTL": {
+          "type": "integer",
+          "description": "API令牌过期时间(秒)"
+        },
+        "jwt": {
+          "oneOf": [
+            { "$ref": "#/definitions/SecretConfigure" },
+            { "$ref": "#/definitions/LocalKeyConfigure" }
+          ]
+        }
+      }
+    },
+    "SecretConfigure": {
+      "type": "object",
+      "required": ["mode", "secret"],
+      "properties": {
+        "mode": { "const": "secret", "description": "JWT模式:使用密钥" },
+        "secret": { "type": "string", "description": "JWT密钥" }
+      }
+    },
+    "LocalKeyConfigure": {
+      "type": "object",
+      "required": ["mode", "publicKeyPath", "privateKeyPath"],
+      "properties": {
+        "mode": {
+          "const": "local-key",
+          "description": "JWT模式:使用本地密钥文件"
+        },
+        "publicKeyPath": { "type": "string", "description": "公钥文件路径" },
+        "privateKeyPath": { "type": "string", "description": "私钥文件路径" }
+      }
+    }
+  }
+}
