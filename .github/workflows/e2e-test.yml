@@ -55,4 +55,6 @@ jobs:
         working-directory: ./template/nestJs
         run: docker compose logs
       - name: Run E2E tests
+        env:
+          PLAYWRIGHT_WEB_SERVER_COMMAND: pnpm dev:full
         run: pnpm test:e2e
