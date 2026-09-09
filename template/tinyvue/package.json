@@ -22,7 +22,7 @@
     "report": "cross-env REPORT=true npm run build",
     "lint-staged": "npx lint-staged",
     "mock": "tsx ./src/mock/index.ts",
-    "test:mock": "node --import tsx --test src/mock/*.test.ts",
+    "test:mock": "node --import tsx --test src/mock/*.test.ts config/*.test.ts",
     "dev:fr": "farm",
     "build:fr": "farm build",
     "lint": "eslint",
