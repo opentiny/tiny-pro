@@ -1,4 +1,5 @@
   import { defineConfig, devices } from '@playwright/test';
+  import { resolvePlaywrightWebServerCommand } from './playwright-webserver.mjs';
 
   export default defineConfig({
     workers: 1,
@@ -35,7 +36,7 @@
       }
     ],
     webServer: {
-      command: 'pnpm start',
+      command: resolvePlaywrightWebServerCommand(),
       cwd: 'template/tinyvue',
       url: 'http://localhost:3031/vue-pro',
       reuseExistingServer: true,
