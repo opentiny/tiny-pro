@@ -11,20 +11,24 @@ test('GET /api/application returns paginated card-list data', async () => {
   })
 
   assert.equal(result.statusCode, 200)
-  const body = result.body as { data: Array<{
-    id: number
-    name: string
-    description: string
-    icon: string
-    classify: string
-    tag: Array<{ type: string, value: string }>
-  }>, total: number }
+  const body = result.body as {
+    data: Array<{
+      id: number
+      name: string
+      description: string
+      icon: string
+      classify: string
+      tag: Array<{ type: string, value: string }>
+    }>
+    total: number
+  }
 
   assert.ok(Array.isArray(body.data))
   assert.equal(body.data.length, 10)
   assert.ok(body.total > 10)
   assert.equal(typeof body.data[0].id, 'number')
-  assert.ok(body.data[0].name)
+  assert.equal(body.data[0].name, 'TinyVue 组件库')
+  assert.equal(body.data[1].name, 'TinyEngine 低代码引擎')
   assert.ok(Array.isArray(body.data[0].tag))
 })
 
@@ -40,10 +44,10 @@ test('GET /api/application filters by classify and keywords', async () => {
 
   const search = await dispatchMockRequest(application, {
     method: 'get',
-    url: '/api/application?page=1&limit=10&keywords=Furion&classify=all',
+    url: '/api/application?page=1&limit=10&keywords=TinyRobot&classify=all',
   })
   const searchBody = search.body as { data: Array<{ name: string }>, total: number }
   assert.equal(search.statusCode, 200)
   assert.equal(searchBody.total, 1)
-  assert.match(searchBody.data[0].name, /Furion/)
+  assert.match(searchBody.data[0].name, /TinyRobot/)
 })
