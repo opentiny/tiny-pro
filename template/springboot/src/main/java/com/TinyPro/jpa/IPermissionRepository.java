@@ -17,6 +17,8 @@ import java.util.Optional;
 public interface IPermissionRepository extends JpaRepository<Permission, Long> {
      Optional<Permission> findByDesc(String desc);
      Optional<Permission> findByName(String name);
+     List<Permission> findAllByName(String name);
+     boolean existsByName(String name);
      Page<Permission> findByNameContainingIgnoreCase(String name, Pageable pageable);
      @Query("SELECT p FROM Role r JOIN r.permission p WHERE r.id IN :roleIds")
      List<Permission> findByRoleIdIn(@Param("roleIds") List<Integer> roleIds);
