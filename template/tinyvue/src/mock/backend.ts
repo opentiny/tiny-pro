@@ -1,7 +1,7 @@
 import type { MenuNode } from './backend-data'
-import type { MockMethod } from './server'
+import type { MockHeaders, MockMethod } from './dispatch'
 import { createBackendState } from './backend-data'
-import { mockHttpResponse } from './server'
+import { mockHttpResponse } from './dispatch'
 
 function nextId(items: { id: number }[]) {
   return Math.max(0, ...items.map(item => item.id)) + 1
@@ -57,7 +57,7 @@ function findMenuLocation(nodes: MenuNode[], id: number): {
   return null
 }
 
-function bearerToken(headers: Record<string, string> | import('node:http').IncomingHttpHeaders) {
+function bearerToken(headers: MockHeaders) {
   const value = headers.authorization
   return Array.isArray(value) ? value[0]?.replace(/^Bearer\s+/i, '') : value?.replace(/^Bearer\s+/i, '')
 }
@@ -85,7 +85,7 @@ export function createBackendMocks(): MockMethod[] {
   }
 
   const authenticatedEmail = (
-    headers: Record<string, string> | import('node:http').IncomingHttpHeaders,
+    headers: MockHeaders,
   ) => {
     const token = bearerToken(headers)
     return token ? state.tokens.get(token) : undefined

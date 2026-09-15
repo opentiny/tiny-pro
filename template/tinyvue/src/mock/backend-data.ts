@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import localeTable from '../locales.json'
 
 export interface MenuNode {
   children: MenuNode[]
@@ -50,7 +50,7 @@ function menu(
   }
 }
 
-export const menuTree = [
+const menuTree = [
   menu('Board', 'board', 'board/index', 'menu.board', [
     menu('Home', 'home', 'board/home/index', 'menu.home'),
     menu('Work', 'work', 'board/work/index', 'menu.work'),
@@ -86,10 +86,6 @@ export const menuTree = [
     menu('Local', 'locale', 'locale/index', 'menu.i18n'),
   ], 'IconTotal'),
 ]
-
-export const localeTable = JSON.parse(
-  readFileSync(new URL('../locales.json', import.meta.url), 'utf8'),
-)
 
 export function createBackendState() {
   const role = {

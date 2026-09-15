@@ -21,25 +21,37 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Setup pnpm
-        uses: pnpm/action-setup@v3
+        uses: pnpm/action-setup@v4
         with:
-          version: 9
+          version: 10
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
       - name: Install deps
-        run: pnpm -F tiny-pro-vue i
+        run: pnpm install --frozen-lockfile --filter tiny-pro-vue...
       - name: Build site
         run: pnpm -F tiny-pro-vue build
         env:
-          VITE_BASE: /tiny-pro/
+          NODE_OPTIONS: --max-old-space-size=8192
+          VITE_BASE: /${{ github.event.repository.name }}/
+          VITE_CONTEXT: /${{ github.event.repository.name }}/
+          VITE_BASE_API: /api
+          VITE_MOCK_SERVER_HOST: /mock
+          VITE_USE_MOCK: true
+          VITE_LOWCODE_DESIGNER_ENABLED: false
+      - name: Prepare GitHub Pages
+        run: |
+          touch ./template/tinyvue/dist/.nojekyll
+          cp ./template/tinyvue/dist/index.html ./template/tinyvue/dist/404.html
+          find ./template/tinyvue/dist -name '*.gz' -delete
       - name: Setup Pages
-        uses: actions/configure-pages@v2
-      - name: Build with Jekyll
-        uses: actions/jekyll-build-pages@v1
-        with:
-          source: ./template/tinyvue/dist
-          destination: ./_site
+        uses: actions/configure-pages@v5
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
-  # Deployment job
+        with:
+          path: ./template/tinyvue/dist
   deploy:
     environment:
       name: github-pages
