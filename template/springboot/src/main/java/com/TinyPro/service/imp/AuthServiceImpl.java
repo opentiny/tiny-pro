@@ -1,5 +1,6 @@
 package com.TinyPro.service.imp;
 
+import com.TinyPro.entity.dto.CreateApiTokenDto;
 import com.TinyPro.entity.dto.CreateAuthDto;
 import com.TinyPro.entity.dto.RevokeApiTokenDto;
 import com.TinyPro.entity.vo.ApiToken;
