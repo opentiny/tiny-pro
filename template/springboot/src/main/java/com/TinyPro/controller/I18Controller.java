@@ -8,10 +8,8 @@ import com.TinyPro.entity.page.PageWrapper;
 import com.TinyPro.entity.po.I18;
 import com.TinyPro.entity.vo.I18Vo;
 import com.TinyPro.service.II18Service;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,8 +31,9 @@ public class I18Controller {
     }
 
     @GetMapping("/format")
-    public ResponseEntity<Map<String, Map<String, String>>> getFormat(HttpServletRequest request) {
-        Map<String, Map<String, String>> result = i18Service.getFormat(request);
+    public ResponseEntity<Map<String, Map<String, String>>> getFormat(
+            @RequestParam(name = "lang", required = false) String lang) {
+        Map<String, Map<String, String>> result = i18Service.getFormat(lang);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 

@@ -27,7 +27,7 @@ public class ILangSerivceImp  implements ILangService {
     @Override
     @Transactional
     public ResponseEntity<Lang> create(CreateLangDto createLangDto) {
-        Optional<Lang> langOptional = langRepository.findByName(createLangDto.getName());
+        Optional<Lang> langOptional = langRepository.findFirstByNameOrderByIdAsc(createLangDto.getName());
         if (langOptional.isPresent()) {
             throw new BusinessException("exception.lang.exists", HttpStatus.CONFLICT, null);
         }

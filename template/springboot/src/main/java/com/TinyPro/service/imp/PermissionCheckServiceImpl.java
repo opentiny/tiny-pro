@@ -9,6 +9,7 @@ import com.TinyPro.redis.RedisUtil;
 import com.TinyPro.service.IPermissionService;
 import com.TinyPro.service.IUserService;
 import com.TinyPro.service.PermissionCheckService;
+import com.TinyPro.service.TokenService;
 import com.TinyPro.utils.JwtUtil;
 import com.alibaba.fastjson.JSON;
 import io.jsonwebtoken.Claims;
@@ -32,6 +33,8 @@ public class PermissionCheckServiceImpl implements PermissionCheckService {
     private IUserService iUserService;
     @Autowired
     private IPermissionService iPermissionService;
+    @Autowired
+    private TokenService tokenService;
 
     @Override
     public void checkPermission(
@@ -60,13 +63,32 @@ public class PermissionCheckServiceImpl implements PermissionCheckService {
         Claims claims = jwtUtil.parseJwt(token);
         String email = claims.get("email", String.class);
 
-        // 5. 从 Redis 获取用户信息
-        String key = Contants.UserJwtTop + email + Contants.UserJwtbt;
-        String value = redisUtil.getValue(key);
-        if (value == null) {
-            throw new BusinessException("exception.common.unauthorized", HttpStatus.UNAUTHORIZED, "User not found in session");
+        User user;
+        if ("api".equals(claims.get("type", String.class))) {
+            if (!tokenService.validateApiToken(email, token)) {
+                throw new BusinessException("exception.common.tokenExpire", HttpStatus.UNAUTHORIZED, null);
+            }
+            user = iUserService.getUserInfo(email).getBody();
+            if (user == null) {
+                throw new BusinessException("exception.common.unauthorized", HttpStatus.UNAUTHORIZED, "User not found");
+            }
+        } else if (claims.get("id") != null && claims.getId() != null) {
+            if (!tokenService.isAccessTokenActive(token)) {
+                throw new BusinessException("exception.common.tokenExpire", HttpStatus.UNAUTHORIZED, null);
+            }
+            user = iUserService.getUserInfo(email).getBody();
+            if (user == null) {
+                throw new BusinessException("exception.common.unauthorized", HttpStatus.UNAUTHORIZED, "User not found");
+            }
+        } else {
+            // Legacy single-token sessions keep using the old Redis user cache.
+            String key = Contants.UserJwtTop + email + Contants.UserJwtbt;
+            String value = redisUtil.getValue(key);
+            if (value == null) {
+                throw new BusinessException("exception.common.unauthorized", HttpStatus.UNAUTHORIZED, "User not found in session");
+            }
+            user = JSON.parseObject(value, User.class);
         }
-        User user = JSON.parseObject(value, User.class);
 
         // 6. 获取用户权限列表
         List<Permission> permissions = iUserService.getRoleByUserId(user);

@@ -17,6 +17,7 @@ import java.util.Optional;
 public interface IPermissionRepository extends JpaRepository<Permission, Long> {
      Optional<Permission> findByDesc(String desc);
      Optional<Permission> findByName(String name);
+     Optional<Permission> findFirstByNameOrderByIdAsc(String name);
      List<Permission> findAllByName(String name);
      boolean existsByName(String name);
      Page<Permission> findByNameContainingIgnoreCase(String name, Pageable pageable);

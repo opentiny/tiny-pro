@@ -151,6 +151,27 @@ public class I18ControllerTest {
                         """));
     }
 
+    @Test
+    public void testGetFormat_ByLangQuery() throws Exception {
+        Map<String, Map<String, String>> mockResult = new HashMap<>();
+        mockResult.put("en", Map.of("key1", "value1"));
+        when(i18Service.getFormat("en")).thenReturn(mockResult);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/i18/format")
+                        .param("lang", "en")
+                        .header("Authorization", "Bearer "+Contants.TOKEN))
+                .andExpect(status().isOk())
+                .andExpect(content().json("""
+                        {
+                          "en": {
+                            "key1": "value1"
+                          }
+                        }
+                        """));
+
+        verify(i18Service).getFormat("en");
+    }
+
     // ===================== findAll - GET /i18 =====================
     @Test
     public void testFindAll_Success() throws Exception {

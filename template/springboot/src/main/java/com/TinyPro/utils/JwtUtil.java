@@ -10,6 +10,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,7 +31,7 @@ public class JwtUtil {
         try {
             // 使用 SHA-256 哈希算法将字符串转换为字节数组
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] keyBytes = digest.digest(secretString.getBytes());
+            byte[] keyBytes = digest.digest(secretString.getBytes(StandardCharsets.UTF_8));
 
             // 将字节数组转换为 SecretKey
             this.secretKey = new SecretKeySpec(keyBytes, SignatureAlgorithm.HS256.getJcaName());
@@ -68,6 +69,20 @@ public class JwtUtil {
      * @return 解析后的 JWT 声明
      * @throws SignatureException 如果 JWT 签名无效
      */
+    public String generateToken(Map<String, Object> claims, String jti, long ttlMillis) {
+        Date now = new Date();
+        Map<String, Object> tokenClaims = new HashMap<>(claims);
+        tokenClaims.put("jti", jti);
+
+        return Jwts.builder()
+                .setClaims(tokenClaims)
+                .setId(jti)
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + ttlMillis))
+                .signWith(secretKey, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
     public Claims parseJwt(String jwt) throws SignatureException {
         try {
             return Jwts.parserBuilder()

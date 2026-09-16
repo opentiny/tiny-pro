@@ -18,6 +18,8 @@ public interface IMenuRepository extends JpaRepository<Menu, Long> {
     // 查询所有菜单
     @Query("SELECT m FROM Menu m ORDER BY m.order ASC")
     List<Menu> findAllMenus();
+    Optional<Menu> findByName(String name);
+    Optional<Menu> findFirstByNameOrderByIdAsc(String name);
     Optional<Menu> findByNameAndOrderAndMenuTypeAndParentIdAndPathAndIconAndComponentAndLocale(
             String name,
             Integer order,

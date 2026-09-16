@@ -16,7 +16,6 @@ import com.alibaba.fastjson.JSON;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -31,7 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -63,19 +62,26 @@ public class II18ServiceImpl implements II18Service {
     }
 
     @Override
-    public Map<String, Map<String, String>> getFormat( HttpServletRequest request) {
-        String lang = request.getHeader("x-lang");
-        Map<String, Map<String, String>> result = new HashMap<>();
-        Lang langData = langRepository.findByName(lang).orElseThrow(() -> new BusinessException("exception.lang.notExists", HttpStatus.NOT_FOUND, null));
+    @Transactional(readOnly = true)
+    public Map<String, Map<String, String>> getFormat(String lang) {
+        Map<String, Map<String, String>> result = new LinkedHashMap<>();
+        if (StringUtils.isBlank(lang)) {
+            langRepository.findAllWithI18ns().forEach(language ->
+                    result.put(language.getName(), formatI18ns(language.getI18ns())));
+            return result;
+        }
 
-        List<I18> i18List = i18Repository.findByLang_Id(Long.valueOf(langData.getId()));
-        Map<String, String> i18map = new HashMap<>();
-        i18List.forEach(item -> {
-            i18map.put(item.getKey(), item.getContent());
-        });
-
-        result.put(lang, i18map);
+        langRepository.findByNameWithI18ns(lang)
+                .ifPresent(language -> result.put(language.getName(), formatI18ns(language.getI18ns())));
         return result;
+    }
+
+    private Map<String, String> formatI18ns(List<I18> i18ns) {
+        Map<String, String> i18map = new LinkedHashMap<>();
+        if (i18ns != null) {
+            i18ns.forEach(item -> i18map.put(item.getKey(), item.getContent()));
+        }
+        return i18map;
     }
 
     @Override
