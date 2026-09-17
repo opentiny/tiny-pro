@@ -86,6 +86,22 @@ export type Configure = {
    * Swagger文档版本
    */
   SWAGGER_VERSION: string;
+  /**
+   * 大模型服务地址（OpenAI 兼容协议，默认 DeepSeek）
+   */
+  LLM_BASE_URL: string;
+  /**
+   * 大模型 API Key（仅服务端使用，勿提交到仓库）
+   */
+  LLM_API_KEY: string;
+  /**
+   * 大模型默认模型名
+   */
+  LLM_MODEL: string;
+  /**
+   * 大模型扩展请求参数（JSON 字符串，如 '{"enable_search":true}'）
+   */
+  LLM_EXTRA_BODY: string;
 }
 
 export const CONFIG_SCHEMA = Joi.object<Configure>({
@@ -103,13 +119,17 @@ export const CONFIG_SCHEMA = Joi.object<Configure>({
   EXPIRES_IN: Joi.string(),
   PAGINATION_PAGE: Joi.number(),
   PAGINATION_LIMIT: Joi.number(),
-  GLOBAL_PREFIX: Joi.string(),
+  GLOBAL_PREFIX: Joi.string().default('/'),
   MOCK_REGEX: Joi.string(),
-  REFRESH_TOKEN_TTL: Joi.number(),
-  DEVICE_LIMIT: Joi.number(),
+  REFRESH_TOKEN_TTL: Joi.number().default(604800000),
+  DEVICE_LIMIT: Joi.number().default(3),
   PREVIEW_MODE: Joi.bool().default(true),
   ENABLE_SWAGGER: Joi.bool().default(false),
   SWAGGER_TITLE: Joi.string().default('Tiny Pro'),
   SWAGGER_DESC: Joi.string().default('开箱即用的中后台模板'),
   SWAGGER_VERSION: Joi.string().default('1.0.0'),
+  LLM_BASE_URL: Joi.string().default('https://api.deepseek.com'),
+  LLM_API_KEY: Joi.string().allow('').default(''),
+  LLM_MODEL: Joi.string().default('deepseek-chat'),
+  LLM_EXTRA_BODY: Joi.string().allow('').default(''),
 })
