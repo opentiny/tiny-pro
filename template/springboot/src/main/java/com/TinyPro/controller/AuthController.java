@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,12 +56,12 @@ public class AuthController {
     @PostMapping("/revoke-api-token")
     @Operation(summary = "撤销 API Token", description = "按邮箱和 tokenId 撤销指定 API Token")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "撤销成功"),
+            @ApiResponse(responseCode = "201", description = "撤销成功"),
             @ApiResponse(responseCode = "401", description = "未认证", content = @Content(schema = @Schema(hidden = true)))
     })
-    public ResponseEntity<Void> revokeApiToken(@RequestBody @Valid RevokeApiTokenDto dto) {
+    public ResponseEntity<String> revokeApiToken(@RequestBody @Valid RevokeApiTokenDto dto) {
         authService.revokeApiToken(dto);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping("/test")

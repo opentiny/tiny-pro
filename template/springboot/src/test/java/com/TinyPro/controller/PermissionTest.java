@@ -68,7 +68,7 @@ public class PermissionTest {
     private MockMvc mockMvc;
     @MockBean
     private IAuthService authService;
-    private static final String LOGOUT_ENDPOINT = "/auth/logout";
+    private static final String LOGOUT_ENDPOINT = "/api/auth/logout";
     @Autowired
     private ObjectMapper objectMapper;
     @TestConfiguration

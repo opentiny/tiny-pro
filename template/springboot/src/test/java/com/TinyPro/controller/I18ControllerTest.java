@@ -116,7 +116,7 @@ public class I18ControllerTest {
         when(i18Service.create(any(CreateI18Dto.class)))
                 .thenAnswer(item ->ResponseEntity.ok(mockI18));
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/i18")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/i18")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer "+Contants.TOKEN)
                         .content("{\"lang\": 1, \"key\": \"vali.NOT_EMPTY\", \"content\": \"该不能为空\"}"))
@@ -137,7 +137,7 @@ public class I18ControllerTest {
         when(i18Service.getFormat( any()))
                 .thenReturn(mockResult);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/i18/format")
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/i18/format")
                         .header("Authorization", "Bearer "+Contants.TOKEN)
                 )
                 .andExpect(status().isOk())
@@ -157,7 +157,7 @@ public class I18ControllerTest {
         mockResult.put("en", Map.of("key1", "value1"));
         when(i18Service.getFormat("en")).thenReturn(mockResult);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/i18/format")
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/i18/format")
                         .param("lang", "en")
                         .header("Authorization", "Bearer "+Contants.TOKEN))
                 .andExpect(status().isOk())
@@ -190,7 +190,7 @@ public class I18ControllerTest {
         when(i18Service.findAll(anyInt(), anyInt(), anyBoolean(), any(), any(), any()))
                 .thenAnswer(item ->ResponseEntity.ok(mockWrapper));
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/i18")
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/i18")
                         .param("page", "1")
                         .param("limit", "10")
                         .header("Authorization", "Bearer "+Contants.TOKEN)
@@ -202,7 +202,7 @@ public class I18ControllerTest {
         I18Vo mockVo = new I18Vo(1285,"vali.NOT_EMPTY","该不能为空",new LangVo(1,"zhCN"));
         when(i18Service.getI18ById(anyInt()))
                 .thenAnswer(item ->mockVo);
-        mockMvc.perform(MockMvcRequestBuilders.get("/i18/1")
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/i18/1")
                         .header("Authorization", "Bearer "+Contants.TOKEN)
                 )
                 .andExpect(status().isOk());
@@ -213,7 +213,7 @@ public class I18ControllerTest {
         when(i18Service.updateByi18nId(anyLong(), any(UpdateI18Dto.class)))
                 .thenAnswer(item ->new ResponseEntity<>(new I18Vo(1285,"vali.NOT_EMPTY","该不能为空",new LangVo(1,"zhCN")), HttpStatus.OK));
 
-        mockMvc.perform(MockMvcRequestBuilders.patch("/i18/1")
+        mockMvc.perform(MockMvcRequestBuilders.patch("/api/i18/1")
                         .header("Authorization", "Bearer "+Contants.TOKEN)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{}"))
@@ -227,7 +227,7 @@ public class I18ControllerTest {
         when(i18Service.removei18ById(anyInt()))
                 .thenAnswer(item ->mockI18);
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/i18/1")
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/i18/1")
                         .header("Authorization", "Bearer "+Contants.TOKEN)
                         .content("{}")
                 )
@@ -240,7 +240,7 @@ public class I18ControllerTest {
         when(i18Service.batchDeleteUser(anyList()))
                 .thenReturn(new ResponseEntity<>(List.of(new I18()), HttpStatus.OK));
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/i18/batch")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/i18/batch")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer "+Contants.TOKEN)
                         .content("[1, 2, 3]"))

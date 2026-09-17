@@ -64,11 +64,11 @@ public class AuthControllerTest {
     private LogoutAuthDto validLogoutDto;
     private LogoutAuthDto invalidLogoutDto;
 
-    private static final String LOGIN_ENDPOINT = "/auth/login";
-    private static final String LOGOUT_ENDPOINT = "/auth/logout";
-    private static final String REFRESH_ENDPOINT = "/auth/token/refresh";
-    private static final String API_TOKEN_ENDPOINT = "/auth/api-token";
-    private static final String REVOKE_API_TOKEN_ENDPOINT = "/auth/revoke-api-token";
+    private static final String LOGIN_ENDPOINT = "/api/auth/login";
+    private static final String LOGOUT_ENDPOINT = "/api/auth/logout";
+    private static final String REFRESH_ENDPOINT = "/api/auth/token/refresh";
+    private static final String API_TOKEN_ENDPOINT = "/api/auth/api-token";
+    private static final String REVOKE_API_TOKEN_ENDPOINT = "/api/auth/revoke-api-token";
     @TestConfiguration
     static class TestConfig {
         @Bean
@@ -192,12 +192,13 @@ public class AuthControllerTest {
     }
 
     @Test
-    public void testRevokeApiToken_ReturnsOk() throws Exception {
+    public void testRevokeApiToken_ReturnsCreated() throws Exception {
         mockMvc.perform(post(REVOKE_API_TOKEN_ENDPOINT)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer " + Contants.TOKEN)
                         .content("{\"email\":\"test@example.com\",\"tokenId\":\"integration\"}"))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated())
+                .andExpect(content().string(""));
 
         verify(authService).revokeApiToken(any());
     }

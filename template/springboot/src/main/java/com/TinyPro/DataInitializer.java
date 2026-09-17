@@ -16,6 +16,7 @@ import com.TinyPro.jpa.IPermissionRepository;
 import com.TinyPro.jpa.IRoleRepository;
 import com.TinyPro.jpa.IUserRepository;
 import com.TinyPro.jpa.LangRepository;
+import com.TinyPro.redis.RedisLockService;
 import com.TinyPro.utils.Sha256Utils;
 import com.alibaba.fastjson.JSON;
 import org.slf4j.Logger;
@@ -65,16 +66,27 @@ public class DataInitializer implements CommandLineRunner {
     @Autowired
     private ApplicationRepository applicationRepository;
 
+    @Autowired
+    private RedisLockService redisLockService;
+
     @Override
     public void run(String... args) throws Exception {
-        testMysqlConnection();
-        testRedisConnection();
-        initI18n();
-        initApplications();
-        initPermissions();
-        initMenus();
-        Role role = initRole();
-        initUser(role);
+        String installLockKey = "install";
+        if (!redisLockService.tryLock(installLockKey, 60_000L, 300_000L)) {
+            throw new IllegalStateException("Failed to acquire Redis initialization lock");
+        }
+        try {
+            testMysqlConnection();
+            testRedisConnection();
+            initI18n();
+            initApplications();
+            initPermissions();
+            initMenus();
+            Role role = initRole();
+            initUser(role);
+        } finally {
+            redisLockService.unlock(installLockKey);
+        }
     }
 
     private void initI18n() throws IOException {

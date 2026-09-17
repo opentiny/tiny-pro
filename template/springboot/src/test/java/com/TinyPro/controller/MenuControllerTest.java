@@ -117,7 +117,7 @@ public class MenuControllerTest {
                 .thenReturn(ResponseEntity.ok(mockMenuVoList));
 
         // 模拟请求
-        mockMvc.perform(get("/menu/role/admin@example.com")
+        mockMvc.perform(get("/api/menu/role/admin@example.com")
                         .header("Authorization", "Bearer "+Contants.TOKEN)
                 )
                 .andExpect(status().isOk())
@@ -132,7 +132,7 @@ public class MenuControllerTest {
         when(iMenuService.findAllMenu())
                 .thenReturn(ResponseEntity.ok(mockMenuVoList));
 
-        mockMvc.perform(get("/menu")
+        mockMvc.perform(get("/api/menu")
                         .header("Authorization", "Bearer "+Contants.TOKEN)
                 )
                 .andExpect(status().isOk())
@@ -146,7 +146,7 @@ public class MenuControllerTest {
         when(iMenuService.createMenu(any(), anyBoolean()))
                 .thenReturn(ResponseEntity.ok(mockMenu));
 
-        mockMvc.perform(post("/menu")
+        mockMvc.perform(post("/api/menu")
                         .header("Authorization", "Bearer "+Contants.TOKEN)
                         .contentType("application/json")
                         .content("""
@@ -172,7 +172,7 @@ public class MenuControllerTest {
         when(iMenuService.updateMenu(any()))
                 .thenReturn(ResponseEntity.ok(true));
 
-        mockMvc.perform(patch("/menu")
+        mockMvc.perform(patch("/api/menu")
                         .header("Authorization", "Bearer "+Contants.TOKEN)
                         .contentType("application/json")
                         .content("""
@@ -198,7 +198,7 @@ public class MenuControllerTest {
         when(iMenuService.deleteMenu(anyInt(), anyInt()))
                 .thenReturn(ResponseEntity.ok(mockMenu));
 
-        mockMvc.perform(delete("/menu")
+        mockMvc.perform(delete("/api/menu")
                         .param("id","1")
                         .param("parentId","0")
                         .header("Authorization", "Bearer "+Contants.TOKEN)

@@ -125,7 +125,7 @@ public class PermissionControllerTest {
         when(iPermissionService.create(any(), anyBoolean()))
                 .thenReturn(ResponseEntity.ok(mockPermissionVo));
 
-        mockMvc.perform(post("/permission")
+        mockMvc.perform(post("/api/permission")
                         .contentType("application/json")
                         .content("""
                                 {
@@ -147,7 +147,7 @@ public class PermissionControllerTest {
         when(iPermissionService.updatePermission(any()))
                 .thenReturn(ResponseEntity.ok(updatePermissionVo));
 
-        mockMvc.perform(patch("/permission")
+        mockMvc.perform(patch("/api/permission")
                         .contentType("application/json")
                         .content("""
                                 {
@@ -170,7 +170,7 @@ public class PermissionControllerTest {
         when(iPermissionService.findAllPermission())
                 .thenReturn(mockPermissionList);
 
-        mockMvc.perform(get("/permission")
+        mockMvc.perform(get("/api/permission")
                         .header("Authorization", "Bearer "+Contants.TOKEN)
                 )
                 .andExpect(status().isOk())
@@ -189,7 +189,7 @@ public class PermissionControllerTest {
         when(iPermissionService.findPermissions(anyInt(), anyInt(), anyString()))
                 .thenAnswer(item -> ResponseEntity.ok(pagedPermissions));
 
-        mockMvc.perform(get("/permission")
+        mockMvc.perform(get("/api/permission")
                         .param("page", "1")
                         .param("limit", "10")
                         .param("name", "user")
@@ -206,7 +206,7 @@ public class PermissionControllerTest {
         when(iPermissionService.delPermission(anyInt()))
                 .thenAnswer(item ->ResponseEntity.ok(mockPermission));
 
-        mockMvc.perform(delete("/permission/1")
+        mockMvc.perform(delete("/api/permission/1")
                         .header("Authorization", "Bearer "+Contants.TOKEN)
                 )
                 .andExpect(status().isOk())
