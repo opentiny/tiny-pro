@@ -59,6 +59,18 @@ public class RedisUtil {
         return redisTemplate.opsForValue().get(key);
     }
 
+    public boolean exists(String key) {
+        return Boolean.TRUE.equals(redisTemplate.hasKey(key));
+    }
+
+    /**
+     * Stores a value without a TTL. Used for installation state that must
+     * survive application restarts until it is explicitly removed.
+     */
+    public void setPersistentValue(String key, String value) {
+        redisTemplate.opsForValue().set(key, value);
+    }
+
     /**
      * 删除 Redis 中的值
      *

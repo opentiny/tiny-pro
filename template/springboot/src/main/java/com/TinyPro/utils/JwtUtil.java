@@ -65,7 +65,7 @@ public class JwtUtil {
     /**
      * 解析 JWT
      *
-     * @param jwt JWT 字符串
+     * @param claims JWT 字符串
      * @return 解析后的 JWT 声明
      * @throws SignatureException 如果 JWT 签名无效
      */

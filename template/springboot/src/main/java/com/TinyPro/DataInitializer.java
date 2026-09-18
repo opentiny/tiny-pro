@@ -17,6 +17,7 @@ import com.TinyPro.jpa.IRoleRepository;
 import com.TinyPro.jpa.IUserRepository;
 import com.TinyPro.jpa.LangRepository;
 import com.TinyPro.redis.RedisLockService;
+import com.TinyPro.redis.RedisUtil;
 import com.TinyPro.utils.Sha256Utils;
 import com.alibaba.fastjson.JSON;
 import org.slf4j.Logger;
@@ -68,6 +69,8 @@ public class DataInitializer implements CommandLineRunner {
 
     @Autowired
     private RedisLockService redisLockService;
+    @Autowired
+    private RedisUtil redisUtil;
 
     @Override
     public void run(String... args) throws Exception {
@@ -76,6 +79,11 @@ public class DataInitializer implements CommandLineRunner {
             throw new IllegalStateException("Failed to acquire Redis initialization lock");
         }
         try {
+            if (redisUtil.exists(Contants.INSTALL_FLAG)) {
+                logger.info("[APP]: Already installed; skip default data initialization");
+                return;
+            }
+
             testMysqlConnection();
             testRedisConnection();
             initI18n();
@@ -84,6 +92,8 @@ public class DataInitializer implements CommandLineRunner {
             initMenus();
             Role role = initRole();
             initUser(role);
+            redisUtil.setPersistentValue(Contants.INSTALL_FLAG, "1");
+            logger.info("[APP]: installation flag persisted: {}", Contants.INSTALL_FLAG);
         } finally {
             redisLockService.unlock(installLockKey);
         }
