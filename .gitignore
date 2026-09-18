@@ -12,3 +12,5 @@ yarn.lock
 .env
 .history
 playwright-report
+package-lock.json
+pnpm-lock.yaml
