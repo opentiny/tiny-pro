@@ -135,3 +135,5 @@ export function createBackendState() {
     users: [user],
   }
 }
+
+export type BackendState = ReturnType<typeof createBackendState>

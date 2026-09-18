@@ -1,6 +1,11 @@
 import type { MenuNode } from './backend-data'
+import type { BackendStorage } from './backend-persist'
 import type { MockHeaders, MockMethod } from './dispatch'
-import { createBackendState } from './backend-data'
+import {
+  createDefaultBackendStorage,
+  loadBackendState,
+  withBackendPersist,
+} from './backend-persist'
 import { mockHttpResponse } from './dispatch'
 
 function nextId(items: { id: number }[]) {
@@ -62,8 +67,26 @@ function bearerToken(headers: MockHeaders) {
   return Array.isArray(value) ? value[0]?.replace(/^Bearer\s+/i, '') : value?.replace(/^Bearer\s+/i, '')
 }
 
-export function createBackendMocks(): MockMethod[] {
-  const state = createBackendState()
+function emailFromMockToken(token: string | undefined, prefix: string) {
+  if (!token?.startsWith(prefix)) {
+    return undefined
+  }
+  const email = token.slice(prefix.length)
+  return email || undefined
+}
+
+export function createBackendMocks(storage: BackendStorage = createDefaultBackendStorage()): MockMethod[] {
+  const state = loadBackendState(storage)
+
+  const knownEmail = (email?: string) => {
+    if (!email) {
+      return undefined
+    }
+    if (state.credentials.has(email) || state.users.some(item => item.email === email)) {
+      return email
+    }
+    return undefined
+  }
 
   const syncRoleMenus = (roleMenuIds: Map<number, Set<number>>) => {
     state.roles.forEach((role) => {
@@ -88,10 +111,21 @@ export function createBackendMocks(): MockMethod[] {
     headers: MockHeaders,
   ) => {
     const token = bearerToken(headers)
-    return token ? state.tokens.get(token) : undefined
+    if (!token) {
+      return undefined
+    }
+    const mapped = state.tokens.get(token)
+    if (mapped) {
+      return mapped
+    }
+    const email = knownEmail(emailFromMockToken(token, 'mock-access-token:'))
+    if (email) {
+      state.tokens.set(token, email)
+    }
+    return email
   }
 
-  return [
+  return withBackendPersist([
     {
       url: '/api/auth/login',
       method: 'post',
@@ -116,9 +150,11 @@ export function createBackendMocks(): MockMethod[] {
       method: 'post',
       response: ({ body }) => {
         const email = state.refreshTokens.get(body?.token)
+          ?? knownEmail(emailFromMockToken(body?.token, 'mock-refresh-token:'))
         if (!email) {
           return mockHttpResponse(401, { message: '刷新令牌无效' })
         }
+        state.refreshTokens.set(body.token, email)
         const accessToken = `mock-access-token:${email}`
         const refreshToken = `mock-refresh-token:${email}`
         state.tokens.set(accessToken, email)
@@ -624,5 +660,5 @@ export function createBackendMocks(): MockMethod[] {
         return record
       },
     },
-  ]
+  ], storage, state)
 }
