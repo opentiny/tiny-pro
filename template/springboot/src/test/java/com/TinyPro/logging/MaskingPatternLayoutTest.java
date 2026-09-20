@@ -23,4 +23,20 @@ class MaskingPatternLayoutTest {
         assertFalse(masked.contains("jwt-secret"));
         assertFalse(masked.contains("jwt-token"));
     }
+
+    @Test
+    void masksCompleteCookieHeaderValue() {
+        String message = "Cookie: session=abc; refresh=def; theme=dark\n"
+                + "Set-Cookie: session=ghi; refresh=jkl; Path=/; HttpOnly";
+
+        String masked = MaskingPatternLayout.mask(message);
+
+        assertTrue(masked.contains("Cookie: ******"), masked);
+        assertTrue(masked.contains("Set-Cookie: ******"), masked);
+        assertFalse(masked.contains("session=abc"));
+        assertFalse(masked.contains("refresh=def"));
+        assertFalse(masked.contains("session=ghi"));
+        assertFalse(masked.contains("refresh=jkl"));
+        assertFalse(masked.contains("HttpOnly"));
+    }
 }
