@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 public interface IAuthService {
     ResponseEntity<?> login(CreateAuthDto createAuthDto, HttpServletResponse response) throws Exception;
 
-    String logout(@NotEmpty(message = "validation.NOT_EMPTY_HUMAN") String token);
+    void logout(@NotEmpty(message = "validation.NOT_EMPTY_HUMAN") String token);
 
     TokenPair refreshToken(@NotEmpty(message = "validation.NOT_EMPTY_HUMAN") String token);
 

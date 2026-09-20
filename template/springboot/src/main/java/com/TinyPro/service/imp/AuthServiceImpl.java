@@ -38,9 +38,8 @@ public class AuthServiceImpl implements IAuthService {
     }
 
     @Override
-    public String logout(String token) {
+    public void logout(String token) {
         tokenService.logout(token);
-        return "redirect:/login";
     }
 
     @Override

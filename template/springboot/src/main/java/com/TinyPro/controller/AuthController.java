@@ -18,6 +18,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -49,8 +51,9 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public String logout(@Valid @RequestBody LogoutAuthDto logoutAuthDto) {
-        return authService.logout(logoutAuthDto.getToken());
+    public ResponseEntity<Map<String, Boolean>> logout(@Valid @RequestBody LogoutAuthDto logoutAuthDto) {
+        authService.logout(logoutAuthDto.getToken());
+        return ResponseEntity.ok(Map.of("success", true));
     }
 
     @PostMapping("/revoke-api-token")

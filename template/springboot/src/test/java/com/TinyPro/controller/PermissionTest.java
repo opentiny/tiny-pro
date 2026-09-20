@@ -36,6 +36,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -115,8 +116,7 @@ public class PermissionTest {
     //测试_假的token测试
     @Test
     public void testPermission_Faile() throws Exception {
-        when(authService.logout(anyString()))
-                .thenReturn("redirect:/login");
+        doNothing().when(authService).logout(anyString());
         mockMvc.perform(post(LOGOUT_ENDPOINT)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization" ,"Bearer "+ Contants.TRUE_TOKEN)

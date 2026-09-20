@@ -203,17 +203,17 @@ public class AuthControllerTest {
         verify(authService).revokeApiToken(any());
     }
 
-    // 登出成功场景（无需修改，因返回值是String，无泛型冲突）
+    // 登出成功场景
     @Test
     public void testLogout_Success() throws Exception {
-        when(authService.logout(anyString()))
-                .thenReturn("redirect:/login");
+        doNothing().when(authService).logout(anyString());
 
         mockMvc.perform(post(LOGOUT_ENDPOINT)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization" ,"Bearer "+ Contants.TOKEN)
                         .content(objectMapper.writeValueAsString(validLogoutDto)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true));
     }
 
     // 登出无效token场景（无需修改）
