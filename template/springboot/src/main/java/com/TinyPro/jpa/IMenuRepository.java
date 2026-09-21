@@ -19,6 +19,16 @@ public interface IMenuRepository extends JpaRepository<Menu, Long> {
     @Query("SELECT m FROM Menu m ORDER BY m.order ASC")
     List<Menu> findAllMenus();
     Optional<Menu> findByName(String name);
+    Optional<Menu> findByNameAndOrderAndMenuTypeAndParentIdAndPathAndIconAndComponentAndLocale(
+      String name,
+      Integer order,
+      String menuType,
+      Integer parentId,
+      String path,
+      String icon,
+      String component,
+      String locale
+    );
     Optional<Menu> findFirstByNameOrderByIdAsc(String name);
     List<Menu> findByParentId(Integer parentId);
 }

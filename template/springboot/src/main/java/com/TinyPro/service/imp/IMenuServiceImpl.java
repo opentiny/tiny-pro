@@ -89,8 +89,10 @@ import java.util.stream.Collectors;
         Integer parentId = createMenuDto.getParentId();
         String locale = createMenuDto.getLocale();
 
-        Optional<Menu> existingMenu = menuRepository.findFirstByNameOrderByIdAsc(name);
-
+        // 检查菜单是否已存在
+        Optional<Menu> existingMenu = menuRepository.findByNameAndOrderAndMenuTypeAndParentIdAndPathAndIconAndComponentAndLocale(
+          name, order, menuType, parentId, path, icon, component, locale
+        );
         if (isInit && existingMenu.isPresent()) {
             return ResponseEntity.ok(existingMenu.get());
         }

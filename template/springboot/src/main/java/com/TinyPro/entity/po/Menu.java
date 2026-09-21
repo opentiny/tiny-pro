@@ -21,7 +21,7 @@ public class Menu implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String name;
     @Column(name = "`order`")
     @TableField("'order'")
