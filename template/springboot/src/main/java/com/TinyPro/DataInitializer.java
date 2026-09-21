@@ -274,7 +274,16 @@ public class DataInitializer implements CommandLineRunner {
         menu.setParentId(parentId);
 
         Menu persisted = findOrInsert(
-                () -> menuRepository.findFirstByNameOrderByIdAsc(menu.getName()).orElse(null),
+                () -> menuRepository.findByMenuIdentity(
+                        menu.getName(),
+                        menu.getOrder(),
+                        menu.getMenuType(),
+                        menu.getParentId(),
+                        menu.getPath(),
+                        menu.getIcon(),
+                        menu.getComponent(),
+                        menu.getLocale()
+                ).orElse(null),
                 () -> menuRepository.saveAndFlush(menu)
         );
 

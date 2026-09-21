@@ -90,8 +90,8 @@ import java.util.stream.Collectors;
         String locale = createMenuDto.getLocale();
 
         // 检查菜单是否已存在
-        Optional<Menu> existingMenu = menuRepository.findByNameAndOrderAndMenuTypeAndParentIdAndPathAndIconAndComponentAndLocale(
-          name, order, menuType, parentId, path, icon, component, locale
+        Optional<Menu> existingMenu = menuRepository.findByMenuIdentity(
+                name, order, menuType, parentId, path, icon, component, locale
         );
         if (isInit && existingMenu.isPresent()) {
             return ResponseEntity.ok(existingMenu.get());
@@ -115,7 +115,9 @@ import java.util.stream.Collectors;
         try {
             return ResponseEntity.ok(menuRepository.saveAndFlush(newMenu));
         } catch (DataIntegrityViolationException ex) {
-            Optional<Menu> reloadedMenu = menuRepository.findFirstByNameOrderByIdAsc(name);
+            Optional<Menu> reloadedMenu = menuRepository.findByMenuIdentity(
+                    name, order, menuType, parentId, path, icon, component, locale
+            );
             if (reloadedMenu.isPresent()) {
                 if (isInit) {
                     return ResponseEntity.ok(reloadedMenu.get());

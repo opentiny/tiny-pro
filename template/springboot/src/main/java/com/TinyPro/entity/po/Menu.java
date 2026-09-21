@@ -14,7 +14,16 @@ import java.io.Serializable;
 
 
 @Entity
-@Table(name = "menu")
+@Table(
+        name = "menu",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uk_menu_identity",
+                columnNames = {
+                        "name", "order", "menuType", "parentId",
+                        "path", "icon", "component", "locale"
+                }
+        )
+)
 @Data
 @DynamicUpdate
 public class Menu implements Serializable {
