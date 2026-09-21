@@ -3,7 +3,7 @@ import type { MockMethod } from './dispatch'
 import { createBackendState } from './backend-data'
 
 export const MOCK_BACKEND_STORAGE_KEY = 'tiny-pro-mock-backend-state'
-const MOCK_BACKEND_STATE_VERSION = 1
+const MOCK_BACKEND_STATE_VERSION = 2
 
 export interface BackendStorage {
   getItem: (key: string) => string | null
@@ -32,8 +32,17 @@ export function createDefaultBackendStorage(): BackendStorage {
   return createMemoryStorage()
 }
 
-function toEntries(value: unknown): [string, string][] {
-  return Array.isArray(value) ? value : []
+function isObject(value: unknown): value is Record<string, unknown> {
+  return !!value && typeof value === 'object' && !Array.isArray(value)
+}
+
+function isStringPairList(value: unknown): value is [string, string][] {
+  return Array.isArray(value) && value.every(
+    item => Array.isArray(item)
+      && item.length === 2
+      && typeof item[0] === 'string'
+      && typeof item[1] === 'string',
+  )
 }
 
 function serializeBackendState(state: BackendState) {
@@ -52,28 +61,66 @@ function serializeBackendState(state: BackendState) {
   }
 }
 
+function rebindRoles(state: {
+  permissions: BackendState['permissions']
+  roles: BackendState['roles']
+}): BackendState['roles'] {
+  return state.roles.map(role => ({
+    ...role,
+    permission: (role.permission ?? [])
+      .map(item => state.permissions.find(permission => permission.id === item.id))
+      .filter((item): item is NonNullable<typeof item> => Boolean(item)),
+  }))
+}
+
+function rebindUsers(
+  users: BackendState['users'],
+  roles: BackendState['roles'],
+): BackendState['users'] {
+  return users.map(user => ({
+    ...user,
+    role: (user.role ?? [])
+      .map(item => roles.find(role => role.id === item.id))
+      .filter((item): item is NonNullable<typeof item> => Boolean(item)),
+  }))
+}
+
 function deserializeBackendState(raw: unknown): BackendState | null {
-  if (!raw || typeof raw !== 'object') {
+  if (!isObject(raw) || raw.version !== MOCK_BACKEND_STATE_VERSION) {
     return null
   }
-  const data = raw as Record<string, unknown>
-  if (data.version !== MOCK_BACKEND_STATE_VERSION) {
+  if (
+    !isStringPairList(raw.credentials)
+    || !isStringPairList(raw.tokens)
+    || !isStringPairList(raw.refreshTokens)
+    || !Array.isArray(raw.users)
+    || !Array.isArray(raw.languages)
+    || !Array.isArray(raw.localeRecords)
+    || !Array.isArray(raw.menuTree)
+    || !Array.isArray(raw.permissions)
+    || !Array.isArray(raw.roles)
+    || !isObject(raw.localeTable)
+  ) {
     return null
   }
-  if (!Array.isArray(data.credentials) || !Array.isArray(data.users)) {
-    return null
-  }
+
+  const permissions = raw.permissions as BackendState['permissions']
+  const roles = rebindRoles({
+    permissions,
+    roles: raw.roles as BackendState['roles'],
+  })
+
   return {
-    credentials: new Map(toEntries(data.credentials)),
-    languages: data.languages as BackendState['languages'],
-    localeTable: data.localeTable as BackendState['localeTable'],
-    localeRecords: data.localeRecords as BackendState['localeRecords'],
-    menuTree: data.menuTree as BackendState['menuTree'],
-    permissions: data.permissions as BackendState['permissions'],
-    roles: data.roles as BackendState['roles'],
-    refreshTokens: new Map(toEntries(data.refreshTokens)),
-    tokens: new Map(toEntries(data.tokens)),
-    users: data.users as BackendState['users'],
+    credentials: new Map(raw.credentials),
+    languages: raw.languages as BackendState['languages'],
+    localeTable: raw.localeTable as BackendState['localeTable'],
+    localeRecords: raw.localeRecords as BackendState['localeRecords'],
+    menuTree: raw.menuTree as BackendState['menuTree'],
+    permissions,
+    roles,
+    refreshTokens: new Map(raw.refreshTokens),
+    tokens: new Map(raw.tokens),
+    users: rebindUsers(raw.users as BackendState['users'], roles),
   }
 }
 
@@ -110,8 +157,8 @@ export function withBackendPersist(
   const persist = () => saveBackendState(storage, state)
   return mocks.map(mock => ({
     ...mock,
-    response: (context) => {
-      const result = mock.response(context)
+    response: async (context) => {
+      const result = await mock.response(context)
       persist()
       return result
     },

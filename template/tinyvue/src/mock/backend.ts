@@ -67,26 +67,16 @@ function bearerToken(headers: MockHeaders) {
   return Array.isArray(value) ? value[0]?.replace(/^Bearer\s+/i, '') : value?.replace(/^Bearer\s+/i, '')
 }
 
-function emailFromMockToken(token: string | undefined, prefix: string) {
-  if (!token?.startsWith(prefix)) {
-    return undefined
-  }
-  const email = token.slice(prefix.length)
-  return email || undefined
+async function digestPassword(password: string) {
+  const digest = await globalThis.crypto.subtle.digest(
+    'SHA-256',
+    new TextEncoder().encode(password),
+  )
+  return Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('')
 }
 
 export function createBackendMocks(storage: BackendStorage = createDefaultBackendStorage()): MockMethod[] {
   const state = loadBackendState(storage)
-
-  const knownEmail = (email?: string) => {
-    if (!email) {
-      return undefined
-    }
-    if (state.credentials.has(email) || state.users.some(item => item.email === email)) {
-      return email
-    }
-    return undefined
-  }
 
   const syncRoleMenus = (roleMenuIds: Map<number, Set<number>>) => {
     state.roles.forEach((role) => {
@@ -114,23 +104,15 @@ export function createBackendMocks(storage: BackendStorage = createDefaultBacken
     if (!token) {
       return undefined
     }
-    const mapped = state.tokens.get(token)
-    if (mapped) {
-      return mapped
-    }
-    const email = knownEmail(emailFromMockToken(token, 'mock-access-token:'))
-    if (email) {
-      state.tokens.set(token, email)
-    }
-    return email
+    return state.tokens.get(token)
   }
 
   return withBackendPersist([
     {
       url: '/api/auth/login',
       method: 'post',
-      response: ({ body }) => {
-        if (!body?.email || state.credentials.get(body.email) !== body?.password) {
+      response: async ({ body }) => {
+        if (!body?.email || state.credentials.get(body.email) !== await digestPassword(body.password ?? '')) {
           return mockHttpResponse(401, { message: '邮箱或密码错误' })
         }
         const accessToken = `mock-access-token:${body.email}`
@@ -150,7 +132,6 @@ export function createBackendMocks(storage: BackendStorage = createDefaultBacken
       method: 'post',
       response: ({ body }) => {
         const email = state.refreshTokens.get(body?.token)
-          ?? knownEmail(emailFromMockToken(body?.token, 'mock-refresh-token:'))
         if (!email) {
           return mockHttpResponse(401, { message: '刷新令牌无效' })
         }
@@ -331,7 +312,7 @@ export function createBackendMocks(storage: BackendStorage = createDefaultBacken
     {
       url: '/api/user/reg',
       method: 'post',
-      response: ({ body }) => {
+      response: async ({ body }) => {
         const email = body.email ?? body.username
         if (!email || state.users.some(item => item.email === email)) {
           return mockHttpResponse(409, { message: '用户已存在或邮箱为空' })
@@ -347,7 +328,7 @@ export function createBackendMocks(storage: BackendStorage = createDefaultBacken
           role: state.roles.filter(role => roleIds.includes(role.id)),
         }
         state.users.push(user)
-        state.credentials.set(email, password)
+        state.credentials.set(email, await digestPassword(password ?? ''))
         return user
       },
     },
@@ -394,22 +375,22 @@ export function createBackendMocks(storage: BackendStorage = createDefaultBacken
     {
       url: '/api/user/admin/updatePwd',
       method: 'patch',
-      response: ({ body }) => {
+      response: async ({ body }) => {
         if (!state.credentials.has(body.email)) {
           return mockHttpResponse(404, { message: '用户不存在' })
         }
-        state.credentials.set(body.email, body.newPassword)
+        state.credentials.set(body.email, await digestPassword(body.newPassword ?? ''))
         return true
       },
     },
     {
       url: '/api/user/updatePwd',
       method: 'patch',
-      response: ({ body }) => {
-        if (!body.email || state.credentials.get(body.email) !== body.oldPassword) {
+      response: async ({ body }) => {
+        if (!body.email || state.credentials.get(body.email) !== await digestPassword(body.oldPassword ?? '')) {
           return mockHttpResponse(401, { message: '旧密码错误' })
         }
-        state.credentials.set(body.email, body.newPassword)
+        state.credentials.set(body.email, await digestPassword(body.newPassword ?? ''))
         return true
       },
     },

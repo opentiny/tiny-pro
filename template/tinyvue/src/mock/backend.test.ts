@@ -352,14 +352,102 @@ test('corrupt persisted backend state falls back to the default catalog', async 
 })
 
 test('issued mock access tokens still authenticate after a process restart', async () => {
-  const request = createClient()
-  const session = await request(
+  const storage = createMemoryStorage()
+  const request = createClient(storage)
+  const login = await request('post', '/api/auth/login', {
+    email: 'admin@no-reply.com',
+    password: 'admin',
+  })
+  const token = (login.body as { accessToken: string }).accessToken
+  const reloaded = createClient(storage)
+  const session = await reloaded(
     'get',
     '/api/user/info/',
     undefined,
-    { authorization: 'Bearer mock-access-token:admin@no-reply.com' },
+    { authorization: `Bearer ${token}` },
   )
 
   assert.equal(session.statusCode, 200)
   assert.equal((session.body as { email: string }).email, 'admin@no-reply.com')
+})
+
+test('logged-out tokens stay invalid after the mock backend is recreated', async () => {
+  const storage = createMemoryStorage()
+  const request = createClient(storage)
+  const login = await request('post', '/api/auth/login', {
+    email: 'admin@no-reply.com',
+    password: 'admin',
+  })
+  const token = (login.body as { accessToken: string }).accessToken
+
+  await request(
+    'post',
+    '/api/auth/logout',
+    undefined,
+    { authorization: `Bearer ${token}` },
+  )
+
+  const reloaded = createClient(storage)
+  const session = await reloaded(
+    'get',
+    '/api/user/info/',
+    undefined,
+    { authorization: `Bearer ${token}` },
+  )
+
+  assert.equal(session.statusCode, 401)
+})
+
+test('persisted mock credentials are not stored as plaintext passwords', async () => {
+  const storage = createMemoryStorage()
+  const request = createClient(storage)
+  await request('post', '/api/user/reg', {
+    email: 'secret@example.com',
+    password: 'persisted-password',
+    department: 'demo',
+    employeeType: 'full-time',
+    job: 'tester',
+    probationDate: '2024-01-01',
+    probationPeriod: '3',
+    protocol: true,
+    role: 'employee',
+  })
+
+  const snapshot = storage.getItem(MOCK_BACKEND_STORAGE_KEY) ?? ''
+  assert.equal(snapshot.includes('persisted-password'), false)
+  assert.match(snapshot, /[0-9a-f]{64}/)
+})
+
+test('incomplete persisted snapshots fall back to the default catalog', async () => {
+  const storage = createMemoryStorage()
+  const request = createClient(storage)
+  await request('post', '/api/auth/login', {
+    email: 'admin@no-reply.com',
+    password: 'admin',
+  })
+  const snapshot = JSON.parse(storage.getItem(MOCK_BACKEND_STORAGE_KEY) ?? '{}')
+  delete snapshot.languages
+  storage.setItem(MOCK_BACKEND_STORAGE_KEY, JSON.stringify(snapshot))
+
+  const reloaded = createClient(storage)
+  const created = await reloaded('post', '/api/lang', { name: 'frFR' })
+  assert.equal(created.statusCode, 200)
+})
+
+test('role menu updates still apply after persisted user-role identity is restored', async () => {
+  const storage = createMemoryStorage()
+  const request = createClient(storage)
+  await request('post', '/api/auth/login', {
+    email: 'admin@no-reply.com',
+    password: 'admin',
+  })
+
+  const reloaded = createClient(storage)
+  const menus = (await reloaded('get', '/api/menu')).body as { id: number; label: string }[]
+  const list = menus.find(item => item.label === 'List')
+  assert.ok(list)
+
+  await reloaded('patch', '/api/role', { id: 1, menuIds: [list.id] })
+  const assigned = (await reloaded('get', '/api/menu/role/admin@no-reply.com')).body as { label: string }[]
+  assert.deepEqual(assigned.map(item => item.label), ['List'])
 })

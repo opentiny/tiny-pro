@@ -123,7 +123,10 @@ export function createBackendState() {
   )
 
   return {
-    credentials: new Map([['admin@no-reply.com', 'admin']]),
+    credentials: new Map([[
+      'admin@no-reply.com',
+      '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918',
+    ]]),
     languages: [{ id: 1, name: 'enUS' }, { id: 2, name: 'zhCN' }],
     localeTable: structuredClone(localeTable),
     localeRecords,
