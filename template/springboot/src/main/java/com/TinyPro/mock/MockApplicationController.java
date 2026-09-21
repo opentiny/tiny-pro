@@ -26,8 +26,10 @@ public class MockApplicationController {
         pageIndex = Math.max(1, pageIndex);
         pageSize = Math.max(1, pageSize);
 
-        int offset = Math.min((pageIndex - 1) * pageSize, applications.size());
-        int end = Math.min(offset + pageSize, applications.size());
+        long requestedOffset = (long) (pageIndex - 1) * pageSize;
+        long requestedEnd = requestedOffset + pageSize;
+        int offset = (int) Math.min(requestedOffset, applications.size());
+        int end = (int) Math.min(requestedEnd, applications.size());
         Map<String, Object> data = new HashMap<>();
         data.put("total", applications.size());
         data.put("data", new ArrayList<>(applications.subList(offset, end)));

@@ -37,6 +37,19 @@ class MockControllerTest {
     }
 
     @Test
+    void applicationMockReturnsEmptyPageWithoutIntegerOverflow() {
+        MockApplicationController controller = new MockApplicationController();
+
+        ApiResponse<Map<String, Object>> response = controller.getApplications(
+                Map.of("pageIndex", Integer.MAX_VALUE, "pageSize", Integer.MAX_VALUE)
+        );
+
+        Map<String, Object> data = response.getData();
+        assertEquals(60, data.get("total"));
+        assertTrue(((List<?>) data.get("data")).isEmpty());
+    }
+
+    @Test
     void employeeMockSupportsDetailAndUpdateEndpoints() {
         MockListController controller = new MockListController();
 
