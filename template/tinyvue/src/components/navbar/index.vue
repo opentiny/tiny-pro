@@ -21,6 +21,7 @@ import { LOCALE_OPTIONS } from '@/locale'
 import router from '@/router'
 import { useAppStore, useUserStore } from '@/store'
 import { getToken } from '@/utils/auth'
+import { openHelpCenter } from '@/utils/help-center'
 
 const i18 = useI18n()
 const { t } = useI18n()
@@ -61,9 +62,8 @@ const state = reactive<{
 function changeLan() {
   lan.value = !lan.value
 }
-// 帮助中心
 function help() {
-  window.location.href = `${window.location.protocol}//${window.location.host}/vue-pro/docs/start`
+  openHelpCenter()
 }
 
 // 设置页面显示
