@@ -1,8 +1,9 @@
-import type { LocationQueryRaw, Router } from 'vue-router'
+import type { Router } from 'vue-router'
 import { Modal } from '@opentiny/vue'
 import { t } from '@opentiny/vue-locale'
 import NProgress from 'nprogress' // progress bar
 import { nextTick } from 'vue'
+import { unauthorizedLoginLocation } from '@/utils/app-location'
 import { isLogin } from '@/utils/auth'
 
 export default function setupPermissionGuard(router: Router) {
@@ -20,13 +21,7 @@ export default function setupPermissionGuard(router: Router) {
         status: 'error',
       })
       await nextTick()
-      next({
-        name: 'login',
-        query: {
-          redirect: to.name,
-          ...to.query,
-        } as LocationQueryRaw,
-      })
+      next(unauthorizedLoginLocation(to))
       NProgress.done()
       return
     }

@@ -2,20 +2,10 @@ import assert from 'node:assert/strict'
 // eslint-disable-next-line test/no-import-node-test
 import test from 'node:test'
 import { createBackendMocks } from './backend'
-import { MOCK_BACKEND_STORAGE_KEY } from './backend-persist'
+import { type BackendStorage, MOCK_BACKEND_STORAGE_KEY, createMemoryStorage } from './backend-persist'
 import { dispatchMockRequest } from './dispatch'
 
-function createMemoryStorage() {
-  const data = new Map<string, string>()
-  return {
-    getItem: (key: string) => data.get(key) ?? null,
-    setItem: (key: string, value: string) => {
-      data.set(key, value)
-    },
-  }
-}
-
-function createClient(storage?: { getItem: (key: string) => string | null, setItem: (key: string, value: string) => void }) {
+function createClient(storage?: BackendStorage) {
   const mocks = createBackendMocks(storage)
 
   return async (method: string, url: string, body?: unknown, headers: Record<string, string> = {}) => {

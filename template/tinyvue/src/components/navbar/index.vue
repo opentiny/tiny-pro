@@ -21,7 +21,6 @@ import { LOCALE_OPTIONS } from '@/locale'
 import router from '@/router'
 import { useAppStore, useUserStore } from '@/store'
 import { getToken } from '@/utils/auth'
-import { openHelpCenter } from '@/utils/help-center'
 
 const i18 = useI18n()
 const { t } = useI18n()
@@ -63,7 +62,7 @@ function changeLan() {
   lan.value = !lan.value
 }
 function help() {
-  openHelpCenter()
+  window.open('https://opentiny.design/vue-pro/docs/start', '_blank', 'noopener,noreferrer')
 }
 
 // 设置页面显示

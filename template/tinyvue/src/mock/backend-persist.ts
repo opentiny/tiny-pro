@@ -3,7 +3,7 @@ import type { MockMethod } from './dispatch'
 import { createBackendState } from './backend-data'
 
 export const MOCK_BACKEND_STORAGE_KEY = 'tiny-pro-mock-backend-state'
-export const MOCK_BACKEND_STATE_VERSION = 1
+const MOCK_BACKEND_STATE_VERSION = 1
 
 export interface BackendStorage {
   getItem: (key: string) => string | null
@@ -36,7 +36,7 @@ function toEntries(value: unknown): [string, string][] {
   return Array.isArray(value) ? value : []
 }
 
-export function serializeBackendState(state: BackendState) {
+function serializeBackendState(state: BackendState) {
   return {
     version: MOCK_BACKEND_STATE_VERSION,
     credentials: [...state.credentials.entries()],
@@ -52,7 +52,7 @@ export function serializeBackendState(state: BackendState) {
   }
 }
 
-export function deserializeBackendState(raw: unknown): BackendState | null {
+function deserializeBackendState(raw: unknown): BackendState | null {
   if (!raw || typeof raw !== 'object') {
     return null
   }
@@ -90,7 +90,7 @@ export function loadBackendState(storage: BackendStorage): BackendState {
   }
 }
 
-export function saveBackendState(storage: BackendStorage, state: BackendState) {
+function saveBackendState(storage: BackendStorage, state: BackendState) {
   try {
     storage.setItem(
       MOCK_BACKEND_STORAGE_KEY,
@@ -112,9 +112,6 @@ export function withBackendPersist(
     ...mock,
     response: (context) => {
       const result = mock.response(context)
-      if (result && typeof result === 'object' && 'then' in result) {
-        return Promise.resolve(result).finally(persist)
-      }
       persist()
       return result
     },
