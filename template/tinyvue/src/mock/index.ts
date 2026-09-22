@@ -4,6 +4,7 @@ import { createBackendMocks } from './backend'
 import board from './board'
 import list from './list'
 import profile from './profile'
+import robot from './robot'
 import { startMockServer } from './server'
 import user from './user'
 
@@ -12,6 +13,7 @@ const mockData = [
   ...list,
   ...froms,
   ...profile,
+  ...robot,
   ...board,
   ...user,
   ...application,

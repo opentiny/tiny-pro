@@ -1,4 +1,4 @@
-# AGENTS.md
+# TECHNICAL-SPECIFICATION.md
 
 本文件面向 AI 编码代理，介绍 tiny-pro 仓库的整体情况、构建测试命令与开发约定。阅读本文件前无需了解本项目。
 
@@ -53,7 +53,8 @@ pnpm test             # build + test:**（lint + 后端单测/覆盖率）
 pnpm test:lint        # tslint 检查 + prettier 校验
 pnpm test:unit        # build + lint + 后端 jest 单测 + 覆盖率
 pnpm test:e2e         # Playwright 测试（自动启动 template/tinyvue 前端）
-pnpm dev              # 启动前端模板（pnpm -F tiny-pro-vue start，端口 3031）
+pnpm dev              # 启动前端模板,采用mock数据，无需后端数据交互（pnpm -F tiny-pro-vue start，端口 3031）
+pnpm dev:vite         # 启动前端模板，需要后端启动，与后端数据交互（pnpm -F tiny-pro-vue start，端口 3031）
 pnpm dev:backend      # 启动 NestJS 后端模板（需要 MySQL / Redis）
 ```
 

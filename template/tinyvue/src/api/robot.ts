@@ -75,6 +75,8 @@ async function chatViaProxy(messages: RobotChatMessage[]): Promise<string> {
         ? parseExtraBody()
         : undefined,
     },
+    // 联网搜索（forced_search）耗时较长，单独放宽超时
+    { timeout: 60000 },
   )
   return response.data?.content ?? response.data
 }
