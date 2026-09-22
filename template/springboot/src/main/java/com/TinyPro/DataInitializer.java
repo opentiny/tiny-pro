@@ -283,7 +283,7 @@ public class DataInitializer implements CommandLineRunner {
                         menu.getIcon(),
                         menu.getComponent(),
                         menu.getLocale()
-                ).orElse(null),
+                ).stream().findFirst().orElse(null),
                 () -> menuRepository.saveAndFlush(menu)
         );
 

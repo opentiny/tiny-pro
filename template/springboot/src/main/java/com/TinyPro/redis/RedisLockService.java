@@ -1,5 +1,6 @@
 package com.TinyPro.redis;
 
+import jakarta.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -127,10 +128,10 @@ public class RedisLockService {
         if (!holdCounts.get().containsKey(redisKey)) {
             return false;
         }
-        return renew(redisKey, ownerId(), leaseMillis);
+        return renewLease(redisKey, ownerId(), leaseMillis);
     }
 
-    private boolean renew(String redisKey, String owner, long leaseMillis) {
+    private boolean renewLease(String redisKey, String owner, long leaseMillis) {
         Long renewed = redisTemplate.execute(
                 RENEW_SCRIPT,
                 List.of(redisKey),
@@ -153,8 +154,13 @@ public class RedisLockService {
         long renewInterval = Math.max(leaseMillis / 3L, 100L);
         ScheduledFuture<?> renewal = renewExecutor.scheduleAtFixedRate(
                 () -> {
-                    if (!renew(lockKey(key), owner, leaseMillis)) {
-                        logger.warn("Redis lock lease renewal failed: {}", key);
+                    try {
+                        if (!renewLease(lockKey(key), owner, leaseMillis)) {
+                            logger.warn("Redis lock lease renewal failed: {}", key);
+                        }
+                    } catch (RuntimeException ex) {
+                        // A transient Redis failure must not cancel future renewals.
+                        logger.warn("Redis lock lease renewal threw an exception: {}", key, ex);
                     }
                 },
                 renewInterval,
@@ -218,6 +224,11 @@ public class RedisLockService {
             Thread.currentThread().interrupt();
             throw new IllegalStateException("Interrupted while waiting for Redis lock", ex);
         }
+    }
+
+    @PreDestroy
+    void shutdown() {
+        renewExecutor.shutdownNow();
     }
 
     private static class DaemonThreadFactory implements ThreadFactory {

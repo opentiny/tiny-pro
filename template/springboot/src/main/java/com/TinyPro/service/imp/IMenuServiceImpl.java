@@ -92,7 +92,7 @@ import java.util.stream.Collectors;
         // 检查菜单是否已存在
         Optional<Menu> existingMenu = menuRepository.findByMenuIdentity(
                 name, order, menuType, parentId, path, icon, component, locale
-        );
+        ).stream().findFirst();
         if (isInit && existingMenu.isPresent()) {
             return ResponseEntity.ok(existingMenu.get());
         }
@@ -117,7 +117,7 @@ import java.util.stream.Collectors;
         } catch (DataIntegrityViolationException ex) {
             Optional<Menu> reloadedMenu = menuRepository.findByMenuIdentity(
                     name, order, menuType, parentId, path, icon, component, locale
-            );
+            ).stream().findFirst();
             if (reloadedMenu.isPresent()) {
                 if (isInit) {
                     return ResponseEntity.ok(reloadedMenu.get());

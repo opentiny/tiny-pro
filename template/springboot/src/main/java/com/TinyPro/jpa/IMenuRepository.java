@@ -30,7 +30,7 @@ public interface IMenuRepository extends JpaRepository<Menu, Long> {
               AND ((m.component = :component) OR (m.component IS NULL AND :component IS NULL))
               AND ((m.locale = :locale) OR (m.locale IS NULL AND :locale IS NULL))
             """)
-    Optional<Menu> findByMenuIdentity(
+    List<Menu> findByMenuIdentity(
             @Param("name") String name,
             @Param("menuOrder") Integer order,
             @Param("menuType") String menuType,

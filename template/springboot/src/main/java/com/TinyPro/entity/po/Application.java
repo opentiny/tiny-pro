@@ -29,9 +29,11 @@ public class Application {
   private String classify;
 
   @CreationTimestamp
+  @Column(name = "created_at")
   private LocalDateTime createdAt;
 
   @UpdateTimestamp
+  @Column(name = "updated_at")
   private LocalDateTime updatedAt;
 
   public Application(String name, String description, String tag, String icon, String classify) {

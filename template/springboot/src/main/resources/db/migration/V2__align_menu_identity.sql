@@ -39,7 +39,7 @@ SET @menu_identity_index_exists = (
 
 SET @add_menu_identity_index = IF(
     @menu_identity_index_exists = 0,
-    'ALTER TABLE `menu` ADD CONSTRAINT `uk_menu_identity` UNIQUE (`name`, `order`, `menuType`, `parentId`, `path`, `icon`, `component`, `locale`)',
+    'ALTER TABLE `menu` ADD UNIQUE KEY `uk_menu_identity` (`name`(120), `order`, `menuType`(120), `parentId`, `path`(120), `icon`(120), `component`(120), `locale`(120))',
     'SELECT 1'
 );
 

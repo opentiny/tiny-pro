@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,8 +52,11 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Map<String, Boolean>> logout(@Valid @RequestBody LogoutAuthDto logoutAuthDto) {
-        authService.logout(logoutAuthDto.getToken());
+    public ResponseEntity<Map<String, Boolean>> logout(
+            @Valid @RequestBody LogoutAuthDto logoutAuthDto,
+            HttpServletRequest request
+    ) {
+        authService.logout(extractBearerToken(request));
         return ResponseEntity.ok(Map.of("success", true));
     }
 
@@ -70,5 +74,13 @@ public class AuthController {
     @GetMapping("/test")
     public ResponseEntity<MenuTreeVo> gettext() {
         return ResponseEntity.ok(new MenuTreeVo());
+    }
+
+    private String extractBearerToken(HttpServletRequest request) {
+        String header = request.getHeader("Authorization");
+        if (header == null || !header.startsWith("Bearer ")) {
+            return null;
+        }
+        return header.substring(7);
     }
 }
