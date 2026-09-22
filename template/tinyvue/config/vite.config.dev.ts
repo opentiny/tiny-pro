@@ -36,6 +36,31 @@ export default mergeConfig(
       'import.meta.env.VITE_LOWCODE_DESIGNER_URL': JSON.stringify(
         process.env.VITE_LOWCODE_DESIGNER_URL || 'http://localhost:8090',
       ),
+      // 确保可选功能开关与 TinyRobot 大模型配置被注入到客户端代码
+      'import.meta.env.VITE_TINY_ROBOT_ENABLED': JSON.stringify(
+        process.env.VITE_TINY_ROBOT_ENABLED || 'false',
+      ),
+      'import.meta.env.VITE_TINY_EDITOR_ENABLED': JSON.stringify(
+        process.env.VITE_TINY_EDITOR_ENABLED || 'false',
+      ),
+      'import.meta.env.VITE_ROBOT_LLM_MODE': JSON.stringify(
+        process.env.VITE_ROBOT_LLM_MODE || 'proxy',
+      ),
+      'import.meta.env.VITE_ROBOT_LLM_BASE_URL': JSON.stringify(
+        process.env.VITE_ROBOT_LLM_BASE_URL || 'https://api.deepseek.com',
+      ),
+      'import.meta.env.VITE_ROBOT_LLM_API_KEY': JSON.stringify(
+        process.env.VITE_ROBOT_LLM_API_KEY || '',
+      ),
+      'import.meta.env.VITE_ROBOT_LLM_MODEL': JSON.stringify(
+        process.env.VITE_ROBOT_LLM_MODEL || 'deepseek-chat',
+      ),
+      'import.meta.env.VITE_ROBOT_LLM_PROXY_URL': JSON.stringify(
+        process.env.VITE_ROBOT_LLM_PROXY_URL || '/api/robot/chat',
+      ),
+      'import.meta.env.VITE_ROBOT_LLM_EXTRA_BODY': JSON.stringify(
+        process.env.VITE_ROBOT_LLM_EXTRA_BODY || '',
+      ),
     },
     plugins: [],
   },

@@ -2,7 +2,7 @@
 import { Modal, TabItem, Tabs, Modal as tinyModal } from '@opentiny/vue'
 import locale from '@opentiny/vue-locale'
 import TinyThemeTool from '@opentiny/vue-theme/theme-tool'
-import { computed, nextTick, provide, ref, watch } from 'vue'
+import { computed, defineAsyncComponent, nextTick, provide, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import Footer from '@/components/footer/index.vue'
@@ -168,6 +168,15 @@ const theme = new TinyThemeTool()
 useTheme(theme)
 provide('THEME', theme)
 
+// 检查是否启用 TinyRobot 智能助手
+const isTinyRobotEnabled = computed(() => {
+  return import.meta.env.VITE_TINY_ROBOT_ENABLED === 'true'
+})
+// 未启用时不加载智能助手组件对应的 chunk
+const TinyRobot = defineAsyncComponent(
+  () => import('@/components/tiny-robot/index.vue'),
+)
+
 function themeVisible() {
   disTheme.value = !disTheme.value
 }
@@ -252,6 +261,7 @@ watch(appStore.$state, (newValue) => {
       </tiny-modal>
     </div>
     <img v-if="!appStore.navbar" src="@/assets/images/global.png" class="global-setting" @click="switchSet">
+    <TinyRobot v-if="isTinyRobotEnabled" />
   </div>
 </template>
 
