@@ -46,6 +46,7 @@
   },
   "scripts": {
     "dev": "pnpm -F tiny-pro-vue start",
+    "dev:vite": "pnpm -F tiny-pro-vue dev:vite",
     "dev:backend": "pnpm -F tinyui-nestjs-server start",
     "describe": "npm-scripts-info",
     "build": "run-s build:*",

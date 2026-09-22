@@ -11,7 +11,7 @@ import {
   Row as TinyRow,
   Select as TinySelect,
 } from '@opentiny/vue'
-import { computed, reactive, ref, toRefs } from 'vue'
+import { computed, defineAsyncComponent, reactive, ref, toRefs } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 interface FilterOptions {
@@ -42,6 +42,15 @@ const state = reactive<{
 const { t } = useI18n()
 const baseFormRef = ref()
 const disabled = ref(false)
+
+// 检查是否启用 TinyEditor 富文本编辑器
+const isTinyEditorEnabled = computed(() => {
+  return import.meta.env.VITE_TINY_EDITOR_ENABLED === 'true'
+})
+// 未启用时不加载富文本组件对应的 chunk
+const RichTextItem = defineAsyncComponent(
+  () => import('./rich-text-item.vue'),
+)
 
 function handleBlur() {
   const start = state.filterOptions.startTime
@@ -212,6 +221,13 @@ defineExpose({
             </TinyFormItem>
           </TinyCol>
         </transition-fade-down-group>
+      </TinyRow>
+      <TinyRow v-if="isTinyEditorEnabled" class="flex flex-wrap">
+        <TinyCol class="w-full">
+          <TinyFormItem label="富文本说明">
+            <RichTextItem />
+          </TinyFormItem>
+        </TinyCol>
       </TinyRow>
     </TinyForm>
   </TinyLayout>

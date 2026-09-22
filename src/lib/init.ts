@@ -13,6 +13,7 @@ import {
   BuildTool,
   devCommand,
   devDependencies,
+  FEATURE_OPTIONS,
   LowcodeEngine,
   ProjectInfo,
   removedCommand,
@@ -94,6 +95,18 @@ const getProjectInfo = (): Promise<ProjectInfo> => {
       ],
       default: BuildTool.Vite,
       prefix: '*',
+    },
+    {
+      type: 'checkbox',
+      name: 'features',
+      message: '请选择需要额外集成的功能（可多选）: ',
+      choices: FEATURE_OPTIONS.map((feature) => ({
+        name: feature.name,
+        value: feature.value,
+      })),
+      default: [],
+      prefix: '*',
+      when: (answers) => answers.framework === VUE_TEMPLATE_PATH,
     },
     {
       type: 'list',
@@ -336,6 +349,10 @@ const createServerSync = (answers: ProjectInfo) => {
       EXPIRES_IN: '2h',
       PAGINATION_PAGE: 1,
       PAGINATION_LIMIT: 10,
+      LLM_BASE_URL: 'https://api.deepseek.com',
+      LLM_API_KEY: '',
+      LLM_MODEL: 'deepseek-chat',
+      LLM_EXTRA_BODY: '',
     };
     const envStr = objToEnv(config);
     const overwriteDockerComposeConfig = {
@@ -473,6 +490,7 @@ const createProjectSync = (answers: ProjectInfo) => {
     buildTool,
     serverFramework,
     lowcodeEngine,
+    features,
   } = answers;
   const templatePath = VueVersion.Vue3;
   // 模板来源目录
@@ -520,6 +538,16 @@ const createProjectSync = (answers: ProjectInfo) => {
       /VITE_LOWCODE_DESIGNER_ENABLED=false/,
       `VITE_LOWCODE_DESIGNER_ENABLED=${lowcodeEnabled}`
     );
+
+    // 根据用户多选结果设置各可选功能的环境变量
+    const selectedFeatures = features ?? [];
+    FEATURE_OPTIONS.forEach((feature) => {
+      const enabled = selectedFeatures.includes(feature.value);
+      updatedEnvContent = updatedEnvContent.replace(
+        new RegExp(`${feature.envKey}=false`),
+        `${feature.envKey}=${enabled}`
+      );
+    });
 
     fs.writeFileSync(envPath, updatedEnvContent);
     log.success(`低代码设计器环境变量已设置为: ${lowcodeEnabled}`);

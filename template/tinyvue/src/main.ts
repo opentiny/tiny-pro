@@ -1,4 +1,4 @@
-import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
+import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill'
 import TinySearchBox from '@opentiny/vue-search-box'
 import { createApp } from 'vue'
 import globalComponents from '@/components'
@@ -12,8 +12,9 @@ import '@/assets/style/global.less'
 import '@opentiny/vue-search-box/dist/index.css'
 import 'virtual:uno.css'
 import '@opentiny/icons/style/all.css'
+import '@opentiny/tiny-robot/dist/style.css'
 
-initializeWebMCPPolyfill();
+initializeWebMCPPolyfill()
 
 const app = createApp(App)
 
