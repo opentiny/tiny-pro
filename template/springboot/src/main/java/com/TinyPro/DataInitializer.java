@@ -74,29 +74,32 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        String installLockKey = "install";
-        if (!redisLockService.tryLock(installLockKey, 60_000L, 300_000L)) {
-            throw new IllegalStateException("Failed to acquire Redis initialization lock");
-        }
-        try {
-            if (redisUtil.exists(Contants.INSTALL_FLAG)) {
-                logger.info("[APP]: Already installed; skip default data initialization");
-                return;
+        redisLockService.execute("install", 60_000L, 300_000L, () -> {
+            try {
+                initializeDefaultData();
+                return null;
+            } catch (Exception exception) {
+                throw new IllegalStateException("Failed to initialize default data", exception);
             }
+        });
+    }
 
-            testMysqlConnection();
-            testRedisConnection();
-            initI18n();
-            initApplications();
-            initPermissions();
-            initMenus();
-            Role role = initRole();
-            initUser(role);
-            redisUtil.setPersistentValue(Contants.INSTALL_FLAG, "1");
-            logger.info("[APP]: installation flag persisted: {}", Contants.INSTALL_FLAG);
-        } finally {
-            redisLockService.unlock(installLockKey);
+    private void initializeDefaultData() throws IOException {
+        if (redisUtil.exists(Contants.INSTALL_FLAG)) {
+            logger.info("[APP]: Already installed; skip default data initialization");
+            return;
         }
+
+        testMysqlConnection();
+        testRedisConnection();
+        initI18n();
+        initApplications();
+        initPermissions();
+        initMenus();
+        Role role = initRole();
+        initUser(role);
+        redisUtil.setPersistentValue(Contants.INSTALL_FLAG, "1");
+        logger.info("[APP]: installation flag persisted: {}", Contants.INSTALL_FLAG);
     }
 
     private void initI18n() throws IOException {
