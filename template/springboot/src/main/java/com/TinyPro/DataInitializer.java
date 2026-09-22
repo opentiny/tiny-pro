@@ -85,9 +85,13 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void initializeDefaultData() throws IOException {
-        if (redisUtil.exists(Contants.INSTALL_FLAG)) {
+        if (redisUtil.exists(Contants.INSTALL_FLAG) && requiredSeedDataExists()) {
             logger.info("[APP]: Already installed; skip default data initialization");
             return;
+        }
+
+        if (redisUtil.exists(Contants.INSTALL_FLAG)) {
+            logger.warn("[APP]: Installation flag exists but required seed data is incomplete; re-running initialization");
         }
 
         testMysqlConnection();
@@ -100,6 +104,21 @@ public class DataInitializer implements CommandLineRunner {
         initUser(role);
         redisUtil.setPersistentValue(Contants.INSTALL_FLAG, "1");
         logger.info("[APP]: installation flag persisted: {}", Contants.INSTALL_FLAG);
+    }
+
+    /**
+     * Redis and MySQL can be restored independently. Do not trust the Redis
+     * installation marker unless the database still contains the seed data
+     * required by the application.
+     */
+    private boolean requiredSeedDataExists() {
+        return permissionRepository.existsByName(Contants.ADMIN_SUPE_POWER)
+                && roleRepository.findFirstByNameOrderByIdAsc(Contants.ADMIN).isPresent()
+                && userRepository.findByEmail("admin@no-reply.com").isPresent()
+                && menuRepository.count() > 0
+                && langRepository.count() > 0
+                && i18Repository.count() > 0
+                && applicationRepository.count() > 0;
     }
 
     private void initI18n() throws IOException {
