@@ -36,6 +36,48 @@ function isObject(value: unknown): value is Record<string, unknown> {
   return !!value && typeof value === 'object' && !Array.isArray(value)
 }
 
+function isIdRecord(value: unknown): value is { id: number } {
+  return isObject(value) && typeof value.id === 'number'
+}
+
+function isMenuNode(value: unknown): boolean {
+  return isObject(value)
+    && typeof value.id === 'number'
+    && Array.isArray(value.children)
+    && value.children.every(isMenuNode)
+}
+
+function isRole(value: unknown): boolean {
+  return isObject(value)
+    && typeof value.id === 'number'
+    && Array.isArray(value.permission)
+    && value.permission.every(isIdRecord)
+    && Array.isArray(value.menus)
+    && value.menus.every(isMenuNode)
+}
+
+function isUser(value: unknown): boolean {
+  return isObject(value)
+    && typeof value.email === 'string'
+    && Array.isArray(value.role)
+    && value.role.every(isIdRecord)
+}
+
+function isLanguage(value: unknown): boolean {
+  return isObject(value) && typeof value.id === 'number' && typeof value.name === 'string'
+}
+
+function isLocaleRecord(value: unknown): boolean {
+  return isObject(value)
+    && typeof value.id === 'number'
+    && isObject(value.lang)
+    && typeof value.lang.name === 'string'
+}
+
+function everyItem<T>(value: unknown, check: (item: T) => boolean): value is T[] {
+  return Array.isArray(value) && value.every(check)
+}
+
 function isStringPairList(value: unknown): value is [string, string][] {
   return Array.isArray(value) && value.every(
     item => Array.isArray(item)
@@ -93,12 +135,12 @@ function deserializeBackendState(raw: unknown): BackendState | null {
     !isStringPairList(raw.credentials)
     || !isStringPairList(raw.tokens)
     || !isStringPairList(raw.refreshTokens)
-    || !Array.isArray(raw.users)
-    || !Array.isArray(raw.languages)
-    || !Array.isArray(raw.localeRecords)
-    || !Array.isArray(raw.menuTree)
-    || !Array.isArray(raw.permissions)
-    || !Array.isArray(raw.roles)
+    || !everyItem(raw.users, isUser)
+    || !everyItem(raw.languages, isLanguage)
+    || !everyItem(raw.localeRecords, isLocaleRecord)
+    || !everyItem(raw.menuTree, isMenuNode)
+    || !everyItem(raw.permissions, isIdRecord)
+    || !everyItem(raw.roles, isRole)
     || !isObject(raw.localeTable)
   ) {
     return null

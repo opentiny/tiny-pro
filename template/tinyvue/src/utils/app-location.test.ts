@@ -47,6 +47,29 @@ test('login is not used as a post-login redirect target', () => {
   )
 })
 
+test('login redirects with a fragment still use the signed-in fallback', () => {
+  assert.deepEqual(
+    resolvePostLoginLocation('/tiny-pro/login#section', {
+      fallbackPath: '/tiny-pro/board/home',
+      loginPath: '/tiny-pro/login',
+    }),
+    { path: '/tiny-pro/board/home' },
+  )
+})
+
+test('post-login navigation keeps repeated query values', () => {
+  assert.deepEqual(
+    resolvePostLoginLocation('/tiny-pro/role/allRole?tag=a&tag=b#panel', {
+      fallbackPath: '/tiny-pro/board/home',
+    }),
+    {
+      path: '/tiny-pro/role/allRole',
+      query: { tag: ['a', 'b'] },
+      hash: '#panel',
+    },
+  )
+})
+
 test('protocol-relative urls are not treated as in-app paths', () => {
   assert.deepEqual(
     resolvePostLoginLocation('//example.com/phish', {

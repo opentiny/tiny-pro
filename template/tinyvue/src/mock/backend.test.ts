@@ -378,7 +378,9 @@ test('logged-out tokens stay invalid after the mock backend is recreated', async
     email: 'admin@no-reply.com',
     password: 'admin',
   })
+  assert.equal(login.statusCode, 200)
   const token = (login.body as { accessToken: string }).accessToken
+  assert.ok(token)
 
   await request(
     'post',
@@ -401,7 +403,7 @@ test('logged-out tokens stay invalid after the mock backend is recreated', async
 test('persisted mock credentials are not stored as plaintext passwords', async () => {
   const storage = createMemoryStorage()
   const request = createClient(storage)
-  await request('post', '/api/user/reg', {
+  const registered = await request('post', '/api/user/reg', {
     email: 'secret@example.com',
     password: 'persisted-password',
     department: 'demo',
@@ -412,10 +414,33 @@ test('persisted mock credentials are not stored as plaintext passwords', async (
     protocol: true,
     role: 'employee',
   })
+  assert.equal(registered.statusCode, 200)
 
-  const snapshot = storage.getItem(MOCK_BACKEND_STORAGE_KEY) ?? ''
-  assert.equal(snapshot.includes('persisted-password'), false)
-  assert.match(snapshot, /[0-9a-f]{64}/)
+  const snapshot = JSON.parse(storage.getItem(MOCK_BACKEND_STORAGE_KEY) ?? '{}') as {
+    credentials?: [string, string][]
+  }
+  const credential = snapshot.credentials?.find(([email]) => email === 'secret@example.com')
+  assert.equal(JSON.stringify(snapshot).includes('persisted-password'), false)
+  assert.ok(credential)
+  assert.match(credential[1], /^[0-9a-f]{64}$/)
+})
+
+test('malformed persisted roles fall back to the default catalog', async () => {
+  const storage = createMemoryStorage()
+  const request = createClient(storage)
+  await request('post', '/api/auth/login', {
+    email: 'admin@no-reply.com',
+    password: 'admin',
+  })
+  const snapshot = JSON.parse(storage.getItem(MOCK_BACKEND_STORAGE_KEY) ?? '{}')
+  snapshot.roles = [{}]
+  storage.setItem(MOCK_BACKEND_STORAGE_KEY, JSON.stringify(snapshot))
+
+  const reloaded = createClient(storage)
+  const roles = await reloaded('get', '/api/role')
+  const admin = (roles.body as { name?: string, menus?: unknown }[])
+    .find(item => item.name === 'admin')
+  assert.ok(Array.isArray(admin?.menus))
 })
 
 test('incomplete persisted snapshots fall back to the default catalog', async () => {

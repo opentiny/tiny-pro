@@ -112,13 +112,15 @@ export function createBackendMocks(storage: BackendStorage = createDefaultBacken
       url: '/api/auth/login',
       method: 'post',
       response: async ({ body }) => {
-        if (!body?.email || state.credentials.get(body.email) !== await digestPassword(body.password ?? '')) {
+        const passwordHash = await digestPassword(body?.password ?? '')
+        const email = body?.email
+        if (!email || !state.users.some(item => item.email === email) || state.credentials.get(email) !== passwordHash) {
           return mockHttpResponse(401, { message: '邮箱或密码错误' })
         }
-        const accessToken = `mock-access-token:${body.email}`
-        const refreshToken = `mock-refresh-token:${body.email}`
-        state.tokens.set(accessToken, body.email)
-        state.refreshTokens.set(refreshToken, body.email)
+        const accessToken = `mock-access-token:${email}`
+        const refreshToken = `mock-refresh-token:${email}`
+        state.tokens.set(accessToken, email)
+        state.refreshTokens.set(refreshToken, email)
         return {
           accessToken,
           accessTokenTTL: 3600,
@@ -314,10 +316,11 @@ export function createBackendMocks(storage: BackendStorage = createDefaultBacken
       method: 'post',
       response: async ({ body }) => {
         const email = body.email ?? body.username
+        const passwordHash = await digestPassword(body.password ?? '')
         if (!email || state.users.some(item => item.email === email)) {
           return mockHttpResponse(409, { message: '用户已存在或邮箱为空' })
         }
-        const { password, username: _username, ...userData } = body
+        const { password: _password, username: _username, ...userData } = body
         const roleIds = body.roleIds ?? (state.roles[0] ? [state.roles[0].id] : [])
         const user = {
           ...state.users[0],
@@ -328,7 +331,7 @@ export function createBackendMocks(storage: BackendStorage = createDefaultBacken
           role: state.roles.filter(role => roleIds.includes(role.id)),
         }
         state.users.push(user)
-        state.credentials.set(email, await digestPassword(password ?? ''))
+        state.credentials.set(email, passwordHash)
         return user
       },
     },
@@ -376,10 +379,11 @@ export function createBackendMocks(storage: BackendStorage = createDefaultBacken
       url: '/api/user/admin/updatePwd',
       method: 'patch',
       response: async ({ body }) => {
-        if (!state.credentials.has(body.email)) {
+        const passwordHash = await digestPassword(body.newPassword ?? '')
+        if (!body.email || !state.users.some(item => item.email === body.email) || !state.credentials.has(body.email)) {
           return mockHttpResponse(404, { message: '用户不存在' })
         }
-        state.credentials.set(body.email, await digestPassword(body.newPassword ?? ''))
+        state.credentials.set(body.email, passwordHash)
         return true
       },
     },
@@ -387,10 +391,18 @@ export function createBackendMocks(storage: BackendStorage = createDefaultBacken
       url: '/api/user/updatePwd',
       method: 'patch',
       response: async ({ body }) => {
-        if (!body.email || state.credentials.get(body.email) !== await digestPassword(body.oldPassword ?? '')) {
+        const [oldHash, newHash] = await Promise.all([
+          digestPassword(body.oldPassword ?? ''),
+          digestPassword(body.newPassword ?? ''),
+        ])
+        if (
+          !body.email
+          || !state.users.some(item => item.email === body.email)
+          || state.credentials.get(body.email) !== oldHash
+        ) {
           return mockHttpResponse(401, { message: '旧密码错误' })
         }
-        state.credentials.set(body.email, await digestPassword(body.newPassword ?? ''))
+        state.credentials.set(body.email, newHash)
         return true
       },
     },

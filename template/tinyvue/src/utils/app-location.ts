@@ -2,6 +2,15 @@ import type { LocationQueryRaw, RouteLocationRaw } from 'vue-router'
 
 const BLOCKED_REDIRECT_NAMES = ['login', 'notFound', 'redirect', 'preview', 'root']
 
+function queryFromSearchParams(params: URLSearchParams): LocationQueryRaw {
+  const query: LocationQueryRaw = {}
+  for (const key of new Set(params.keys())) {
+    const values = params.getAll(key)
+    query[key] = values.length > 1 ? values : values[0]
+  }
+  return query
+}
+
 function withContext(path: string, context = import.meta.env?.VITE_CONTEXT || '/') {
   const base = context.endsWith('/') ? context : `${context}/`
   return `${base}${path.replace(/^\//, '')}`
@@ -37,15 +46,14 @@ export function resolvePostLoginLocation(
   if (typeof redirect !== 'string' || !redirect) {
     return { path: fallbackPath }
   }
-  const pathOnly = redirect.split('?')[0]
-  if (pathOnly === loginPath || pathOnly === `${loginPath}/`) {
-    return { path: fallbackPath }
-  }
   if (redirect.startsWith('/') && !redirect.startsWith('//')) {
     const url = new URL(redirect, 'http://local.invalid')
+    if (url.pathname === loginPath || url.pathname === `${loginPath}/`) {
+      return { path: fallbackPath }
+    }
     return {
       path: url.pathname,
-      query: Object.fromEntries(url.searchParams),
+      query: queryFromSearchParams(url.searchParams),
       hash: url.hash,
     }
   }
