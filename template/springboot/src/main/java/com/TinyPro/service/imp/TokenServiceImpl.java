@@ -83,7 +83,7 @@ public class TokenServiceImpl implements TokenService {
         String email = claims.get("email", String.class);
         String tokenId = claims.get("tokenId", String.class);
         return StringUtils.isNotBlank(email)
-                && validateApiToken(email, token);
+                && validateApiToken(email, tokenId, token);
     }
 
     /**
@@ -93,6 +93,13 @@ public class TokenServiceImpl implements TokenService {
         return StringUtils.isNotBlank(email)
                 && StringUtils.isNotBlank(token)
                 && redisUtil.getAllApiTokens(email).contains(token);
+    }
+
+    @Override
+    public boolean validateApiToken(String email, String tokenId, String token) {
+        return StringUtils.isNotBlank(email)
+                && StringUtils.isNotBlank(token)
+                && redisUtil.containsApiToken(email, tokenId, token);
     }
 
     public void revokeApiToken(String email, String tokenId) {
@@ -141,13 +148,20 @@ public class TokenServiceImpl implements TokenService {
         String sessionKey = sessionKey(uid, sessionId);
         String sessionValue = accessJti + "|" + refreshJti;
 
+        assertLeaseHeld();
         redisUtil.setValueMillis(accessKey, accessToken, accessTtlMillis);
+        assertLeaseHeld();
         redisUtil.setValueMillis(refreshKey, refreshToken, refreshTokenTtlMillis);
+        assertLeaseHeld();
         redisUtil.setValueMillis(sessionKey, sessionValue, refreshTokenTtlMillis);
+        assertLeaseHeld();
         redisUtil.leftPush(sessionListKey(uid), sessionId);
+        assertLeaseHeld();
         redisUtil.leftPush("user:" + uid + ":at", accessJti);
+        assertLeaseHeld();
         redisUtil.leftPush("user:" + uid + ":rt", refreshJti);
         if (StringUtils.isNotBlank(userJson)) {
+            assertLeaseHeld();
             redisUtil.setValue(
                     Contants.UserJwtTop + email + Contants.UserJwtbt,
                     userJson,
@@ -176,6 +190,7 @@ public class TokenServiceImpl implements TokenService {
 
         while (refreshJtis.size() >= deviceLimit) {
             String oldestRefreshJti = refreshJtis.get(refreshJtis.size() - 1);
+            assertLeaseHeld();
             String oldestRefreshToken = redisUtil.getValue(refreshKey(uid, oldestRefreshJti));
             if (StringUtils.isBlank(oldestRefreshToken)) {
                 redisUtil.removeList(refreshListKey, oldestRefreshJti);
@@ -254,6 +269,7 @@ public class TokenServiceImpl implements TokenService {
                 sessionId,
                 refreshTokenTtlMillis
         );
+        assertLeaseHeld();
 
         if (consumed != null && consumed == 2L) {
             revokeSession(uid, sessionId);
@@ -335,17 +351,24 @@ public class TokenServiceImpl implements TokenService {
         String legacyKey = Contants.UserJwtTop + email + Contants.UserJwtbt;
         String uid = String.valueOf(user.getId());
         for (String sessionId : redisUtil.range(sessionListKey(uid), 0, -1)) {
+            assertLeaseHeld();
             revokeSession(uid, sessionId);
         }
         for (String accessJti : redisUtil.range("user:" + uid + ":at", 0, -1)) {
+            assertLeaseHeld();
             redisUtil.deleteValue(accessKey(uid, accessJti));
         }
         for (String refreshJti : redisUtil.range("user:" + uid + ":rt", 0, -1)) {
+            assertLeaseHeld();
             redisUtil.deleteValue(refreshKey(uid, refreshJti));
         }
+        assertLeaseHeld();
         redisUtil.deleteValue(sessionListKey(uid));
+        assertLeaseHeld();
         redisUtil.deleteValue("user:" + uid + ":at");
+        assertLeaseHeld();
         redisUtil.deleteValue("user:" + uid + ":rt");
+        assertLeaseHeld();
         redisUtil.deleteValue(legacyKey);
     }
 
@@ -353,6 +376,7 @@ public class TokenServiceImpl implements TokenService {
         String sessionKey = sessionKey(uid, sessionId);
         String sessionValue = redisUtil.getValue(sessionKey);
         if (StringUtils.isBlank(sessionValue)) {
+            assertLeaseHeld();
             redisUtil.removeList(sessionListKey(uid), sessionId);
             return;
         }
@@ -366,11 +390,17 @@ public class TokenServiceImpl implements TokenService {
     }
 
     private void revokePair(String uid, String accessJti, String refreshJti, String sessionId) {
+        assertLeaseHeld();
         redisUtil.deleteValue(accessKey(uid, accessJti));
+        assertLeaseHeld();
         redisUtil.deleteValue(refreshKey(uid, refreshJti));
+        assertLeaseHeld();
         redisUtil.removeList("user:" + uid + ":at", accessJti);
+        assertLeaseHeld();
         redisUtil.removeList("user:" + uid + ":rt", refreshJti);
+        assertLeaseHeld();
         redisUtil.removeList(sessionListKey(uid), sessionId);
+        assertLeaseHeld();
         redisUtil.deleteValue(sessionKey(uid, sessionId));
     }
 
@@ -452,6 +482,12 @@ public class TokenServiceImpl implements TokenService {
             return action.get();
         }
         return redisLockService.execute("user-token:" + userId, action);
+    }
+
+    private void assertLeaseHeld() {
+        if (redisLockService != null) {
+            redisLockService.assertLeaseHeld();
+        }
     }
 
     private void validateTtl(long accessTtlMillis, long refreshTtlMillis) {

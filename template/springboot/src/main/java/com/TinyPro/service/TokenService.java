@@ -15,6 +15,8 @@ public interface TokenService {
 
     boolean validateApiToken(String email, String token);
 
+    boolean validateApiToken(String email, String tokenId, String token);
+
     void revokeApiToken(String email, String tokenId);
 
     TokenPair rotate(String presentedRefreshToken);

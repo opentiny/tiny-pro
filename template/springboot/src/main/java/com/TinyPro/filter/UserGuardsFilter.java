@@ -58,7 +58,11 @@ public class UserGuardsFilter implements HandlerInterceptor {
             String email = claims.get("email", String.class);
 
             if ("api".equals(claims.get("type", String.class))) {
-                if (!tokenService.validateApiToken(email, token)) {
+                if (!tokenService.validateApiToken(
+                        email,
+                        claims.get("tokenId", String.class),
+                        token
+                )) {
                     throw new BusinessException("exception.common.tokenExpire", HttpStatus.UNAUTHORIZED, null);
                 }
                 return true;

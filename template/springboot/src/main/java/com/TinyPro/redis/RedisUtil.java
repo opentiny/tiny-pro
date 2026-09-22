@@ -4,10 +4,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
+import org.springframework.data.redis.core.Cursor;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -95,6 +99,7 @@ public class RedisUtil {
 
     public void setApiToken(String email, String tokenId, String token, long ttlSeconds) {
         setValue(apiTokenKey(email, tokenId), token, ttlSeconds);
+        redisTemplate.opsForSet().add(apiTokenIdsKey(email), tokenId);
     }
 
     public String getApiToken(String email, String tokenId) {
@@ -102,16 +107,28 @@ public class RedisUtil {
     }
 
     public List<String> getAllApiTokens(String email) {
-        Set<String> keys = redisTemplate.keys("user:" + email + ":api:*");
+        Set<String> tokenIds = redisTemplate.opsForSet().members(apiTokenIdsKey(email));
+        Set<String> keys = new LinkedHashSet<>();
+        if (tokenIds != null) {
+            tokenIds.stream()
+                    .filter(Objects::nonNull)
+                    .map(tokenId -> apiTokenKey(email, tokenId))
+                    .forEach(keys::add);
+        }
+
+        // Include tokens created before the per-user index was introduced.
+        // SCAN is incremental and does not block Redis like KEYS.
+        keys.addAll(scanApiTokenKeys(email));
         if (keys == null || keys.isEmpty()) {
             return List.of();
         }
         List<String> values = redisTemplate.opsForValue().multiGet(keys);
-        return values == null ? List.of() : values.stream().filter(java.util.Objects::nonNull).toList();
+        return values == null ? List.of() : values.stream().filter(Objects::nonNull).toList();
     }
 
     public void deleteApiToken(String email, String tokenId) {
         deleteValue(apiTokenKey(email, tokenId));
+        redisTemplate.opsForSet().remove(apiTokenIdsKey(email), tokenId);
     }
 
     /**
@@ -123,11 +140,45 @@ public class RedisUtil {
             return token.equals(getApiToken(email, tokenId));
         }
 
-        return getAllApiTokens(email).contains(token);
+        // Legacy NestJS tokens may predate the index. Keep this fallback
+        // incremental and non-blocking while those tokens expire naturally.
+        return scanApiTokenKeys(email).stream()
+                .map(redisTemplate.opsForValue()::get)
+                .filter(Objects::nonNull)
+                .anyMatch(token::equals);
     }
 
     private String apiTokenKey(String email, String tokenId) {
         return "user:" + email + ":api:" + tokenId;
+    }
+
+    private String apiTokenIdsKey(String email) {
+        return "user:" + email + ":api:ids";
+    }
+
+    private Set<String> scanApiTokenKeys(String email) {
+        Set<String> keys = new LinkedHashSet<>();
+        String escapedEmail = escapeRedisGlob(email);
+        ScanOptions options = ScanOptions.scanOptions()
+                .match("user:" + escapedEmail + ":api:*")
+                .count(100)
+                .build();
+        try (Cursor<String> cursor = redisTemplate.scan(options)) {
+            cursor.forEachRemaining(key -> {
+                if (!key.equals(apiTokenIdsKey(email))) {
+                    keys.add(key);
+                }
+            });
+        }
+        return keys;
+    }
+
+    private String escapeRedisGlob(String value) {
+        return value
+                .replace("\\", "\\\\")
+                .replace("*", "\\*")
+                .replace("?", "\\?")
+                .replace("[", "\\[");
     }
 
     /**

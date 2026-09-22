@@ -14,6 +14,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -80,5 +81,44 @@ class RedisLockServiceTest {
                 .execute(any(RedisScript.class), keys.capture(), any(Object[].class));
         assertTrue(keys.getAllValues().stream().allMatch(List.of("lock:session")::equals));
         assertFalse(worker.isAlive());
+    }
+
+    @Test
+    void stopsTheProtectedActionWhenLeaseRenewalIsLost() throws Exception {
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        when(valueOperations.get("lock:session")).thenReturn(null);
+        when(valueOperations.setIfAbsent(eq("lock:session"), anyString(), eq(300L), eq(TimeUnit.MILLISECONDS)))
+                .thenReturn(true);
+        doReturn(0L).when(redisTemplate).execute(
+                any(RedisScript.class), anyList(), any(Object[].class)
+        );
+
+        lockService = new RedisLockService();
+        ReflectionTestUtils.setField(lockService, "redisTemplate", redisTemplate);
+
+        CountDownLatch actionStarted = new CountDownLatch(1);
+        AtomicReference<Throwable> failure = new AtomicReference<>();
+        Thread worker = new Thread(() -> {
+            try {
+                lockService.execute("session", 0L, 300L, () -> {
+                    actionStarted.countDown();
+                    try {
+                        Thread.sleep(2_000L);
+                    } catch (InterruptedException ex) {
+                        Thread.currentThread().interrupt();
+                    }
+                    return null;
+                });
+            } catch (Throwable ex) {
+                failure.set(ex);
+            }
+        });
+        worker.start();
+
+        assertTrue(actionStarted.await(1, TimeUnit.SECONDS));
+        worker.join(1_000L);
+
+        assertFalse(worker.isAlive());
+        assertTrue(failure.get() instanceof IllegalStateException);
     }
 }

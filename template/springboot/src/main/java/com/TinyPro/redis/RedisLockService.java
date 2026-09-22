@@ -18,6 +18,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 /**
@@ -60,6 +62,7 @@ public class RedisLockService {
     private final String instanceId = UUID.randomUUID().toString();
     private final ThreadLocal<Map<String, Integer>> holdCounts =
             ThreadLocal.withInitial(HashMap::new);
+    private final ThreadLocal<LeaseState> activeLease = new ThreadLocal<>();
     private final ScheduledExecutorService renewExecutor = Executors.newScheduledThreadPool(
             1,
             new DaemonThreadFactory()
@@ -151,16 +154,20 @@ public class RedisLockService {
         }
 
         String owner = ownerId();
+        Thread actionThread = Thread.currentThread();
+        LeaseState leaseState = new LeaseState();
+        LeaseState previousLease = activeLease.get();
+        activeLease.set(leaseState);
         long renewInterval = Math.max(leaseMillis / 3L, 100L);
         ScheduledFuture<?> renewal = renewExecutor.scheduleAtFixedRate(
                 () -> {
                     try {
                         if (!renewLease(lockKey(key), owner, leaseMillis)) {
-                            logger.warn("Redis lock lease renewal failed: {}", key);
+                            markLeaseLost(key, actionThread, leaseState,
+                                    new IllegalStateException("Redis lock lease renewal failed: " + key));
                         }
                     } catch (RuntimeException ex) {
-                        // A transient Redis failure must not cancel future renewals.
-                        logger.warn("Redis lock lease renewal threw an exception: {}", key, ex);
+                        markLeaseLost(key, actionThread, leaseState, ex);
                     }
                 },
                 renewInterval,
@@ -169,13 +176,52 @@ public class RedisLockService {
         );
 
         try {
-            return action.get();
+            assertLeaseHeld();
+            T result = action.get();
+            assertLeaseHeld();
+            return result;
         } finally {
             renewal.cancel(false);
             if (!unlock(key)) {
                 logger.warn("Redis lock release failed or lock expired: {}", key);
             }
+            if (previousLease == null) {
+                activeLease.remove();
+            } else {
+                activeLease.set(previousLease);
+            }
         }
+    }
+
+    public void assertLeaseHeld() {
+        LeaseState leaseState = activeLease.get();
+        if (leaseState != null && leaseState.lost.get()) {
+            throw leaseLostException(leaseState.key, leaseState.failure.get());
+        }
+    }
+
+    private void markLeaseLost(
+            String key,
+            Thread actionThread,
+            LeaseState leaseState,
+            RuntimeException failure
+    ) {
+        leaseState.key = key;
+        if (leaseState.lost.compareAndSet(false, true)) {
+            leaseState.failure.set(failure);
+            logger.error("Redis lock lease lost; interrupting protected action: {}", key, failure);
+            actionThread.interrupt();
+        }
+    }
+
+    private IllegalStateException leaseLostException(String key, RuntimeException failure) {
+        return new IllegalStateException("Redis lock lease lost: " + key, failure);
+    }
+
+    private static final class LeaseState {
+        private final AtomicBoolean lost = new AtomicBoolean(false);
+        private final AtomicReference<RuntimeException> failure = new AtomicReference<>();
+        private String key;
     }
 
     private boolean tryAcquire(String redisKey, String owner, long leaseMillis) {

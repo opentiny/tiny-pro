@@ -65,7 +65,11 @@ public class PermissionCheckServiceImpl implements PermissionCheckService {
 
         User user;
         if ("api".equals(claims.get("type", String.class))) {
-            if (!tokenService.validateApiToken(email, token)) {
+            if (!tokenService.validateApiToken(
+                    email,
+                    claims.get("tokenId", String.class),
+                    token
+            )) {
                 throw new BusinessException("exception.common.tokenExpire", HttpStatus.UNAUTHORIZED, null);
             }
             user = iUserService.getUserInfo(email).getBody();
