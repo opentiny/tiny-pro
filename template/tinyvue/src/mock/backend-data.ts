@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import localeTable from '../locales.json'
 
 export interface MenuNode {
   children: MenuNode[]
@@ -50,7 +50,7 @@ function menu(
   }
 }
 
-export const menuTree = [
+const menuTree = [
   menu('Board', 'board', 'board/index', 'menu.board', [
     menu('Home', 'home', 'board/home/index', 'menu.home'),
     menu('Work', 'work', 'board/work/index', 'menu.work'),
@@ -86,10 +86,6 @@ export const menuTree = [
     menu('Local', 'locale', 'locale/index', 'menu.i18n'),
   ], 'IconTotal'),
 ]
-
-export const localeTable = JSON.parse(
-  readFileSync(new URL('../locales.json', import.meta.url), 'utf8'),
-)
 
 export function createBackendState() {
   const role = {
@@ -127,7 +123,10 @@ export function createBackendState() {
   )
 
   return {
-    credentials: new Map([['admin@no-reply.com', 'admin']]),
+    credentials: new Map([[
+      'admin@no-reply.com',
+      '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918',
+    ]]),
     languages: [{ id: 1, name: 'enUS' }, { id: 2, name: 'zhCN' }],
     localeTable: structuredClone(localeTable),
     localeRecords,
@@ -139,3 +138,5 @@ export function createBackendState() {
     users: [user],
   }
 }
+
+export type BackendState = ReturnType<typeof createBackendState>

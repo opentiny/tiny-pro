@@ -20,6 +20,7 @@ import { toRoutes } from '@/router/guard/menu'
 import { useUserStore } from '@/store'
 import { useLocales } from '@/store/modules/locales'
 import { useMenuStore } from '@/store/modules/router'
+import { resolvePostLoginLocation } from '@/utils/app-location'
 
 const router = useRouter()
 const { t, mergeLocaleMessage } = useI18n()
@@ -99,16 +100,13 @@ function handleSubmit() {
       })
 
       const route = router.currentRoute
-      const { redirect = 'Home' } = route.value.query
-      const blackList = ['login', 'notFound', 'redirect', 'preview', 'root']
-      let redirectTo = blackList.includes(redirect.toString())
-        ? 'Home'
-        : redirect.toString()
-      if (!router.hasRoute(redirectTo)) {
+      const { redirect } = route.value.query
+      const target = resolvePostLoginLocation(redirect)
+      if ('name' in target && target.name && !router.hasRoute(target.name)) {
         const [routerItem] = router.getRoutes().filter((routeItem) => {
           return (
             routeItem.name
-            && !blackList.includes(routeItem.name.toString())
+            && !['login', 'notFound', 'redirect', 'preview', 'root'].includes(routeItem.name.toString())
             && routeItem.children.length === 0
           )
         })
@@ -120,10 +118,11 @@ function handleSubmit() {
           })
           return
         }
-        redirectTo = routerItem.name.toString()
+        router.replace({ name: routerItem.name.toString() })
+        return
       }
 
-      router.replace({ name: redirectTo })
+      router.replace(target)
     }
     catch (err) {
       let title = t('login.tip.right')
