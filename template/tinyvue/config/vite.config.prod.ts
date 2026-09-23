@@ -1,5 +1,5 @@
 import process from 'node:process'
-import { loadEnv, mergeConfig } from 'vite'
+import { mergeConfig } from 'vite'
 import configCompressPlugin from './plugin/compress'
 import configVisualizerPlugin from './plugin/visualizer'
 import baseConfig from './vite.config.base'
@@ -7,7 +7,7 @@ import baseConfig from './vite.config.base'
 export default mergeConfig(
   {
     mode: 'production',
-    base: loadEnv('', process.cwd()).VITE_BASE || '/',
+    base: process.env.VITE_BASE || '/',
     plugins: [configCompressPlugin('gzip'), configVisualizerPlugin()],
     define: {
       // 确保环境变量被注入到客户端代码
