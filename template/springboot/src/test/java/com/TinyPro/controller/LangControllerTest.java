@@ -104,7 +104,7 @@ public class LangControllerTest {
         when(langService.create(any(CreateLangDto.class)))
                 .thenReturn(ResponseEntity.ok(mockLang));
         
-        mockMvc.perform(MockMvcRequestBuilders.post("/lang")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/lang")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -136,7 +136,7 @@ public class LangControllerTest {
                 .thenReturn(ResponseEntity.ok(langList));
 
         // 模拟 GET 请求
-        mockMvc.perform(MockMvcRequestBuilders.get("/lang")
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/lang")
                         .header("Authorization","Bearer "+ Contants.TOKEN)
                 )
                 .andExpect(status().isOk())
@@ -154,7 +154,7 @@ public class LangControllerTest {
         when(langService.update(anyInt(), any(CreateLangDto.class)))
                 .thenReturn(ResponseEntity.ok(updatedLang));
 
-        mockMvc.perform(MockMvcRequestBuilders.patch("/lang/{id}", id)
+        mockMvc.perform(MockMvcRequestBuilders.patch("/api/lang/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -183,7 +183,7 @@ public class LangControllerTest {
         when(langService.remove(anyInt()))
                 .thenReturn(ResponseEntity.ok(removedLang));
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/lang/{id}", id)
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/lang/{id}", id)
                         .header("Authorization", "Bearer "+Contants.TOKEN)
                 )
                 .andExpect(status().isOk())

@@ -24,7 +24,7 @@ public class Lang implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
+    @Column(nullable = false, unique = true)
     private String name;
 
     @OneToMany(mappedBy = "lang", fetch = FetchType.LAZY)

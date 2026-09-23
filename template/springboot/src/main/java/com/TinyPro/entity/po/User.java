@@ -25,8 +25,8 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
     private String name;
+    @Column(nullable = false, unique = true)
     private String email;
     private String password;
 
@@ -51,14 +51,8 @@ public class User {
     private Integer status;
 
     @CreatedDate
-    @Column(name = "createTime", updatable = false)
-    private LocalDate createTime;
-    @CreatedDate
     @Column(name = "create_time", updatable = false)
     private LocalDate create_time;
-    @LastModifiedDate
-    @Column(name = "updateTime")
-    private LocalDate updateTime;
     @LastModifiedDate
     @Column(name = "update_time")
     private LocalDate update_time;

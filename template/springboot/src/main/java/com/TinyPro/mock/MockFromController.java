@@ -33,7 +33,13 @@ public class MockFromController {
             "position", mockPosition,
             "HR", mockHR,
             "mentor", mockMentor,
-            "director", mockDirector
+            "director", mockDirector,
+            "status", List.of("running", "finished", "delayed"),
+            "department", List.of(
+                    Map.of("value", "1", "label", "department01"),
+                    Map.of("value", "2", "label", "department02"),
+                    Map.of("value", "3", "label", "department03")
+            )
     );
 
 
@@ -45,6 +51,11 @@ public class MockFromController {
     @GetMapping("/api/step/getdata")
     public ApiResponse<Map<String, Object>> getStepData() {
         return ApiResponse.success(initBase, "获取步骤数据成功", 20000);
+    }
+
+    @GetMapping("/api/advance/getdata")
+    public ApiResponse<Map<String, Object>> getAdvanceData() {
+        return ApiResponse.success(initBase, "request success", 20000);
     }
 
     @PostMapping("/api/channel-form/submit")

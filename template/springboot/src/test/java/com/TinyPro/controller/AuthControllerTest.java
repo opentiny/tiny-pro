@@ -3,6 +3,8 @@ package com.TinyPro.controller;
 import com.TinyPro.controller.contants.Contants;
 import com.TinyPro.entity.dto.CreateAuthDto;
 import com.TinyPro.entity.dto.LogoutAuthDto;
+import com.TinyPro.entity.vo.TokenPair;
+import com.TinyPro.entity.vo.ApiToken;
 import com.TinyPro.filter.RejectInterceptor;
 import com.TinyPro.redis.RedisUtil;
 import com.TinyPro.service.IAuthService;
@@ -62,8 +64,11 @@ public class AuthControllerTest {
     private LogoutAuthDto validLogoutDto;
     private LogoutAuthDto invalidLogoutDto;
 
-    private static final String LOGIN_ENDPOINT = "/auth/login";
-    private static final String LOGOUT_ENDPOINT = "/auth/logout";
+    private static final String LOGIN_ENDPOINT = "/api/auth/login";
+    private static final String LOGOUT_ENDPOINT = "/api/auth/logout";
+    private static final String REFRESH_ENDPOINT = "/api/auth/token/refresh";
+    private static final String API_TOKEN_ENDPOINT = "/api/auth/api-token";
+    private static final String REVOKE_API_TOKEN_ENDPOINT = "/api/auth/revoke-api-token";
     @TestConfiguration
     static class TestConfig {
         @Bean
@@ -157,17 +162,58 @@ public class AuthControllerTest {
                 .andExpect(jsonPath("$.message").value("邮箱或密码错误"));
     }
 
-    // 登出成功场景（无需修改，因返回值是String，无泛型冲突）
+    @Test
+    public void testRefreshToken_ReturnsTokenPair() throws Exception {
+        when(authService.refreshToken("refresh-token"))
+                .thenReturn(new TokenPair("access-token", "new-refresh-token", 7200000L, 604800000L));
+
+        mockMvc.perform(post(REFRESH_ENDPOINT)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"token\":\"refresh-token\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessToken").value("access-token"))
+                .andExpect(jsonPath("$.refreshToken").value("new-refresh-token"))
+                .andExpect(jsonPath("$.accessTokenTTL").value(7200000))
+                .andExpect(jsonPath("$.refreshTokenTTL").value(604800000));
+    }
+
+    @Test
+    public void testGenerateApiToken_ReturnsNestCompatibleResponse() throws Exception {
+        when(authService.generateApiToken(any()))
+                .thenReturn(new ApiToken("api-token", "integration", 604800L));
+
+        mockMvc.perform(post(API_TOKEN_ENDPOINT)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"test@example.com\",\"password\":\"admin\",\"tokenName\":\"integration\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.token").value("api-token"))
+                .andExpect(jsonPath("$.tokenId").value("integration"))
+                .andExpect(jsonPath("$.expiresIn").value(604800));
+    }
+
+    @Test
+    public void testRevokeApiToken_ReturnsCreated() throws Exception {
+        mockMvc.perform(post(REVOKE_API_TOKEN_ENDPOINT)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + Contants.TOKEN)
+                        .content("{\"email\":\"test@example.com\",\"tokenId\":\"integration\"}"))
+                .andExpect(status().isCreated())
+                .andExpect(content().string(""));
+
+        verify(authService).revokeApiToken(any());
+    }
+
+    // 登出成功场景
     @Test
     public void testLogout_Success() throws Exception {
-        when(authService.logout(anyString()))
-                .thenReturn("redirect:/login");
+        doNothing().when(authService).logout(anyString());
 
         mockMvc.perform(post(LOGOUT_ENDPOINT)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization" ,"Bearer "+ Contants.TOKEN)
                         .content(objectMapper.writeValueAsString(validLogoutDto)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true));
     }
 
     // 登出无效token场景（无需修改）
