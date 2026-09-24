@@ -17,6 +17,7 @@ import java.util.Optional;
 public interface I18Repository extends JpaRepository<I18, Long>,
         JpaSpecificationExecutor<I18> {
     Optional<I18> findByKeyAndLang_Id(String key, Long langId);
+    Optional<I18> findFirstByKeyAndLang_IdOrderByIdAsc(String key, Long langId);
     List<I18> findByLang_Id(Long langId);
     // 使用投影，SQL 只查需要的列，不会把 Lang.i18n 带出来
     Page<I18> findAll(Specification<I18> spec, Pageable pageable);
