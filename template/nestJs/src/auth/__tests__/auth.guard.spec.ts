@@ -3,7 +3,7 @@ import { Reflector } from '@nestjs/core';
 import { JwtService } from '@app/jwt';
 import { AuthGuard } from '../auth.guard';
 import { AuthService } from '../auth.service';
-import { I18nContext } from 'nestjs-i18n';
+import { I18nContext, I18nService } from 'nestjs-i18n';
 import { Test } from '@nestjs/testing';
 import { TokenService } from '../token.service';
 
@@ -24,7 +24,8 @@ describe('AuthGuard', () => {
     getToken: jest.fn(),
     kickOut: jest.fn(),
     logout: jest.fn(),
-    login: jest.fn()
+    login: jest.fn(),
+    validateApiToken: jest.fn(),
   }
   const tokenService = {
     revokeToken: jest.fn(),
@@ -37,6 +38,9 @@ describe('AuthGuard', () => {
   }
   const i18n = {
     lang: '',
+    t: jest.fn()
+  }
+  const i18nService = {
     t: jest.fn()
   }
   beforeEach(async () => {
@@ -58,6 +62,10 @@ describe('AuthGuard', () => {
         {
           provide: TokenService,
           useValue: tokenService
+        },
+        {
+          provide: I18nService,
+          useValue: i18nService
         }
       ]
     })
@@ -225,4 +233,66 @@ describe('AuthGuard', () => {
     const result = await authGuard.canActivate(mockContext);
     expect(result).toBe(true);
   });
+
+  it('should not crash when I18nContext.current() returns undefined (token missing)', async () => {
+    reflector.getAllAndOverride.mockReturnValue(false);
+    jest.spyOn(I18nContext, 'current').mockReturnValue(undefined as any);
+    i18nService.t.mockReturnValue('Token error');
+  
+    const mockRequest = {
+      headers: {
+        authorization: '',
+      },
+    };
+    const mockContext = {
+      getHandler: jest.fn(),
+      getClass: jest.fn(),
+      switchToHttp: () => ({
+        getRequest: () => mockRequest,
+      }),
+    } as any;
+  
+    await expect(authGuard.canActivate(mockContext)).rejects.toThrow(
+      HttpException,
+    );
+    expect(i18nService.t).toHaveBeenCalledWith(
+      'exception.common.tokenError',
+      expect.objectContaining({ lang: 'enUS' }),
+    );
+  
+    jest.spyOn(I18nContext, 'current').mockReturnValue(i18n as any);
+  });
+  
+  it('should not crash when I18nContext.current() returns undefined (token verify fail)', async () => {
+    reflector.getAllAndOverride.mockReturnValue(false);
+    jwt.verify.mockRejectedValue(new Error('expired'));
+    jest.spyOn(I18nContext, 'current').mockReturnValue(undefined as any);
+    i18nService.t.mockReturnValue('Token expired');
+  
+    const mockRequest = {
+      headers: {
+        authorization: 'Bearer expiredToken',
+      },
+    };
+    const mockContext = {
+      getHandler: jest.fn(),
+      getClass: jest.fn(),
+      switchToHttp: () => ({
+        getRequest: () => mockRequest,
+      }),
+    } as any;
+  
+    await expect(authGuard.canActivate(mockContext)).rejects.toThrow(
+      HttpException,
+    );
+    expect(i18nService.t).toHaveBeenCalledWith(
+      'exception.common.tokenExpire',
+      expect.objectContaining({ lang: 'enUS' }),
+    );
+  
+    jest.spyOn(I18nContext, 'current').mockReturnValue(i18n as any);
+  });
 });
+
+
+
