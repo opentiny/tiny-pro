@@ -9,7 +9,7 @@ import { Reflector } from '@nestjs/core';
 import { JwtService } from '@app/jwt';
 import { Request } from 'express';
 import { AuthService } from './auth.service';
-import { I18nContext } from 'nestjs-i18n';
+import { I18nContext, I18nService } from 'nestjs-i18n';
 import { I18nTranslations } from '../.generate/i18n.generated';
 import { TokenService } from './token.service';
 import { TokenPayload } from './entity/token';
@@ -20,10 +20,15 @@ export class AuthGuard implements CanActivate {
     private readonly jwt: JwtService,
     private readonly reflector: Reflector,
     private readonly authService: AuthService,
-    private readonly tokenService: TokenService
+    private readonly tokenService: TokenService,
+    private readonly i18nService: I18nService<I18nTranslations>,
   ) {}
   async canActivate(ctx: ExecutionContext): Promise<boolean> {
     const i18n = I18nContext.current<I18nTranslations>();
+    const t = (key: string) =>
+      i18n?.t(key, { lang: i18n.lang }) ??
+      this.i18nService.t(key, { lang: 'enUS' });
+      
     const isPublic = this.reflector.getAllAndOverride('isPublic', [
       ctx.getHandler(),
       ctx.getClass(),
@@ -35,9 +40,7 @@ export class AuthGuard implements CanActivate {
     const token = this.extractTokenFromHeader(req);
     if (!token) {
       throw new HttpException(
-        i18n.t('exception.common.tokenError', {
-          lang: I18nContext.current().lang,
-        }),
+        t('exception.common.tokenError'),
         HttpStatus.UNAUTHORIZED
       );
     }
@@ -55,9 +58,7 @@ export class AuthGuard implements CanActivate {
         );
         if (!isValidApiToken) {
           throw new HttpException(
-            i18n.t('exception.common.tokenExpire', {
-              lang: I18nContext.current().lang,
-            }),
+            t('exception.common.tokenExpire'),
             HttpStatus.UNAUTHORIZED
           );
         }
@@ -65,9 +66,7 @@ export class AuthGuard implements CanActivate {
         // 原有的登录token验证逻辑
         if (!await this.tokenService.accessTokenAlive(token)){
           throw new HttpException(
-            i18n.t('exception.common.tokenExpire', {
-              lang: I18nContext.current().lang,
-            }),
+            t('exception.common.tokenExpire'),
             HttpStatus.UNAUTHORIZED
           );
         }
@@ -75,10 +74,8 @@ export class AuthGuard implements CanActivate {
       return true;
     } catch (err) {
       throw new HttpException(
-        i18n.t('exception.common.tokenExpire', {
-          lang: I18nContext.current().lang,
-        }),
-        HttpStatus.UNAUTHORIZED
+        t('exception.common.tokenExpire'),
+        HttpStatus.UNAUTHORIZED,
       );
     }
   }
