@@ -37,7 +37,14 @@ flyway validate \
 
 The baseline records the existing schema as version `1`; it does not execute `V1__init_schema.sql`. Subsequent application startup can then apply `V2` and later migrations.
 
-After the one-time baseline, set `FLYWAY_BASELINE_ON_MIGRATE=false` and start the production application. Future migrations must be applied explicitly and must pass Flyway validation before the application starts.
+Do not set `FLYWAY_BASELINE_ON_MIGRATE=false` until the baseline command has created `flyway_schema_history` and `flyway validate` has succeeded. The production rollout order is:
+
+1. Verify the existing schema and back up the database.
+2. Run the one-time `flyway baseline` command above.
+3. Run `flyway validate` and confirm that `flyway_schema_history` contains baseline version `1`.
+4. Set `FLYWAY_BASELINE_ON_MIGRATE=false` and start the application.
+
+Future migrations must be applied explicitly and must pass Flyway validation before the application starts.
 
 For a controlled first startup instead of the CLI, `FLYWAY_BASELINE_ON_MIGRATE=true` may be supplied for that single deployment only, after schema verification. Set it back to `false` immediately after startup and never use automatic baselining as the normal production setting.
 
