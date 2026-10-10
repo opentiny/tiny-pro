@@ -10,11 +10,11 @@ title: "路由与菜单"
 
 <h2 id='function'>核心模块和功能</h2>
 
-- #### 导航
+- ### 导航
 
   在`src/router/routes/modules`中根据你的路由进行配置。
 
-- #### 路由管理
+- ### 路由管理
 
   - **1.主路由**  
     在`src/router/index`中进行配置。
@@ -23,7 +23,7 @@ title: "路由与菜单"
     在`src/router/routes/modules`中进行配置。
 
 
-- #### 面包屑
+- ### 面包屑
 
   可以参考`src/compoments/breadcrumb`中进行配置。
 

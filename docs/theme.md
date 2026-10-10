@@ -24,13 +24,13 @@ title: "个性化主题"
         <span>Dark</span>
       </div>
       <div>
-        <div v-for="(index, item) in SwitchColor" :key="index">
+        <div v-for="(item, index) in SwitchColor" :key="index">
           <div
             class="theme-block"
             :style="{ 'background-color': item.color }"
             @click="choose(item)"
           >
-            <iconYes v-if="item.value === index" class="theme-yes"></iconYes>
+            <iconYes v-if="item.value === current" class="theme-yes"></iconYes>
           </div>
         </div>
       </div>
@@ -43,7 +43,7 @@ title: "个性化主题"
     dark: any;
     theme: any;
   }) => {
-    index.value = item.value;
+    current.value = item.value;
     theme.changeTheme(item.theme);
     dark.value = item.dark as string;
   };

@@ -64,7 +64,7 @@ export function login(data: LoginData) {
 
 <h2 id='make'>项目中使用</h2>
 
-在`src/view/login`中调用你的 service：
+在`src/views/login`中调用你的 service：
 
 ```ts
     async login(loginForm: LoginData) {

@@ -6,13 +6,13 @@ title: "新增页面"
 
 ---
 
-如果你想通过导航栏访问一个新页面，可通过此方法进行操作。新建页面的主要流程为在 `src/view` 目录中创建对应页面，
+如果你想通过导航栏访问一个新页面，可通过此方法进行操作。新建页面的主要流程为在 `src/views` 目录中创建对应页面，
 然后在模块中创建对应的组件，如果组件中需创建公共组件，则在 `src/components` 中创建。  下面以新建**结果页**为例，介绍新建页面的流程。
 
 
 <h2 id='modal'>创建模块</h2>
 
-首先在`src/view`下新建一个页面：
+首先在`src/views`下新建一个页面：
 
  ![result.png](/images/routercode.png)
 
@@ -21,7 +21,7 @@ title: "新增页面"
 
 以上步骤完成后，需要为新增的页面在导航栏中添加对应的路由访问。
 
-在 `src/router/moudles`中，添加路由信息。
+在 `src/router/routes/modules`中，添加路由信息。
 
 ```ts
 export default {

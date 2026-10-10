@@ -43,7 +43,7 @@ tiny-pro
 
 ## 后端启动
 
-后端服务支持`docker启动`与`命令启动`， 执行操作前请先确保所处位置为`tiny-pro/nestJS`
+后端服务支持`docker启动`与`命令启动`， 执行操作前请先确保所处位置为`tiny-pro/nestJs`
 
 ### Docker启动
 
@@ -66,8 +66,8 @@ DATABASE_NAME = 'demo_tiny_pro'
 DATABASE_SYNCHRONIZE = true
 #  是否自动加载Entry (建议设置为true)
 DATABASE_AUTOLOADENTITIES = true
-#  jwt盐
-AUTH_SECRET = 'secret'
+#  jwt盐（仅限本地开发。请为每个环境单独生成随机字符串，不要复用示例值）
+AUTH_SECRET = 'dev-only-change-me'
 #  AccessToken默认过期时间
 REDIS_SECONDS = 7200
 #  Redis IP
@@ -146,8 +146,8 @@ DATABASE_NAME = 'demo_tiny_pro'
 DATABASE_SYNCHRONIZE = true
 #  是否自动加载Entry (建议设置为true)
 DATABASE_AUTOLOADENTITIES = true
-#  jwt盐
-AUTH_SECRET = 'secret'
+#  jwt盐（仅限本地开发。请为每个环境单独生成随机字符串，不要复用示例值）
+AUTH_SECRET = 'dev-only-change-me'
 #  AccessToken默认过期时间
 REDIS_SECONDS = 7200
 #  Redis IP
@@ -233,7 +233,7 @@ npm i
 
 > 这里只阐述默认 tiny-pro 后端打包，如果您进行了修改(例如增加了某些node-gyp依赖，请修改`dockerfile`手动安装`node-gyp`系统级前置依赖)
 
-运行 `docker build -t tinypro:latest` 即可
+在 Dockerfile 所在目录运行 `docker build -t tinypro:latest .` 即可
 
 ## 遇到困难?
 
@@ -254,7 +254,7 @@ npm i
 
 ### 后端docker启动时出现 `Error response from daemon: Ports are not available: exposing port TCP 0.0.0.0:3306 -> 0.0.0.0:0: listen tcp 0.0.0.0:3306: bind: Only one usage of each socket address (protocol/network address/port) is normally permitted.`
 
-这是因为宿主机的某些应用占用了`3306`端口, 请先释放宿主机该端口后手动启动MySQL服务
+这是因为宿主机的某些应用占用了`3306`端口。若使用 Compose 管理 MySQL，请停止占用该端口的宿主机服务后重新执行 `docker compose up -d`；若使用宿主机 MySQL，请修改 Compose 配置，避免容器也发布 `3306` 端口。
 
 ### 后端使用`docker compose up -d`启动时候，出现I/O timeout错误
 
