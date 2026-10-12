@@ -130,7 +130,7 @@ defineExpose({
       <div class="form-header">
         {{ $t('stepForm.collapse.base') }}
       </div>
-      <TinyRow class="flex flex-wrap">
+      <TinyRow>
         <transition-fade-down-group>
           <TinyCol class="w-1/3 max-md:w-1/2 max-sm:w-full max-sm:pb-3">
             <TinyFormItem :label="$t('stepForm.coach.culture')" prop="sector">

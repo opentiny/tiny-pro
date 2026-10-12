@@ -107,4 +107,10 @@ function handleSubmit() {
   </div>
 </template>
 
-<style scoped lang="less"></style>
+<style scoped lang="less">
+.form-card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+</style>
