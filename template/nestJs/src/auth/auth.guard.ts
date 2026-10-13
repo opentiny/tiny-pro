@@ -9,7 +9,7 @@ import { Reflector } from '@nestjs/core';
 import { JwtService } from '@app/jwt';
 import { Request } from 'express';
 import { AuthService } from './auth.service';
-import { I18nContext, I18nService } from 'nestjs-i18n';
+import { I18nContext, I18nService, Path } from 'nestjs-i18n';
 import { I18nTranslations } from '../.generate/i18n.generated';
 import { TokenService } from './token.service';
 import { TokenPayload } from './entity/token';
@@ -25,10 +25,10 @@ export class AuthGuard implements CanActivate {
   ) {}
   async canActivate(ctx: ExecutionContext): Promise<boolean> {
     const i18n = I18nContext.current<I18nTranslations>();
-    const t = (key: string) =>
+    const t = (key: Path<I18nTranslations>) =>
       i18n?.t(key, { lang: i18n.lang }) ??
       this.i18nService.t(key, { lang: 'enUS' });
-      
+
     const isPublic = this.reflector.getAllAndOverride('isPublic', [
       ctx.getHandler(),
       ctx.getClass(),
