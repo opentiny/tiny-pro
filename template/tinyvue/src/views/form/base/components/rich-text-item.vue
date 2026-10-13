@@ -12,21 +12,10 @@ const TOOLBAR_OPTIONS = [
   ['undo', 'redo'],
   // 标题
   [{ header: [1, 2, 3, 4, false] }],
-  // 字体 / 字号
   // 加粗等基础样式
   ['bold', 'italic', 'underline', 'strike'],
-<<<<<<< Updated upstream
   // 字体颜色 / 背景色
   [{ color: [] }, { background: [] }],
-  // 列表 / 对齐
-  [{ list: 'ordered' }, { list: 'bullet' }],
-  [{ align: [] }],
-  // 引用 / 代码块 / 链接
-  ['blockquote', 'code-block', 'link'],
-  [{ size: ['small', false, 'large', 'huge'] }],
-  // 清除格式
-  ['clean'],
-=======
   // 列表 / 对齐
   [{ list: 'ordered' }, { list: 'bullet' }],
   // 清除格式
@@ -34,10 +23,7 @@ const TOOLBAR_OPTIONS = [
   // 引用 / 代码块 / 链接
   ['blockquote', 'code-block', 'link'],
   [{ size: ['small', false, 'large', 'huge'] }],
-  // 字体颜色 / 背景色
-  [{ color: [] }, { background: [] }],
   [{ align: [] }],
->>>>>>> Stashed changes
 ]
 
 onMounted(() => {
