@@ -1,15 +1,16 @@
 package com.TinyPro.utils;
 
+import com.TinyPro.config.TinyProProperties;
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,14 +19,16 @@ public class JwtUtil {
 
     private final Key secretKey;
 
-    @Value("${jwt.secret}")
-    private String secretString;
+    @Autowired
+    public JwtUtil(TinyProProperties properties) {
+        this(properties.getJwt().getSecret());
+    }
 
-    public JwtUtil(@Value("${jwt.secret}") String secretString) {
+    public JwtUtil(String secretString) {
         try {
             // 使用 SHA-256 哈希算法将字符串转换为字节数组
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] keyBytes = digest.digest(secretString.getBytes());
+            byte[] keyBytes = digest.digest(secretString.getBytes(StandardCharsets.UTF_8));
 
             // 将字节数组转换为 SecretKey
             this.secretKey = new SecretKeySpec(keyBytes, SignatureAlgorithm.HS256.getJcaName());
