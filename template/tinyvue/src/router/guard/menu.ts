@@ -124,6 +124,6 @@ export function setupMenuGuard(router: Router) {
         router.addRoute('root', route)
       }
     })
-    next({ ...to, replace: true })
+    next({ path: to.path, query: to.query, hash: to.hash, replace: true })
   })
 }

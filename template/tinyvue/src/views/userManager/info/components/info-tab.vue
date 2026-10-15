@@ -143,7 +143,6 @@ async function fetchData(params: { pageIndex: 1, pageSize: 10 }, filters: Filter
   state.loading = Loading.service({
     text: 'loading...',
     target: document.getElementById('contain'),
-    background: 'rgba(0, 0, 0, 0.7)',
   })
   try {
     const { data } = await getAllUser(

@@ -24,8 +24,9 @@ export const useMenuStore = defineStore('menu', {
       this.flatMenuList = []
       const dfs = (item: any) => {
         this.flatMenuList.push(item)
-        for (let i = 0; i < item.children.length; i += 1) {
-          dfs(item.children[i])
+        const children = item.children ?? []
+        for (let i = 0; i < children.length; i += 1) {
+          dfs(children[i])
         }
       }
       for (let i = 0; i < this.menuList.length; i += 1) {

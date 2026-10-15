@@ -2,7 +2,7 @@ FROM node:20-alpine as BUILDER
 WORKDIR /builder/
 ADD . .
 RUN apk add wait4x && \
-    npm install pnpm -g && \
+    npm install pnpm@10 -g && \
     pnpm i && \
     pnpm build
 

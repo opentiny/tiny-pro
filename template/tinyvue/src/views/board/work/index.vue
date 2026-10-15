@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import learncoach from './components/learn-coach.vue'
+import salesChart from './components/sales-chart.vue'
 import learnplan from './components/learn-plan.vue'
 import learnprobation from './components/learn-probation.vue'
 import learntrain from './components/learn-traini.vue'
@@ -14,11 +15,7 @@ const Home = [
 <template>
   <div class="container-work">
     <Breadcrumb :items="['menu.board', 'menu.work']" />
-    <div class="work-image">
-      <transition-slide>
-        <img src="@/assets/images/woker.png" alt="403" class="user-image">
-      </transition-slide>
-    </div>
+    <sales-chart />
     <div class="content">
       <div class="left">
         <div class="card">
@@ -71,16 +68,6 @@ const Home = [
   overflow: auto;
   background: #f6f8f9;
   color: #191919;
-
-  .work-image {
-    width: 100%;
-    margin: 0 auto;
-
-    img {
-      width: 100%;
-      min-height: 50px;
-    }
-  }
 }
 
 .content {
