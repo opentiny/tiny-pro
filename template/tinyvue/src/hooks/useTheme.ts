@@ -1,14 +1,16 @@
 import type TinyThemeTool from '@opentiny/vue-theme/theme-tool'
+import { storeToRefs } from 'pinia'
 import { computed, onMounted, watch } from 'vue'
 import * as Themes from '@/components/theme/type'
 import { useAppStore } from '@/store'
 import useThemes from './themes'
 
 export function useTheme(themeTool: TinyThemeTool) {
-  const { themelist, $patch } = useAppStore()
+  const appStore = useAppStore()
+  const { themelist } = storeToRefs(appStore)
   const themeName = computed(() =>
-    themelist?.length
-      ? `${themelist[0].toUpperCase()}${themelist.slice(1).toLowerCase()}Theme`
+    themelist.value?.length
+      ? `${themelist.value[0].toUpperCase()}${themelist.value.slice(1).toLowerCase()}Theme`
       : 'DefaultTheme',
   )
 
@@ -17,11 +19,12 @@ export function useTheme(themeTool: TinyThemeTool) {
   watch(
     themeName,
     () => {
-      themeTool.changeTheme(
-        themeName.value === 'DefaultTheme'
-          ? ''
-          : (Themes as any)[themeName.value],
-      )
+      const nextTheme = themeName.value === 'DefaultTheme'
+        ? Themes.DefaultTheme
+        : (Themes as any)[themeName.value]
+      if (nextTheme) {
+        themeTool.changeTheme(nextTheme)
+      }
     },
     { immediate: true },
   )
@@ -42,7 +45,7 @@ export function useTheme(themeTool: TinyThemeTool) {
   })
 
   const toggleTheme = (name: string) => {
-    $patch({
+    appStore.$patch({
       themelist: name,
     })
   }

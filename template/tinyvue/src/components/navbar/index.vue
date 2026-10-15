@@ -61,9 +61,8 @@ const state = reactive<{
 function changeLan() {
   lan.value = !lan.value
 }
-// 帮助中心
 function help() {
-  window.location.href = `${window.location.protocol}//${window.location.host}/vue-pro/docs/start`
+  window.open('https://opentiny.design/vue-pro/docs/start', '_blank', 'noopener,noreferrer')
 }
 
 // 设置页面显示

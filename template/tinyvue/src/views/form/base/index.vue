@@ -34,7 +34,6 @@ async function fetchData() {
   state.loading = Loading.service({
     text: 'loading...',
     target: document.getElementById('container'),
-    background: 'rgba(0, 0, 0, 0.7)',
   })
   try {
     const { data } = await getBaseData()

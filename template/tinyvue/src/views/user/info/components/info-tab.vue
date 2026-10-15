@@ -49,7 +49,6 @@ async function fetchData() {
   state.loading = Loading.service({
     text: 'loading...',
     target: document.getElementById('contain'),
-    background: 'rgba(0, 0, 0, 0.7)',
   })
   try {
     const { data } = await getUserData(userStore.$state as any)

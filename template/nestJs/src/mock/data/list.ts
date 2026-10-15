@@ -40,7 +40,7 @@ export default [
       const count = index * size;
       treeData = tableData.slice(offset, count);
       const data = mock({
-        total: 60,
+        total: tableData.length,
         data: treeData,
       });
 
@@ -74,6 +74,18 @@ export default [
       });
 
       return res;
+    },
+  },
+  {
+    url: '/api/employee/delete',
+    method: 'delete',
+    response: (params: { query: any }) => {
+      const { id } = params.query || {};
+      const idx = tableData.findIndex((item) => item.id === id);
+      if (idx !== -1) {
+        tableData.splice(idx, 1);
+      }
+      return successResponseWrap(true);
     },
   },
 ] as const;
