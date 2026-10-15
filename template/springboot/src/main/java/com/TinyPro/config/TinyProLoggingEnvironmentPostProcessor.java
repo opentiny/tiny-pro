@@ -4,6 +4,7 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.context.config.ConfigDataEnvironmentPostProcessor;
 import org.springframework.boot.context.properties.bind.BindException;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
@@ -44,6 +45,8 @@ public class TinyProLoggingEnvironmentPostProcessor implements EnvironmentPostPr
 
     @Override
     public int getOrder() {
-        return Ordered.HIGHEST_PRECEDENCE;
+        // Run after application.properties and profile-specific config have
+        // been loaded, but before LoggingApplicationListener initializes Logback.
+        return ConfigDataEnvironmentPostProcessor.ORDER + 1;
     }
 }

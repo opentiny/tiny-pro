@@ -1,12 +1,11 @@
--- TinyPro initial schema for SpringBoot.
--- Application seed data is intentionally handled by DataInitializer.
+-- Baseline schema matching the legacy SpringBoot ddl-auto:update database.
+-- Final constraints and Application schema are applied by V2.
 
 CREATE TABLE `permission` (
     `id` INT NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(255) NOT NULL,
     `desc` VARCHAR(255) NULL,
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_permission_name` (`name`)
+    PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `menu` (
@@ -19,34 +18,19 @@ CREATE TABLE `menu` (
     `component` VARCHAR(255) NULL,
     `path` VARCHAR(255) NULL,
     `locale` VARCHAR(255) NULL,
-    `menu_identity_hash` BINARY(32) GENERATED ALWAYS AS (
-        UNHEX(SHA2(CONCAT(
-            IF(`name` IS NULL, '-1:', CONCAT(CHAR_LENGTH(`name`), ':', `name`)),
-            IF(`order` IS NULL, '-1:', CONCAT(CHAR_LENGTH(`order`), ':', `order`)),
-            IF(`menuType` IS NULL, '-1:', CONCAT(CHAR_LENGTH(`menuType`), ':', `menuType`)),
-            IF(`parentId` IS NULL, '-1:', CONCAT(CHAR_LENGTH(`parentId`), ':', `parentId`)),
-            IF(`path` IS NULL, '-1:', CONCAT(CHAR_LENGTH(`path`), ':', `path`)),
-            IF(`icon` IS NULL, '-1:', CONCAT(CHAR_LENGTH(`icon`), ':', `icon`)),
-            IF(`component` IS NULL, '-1:', CONCAT(CHAR_LENGTH(`component`), ':', `component`)),
-            IF(`locale` IS NULL, '-1:', CONCAT(CHAR_LENGTH(`locale`), ':', `locale`))
-        ), 256))
-    ) STORED,
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_menu_identity` (`menu_identity_hash`)
+    PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `role` (
     `id` INT NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(255) NOT NULL,
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_role_name` (`name`)
+    PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `lang` (
     `id` INT NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(255) NOT NULL,
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_lang_name` (`name`)
+    PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `user` (
@@ -63,20 +47,18 @@ CREATE TABLE `user` (
     `protocol_end` DATE NULL,
     `address` VARCHAR(255) NULL,
     `status` INT NULL,
-    `create_time` DATE NULL,
-    `update_time` DATE NULL,
+    `createTime` DATE NULL,
+    `updateTime` DATE NULL,
     `salt` VARCHAR(64) NULL,
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_user_email` (`email`)
+    PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE `i18` (
+CREATE TABLE `I18` (
     `id` INT NOT NULL AUTO_INCREMENT,
     `key` VARCHAR(255) NULL,
     `content` TEXT NULL,
     `lang_id` INT NULL,
     PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_i18_lang_key` (`lang_id`, `key`),
     KEY `idx_i18_lang_id` (`lang_id`),
     CONSTRAINT `fk_i18_lang`
         FOREIGN KEY (`lang_id`) REFERENCES `lang` (`id`)
@@ -120,19 +102,6 @@ CREATE TABLE `user_role` (
     CONSTRAINT `fk_user_role_role`
         FOREIGN KEY (`role_id`) REFERENCES `role` (`id`)
         ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-CREATE TABLE `application` (
-    `id` BIGINT NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR(255) NOT NULL,
-    `description` VARCHAR(255) NULL,
-    `tag` TEXT NULL,
-    `icon` VARCHAR(255) NULL,
-    `classify` VARCHAR(255) NULL,
-    `created_at` DATETIME(6) NULL,
-    `updated_at` DATETIME(6) NULL,
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_application_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `employee` (

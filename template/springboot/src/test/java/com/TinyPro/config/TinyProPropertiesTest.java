@@ -3,7 +3,12 @@ package com.TinyPro.config;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.WebApplicationType;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.mock.env.MockEnvironment;
+
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -56,5 +61,23 @@ class TinyProPropertiesTest {
 
         assertThrows(IllegalStateException.class, () ->
                 new TinyProLoggingEnvironmentPostProcessor().postProcessEnvironment(environment, null));
+    }
+
+    @Test
+    void rejectsEnvironmentLoggingValueBeforeLogbackInitialization() {
+        SpringApplication application = new SpringApplication(LoggingValidationApplication.class);
+        application.setWebApplicationType(WebApplicationType.NONE);
+        application.setDefaultProperties(Map.of(
+                "LOG_MAX_FILE_SIZE", "abc",
+                "spring.main.banner-mode", "off"
+        ));
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class, application::run);
+
+        assertTrue(exception.getMessage().contains("Invalid tinypro.logging configuration"));
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    static class LoggingValidationApplication {
     }
 }
