@@ -119,8 +119,8 @@ CREATE TABLE `application` (
     `tag` TEXT NULL,
     `icon` VARCHAR(255) NULL,
     `classify` VARCHAR(255) NULL,
-    `createdAt` DATETIME(6) NULL,
-    `updatedAt` DATETIME(6) NULL,
+    `created_at` DATETIME(6) NULL,
+    `updated_at` DATETIME(6) NULL,
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_application_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
