@@ -41,7 +41,7 @@ import { RoleInit } from './role/role.initializer';
 import { PermissionInit } from './permission/permission.initalizer';
 import { UserInit } from './user/user.initalizer';
 import { ApplicationInit } from './application/application.init';
-import { RobotModule } from './robot/robot.module';
+import { ChatModule } from './chat/chat.module';
 
 const INSTALL_FLAG = 'FLAG:INSTALL';
 const MAX_RETRY = 20;
@@ -55,7 +55,7 @@ const MAX_RETRY = 20;
     RoleModule,
     MenuModule,
     ApplicationModule,
-    RobotModule,
+    ChatModule,
     ConfigModule.forRoot({
       isGlobal: true,
       expandVariables: true,

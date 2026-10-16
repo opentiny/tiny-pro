@@ -173,8 +173,8 @@ const isTinyRobotEnabled = computed(() => {
   return import.meta.env.VITE_TINY_ROBOT_ENABLED === 'true'
 })
 // 未启用时不加载智能助手组件对应的 chunk
-const TinyRobot = defineAsyncComponent(
-  () => import('@/components/tiny-robot/index.vue'),
+const TinyRobotChat = defineAsyncComponent(
+  () => import('@/tiny-robot-chat/TinyRobotChat.vue'),
 )
 
 function themeVisible() {
@@ -261,7 +261,7 @@ watch(appStore.$state, (newValue) => {
       </tiny-modal>
     </div>
     <img v-if="!appStore.navbar" src="@/assets/images/global.png" class="global-setting" @click="switchSet">
-    <TinyRobot v-if="isTinyRobotEnabled" />
+    <TinyRobotChat v-if="isTinyRobotEnabled" />
   </div>
 </template>
 

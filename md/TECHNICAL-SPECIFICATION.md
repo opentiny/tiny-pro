@@ -8,7 +8,7 @@
 
 套件本身是一个 Node.js CLI 程序（TypeScript 编写，CommonJS 输出到 `dist/`），核心职责是：
 
-1. 通过交互式问询（inquirer）收集用户选择：项目名称/描述、服务端框架（NestJS / SpringBoot / 暂不配置）、是否集成低代码设计器、构建工具（Vite / Webpack / Rspack / Farm）、数据库（MySQL）与 Redis 连接信息；
+1. 通过交互式问询（inquirer）收集用户选择：项目名称/描述、服务端框架（NestJS / SpringBoot / 暂不配置）、是否集成低代码设计器、构建工具（Vite / Webpack / Rspack / Farm）、可选页面功能（TinyRobot 智能助手、TinyEditor 富文本编辑器）、数据库（MySQL）与 Redis 连接信息；
 2. 将 `template/` 下的模板复制到目标目录，并根据用户选择改写 `package.json`（增删依赖与脚本）、`dev.env`、`docker-compose.yml`（NestJS）或 `application.properties`（SpringBoot）；
 3. 提供 `start` / `build` / `help` 命令，透传执行生成项目的 npm 脚本。
 
@@ -36,9 +36,9 @@ tests/e2e/           Playwright 移动端 E2E 用例
 tiny.config.js       TinyCLI 套件配置（声明 toolkit 类型与 start/build 前置任务）
 ```
 
-前端模板 `template/tinyvue/src/` 的主要模块：`api/`（axios 接口封装）、`router/`（vue-router，含路由守卫）、`store/`（pinia）、`views/`（board、form、list、login、menu、permission、role、user 等业务页面）、`layout/`、`locale/`（vue-i18n）、`mock/`（vite-plugin-mock 或 tsx 启动的 mock 服务）、`hooks/`、`directive/`、`utils/`、`config/`。构建配置同时存在四套：`config/vite.config.*.ts`、`webpack.config.js`、`rspack.config.js`、`farm.config.ts`，由 `tiny init` 按用户选择裁剪。
+前端模板 `template/tinyvue/src/` 的主要模块：`api/`（axios 接口封装）、`router/`（vue-router，含路由守卫）、`store/`（pinia）、`views/`（board、form、list、login、menu、permission、role、user 等业务页面）、`layout/`、`locale/`（vue-i18n）、`mock/`（vite-plugin-mock 或 tsx 启动的 mock 服务）、`hooks/`、`directive/`、`utils/`、`config/`、`tiny-robot-chat/`（AI 对话助手，由 `@opentiny/tiny-robot-cli@1.0.0-rc.1` 的 `add chat` 生成，运行时 `@opentiny/tiny-robot` / `@opentiny/tiny-robot-chat` 1.0.0-rc.1；`VITE_TINY_ROBOT_ENABLED` 开关控制显隐与 chunk；对话请求走 `/api/robot/chat/completions`——mock 模式下由 `src/mock/robot.ts` 返回 SSE 演示数据，后端模式下经 NestJS `chat` 模块代理到大模型，详见 `md/INTEGRATION-HELP.md`）。构建配置同时存在四套：`config/vite.config.*.ts`、`webpack.config.js`、`rspack.config.js`、`farm.config.ts`，由 `tiny init` 按用户选择裁剪。
 
-后端模板 `template/nestJs/src/` 按业务域划分模块：`auth`（JWT 认证）、`user`、`role`、`menu`、`permission`（角色/用户/菜单/组件的细粒度权限）、`employees`、`i18`（多语言）、`mock`、`application`（应用初始化）。每个模块遵循 NestJS 惯例的 `*.module.ts / *.controller.ts / *.service.ts / dto / entity` 结构，部分模块带 `__tests__` 目录。
+后端模板 `template/nestJs/src/` 按业务域划分模块：`auth`（JWT 认证）、`user`、`role`、`menu`、`permission`（角色/用户/菜单/组件的细粒度权限）、`employees`、`i18`（多语言）、`mock`、`application`（应用初始化）、`chat`（AI 对话代理：`POST /robot/chat/completions` 转发 OpenAI 兼容的 SSE 流式请求到 `LLM_BASE_URL`，key 只留在服务端）。每个模块遵循 NestJS 惯例的 `*.module.ts / *.controller.ts / *.service.ts / dto / entity` 结构，部分模块带 `__tests__` 目录。
 
 ## 构建与常用命令
 

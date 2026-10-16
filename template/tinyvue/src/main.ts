@@ -12,7 +12,6 @@ import '@/assets/style/global.less'
 import '@opentiny/vue-search-box/dist/index.css'
 import 'virtual:uno.css'
 import '@opentiny/icons/style/all.css'
-import '@opentiny/tiny-robot/dist/style.css'
 
 initializeWebMCPPolyfill()
 

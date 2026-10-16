@@ -544,7 +544,7 @@ const createProjectSync = (answers: ProjectInfo) => {
     FEATURE_OPTIONS.forEach((feature) => {
       const enabled = selectedFeatures.includes(feature.value);
       updatedEnvContent = updatedEnvContent.replace(
-        new RegExp(`${feature.envKey}=false`),
+        new RegExp(`${feature.envKey}=(true|false)`),
         `${feature.envKey}=${enabled}`
       );
     });
