@@ -20,5 +20,5 @@ public interface IAuthService {
 
     ApiToken generateApiToken(CreateApiTokenDto dto);
 
-    void revokeApiToken(RevokeApiTokenDto dto);
+    void revokeApiToken(RevokeApiTokenDto dto, String requesterEmail);
 }

@@ -69,7 +69,10 @@ public class AuthServiceImpl implements IAuthService {
     }
 
     @Override
-    public void revokeApiToken(RevokeApiTokenDto dto) {
+    public void revokeApiToken(RevokeApiTokenDto dto, String requesterEmail) {
+        if (!StringUtils.equalsIgnoreCase(requesterEmail, dto.getEmail())) {
+            throw new BusinessException("common.forbidden", HttpStatus.FORBIDDEN, "api-token-owner");
+        }
         tokenService.revokeApiToken(dto.getEmail(), dto.getTokenId());
     }
 }

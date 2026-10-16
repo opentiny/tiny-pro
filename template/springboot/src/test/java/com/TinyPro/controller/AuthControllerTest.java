@@ -200,7 +200,18 @@ public class AuthControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(content().string(""));
 
-        verify(authService).revokeApiToken(any());
+        verify(authService).revokeApiToken(any(), eq("test@example.com"));
+    }
+
+    @Test
+    public void testRevokeApiToken_CannotRevokeAnotherUsersToken() throws Exception {
+        mockMvc.perform(post(REVOKE_API_TOKEN_ENDPOINT)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + Contants.TOKEN)
+                        .content("{\"email\":\"other@example.com\",\"tokenId\":\"integration\"}"))
+                .andExpect(status().isForbidden());
+
+        verify(authService, never()).revokeApiToken(any(), anyString());
     }
 
     // 登出成功场景

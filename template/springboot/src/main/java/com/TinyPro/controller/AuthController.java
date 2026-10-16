@@ -5,7 +5,10 @@ import com.TinyPro.entity.dto.*;
 import com.TinyPro.entity.vo.ApiToken;
 import com.TinyPro.entity.vo.MenuTreeVo;
 import com.TinyPro.entity.vo.TokenPair;
+import com.TinyPro.exception.BusinessException;
 import com.TinyPro.service.IAuthService;
+import com.TinyPro.utils.JwtUtil;
+import io.jsonwebtoken.Claims;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -14,6 +17,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +29,8 @@ import java.util.Map;
 public class AuthController {
     @Autowired
     private IAuthService authService;
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @IsPublic()
     @PostMapping("/token/refresh")
@@ -66,9 +72,29 @@ public class AuthController {
             @ApiResponse(responseCode = "201", description = "撤销成功"),
             @ApiResponse(responseCode = "401", description = "未认证", content = @Content(schema = @Schema(hidden = true)))
     })
-    public ResponseEntity<String> revokeApiToken(@RequestBody @Valid RevokeApiTokenDto dto) {
-        authService.revokeApiToken(dto);
+    public ResponseEntity<String> revokeApiToken(
+            @RequestBody @Valid RevokeApiTokenDto dto,
+            HttpServletRequest request) {
+        String requesterEmail = authenticatedEmail(request);
+        if (!StringUtils.equalsIgnoreCase(requesterEmail, dto.getEmail())) {
+            throw new BusinessException("common.forbidden", HttpStatus.FORBIDDEN, "api-token-owner");
+        }
+        authService.revokeApiToken(dto, requesterEmail);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    private String authenticatedEmail(HttpServletRequest request) {
+        String token = extractBearerToken(request);
+        if (StringUtils.isBlank(token)) {
+            throw new BusinessException("common.unauth", HttpStatus.UNAUTHORIZED, null);
+        }
+
+        Claims claims = jwtUtil.parseJwt(token);
+        String email = claims.get("email", String.class);
+        if (StringUtils.isBlank(email)) {
+            throw new BusinessException("common.unauth", HttpStatus.UNAUTHORIZED, null);
+        }
+        return email;
     }
 
     @GetMapping("/test")
