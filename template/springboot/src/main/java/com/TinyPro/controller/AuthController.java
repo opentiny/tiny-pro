@@ -20,7 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -42,18 +41,19 @@ public class AuthController {
             @ApiResponse(responseCode = "404", description = "用户不存在")
     })
     public ResponseEntity<ApiToken> generateApiToken(@RequestBody @Valid CreateApiTokenDto dto) {
-        return ResponseEntity.ok(authService.generateApiToken(dto));
+      return ResponseEntity.ok(authService.generateApiToken(dto));
     }
 
     @IsPublic()
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid CreateAuthDto createAuthDto, HttpServletResponse response) throws Exception {
         return authService.login(createAuthDto, response);
+
     }
 
     @PostMapping("/logout")
     public ResponseEntity<Map<String, Boolean>> logout(
-            @Valid @RequestBody LogoutAuthDto logoutAuthDto,
+             @RequestBody LogoutAuthDto logoutAuthDto,
             HttpServletRequest request
     ) {
         authService.logout(extractBearerToken(request));

@@ -1,7 +1,7 @@
 package com.TinyPro.controller;
 
 import com.TinyPro.entity.dto.CreateApplicationDto;
-import com.TinyPro.entity.dto.PaginationQueryDto;
+import com.TinyPro.entity.dto.ApplicationPaginationQueryDto;
 import com.TinyPro.entity.po.Application;
 import com.TinyPro.entity.vo.ApplicationVo;
 import com.TinyPro.service.ApplicationService;
@@ -40,10 +40,10 @@ class ApplicationControllerTest {
   }
 
   private static final class RecordingApplicationService implements ApplicationService {
-    private PaginationQueryDto lastSearchInfo;
+    private ApplicationPaginationQueryDto lastSearchInfo;
 
     @Override
-    public ApplicationVo findAllApplication(PaginationQueryDto searchInfo) {
+    public ApplicationVo findAllApplication(ApplicationPaginationQueryDto searchInfo) {
       this.lastSearchInfo = searchInfo;
       return new ApplicationVo();
     }

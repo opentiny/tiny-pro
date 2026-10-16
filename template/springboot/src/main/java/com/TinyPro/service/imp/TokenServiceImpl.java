@@ -160,6 +160,7 @@ public class TokenServiceImpl implements TokenService {
         redisUtil.leftPush("user:" + uid + ":at", accessJti);
         assertLeaseHeld();
         redisUtil.leftPush("user:" + uid + ":rt", refreshJti);
+        expireSessionIndexes(uid);
         if (StringUtils.isNotBlank(userJson)) {
             assertLeaseHeld();
             redisUtil.setValue(
@@ -173,20 +174,14 @@ public class TokenServiceImpl implements TokenService {
     }
 
     private void enforceDeviceLimit(String uid) {
+        cleanupExpiredIndexes(uid);
+
         if (deviceLimit <= 0) {
             return;
         }
 
         String refreshListKey = "user:" + uid + ":rt";
         List<String> refreshJtis = new ArrayList<>(safeRange(refreshListKey));
-
-        // Redis TTL removes the token value first; remove stale JTI list entries.
-        for (String refreshJti : new ArrayList<>(refreshJtis)) {
-            if (StringUtils.isBlank(redisUtil.getValue(refreshKey(uid, refreshJti)))) {
-                redisUtil.removeList(refreshListKey, refreshJti);
-                refreshJtis.remove(refreshJti);
-            }
-        }
 
         while (refreshJtis.size() >= deviceLimit) {
             String oldestRefreshJti = refreshJtis.get(refreshJtis.size() - 1);
@@ -210,6 +205,47 @@ public class TokenServiceImpl implements TokenService {
             }
             refreshJtis.remove(refreshJtis.size() - 1);
         }
+    }
+
+    /**
+     * Redis expires token values, but list members do not inherit the value
+     * TTL. Remove stale index entries on every login, including when there is
+     * no device limit.
+     */
+    private void cleanupExpiredIndexes(String uid) {
+        String accessListKey = "user:" + uid + ":at";
+        for (String accessJti : safeRange(accessListKey)) {
+            if (StringUtils.isBlank(redisUtil.getValue(accessKey(uid, accessJti)))) {
+                redisUtil.removeList(accessListKey, accessJti);
+            }
+        }
+
+        String refreshListKey = "user:" + uid + ":rt";
+        for (String refreshJti : safeRange(refreshListKey)) {
+            if (StringUtils.isBlank(redisUtil.getValue(refreshKey(uid, refreshJti)))) {
+                redisUtil.removeList(refreshListKey, refreshJti);
+            }
+        }
+
+        String sessionListKey = sessionListKey(uid);
+        for (String sessionId : safeRange(sessionListKey)) {
+            if (StringUtils.isBlank(redisUtil.getValue(sessionKey(uid, sessionId)))) {
+                redisUtil.removeList(sessionListKey, sessionId);
+            }
+        }
+    }
+
+    /**
+     * List indexes have no per-member TTL. Give each index a TTL no shorter
+     * than the refresh-token lifetime so abandoned indexes cannot live forever.
+     */
+    private void expireSessionIndexes(String uid) {
+        assertLeaseHeld();
+        redisUtil.expireMillis(sessionListKey(uid), refreshTokenTtlMillis);
+        assertLeaseHeld();
+        redisUtil.expireMillis("user:" + uid + ":at", refreshTokenTtlMillis);
+        assertLeaseHeld();
+        redisUtil.expireMillis("user:" + uid + ":rt", refreshTokenTtlMillis);
     }
 
     private List<String> safeRange(String key) {

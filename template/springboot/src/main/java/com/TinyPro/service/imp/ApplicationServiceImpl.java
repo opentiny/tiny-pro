@@ -1,7 +1,7 @@
 package com.TinyPro.service.imp;
 
 import com.TinyPro.entity.dto.CreateApplicationDto;
-import com.TinyPro.entity.dto.PaginationQueryDto;
+import com.TinyPro.entity.dto.ApplicationPaginationQueryDto;
 import com.TinyPro.entity.po.Application;
 import com.TinyPro.entity.vo.ApplicationVo;
 import com.TinyPro.jpa.ApplicationRepository;
@@ -36,7 +36,7 @@ public class ApplicationServiceImpl implements ApplicationService {
   private final ObjectMapper objectMapper;
 
   // 分页查询
-  public ApplicationVo findAllApplication(PaginationQueryDto searchInfo) {
+  public ApplicationVo findAllApplication(ApplicationPaginationQueryDto searchInfo) {
     int page = searchInfo.getPage();
     int limit = searchInfo.getLimit();
     String keywords = searchInfo.getKeywords();

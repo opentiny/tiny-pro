@@ -53,6 +53,10 @@ public class RedisUtil {
         redisTemplate.opsForValue().set(key, value, timeoutMillis, TimeUnit.MILLISECONDS);
     }
 
+    public void expireMillis(String key, long timeoutMillis) {
+        redisTemplate.expire(key, timeoutMillis, TimeUnit.MILLISECONDS);
+    }
+
     /**
      * 获取 Redis 中的值
      *

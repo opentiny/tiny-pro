@@ -1,7 +1,7 @@
 package com.TinyPro.service;
 
 import com.TinyPro.entity.dto.CreateApplicationDto;
-import com.TinyPro.entity.dto.PaginationQueryDto;
+import com.TinyPro.entity.dto.ApplicationPaginationQueryDto;
 import com.TinyPro.entity.po.Application;
 import com.TinyPro.entity.vo.ApplicationVo;
 
@@ -9,7 +9,7 @@ public interface ApplicationService {
   /**
    * 分页查询应用列表
    */
-  ApplicationVo findAllApplication(PaginationQueryDto searchInfo);
+  ApplicationVo findAllApplication(ApplicationPaginationQueryDto searchInfo);
 
   /**
    * 创建应用

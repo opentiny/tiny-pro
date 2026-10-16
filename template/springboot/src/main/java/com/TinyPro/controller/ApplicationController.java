@@ -1,7 +1,7 @@
 package com.TinyPro.controller;
 
 import com.TinyPro.entity.dto.CreateApplicationDto;
-import com.TinyPro.entity.dto.PaginationQueryDto;
+import com.TinyPro.entity.dto.ApplicationPaginationQueryDto;
 import com.TinyPro.entity.po.Application;
 import com.TinyPro.entity.vo.ApplicationVo;
 import com.TinyPro.entity.vo.I18Vo;
@@ -32,7 +32,7 @@ public class ApplicationController {
   })
   @GetMapping
   public ResponseEntity<ApplicationVo> getAllApplication(
-      @Valid @ModelAttribute PaginationQueryDto searchInfo) {
+      @Valid @ModelAttribute ApplicationPaginationQueryDto searchInfo) {
     return new ResponseEntity<>(applicationService.findAllApplication(searchInfo), HttpStatus.OK);
   }
 
