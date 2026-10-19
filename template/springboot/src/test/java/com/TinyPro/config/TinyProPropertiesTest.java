@@ -29,6 +29,14 @@ class TinyProPropertiesTest {
     }
 
     @Test
+    void rejectsUnresolvedJwtSecretPlaceholder() {
+        TinyProProperties properties = new TinyProProperties();
+        properties.getJwt().setSecret("${JWT_SECRET}");
+
+        assertFalse(validator.validate(properties).isEmpty());
+    }
+
+    @Test
     void acceptsLogbackSizeUnits() {
         TinyProProperties properties = new TinyProProperties();
         properties.getJwt().setSecret("a-valid-secret");

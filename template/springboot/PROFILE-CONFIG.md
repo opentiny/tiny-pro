@@ -29,6 +29,10 @@ DATABASE_PASSWORD
 REDIS_HOST
 REDIS_PASSWORD
 JWT_SECRET
+GLOBAL_PREFIX
+FLYWAY_ENABLED
 ```
 
 If a required production variable is missing, SpringBoot fails during startup instead of using a known credential.
+
+The application explicitly checks these variables when the `prod` profile is active. `JWT_SECRET` is also validated against unresolved `${...}` placeholders before the JWT utility is created.

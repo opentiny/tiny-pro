@@ -60,6 +60,11 @@ public class TinyProProperties {
         @Size(min = 8, message = "tinypro.jwt.secret must contain at least 8 characters")
         private String secret;
 
+        @AssertTrue(message = "tinypro.jwt.secret must be resolved and must not contain a placeholder")
+        public boolean isResolved() {
+            return secret != null && !secret.contains("${");
+        }
+
         public String getSecret() {
             return secret;
         }
