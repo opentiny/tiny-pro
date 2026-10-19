@@ -287,7 +287,8 @@ const createServerSync = (answers: ProjectInfo) => {
     );
 
     // JPA (如同时使用)
-    editor.set('spring.jpa.hibernate.ddl-auto', 'update');
+    // Hibernate only validates the Flyway-managed schema; it must never alter it.
+    editor.set('spring.jpa.hibernate.ddl-auto', 'validate');
     editor.set(
       'spring.jpa.database-platform',
       'org.hibernate.dialect.MySQL8Dialect'
