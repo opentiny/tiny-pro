@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -120,5 +121,58 @@ class RedisLockServiceTest {
 
         assertFalse(worker.isAlive());
         assertTrue(failure.get() instanceof IllegalStateException);
+    }
+
+    @Test
+    void clearsLocalHoldCountWhenReleaseScriptFails() {
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        when(valueOperations.get("lock:session")).thenReturn(null);
+        when(valueOperations.setIfAbsent(eq("lock:session"), anyString(), eq(30_000L), eq(TimeUnit.MILLISECONDS)))
+                .thenReturn(true);
+        doReturn(1L)
+                .when(redisTemplate)
+                .execute(any(RedisScript.class), anyList(), any(Object[].class));
+
+        lockService = new RedisLockService();
+        ReflectionTestUtils.setField(lockService, "redisTemplate", redisTemplate);
+        assertTrue(lockService.tryLock("session", 0L, 30_000L));
+
+        when(redisTemplate.execute(any(RedisScript.class), anyList(), any(Object[].class)))
+                .thenThrow(new IllegalStateException("redis unavailable"));
+
+        assertThrows(IllegalStateException.class, () -> lockService.unlock("session"));
+
+        when(redisTemplate.execute(any(RedisScript.class), anyList(), any(Object[].class)))
+                .thenReturn(1L);
+        assertTrue(lockService.tryLock("session", 0L, 30_000L));
+    }
+
+    @Test
+    void restoresInterruptStatusAfterRelease() throws Exception {
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        when(valueOperations.get("lock:session")).thenReturn(null);
+        when(valueOperations.setIfAbsent(eq("lock:session"), anyString(), eq(300L), eq(TimeUnit.MILLISECONDS)))
+                .thenReturn(true);
+        doReturn(1L).when(redisTemplate).execute(
+                any(RedisScript.class), anyList(), any(Object[].class)
+        );
+
+        lockService = new RedisLockService();
+        ReflectionTestUtils.setField(lockService, "redisTemplate", redisTemplate);
+
+        AtomicReference<Boolean> interruptedAfterExecute = new AtomicReference<>();
+        Thread worker = new Thread(() -> {
+            lockService.execute("session", 0L, 300L, () -> {
+                Thread.currentThread().interrupt();
+                return null;
+            });
+            interruptedAfterExecute.set(Thread.currentThread().isInterrupted());
+        });
+        worker.start();
+        worker.join(1_000L);
+
+        assertFalse(worker.isAlive());
+        assertTrue(interruptedAfterExecute.get());
+        verify(redisTemplate).execute(any(RedisScript.class), anyList(), any(Object[].class));
     }
 }

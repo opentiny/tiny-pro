@@ -113,16 +113,19 @@ public class RedisLockService {
             return true;
         }
 
-        Long released = redisTemplate.execute(
-                RELEASE_SCRIPT,
-                List.of(redisKey),
-                ownerId()
-        );
-        counts.remove(redisKey);
-        if (counts.isEmpty()) {
-            holdCounts.remove();
+        try {
+            Long released = redisTemplate.execute(
+                    RELEASE_SCRIPT,
+                    List.of(redisKey),
+                    ownerId()
+            );
+            return Long.valueOf(1L).equals(released);
+        } finally {
+            counts.remove(redisKey);
+            if (counts.isEmpty()) {
+                holdCounts.remove();
+            }
         }
-        return Long.valueOf(1L).equals(released);
     }
 
     public boolean renew(String key, long leaseMillis) {
@@ -182,13 +185,20 @@ public class RedisLockService {
             return result;
         } finally {
             renewal.cancel(false);
-            if (!unlock(key)) {
-                logger.warn("Redis lock release failed or lock expired: {}", key);
-            }
-            if (previousLease == null) {
-                activeLease.remove();
-            } else {
-                activeLease.set(previousLease);
+            boolean interrupted = Thread.interrupted();
+            try {
+                if (!unlock(key)) {
+                    logger.warn("Redis lock release failed or lock expired: {}", key);
+                }
+            } finally {
+                if (previousLease == null) {
+                    activeLease.remove();
+                } else {
+                    activeLease.set(previousLease);
+                }
+                if (interrupted) {
+                    Thread.currentThread().interrupt();
+                }
             }
         }
     }
