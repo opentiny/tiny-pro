@@ -109,12 +109,14 @@ public class DataInitializer implements CommandLineRunner {
     /**
      * Redis and MySQL can be restored independently. Do not trust the Redis
      * installation marker unless the database still contains the seed data
-     * required by the application.
+     * required by the application. The check intentionally verifies that the
+     * user table has data instead of requiring a specific default account;
+     * deleting the default admin must not recreate it on the next restart.
      */
     private boolean requiredSeedDataExists() {
         return permissionRepository.existsByName(Contants.ADMIN_SUPE_POWER)
                 && roleRepository.findFirstByNameOrderByIdAsc(Contants.ADMIN).isPresent()
-                && userRepository.findByEmail("admin@no-reply.com").isPresent()
+                && userRepository.count() > 0
                 && menuRepository.count() > 0
                 && langRepository.count() > 0
                 && i18Repository.count() > 0
