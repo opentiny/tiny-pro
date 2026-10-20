@@ -163,8 +163,12 @@ class TokenServiceTest {
         oldRefreshClaims.put("sid", oldSessionId);
         String oldRefreshToken = jwtUtil.generateToken(oldRefreshClaims, oldRefreshJti, 604800000L);
 
+        when(redisUtil.range("user:7:at", 0, -1))
+                .thenReturn(java.util.List.of());
         when(redisUtil.range("user:7:rt", 0, -1))
                 .thenReturn(java.util.List.of(oldRefreshJti));
+        when(redisUtil.range("user:7:sessions", 0, -1))
+                .thenReturn(java.util.List.of());
         when(redisUtil.getValue("rt:7:" + oldRefreshJti)).thenReturn(oldRefreshToken);
 
         tokenService.issue(user);
@@ -172,6 +176,29 @@ class TokenServiceTest {
         verify(redisUtil).deleteValue("at:7:" + oldAccessJti);
         verify(redisUtil).deleteValue("rt:7:" + oldRefreshJti);
         verify(redisUtil).removeList("user:7:rt", oldRefreshJti);
+    }
+
+    @Test
+    void issueCleansExpiredIndexesWhenDeviceLimitIsUnlimited() {
+        User user = user(7, "user@example.com");
+        ReflectionTestUtils.setField(tokenService, "deviceLimit", -1L);
+
+        when(redisUtil.range("user:7:at", 0, -1))
+                .thenReturn(java.util.List.of("expired-access"));
+        when(redisUtil.range("user:7:rt", 0, -1))
+                .thenReturn(java.util.List.of("expired-refresh"));
+        when(redisUtil.range("user:7:sessions", 0, -1))
+                .thenReturn(java.util.List.of("expired-session"));
+        when(redisUtil.getValue(anyString())).thenReturn(null);
+
+        tokenService.issue(user);
+
+        verify(redisUtil).removeList("user:7:at", "expired-access");
+        verify(redisUtil).removeList("user:7:rt", "expired-refresh");
+        verify(redisUtil).removeList("user:7:sessions", "expired-session");
+        verify(redisUtil).expireMillis("user:7:sessions", 604800000L);
+        verify(redisUtil).expireMillis("user:7:at", 604800000L);
+        verify(redisUtil).expireMillis("user:7:rt", 604800000L);
     }
 
     private User user(int id, String email) {
