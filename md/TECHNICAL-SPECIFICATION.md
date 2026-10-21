@@ -80,7 +80,7 @@ pnpm dev:backend      # 启动 NestJS 后端模板（需要 MySQL / Redis）
 
 ## 运行与部署架构
 
-- 生成的项目默认结构：`tiny-pro/web`（前端）+ `tiny-pro/nestJs` 或 `tiny-pro/springboot`（后端）+ 可选 `tiny-pro/lowcode-designer`。
+- 生成的项目统一为 **pnpm workspace monorepo** 结构：根目录 `package.json`（`private: true`，脚本 `pnpm start` / `pnpm build` / `pnpm dev:backend`）+ `pnpm-workspace.yaml` + `.gitignore`；子包为 `tiny-pro/web`（前端，包名 `<项目名>-web`）+ 可选 `tiny-pro/nestJs`（参与pnpm workspace）或 `tiny-pro/springboot`（Java 工程，不参与pnpm workspace）+ 可选 `tiny-pro/lowcode-designer`（参与pnpm workspace）。不集成服务端时同样生成该结构（仅 `web` 一个 workspace 包）。
 - 前端开发端口 **3031**，base 路径 `/vue-pro`；后端默认端口 **3000**，提供 `/healthCheck` 健康检查。
 - 后端依赖 **MySQL**（typeorm/sequelize，启动时 `DATABASE_SYNCHRONIZE=true` 自动建表并填充种子数据）和 **Redis**（缓存/登录态）。环境变量从 `.env` 读取，模板提供 `.env.example`。
 - NestJS 后端支持 Docker 启动（`template/nestJs/docker-compose.yml` 包含 MySQL/Redis 服务）；SpringBoot 后端有独立 `Dockerfile` 与 `docker-compose.yml`。

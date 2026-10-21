@@ -53,6 +53,7 @@
     "describe": "npm-scripts-info",
     "build": "run-s build:*",
     "build:main": "tsc -p tsconfig.json",
+    "prepublishOnly": "npm run build:main",
     "fix": "run-s fix:*",
     "fix:prettier": "prettier \"src/**/*.ts\" --write",
     "fix:tslint": "tslint --fix --project .",
@@ -84,7 +85,7 @@
     "doc:json": "Generate API documentation in typedoc JSON format",
     "version": "Bump package.json version, update CHANGELOG.md, tag release",
     "reset": "Delete all untracked files and reset the repo to the last commit",
-    "prepublishOnly": "One-step: clean, build, test, publish docs, and prep a release"
+    "prepublishOnly": "Automatically recompile the dist before release to prevent the output from becoming outdated after changes in the src"
   },
   "engines": {
     "node": ">=8.9"
