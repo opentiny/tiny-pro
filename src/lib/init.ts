@@ -272,7 +272,7 @@ const createServerSync = (answers: ProjectInfo) => {
     editor.set('spring.datasource.hikari.maximum-pool-size', '10');
     editor.set('spring.datasource.hikari.auto-commit', 'true');
     editor.set('spring.datasource.hikari.max-lifetime', '180000');
-    editor.set('spring.datasource.hikari.connection-timeout', '30000');
+    editor.set('spring.datasource.hikari.connection-timeout', '5000');
 
     // MyBatis-Plus
     editor.set('mybatis-plus.mapper-locations', 'classpath:mappers/*.xml');
@@ -316,6 +316,14 @@ const createServerSync = (answers: ProjectInfo) => {
     // Redis
     editor.set('spring.data.redis.host', config.REDIS_HOST);
     editor.set('spring.data.redis.port', config.REDIS_PORT.toString());
+    editor.set('spring.data.redis.timeout', '2s');
+    editor.set('spring.data.redis.connect-timeout', '2s');
+
+    // Actuator readiness checks the application dependencies used by probes.
+    editor.set(
+      'management.endpoint.health.group.readiness.include',
+      'readinessState,db,redis'
+    );
 
     // ✅ 4. 保存修改后的内容到原 .properties 文件
     editor.save(propertiesFilePath);

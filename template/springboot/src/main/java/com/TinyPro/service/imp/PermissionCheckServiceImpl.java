@@ -56,7 +56,7 @@ public class PermissionCheckServiceImpl implements PermissionCheckService {
         String authHeader = request.getHeader("Authorization");
         String token = extractToken(authHeader);
         if (token == null) {
-            throw new BusinessException("exception.common.unauthorized", HttpStatus.UNAUTHORIZED, "Missing or invalid token");
+            throw new BusinessException("exception.common.unauth", HttpStatus.UNAUTHORIZED, "Missing or invalid token");
         }
 
         // 4. 解析 JWT，获取用户 email
@@ -74,7 +74,7 @@ public class PermissionCheckServiceImpl implements PermissionCheckService {
             }
             user = iUserService.getUserInfo(email).getBody();
             if (user == null) {
-                throw new BusinessException("exception.common.unauthorized", HttpStatus.UNAUTHORIZED, "User not found");
+                throw new BusinessException("exception.common.unauth", HttpStatus.UNAUTHORIZED, "User not found");
             }
         } else if (claims.get("id") != null && claims.getId() != null) {
             if (!tokenService.isAccessTokenActive(token)) {
@@ -82,14 +82,14 @@ public class PermissionCheckServiceImpl implements PermissionCheckService {
             }
             user = iUserService.getUserInfo(email).getBody();
             if (user == null) {
-                throw new BusinessException("exception.common.unauthorized", HttpStatus.UNAUTHORIZED, "User not found");
+                throw new BusinessException("exception.common.unauth", HttpStatus.UNAUTHORIZED, "User not found");
             }
         } else {
             // Legacy single-token sessions keep using the old Redis user cache.
             String key = Contants.UserJwtTop + email + Contants.UserJwtbt;
             String value = redisUtil.getValue(key);
             if (value == null) {
-                throw new BusinessException("exception.common.unauthorized", HttpStatus.UNAUTHORIZED, "User not found in session");
+                throw new BusinessException("exception.common.unauth", HttpStatus.UNAUTHORIZED, "User not found in session");
             }
             user = JSON.parseObject(value, User.class);
         }

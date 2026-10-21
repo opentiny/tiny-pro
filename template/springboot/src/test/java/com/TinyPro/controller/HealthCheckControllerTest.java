@@ -38,4 +38,16 @@ class HealthCheckControllerTest {
         assertEquals(200, response.getStatusCode().value());
         assertEquals("success", response.getBody());
     }
+
+    @Test
+    void returnsUnavailableWhenDatabaseCheckFails() throws Exception {
+        when(dataSource.getConnection()).thenThrow(new IllegalStateException("database unavailable"));
+
+        HealthCheckController controller = new HealthCheckController(dataSource, redisConnectionFactory);
+
+        var response = controller.healthCheck();
+
+        assertEquals(503, response.getStatusCode().value());
+        assertEquals("unhealthy", response.getBody());
+    }
 }

@@ -4,6 +4,8 @@ import com.TinyPro.annotation.IsPublic;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.http.HttpStatus;
@@ -18,6 +20,8 @@ import java.sql.Connection;
 @RestController
 @RequestMapping("/healthCheck")
 public class HealthCheckController {
+
+    private static final Logger logger = LoggerFactory.getLogger(HealthCheckController.class);
 
     private final DataSource dataSource;
     private final RedisConnectionFactory redisConnectionFactory;
@@ -43,6 +47,7 @@ public class HealthCheckController {
             checkRedis();
             return ResponseEntity.ok("success");
         } catch (Exception exception) {
+            logger.warn("Dependency health check failed", exception);
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body("unhealthy");
         }
     }

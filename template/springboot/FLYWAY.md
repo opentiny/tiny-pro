@@ -37,12 +37,12 @@ flyway validate \
 
 The baseline records the existing schema as version `1`; it does not execute `V1__init_schema.sql`. Subsequent application startup can then apply `V2` and `V3`. `V2` aligns the menu identity index, while `V3` creates the application table when needed, normalizes application timestamp columns, and handles the legacy `I18` table-name casing. These migrations do not repair an arbitrary incomplete schema.
 
-Do not set `FLYWAY_BASELINE_ON_MIGRATE=false` until the baseline command has created `flyway_schema_history` and `flyway validate` has succeeded. The production rollout order is:
+Keep `FLYWAY_BASELINE_ON_MIGRATE=false` during the CLI baseline flow. The production rollout order is:
 
 1. Verify the existing schema and back up the database.
 2. Run the one-time `flyway baseline` command above.
 3. Run `flyway validate` and confirm that `flyway_schema_history` contains baseline version `1`.
-4. Set `FLYWAY_BASELINE_ON_MIGRATE=false` and start the application.
+4. Start the application with the default `FLYWAY_BASELINE_ON_MIGRATE=false`.
 
 Future migrations must use a new version and pass Flyway validation. With Flyway enabled, the application startup automatically applies pending migrations; a deployment pipeline may run them explicitly before startup instead.
 
