@@ -3,7 +3,7 @@ import type TinyThemeTool from '@opentiny/vue-theme/theme-tool'
 import { iconYes } from '@opentiny/vue-icon'
 import { inject, onMounted, watch } from 'vue'
 import { useAppStore } from '@/store'
-import { DarkTheme, DeepnessTheme, PeachesTheme, SwitchdarkColor, SwitchlightColor, VioletTheme } from './type'
+import { DarkTheme, DeepnessTheme, DefaultTheme, PeachesTheme, SwitchdarkColor, SwitchlightColor, VioletTheme } from './type'
 
 // 默认循环颜色内容
 const themeTitle = [
@@ -76,6 +76,7 @@ function change(item: any) {
       break
     default:
       appStore.updateSettings({ theme: 'light' })
+      theme.changeTheme(DefaultTheme)
       appStore.updateSettings({ themelist: 'default' })
   }
 }
@@ -95,6 +96,8 @@ watch(
   (newValue) => {
     switch (newValue.themelist) {
       case 'default':
+        appStore.updateSettings({ theme: 'light' })
+        theme.changeTheme(DefaultTheme)
         break
       case 'peaches':
         appStore.updateSettings({ theme: 'light' })

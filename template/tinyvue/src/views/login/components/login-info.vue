@@ -14,6 +14,7 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import useLoading from '@/hooks/loading'
 import { useUserStore } from '@/store'
+import { resolvePostLoginLocation } from '@/utils/app-location'
 
 const router = useRouter()
 const { t } = useI18n()
@@ -69,13 +70,8 @@ function handleSubmit() {
         status: 'success',
       })
 
-      const { redirect, ...othersQuery } = router.currentRoute.value.query
-      await router.replace({
-        name: (redirect as string) || 'Home',
-        query: {
-          ...othersQuery,
-        },
-      })
+      const { redirect } = router.currentRoute.value.query
+      await router.replace(resolvePostLoginLocation(redirect))
     }
     catch {
       Notify({

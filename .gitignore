@@ -14,3 +14,5 @@ yarn.lock
 playwright-report
 package-lock.json
 pnpm-lock.yaml
+docs/.vitepress/cache
+docs/.vitepress/dist

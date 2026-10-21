@@ -1,10 +1,11 @@
-import type { LocationQueryRaw, Router } from 'vue-router'
+import type { Router } from 'vue-router'
 import type { Role } from '@/store/modules/user/types'
 import NProgress from 'nprogress'
 import { getUserInfo } from '@/api/user'
 import { _i18 } from '@/locale'
 import { useUserStore } from '@/store'
 import { useLocales } from '@/store/modules/locales'
+import { unauthorizedLoginLocation } from '@/utils/app-location'
 import { setToken } from '@/utils/auth'
 
 export default function setupInfoGuard(router: Router) {
@@ -19,13 +20,7 @@ export default function setupInfoGuard(router: Router) {
     const localesStore = useLocales()
     const { data } = (await getUserInfo()) ?? { data: null }
     if (!data) {
-      next({
-        name: 'login',
-        query: {
-          redirect: to.name,
-          ...to.query,
-        } as LocationQueryRaw,
-      })
+      next(unauthorizedLoginLocation(to))
       setToken('')
       NProgress.done()
       return

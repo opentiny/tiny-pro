@@ -1,4 +1,4 @@
-import type { MockMethod } from './server'
+import type { MockMethod } from './dispatch'
 
 interface ApplicationTag {
   type: string

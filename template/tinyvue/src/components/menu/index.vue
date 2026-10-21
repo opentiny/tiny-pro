@@ -153,4 +153,122 @@ onMounted(() => {
   </div>
 </template>
 
-<style scoped></style>
+<style lang="less">
+.menu-router .tiny-tree-menu {
+  padding-left: 10px;
+  width: 276px;
+  overflow-y: auto;
+
+  &.is-collapsed {
+    width: 0;
+  }
+
+  &::before {
+    display: none;
+  }
+
+  .tiny-tree {
+    padding-bottom: 30px;
+
+    .tiny-tree-node__wrapper {
+      padding-right: 10px;
+    }
+
+    .tiny-tree-node {
+      &.is-current > .tiny-tree-node__content,
+      .tiny-tree-node__content:hover {
+        border-radius: 20px;
+      }
+
+      .tiny-tree-node__content {
+        height: 40px;
+        line-height: 40px;
+
+        .tiny-tree-node__content-left {
+          padding-left: 16px;
+        }
+
+        &::before {
+          display: none;
+        }
+      }
+    }
+
+    .node-float-tip {
+      border-radius: 0;
+      margin-right: 8px;
+    }
+  }
+
+  .tiny-tree-menu__toggle-button {
+    transform: translateX(100%) translateY(-50%);
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+
+    .tiny-svg {
+      margin-left: 0;
+    }
+  }
+
+  .tiny-input {
+    margin: 0 10px 16px;
+    width: auto;
+    max-width: unset;
+  }
+
+  .tiny-tree-node__content-box {
+    min-width: 0;
+  }
+
+  .tiny-tree-node__content {
+    position: relative;
+  }
+
+  .absolute-tag {
+    position: absolute;
+    right: 8px;
+    top: 13px;
+  }
+
+  .tiny-tree {
+    height: calc(100% - var(--layout-tree-menu-input-height));
+    overflow-y: auto;
+  }
+
+  .tree-node-name {
+    line-height: 1.5;
+
+    .node-name-container {
+      color: var(--tv-color-text-control);
+      display: flex;
+      align-items: center;
+      flex-wrap: nowrap;
+      gap: 6px;
+
+      .node-name-label {
+        flex-grow: 0;
+        min-width: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      svg.menu-type-icon {
+        width: 12px;
+        height: 12px;
+        display: inline-block;
+        fill: var(--tv-color-icon-control, #5f6774);
+      }
+    }
+  }
+
+  & > .tiny-input .tiny-input__inner {
+    height: var(--layout-tree-menu-input-height);
+    font-size: 14px;
+  }
+
+  .tiny-tree-node__content {
+    margin-top: 8px;
+  }
+}
+</style>

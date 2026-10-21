@@ -1,7 +1,12 @@
 import type { MenuNode } from './backend-data'
-import type { MockMethod } from './server'
-import { createBackendState } from './backend-data'
-import { mockHttpResponse } from './server'
+import type { BackendStorage } from './backend-persist'
+import type { MockHeaders, MockMethod } from './dispatch'
+import {
+  createDefaultBackendStorage,
+  loadBackendState,
+  withBackendPersist,
+} from './backend-persist'
+import { mockHttpResponse } from './dispatch'
 
 function nextId(items: { id: number }[]) {
   return Math.max(0, ...items.map(item => item.id)) + 1
@@ -57,13 +62,21 @@ function findMenuLocation(nodes: MenuNode[], id: number): {
   return null
 }
 
-function bearerToken(headers: Record<string, string> | import('node:http').IncomingHttpHeaders) {
+function bearerToken(headers: MockHeaders) {
   const value = headers.authorization
   return Array.isArray(value) ? value[0]?.replace(/^Bearer\s+/i, '') : value?.replace(/^Bearer\s+/i, '')
 }
 
-export function createBackendMocks(): MockMethod[] {
-  const state = createBackendState()
+async function digestPassword(password: string) {
+  const digest = await globalThis.crypto.subtle.digest(
+    'SHA-256',
+    new TextEncoder().encode(password),
+  )
+  return Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('')
+}
+
+export function createBackendMocks(storage: BackendStorage = createDefaultBackendStorage()): MockMethod[] {
+  const state = loadBackendState(storage)
 
   const syncRoleMenus = (roleMenuIds: Map<number, Set<number>>) => {
     state.roles.forEach((role) => {
@@ -85,24 +98,29 @@ export function createBackendMocks(): MockMethod[] {
   }
 
   const authenticatedEmail = (
-    headers: Record<string, string> | import('node:http').IncomingHttpHeaders,
+    headers: MockHeaders,
   ) => {
     const token = bearerToken(headers)
-    return token ? state.tokens.get(token) : undefined
+    if (!token) {
+      return undefined
+    }
+    return state.tokens.get(token)
   }
 
-  return [
+  return withBackendPersist([
     {
       url: '/api/auth/login',
       method: 'post',
-      response: ({ body }) => {
-        if (!body?.email || state.credentials.get(body.email) !== body?.password) {
+      response: async ({ body }) => {
+        const passwordHash = await digestPassword(body?.password ?? '')
+        const email = body?.email
+        if (!email || !state.users.some(item => item.email === email) || state.credentials.get(email) !== passwordHash) {
           return mockHttpResponse(401, { message: '邮箱或密码错误' })
         }
-        const accessToken = `mock-access-token:${body.email}`
-        const refreshToken = `mock-refresh-token:${body.email}`
-        state.tokens.set(accessToken, body.email)
-        state.refreshTokens.set(refreshToken, body.email)
+        const accessToken = `mock-access-token:${email}`
+        const refreshToken = `mock-refresh-token:${email}`
+        state.tokens.set(accessToken, email)
+        state.refreshTokens.set(refreshToken, email)
         return {
           accessToken,
           accessTokenTTL: 3600,
@@ -119,6 +137,7 @@ export function createBackendMocks(): MockMethod[] {
         if (!email) {
           return mockHttpResponse(401, { message: '刷新令牌无效' })
         }
+        state.refreshTokens.set(body.token, email)
         const accessToken = `mock-access-token:${email}`
         const refreshToken = `mock-refresh-token:${email}`
         state.tokens.set(accessToken, email)
@@ -295,12 +314,13 @@ export function createBackendMocks(): MockMethod[] {
     {
       url: '/api/user/reg',
       method: 'post',
-      response: ({ body }) => {
+      response: async ({ body }) => {
         const email = body.email ?? body.username
+        const passwordHash = await digestPassword(body.password ?? '')
         if (!email || state.users.some(item => item.email === email)) {
           return mockHttpResponse(409, { message: '用户已存在或邮箱为空' })
         }
-        const { password, username: _username, ...userData } = body
+        const { password: _password, username: _username, ...userData } = body
         const roleIds = body.roleIds ?? (state.roles[0] ? [state.roles[0].id] : [])
         const user = {
           ...state.users[0],
@@ -311,7 +331,7 @@ export function createBackendMocks(): MockMethod[] {
           role: state.roles.filter(role => roleIds.includes(role.id)),
         }
         state.users.push(user)
-        state.credentials.set(email, password)
+        state.credentials.set(email, passwordHash)
         return user
       },
     },
@@ -358,22 +378,31 @@ export function createBackendMocks(): MockMethod[] {
     {
       url: '/api/user/admin/updatePwd',
       method: 'patch',
-      response: ({ body }) => {
-        if (!state.credentials.has(body.email)) {
+      response: async ({ body }) => {
+        const passwordHash = await digestPassword(body.newPassword ?? '')
+        if (!body.email || !state.users.some(item => item.email === body.email) || !state.credentials.has(body.email)) {
           return mockHttpResponse(404, { message: '用户不存在' })
         }
-        state.credentials.set(body.email, body.newPassword)
+        state.credentials.set(body.email, passwordHash)
         return true
       },
     },
     {
       url: '/api/user/updatePwd',
       method: 'patch',
-      response: ({ body }) => {
-        if (!body.email || state.credentials.get(body.email) !== body.oldPassword) {
+      response: async ({ body }) => {
+        const [oldHash, newHash] = await Promise.all([
+          digestPassword(body.oldPassword ?? ''),
+          digestPassword(body.newPassword ?? ''),
+        ])
+        if (
+          !body.email
+          || !state.users.some(item => item.email === body.email)
+          || state.credentials.get(body.email) !== oldHash
+        ) {
           return mockHttpResponse(401, { message: '旧密码错误' })
         }
-        state.credentials.set(body.email, body.newPassword)
+        state.credentials.set(body.email, newHash)
         return true
       },
     },
@@ -624,5 +653,5 @@ export function createBackendMocks(): MockMethod[] {
         return record
       },
     },
-  ]
+  ], storage, state)
 }

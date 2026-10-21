@@ -49,6 +49,9 @@
   "scripts": {
     "dev": "pnpm -F tiny-pro-vue start",
     "dev:vite": "pnpm -F tiny-pro-vue dev:vite",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs",
     "dev:backend": "pnpm -F tinyui-nestjs-server start",
     "describe": "npm-scripts-info",
     "build": "run-s build:*",
@@ -122,7 +125,8 @@
     "tslint-config-airbnb": "^5.11.1",
     "tslint-config-prettier": "^1.18.0",
     "tslint-immutable": "^6.0.1",
-    "typescript": "^5.1.6"
+    "typescript": "^5.1.6",
+    "vitepress": "^1.6.4"
   },
   "ava": {
     "failFast": true,

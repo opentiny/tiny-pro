@@ -15,13 +15,23 @@ import '@opentiny/icons/style/all.css'
 
 initializeWebMCPPolyfill()
 
-const app = createApp(App)
+async function bootstrap() {
+  // 仅静态部署（GitHub Pages）走浏览器内 Mock；本地 pnpm start 仍走 8848 HTTP mock
+  if (import.meta.env.PROD && import.meta.env.VITE_USE_MOCK === 'true') {
+    const { setupBrowserMock } = await import('@/mock/browser')
+    setupBrowserMock()
+  }
 
-app.use(router)
-app.use(store)
-app.use(i18n({ locale: localStorage.getItem('tiny-locale') }))
-app.use(globalComponents)
-app.use(directive)
-app.use(TinySearchBox)
+  const app = createApp(App)
 
-app.mount('#app')
+  app.use(router)
+  app.use(store)
+  app.use(i18n({ locale: localStorage.getItem('tiny-locale') }))
+  app.use(globalComponents)
+  app.use(directive)
+  app.use(TinySearchBox)
+
+  app.mount('#app')
+}
+
+bootstrap()

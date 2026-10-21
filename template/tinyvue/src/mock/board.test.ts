@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 // eslint-disable-next-line test/no-import-node-test
 import test from 'node:test'
 import board from './board'
-import { dispatchMockRequest } from './server'
+import { dispatchMockRequest } from './dispatch'
 
 test('getrtrain returns collect cards with i18n fields for learn-traini', async () => {
   const result = await dispatchMockRequest(board, {
