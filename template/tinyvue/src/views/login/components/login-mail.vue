@@ -16,7 +16,7 @@ import {
   useRouter,
 } from 'vue-router'
 import useLoading from '@/hooks/loading'
-import { toRoutes } from '@/router/guard/menu'
+import { registerHiddenSubRoutes, toRoutes } from '@/router/guard/menu'
 import { useUserStore } from '@/store'
 import { useLocales } from '@/store/modules/locales'
 import { useMenuStore } from '@/store/modules/router'
@@ -98,6 +98,7 @@ function handleSubmit() {
           router.addRoute('root', route)
         }
       })
+      registerHiddenSubRoutes(router)
 
       const route = router.currentRoute
       const { redirect } = route.value.query

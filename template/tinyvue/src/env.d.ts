@@ -13,6 +13,10 @@ declare global {
     readonly VITE_MOCK_SERVER_HOST: string
     readonly VITE_LOWCODE_DESIGNER_ENABLED: string
     readonly VITE_LOWCODE_DESIGNER_URL: string
+    readonly VITE_TINY_ROBOT_ENABLED: string
+    readonly VITE_TINY_EDITOR_ENABLED: string
+    readonly VITE_AMAP_MCP_URL: string
+    readonly VITE_ALIYUN_DASHSCOPE_KEY: string
     readonly VITE_CONTEXT: string
     readonly VITE_BASE_API: string
     readonly VITE_SERVER_HOST: string

@@ -1,6 +1,6 @@
 {
   "name": "@opentiny/tiny-toolkit-pro",
-  "version": "1.4.0-beta.0",
+  "version": "1.4.0-beta.5",
   "description": "TinyPro Vue：开箱即用、前后端分离的 Vue 后台管理模板",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -33,7 +33,6 @@
   "homepage": "https://opentiny.design/pro/",
   "pnpm": {
     "overrides": {
-      "@modelcontextprotocol/sdk": "1.16.0",
       "@opentiny/tiny-engine-common>@opentiny/vue-renderless": "~3.20.0",
       "@opentiny/tiny-engine-plugin-datasource>@opentiny/vue-renderless": "~3.20.0",
       "@opentiny/tiny-engine-plugin-block>@opentiny/vue-renderless": "~3.20.0",
@@ -42,10 +41,14 @@
       "@opentiny/tiny-engine-setting-styles>@opentiny/vue-renderless": "~3.20.0",
       "@opentiny/tiny-engine-plugin-materials>@opentiny/vue-renderless": "~3.20.0",
       "@opentiny/tiny-engine-plugin-page>@opentiny/vue-renderless": "~3.20.0"
+    },
+    "patchedDependencies": {
+      "quill@2.0.3": "patches/quill@2.0.3.patch"
     }
   },
   "scripts": {
     "dev": "pnpm -F tiny-pro-vue start",
+    "dev:vite": "pnpm -F tiny-pro-vue dev:vite",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
@@ -53,6 +56,7 @@
     "describe": "npm-scripts-info",
     "build": "run-s build:*",
     "build:main": "tsc -p tsconfig.json",
+    "prepublishOnly": "npm run build:main",
     "fix": "run-s fix:*",
     "fix:prettier": "prettier \"src/**/*.ts\" --write",
     "fix:tslint": "tslint --fix --project .",
@@ -84,7 +88,7 @@
     "doc:json": "Generate API documentation in typedoc JSON format",
     "version": "Bump package.json version, update CHANGELOG.md, tag release",
     "reset": "Delete all untracked files and reset the repo to the last commit",
-    "prepublishOnly": "One-step: clean, build, test, publish docs, and prep a release"
+    "prepublishOnly": "Automatically recompile the dist before release to prevent the output from becoming outdated after changes in the src"
   },
   "engines": {
     "node": ">=8.9"

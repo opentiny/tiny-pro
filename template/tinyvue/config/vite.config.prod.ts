@@ -17,6 +17,12 @@ export default mergeConfig(
       'import.meta.env.VITE_LOWCODE_DESIGNER_URL': JSON.stringify(
         process.env.VITE_LOWCODE_DESIGNER_URL || '/designer',
       ),
+      'import.meta.env.VITE_TINY_ROBOT_ENABLED': JSON.stringify(
+        process.env.VITE_TINY_ROBOT_ENABLED || 'false',
+      ),
+      'import.meta.env.VITE_TINY_EDITOR_ENABLED': JSON.stringify(
+        process.env.VITE_TINY_EDITOR_ENABLED || 'false',
+      ),
     },
     build: {
       rollupOptions: {

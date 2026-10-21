@@ -22,7 +22,7 @@ import { useDisclosure } from '@/hooks/useDisclosure'
 import { useI18nMenu } from '@/hooks/useI18nMenu'
 import { useMenuId } from '@/hooks/useMenuId'
 import constant from '@/router/constant'
-import { toRoutes } from '@/router/guard/menu'
+import { registerHiddenSubRoutes, toRoutes } from '@/router/guard/menu'
 import { useTabStore } from '@/store'
 import { useMenuStore } from '@/store/modules/router'
 import { sleep } from '@/utils/base-utils'
@@ -127,6 +127,7 @@ async function flushRouter() {
   routes.forEach((route) => {
     router.addRoute('root', route)
   })
+  registerHiddenSubRoutes(router)
 }
 function flushTabs() {
   const routePaths = router.getRoutes().map(routeItem => routeItem.path)
