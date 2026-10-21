@@ -8,6 +8,10 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import java.text.MessageFormat;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class GlobalExceptionHandlerTest {
@@ -47,5 +51,15 @@ class GlobalExceptionHandlerTest {
         assertEquals(HttpStatus.NOT_FOUND.value(), response.getStatusCode().value());
         assertEquals(HttpStatus.NOT_FOUND.getReasonPhrase(),
                 ((ErrorResponse) response.getBody()).getMessage());
+    }
+
+    @Test
+    void formatsEnglishForbiddenMessageWithPositionalArgument() {
+        String pattern = ResourceBundle
+                .getBundle("i18n.messages", Locale.US)
+                .getString("common.forbidden");
+
+        assertEquals("Need `api-token-owner` permission, but you don't have it",
+                MessageFormat.format(pattern, "api-token-owner"));
     }
 }

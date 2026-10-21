@@ -19,6 +19,11 @@ public class MaskingPatternLayout extends PatternLayout {
             "(?i)(\\bauthorization\\b\\s*[:=]\\s*)(Bearer\\s+)?([^\\s,;]+)");
     private static final Pattern COOKIE_HEADER_PATTERN = Pattern.compile(
             "(?i)(\\b(?:set-)?cookie\\b\\s*:\\s*)[^\\r\\n]*");
+    private static final Pattern SENSITIVE_PROPERTY_VALUE_PATTERN = Pattern.compile(
+            "(?im)(\\bProperty\\s*:\\s*(?=[^\\r\\n]*(?:password|passwd|pwd|secret|token|"
+                    + "access[_\\-.]?token|refresh[_\\-.]?token|client[_\\-.]?secret|"
+                    + "api[_\\-.]?key|private[_\\-.]?key|cookie))[^\\r\\n]*\\r?\\n"
+                    + "\\s*Value\\s*:\\s*)[^\\r\\n]*");
     private static final Pattern SENSITIVE_ASSIGNMENT_PATTERN = Pattern.compile(
             "(?i)((?<![A-Za-z0-9_])[\"']?(?:password|passwd|pwd|secret|token|access[_-]?token|"
                     + "refresh[_-]?token|client[_-]?secret|api[_-]?key|private[_-]?key|cookie)[\"']?\\s*[:=]\\s*)"
@@ -37,6 +42,8 @@ public class MaskingPatternLayout extends PatternLayout {
                         + (matcher.group(2) == null ? "" : matcher.group(2))
                         + MASK);
         masked = replace(masked, COOKIE_HEADER_PATTERN,
+                matcher -> matcher.group(1) + MASK);
+        masked = replace(masked, SENSITIVE_PROPERTY_VALUE_PATTERN,
                 matcher -> matcher.group(1) + MASK);
         return replace(masked, SENSITIVE_ASSIGNMENT_PATTERN,
                 matcher -> matcher.group(1) + maskValue(matcher.group(2)));

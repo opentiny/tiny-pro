@@ -39,4 +39,17 @@ class MaskingPatternLayoutTest {
         assertFalse(masked.contains("refresh=jkl"));
         assertFalse(masked.contains("HttpOnly"));
     }
+
+    @Test
+    void masksValuesFromSensitiveSpringBootPropertyErrors() {
+        String message = "Property: tinypro.jwt.secret\n"
+                + "Value: \"s3cr3t\"\n"
+                + "Reason: must contain at least 8 characters";
+
+        String masked = MaskingPatternLayout.mask(message);
+
+        assertTrue(masked.contains("Property: tinypro.jwt.secret"), masked);
+        assertTrue(masked.contains("Value: ******"), masked);
+        assertFalse(masked.contains("s3cr3t"));
+    }
 }

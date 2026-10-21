@@ -303,7 +303,7 @@ const createServerSync = (answers: ProjectInfo) => {
     );
     editor.set(
       'spring.jpa.properties.hibernate.globally_quoted_identifiers',
-      'true'
+      'false'
     );
     editor.set(
       'spring.jpa.hibernate.naming.physical-strategy',
