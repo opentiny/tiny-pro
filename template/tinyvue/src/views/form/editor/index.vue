@@ -18,7 +18,7 @@ const currentView = ref<EditorView>('documents')
 const menus = [
   {
     key: 'create' as const,
-    title: '开始创作',
+    title: '内容创作',
     desc: '创建并编辑你的富文本文档',
     icon: IconEdit,
   },

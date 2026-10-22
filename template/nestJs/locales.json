@@ -1385,7 +1385,7 @@
     "component.error": "组件错误",
     "component.error.contact": "请联系管理员或重新登录",
     "menu.form.editor": "富文本文档",
-    "menu.form.editor.create": "开始创作",
+    "menu.form.editor.create": "内容创作",
     "menu.form.editor.collaboration": "多人协同"
   }
 }
