@@ -1,8 +1,39 @@
 import axios from 'axios'
 
+export interface EmployeeSearchFilter {
+  field: string
+  values?: string[]
+  start?: string
+  end?: string
+}
+
+export interface EmployeeSearchInfo {
+  keyword?: string
+  filters?: EmployeeSearchFilter[]
+}
+
+export interface EmployeeFilterOptions {
+  name: string[]
+  employeeNo: string[]
+  departmentLevel: string[]
+  department: string[]
+  status: string[]
+  workbenchName: string[]
+  project: string[]
+  type: string[]
+  address: string[]
+  roles: string[]
+  lastUpdateUser: string[]
+  createTime: {
+    min: string
+    max: string
+  }
+}
+
 export interface QueryTaskParmas {
   pageIndex: number
   pageSize: number
+  searchInfo?: EmployeeSearchInfo
   [key: string]: any
 }
 
