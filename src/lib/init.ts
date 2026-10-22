@@ -1,6 +1,5 @@
 import { parse, stringify } from 'yaml';
 import * as path from 'path';
-import * as dotenv from 'dotenv';
 import { copySync } from 'fs-extra';
 import chalk from 'chalk';
 import spawn from 'cross-spawn';
@@ -13,6 +12,7 @@ import {
   BuildTool,
   devCommand,
   devDependencies,
+  FEATURE_OPTIONS,
   LowcodeEngine,
   ProjectInfo,
   removedCommand,
@@ -26,6 +26,24 @@ import { existsSync, readFileSync, rmSync, writeFileSync } from 'fs';
 const log = logs('tiny-toolkit-pro');
 const VUE_TEMPLATE_PATH = 'tinyvue';
 const DEFAULT_PROJECT_NAME = 'tiny-pro';
+// 拷贝模板时需要排除的本地开发残留目录名（相对于模板根目录逐段匹配）
+const TEMPLATE_EXCLUDED_DIRS = ['node_modules', 'dist', 'logs'];
+
+/**
+ * 生成模板拷贝过滤器，必须基于模板根目录的相对路径匹配
+ */
+const createTemplateCopyFilter = (from: string) => {
+  const root = path.resolve(from);
+  return (src: string) => {
+    const relative = path.relative(root, path.resolve(src));
+    if (!relative) {
+      return true;
+    }
+    return !relative
+      .split(path.sep)
+      .some((segment) => TEMPLATE_EXCLUDED_DIRS.includes(segment));
+  };
+};
 
 /**
  * 询问创建项目的描述，使用的技术栈
@@ -59,14 +77,14 @@ const getProjectInfo = (): Promise<ProjectInfo> => {
     {
       type: 'list',
       name: 'serverFramework',
-      message: '请选择您希望使用的服务端技术栈：',
+      message: '请选择是否集成服务端（Nest.js / SpringBoot），默认仅生成前端项目：',
       choices: [
         // { name: 'Egg.js', value: ServerFrameworks.EggJs },
-        { name: 'SpringBoot', value: ServerFrameworks.SpringBoot },
-        { name: 'Nest.js', value: ServerFrameworks.NestJs },
-        { name: '暂不配置', value: ServerFrameworks.Skip },
+        { name: '仅生成前端项目', value: ServerFrameworks.Skip },
+        { name: '集成 Nest.js 服务端', value: ServerFrameworks.NestJs },
+        { name: '集成 SpringBoot 服务端', value: ServerFrameworks.SpringBoot },
       ],
-      default: ServerFrameworks.NestJs,
+      default: ServerFrameworks.Skip,
       prefix: '*',
       when: (answers) => answers.framework === VUE_TEMPLATE_PATH,
     },
@@ -94,6 +112,18 @@ const getProjectInfo = (): Promise<ProjectInfo> => {
       ],
       default: BuildTool.Vite,
       prefix: '*',
+    },
+    {
+      type: 'checkbox',
+      name: 'features',
+      message: '请选择需要额外集成的功能（可多选）: ',
+      choices: FEATURE_OPTIONS.map((feature) => ({
+        name: feature.name,
+        value: feature.value,
+      })),
+      default: [],
+      prefix: '*',
+      when: (answers) => answers.framework === VUE_TEMPLATE_PATH,
     },
     {
       type: 'list',
@@ -194,8 +224,72 @@ const createLowcodeDesignerSync = (answers: ProjectInfo) => {
   const lowcodeFrom = utils.getTemplatePath(lowcodeEngine);
   const lowcodeTo = utils.getDistPath(`${name}/${lowcodeEngine}`);
 
-  copySync(lowcodeFrom, lowcodeTo);
+  copySync(lowcodeFrom, lowcodeTo, {
+    filter: createTemplateCopyFilter(lowcodeFrom),
+  });
   log.success('低代码设计器模板复制成功');
+};
+
+/**
+ * 同步创建 monorepo 根目录配置文件
+ * 无论是否集成服务端，生成项目统一由 pnpm workspace 管理：
+ * name/package.json、name/pnpm-workspace.yaml、name/.gitignore
+ */
+const createMonorepoRootSync = (answers: ProjectInfo) => {
+  const {
+    name,
+    description,
+    serverFramework,
+    serverConfirm,
+    lowcodeEngine,
+  } = answers;
+  const rootPath = utils.getDistPath(name);
+
+  // 参与 workspace 的 Node 子包（springboot 为 Java 工程，不参与）
+  const packages = ['web'];
+  if (serverConfirm && serverFramework === ServerFrameworks.NestJs) {
+    packages.push(ServerFrameworks.NestJs);
+  }
+  if (lowcodeEngine === LowcodeEngine.Include) {
+    packages.push(LowcodeEngine.Include);
+  }
+  writeFileSync(
+    path.join(rootPath, 'pnpm-workspace.yaml'),
+    `packages:\n${packages.map((pkg) => `  - ${pkg}`).join('\n')}\n`
+  );
+
+  // 根 package.json 提供一键启动脚本，子包通过目录引用，与包名无关
+  const scripts: Record<string, string> = {
+    start: 'pnpm -C web start',
+    build: 'pnpm -C web build',
+  };
+  if (serverConfirm && serverFramework === ServerFrameworks.NestJs) {
+    scripts['dev:backend'] = `pnpm -C ${ServerFrameworks.NestJs} run start:dev`;
+  }
+  const rootPackageJson = {
+    name,
+    description,
+    scripts,
+    version: '1.0.0',
+    private: true,
+    pnpm: {
+      overrides: {
+        // tiny-robot-chat 依赖 ^1.30.0；低版本 SDK 的 exports 不支持子路径
+        // 目录导入会导致 vite 预构建失败，锁定已知可用版本保证全新安装可运行
+        '@modelcontextprotocol/sdk': '1.32.1',
+      },
+    },
+  };
+  writeFileSync(
+    path.join(rootPath, 'package.json'),
+    JSON.stringify(rootPackageJson, null, 2)
+  );
+
+  writeFileSync(
+    path.join(rootPath, '.gitignore'),
+    ['node_modules', 'dist', '*.log', '.env', ''].join('\n')
+  );
+  log.success('monorepo 根目录配置（package.json / pnpm-workspace.yaml）创建成功');
 };
 
 /**
@@ -211,7 +305,9 @@ const createServerSync = (answers: ProjectInfo) => {
   if (serverFramework === ServerFrameworks.SpringBoot) {
     console.log('springboot的服务端配置');
     // 拷贝 SpringBoot 模板代码到目标目录
-    copySync(serverFrom, serverTo);
+    copySync(serverFrom, serverTo, {
+      filter: createTemplateCopyFilter(serverFrom),
+    });
 
     // ===== 1. 定义统一的配置对象（从用户输入中提取，不写死）=====
     const config = {
@@ -237,11 +333,6 @@ const createServerSync = (answers: ProjectInfo) => {
       serverTo,
       'src/main/resources/application.properties'
     );
-
-    if (!existsSync(propertiesFilePath)) {
-      log.error(`❌ 未找到 Spring Boot 配置文件：${propertiesFilePath}`);
-      return;
-    }
 
     if (!existsSync(propertiesFilePath)) {
       log.error(`❌ 未找到 Spring Boot 配置文件：${propertiesFilePath}`);
@@ -336,6 +427,10 @@ const createServerSync = (answers: ProjectInfo) => {
       EXPIRES_IN: '2h',
       PAGINATION_PAGE: 1,
       PAGINATION_LIMIT: 10,
+      LLM_BASE_URL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+      LLM_API_KEY: '',
+      LLM_MODEL: 'qwen-plus',
+      LLM_EXTRA_BODY: '',
     };
     const envStr = objToEnv(config);
     const overwriteDockerComposeConfig = {
@@ -350,7 +445,9 @@ const createServerSync = (answers: ProjectInfo) => {
           ? undefined
           : config.DATABASE_PASSWORD,
     };
-    copySync(serverFrom, serverTo);
+    copySync(serverFrom, serverTo, {
+      filter: createTemplateCopyFilter(serverFrom),
+    });
     writeFileSync(path.join(serverTo, '.env'), envStr);
     const dockerComposeYaml = readFileSync(
       path.join(serverTo, 'docker-compose.yml')
@@ -471,32 +568,36 @@ const createProjectSync = (answers: ProjectInfo) => {
     name,
     serverConfirm,
     buildTool,
-    serverFramework,
     lowcodeEngine,
+    features,
   } = answers;
   const templatePath = VueVersion.Vue3;
   // 模板来源目录
   const from = utils.getTemplatePath(templatePath);
-  // 复制模板的目标目录
-  const to = utils.getDistPath(serverConfirm ? `${name}/web` : name);
-  fs.copyTpl(from, to);
-  // 将项目名称、描述写入 package.json中
-  if (serverFramework === ServerFrameworks.NestJs) {
-    try {
-      const packageJsonPath = path.join(to, 'package.json');
-      let packageJson = JSON.parse(
-        fs.readFileSync(packageJsonPath, { encoding: 'utf8' })
-      );
-      packageJson = { ...packageJson, name, description };
-      const remove = packageJsonProcess(buildTool, packageJson, to);
-      fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2), {
-        encoding: 'utf8',
-      });
-      remove();
-    } catch (e) {
-      log.error(e);
-      log.error('配置项目信息创建失败');
-    }
+  // 复制模板的目标目录（生成项目统一为 monorepo 结构，前端固定在 name/web）
+  const to = utils.getDistPath(`${name}/web`);
+  // 忽略本地开发残留的 dist 等产物（与发布包 .npmignore 行为保持一致）
+  fs.copyTpl(from, to, undefined, {
+    ignore: ['node_modules', '.DS_Store', '.idea', 'dist'],
+  });
+  // 将项目名称、描述写入 package.json中，并根据构建工具调整 scripts 与依赖
+  // 无论是否集成服务端，前端项目都需要处理，保证单独的前端项目也可运行
+  try {
+    const packageJsonPath = path.join(to, 'package.json');
+    const packageJson = JSON.parse(
+      fs.readFileSync(packageJsonPath, { encoding: 'utf8' })
+    );
+    // 根 package.json 占用项目名，web 子包使用 name-web 避免 workspace 重名
+    packageJson.name = `${name}-web`;
+    packageJson.description = description;
+    const remove = packageJsonProcess(buildTool, packageJson, to);
+    fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2), {
+      encoding: 'utf8',
+    });
+    remove();
+  } catch (e) {
+    log.error(e);
+    log.error('配置项目信息创建失败');
   }
 
   // 配置环境变量
@@ -505,21 +606,35 @@ const createProjectSync = (answers: ProjectInfo) => {
     const envContent = fs.readFileSync(envPath, { encoding: 'utf8' });
     let updatedEnvContent = envContent;
 
-    // 如果不对接服务端，删除VITE_MOCK_IGNORE配置
+    // 如果不对接服务端，删除VITE_MOCK_IGNORE配置。按行删除、保留其余行的原始格式，
     if (!serverConfirm) {
-      const envConfig = dotenv.parse(envContent);
-      delete envConfig.VITE_MOCK_IGNORE;
-      updatedEnvContent = Object.keys(envConfig)
-        .map((key) => `${key} = ${envConfig[key]}`)
+      updatedEnvContent = updatedEnvContent
+        .split('\n')
+        .filter((line) => !line.trim().startsWith('VITE_MOCK_IGNORE'))
         .join('\n');
     }
 
+    // 兼容 "KEY=value" 与 "KEY = value" 两种格式，无论当前值是 true 还是 false 都能改写
+    const setEnvFlag = (content: string, key: string, enabled: boolean) =>
+      content.replace(
+        new RegExp(`(${key}\\s*=\\s*)(true|false)`),
+        `$1${enabled}`
+      );
+
     // 根据用户选择设置低代码设计器环境变量
     const lowcodeEnabled = lowcodeEngine === LowcodeEngine.Include;
-    updatedEnvContent = updatedEnvContent.replace(
-      /VITE_LOWCODE_DESIGNER_ENABLED=false/,
-      `VITE_LOWCODE_DESIGNER_ENABLED=${lowcodeEnabled}`
+    updatedEnvContent = setEnvFlag(
+      updatedEnvContent,
+      'VITE_LOWCODE_DESIGNER_ENABLED',
+      lowcodeEnabled
     );
+
+    // 根据用户多选结果设置各可选功能的环境变量
+    const selectedFeatures = features ?? [];
+    FEATURE_OPTIONS.forEach((feature) => {
+      const enabled = selectedFeatures.includes(feature.value);
+      updatedEnvContent = setEnvFlag(updatedEnvContent, feature.envKey, enabled);
+    });
 
     fs.writeFileSync(envPath, updatedEnvContent);
     log.success(`低代码设计器环境变量已设置为: ${lowcodeEnabled}`);
@@ -536,52 +651,16 @@ const createProjectSync = (answers: ProjectInfo) => {
 
   // 如果选择了低代码设计器，复制低代码设计器模板
   createLowcodeDesignerSync(answers);
+
+  // 最后统一创建 monorepo 根目录配置（web / 服务端 / 低代码设计器）
+  createMonorepoRootSync(answers);
 };
 
-// 安装依赖
-export const installDependencies = (answers: ProjectInfo) => {
-  const prefix = cliConfig.getBinName();
+/**
+ * 打印初始化完成后的下一步操作提示
+ */
+const printNextSteps = (answers: ProjectInfo, prefix: string) => {
   const { name, serverFramework, serverConfirm, lowcodeEngine } = answers;
-  // egg服务端 安装依赖并启动
-  if (serverConfirm && serverFramework === ServerFrameworks.EggJs) {
-    log.info('正在安装服务端 npm 依赖，安装过程需要几十秒，请耐心等待...');
-    const installServiceResult = spawn.sync('npm', ['install'], {
-      cwd: `${name}/${serverFramework}/`,
-      stdio: 'inherit',
-    });
-    if (installServiceResult.status === 0) {
-      log.success('服务端 npm 依赖安装成功');
-    } else {
-      throw new Error(installServiceResult.error);
-    }
-  }
-  // npm 依赖安装
-  log.info('正在安装客户端 npm 依赖，安装过程需要几十秒，请耐心等待...');
-  const installClientResult = spawn.sync('npm', ['install'], {
-    cwd: serverConfirm ? `${name}/web` : `${name}/`,
-    stdio: 'inherit',
-  });
-  if (installClientResult.status === 0) {
-    log.success('客户端 npm 依赖安装成功');
-  } else {
-    throw new Error(installClientResult.error);
-  }
-
-  // 低代码设计器依赖安装
-  if (lowcodeEngine && lowcodeEngine === LowcodeEngine.Include) {
-    log.info(
-      '正在安装低代码设计器 npm 依赖，安装过程需要几十秒，请耐心等待...'
-    );
-    const installLowcodeResult = spawn.sync('npm', ['install'], {
-      cwd: `${name}/${lowcodeEngine}/`,
-      stdio: 'inherit',
-    });
-    if (installLowcodeResult.status === 0) {
-      log.success('低代码设计器 npm 依赖安装成功');
-    } else {
-      throw new Error(installLowcodeResult.error);
-    }
-  }
 
   /* prettier-ignore-start */
   console.log(
@@ -590,29 +669,25 @@ export const installDependencies = (answers: ProjectInfo) => {
     )
   );
 
+  console.log(
+    chalk.green(
+      `${chalk.yellow(`$ cd ${name} && pnpm i 或者 npm install`)}         # 安装全部依赖（monorepo 一次安装 web${serverConfirm ? ' + server' : ''}）`
+    )
+  );
+  console.log(
+    chalk.green(
+      `${chalk.yellow(`$ cd ${name} && pnpm start 或者 npm run start`)}     # 开启web开发环境`
+    )
+  );
+
   if (serverConfirm) {
     console.log(
       chalk.green(
         `${chalk.yellow(
-          `$ cd ${name}/web && npm run start`
-        )}     # 开启web开发环境`
-      )
-    );
-    console.log(
-      chalk.green(
-        `${chalk.yellow(
           serverFramework === ServerFrameworks.SpringBoot
-            ? `请查看 ${name}/${serverFramework}/README_CN.md `
-            : `$ cd ${name}/${serverFramework} && npm run dev`
+            ? `$ cd ${name}/springboot  # Java工程，参考目录内 Dockerfile / docker-compose.yml / pom.xml 启动`
+            : `$ cd ${name} && pnpm dev:backend`
         )}    # 开启server开发环境`
-      )
-    );
-  } else {
-    console.log(
-      chalk.green(
-        `${chalk.yellow(
-          `$ cd ${name} && ${prefix} start`
-        )}         # 可一键开启项目开发环境`
       )
     );
   }
@@ -622,7 +697,7 @@ export const installDependencies = (answers: ProjectInfo) => {
     console.log(
       chalk.green(
         `${chalk.yellow(
-          `$ cd ${name}/${lowcodeEngine} && npm run dev`
+          `$ cd ${name}/${lowcodeEngine} && pnpm dev`
         )}  # 开启低代码设计器开发环境`
       )
     );
@@ -647,6 +722,26 @@ export const installDependencies = (answers: ProjectInfo) => {
   );
 };
 
+// 安装依赖
+export const installDependencies = (answers: ProjectInfo) => {
+  const prefix = cliConfig.getBinName();
+  const { name } = answers;
+
+  // monorepo 根目录一条命令安装全部 workspace 依赖（web / nestJs / lowcode-designer）
+  log.info('正在安装项目依赖，安装过程需要几十秒，请耐心等待...');
+  const installResult = spawn.sync('pnpm', ['install'], {
+    cwd: name,
+    stdio: 'inherit',
+  });
+  if (installResult.status === 0) {
+    log.success('项目依赖安装成功');
+  } else {
+    throw new Error(installResult.error);
+  }
+
+  printNextSteps(answers, prefix);
+};
+
 export default async () => {
   // 拷贝模板到当前目录
   let projectInfo: ProjectInfo;
@@ -660,5 +755,5 @@ export default async () => {
     log.error('项目模板创建失败');
     return;
   }
-  log.info('初始化成功，请运行npm i或tiny i 安装依赖');
+  printNextSteps(projectInfo, cliConfig.getBinName());
 };

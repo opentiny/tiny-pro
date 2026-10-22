@@ -49,5 +49,32 @@ export default {
         roles: [RoleType.admin],
       },
     },
+    {
+      path: 'editor',
+      name: 'Editor',
+      id: 'Editor',
+      label: 'Editor',
+      component: () => import('@/views/form/editor/index.vue'),
+      meta: {
+        locale: 'menu.form.editor',
+        requiresAuth: true,
+        roles: [RoleType.admin],
+      },
+      children: [
+        {
+          path: 'create',
+          name: 'EditorCreate',
+          id: 'EditorCreate',
+          label: 'EditorCreate',
+          component: () => import('@/views/form/editor/create/index.vue'),
+          meta: {
+            locale: 'menu.form.editor.create',
+            requiresAuth: true,
+            roles: [RoleType.admin],
+            hidden: true,
+          },
+        },
+      ],
+    },
   ],
 }

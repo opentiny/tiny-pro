@@ -27,8 +27,12 @@ export function startMockServer(
         body: await readBody(request),
         headers: request.headers,
       })
-      response.writeHead(result.statusCode, { 'content-type': 'application/json' })
-      response.end(JSON.stringify(result.body))
+      const headers = result.headers ?? { 'content-type': 'application/json' }
+      response.writeHead(result.statusCode, headers)
+      // 文本类原始响应体（如 SSE）原样写出，其余按 JSON 序列化
+      response.end(typeof result.body === 'string'
+        ? result.body
+        : JSON.stringify(result.body))
     }
     catch (error) {
       response.writeHead(500, { 'content-type': 'application/json' })
