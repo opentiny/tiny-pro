@@ -25,7 +25,7 @@ export const richTextDocuments = reactive<RichTextDocument[]>([
       </ul>
       <h3>二、下周计划</h3>
       <ol>
-        <li>推进富文本栏目（开始创作 / 多人协同）页面开发</li>
+        <li>推进富文本栏目（内容创作 / 多人协同）页面开发</li>
         <li>完成列表页卡片模式的联调与验收</li>
       </ol>
       <blockquote>风险：多人协同编辑依赖后端 WebSocket 服务，需要提前申请测试环境。</blockquote>
@@ -63,7 +63,7 @@ export const richTextDocuments = reactive<RichTextDocument[]>([
       <h3>评审结论</h3>
       <ol>
         <li>表单页新增<strong>富文本栏目</strong>，与基础表单、分步表单同级</li>
-        <li>富文本栏目包含开始创作、多人协同两个子功能</li>
+        <li>富文本栏目包含内容创作、多人协同两个子功能</li>
         <li>文档列表默认隐藏表头，展示文档名称、部门、时间三列</li>
       </ol>
       <h3>待确认事项</h3>

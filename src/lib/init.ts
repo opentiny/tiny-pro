@@ -1,6 +1,5 @@
 import { parse, stringify } from 'yaml';
 import * as path from 'path';
-import * as dotenv from 'dotenv';
 import { copySync } from 'fs-extra';
 import chalk from 'chalk';
 import spawn from 'cross-spawn';
@@ -27,9 +26,24 @@ import { existsSync, readFileSync, rmSync, writeFileSync } from 'fs';
 const log = logs('tiny-toolkit-pro');
 const VUE_TEMPLATE_PATH = 'tinyvue';
 const DEFAULT_PROJECT_NAME = 'tiny-pro';
-// 服务端模板中需要排除的本地开发残留目录（与发布包 .npmignore 行为保持一致）
-const copyServerFilter = (src: string) =>
-  !/(^|[\\/])(node_modules|dist|logs)([\\/]|$)/.test(src);
+// 拷贝模板时需要排除的本地开发残留目录名（相对于模板根目录逐段匹配）
+const TEMPLATE_EXCLUDED_DIRS = ['node_modules', 'dist', 'logs'];
+
+/**
+ * 生成模板拷贝过滤器，必须基于模板根目录的相对路径匹配
+ */
+const createTemplateCopyFilter = (from: string) => {
+  const root = path.resolve(from);
+  return (src: string) => {
+    const relative = path.relative(root, path.resolve(src));
+    if (!relative) {
+      return true;
+    }
+    return !relative
+      .split(path.sep)
+      .some((segment) => TEMPLATE_EXCLUDED_DIRS.includes(segment));
+  };
+};
 
 /**
  * 询问创建项目的描述，使用的技术栈
@@ -210,7 +224,9 @@ const createLowcodeDesignerSync = (answers: ProjectInfo) => {
   const lowcodeFrom = utils.getTemplatePath(lowcodeEngine);
   const lowcodeTo = utils.getDistPath(`${name}/${lowcodeEngine}`);
 
-  copySync(lowcodeFrom, lowcodeTo, { filter: copyServerFilter });
+  copySync(lowcodeFrom, lowcodeTo, {
+    filter: createTemplateCopyFilter(lowcodeFrom),
+  });
   log.success('低代码设计器模板复制成功');
 };
 
@@ -289,7 +305,9 @@ const createServerSync = (answers: ProjectInfo) => {
   if (serverFramework === ServerFrameworks.SpringBoot) {
     console.log('springboot的服务端配置');
     // 拷贝 SpringBoot 模板代码到目标目录
-    copySync(serverFrom, serverTo, { filter: copyServerFilter });
+    copySync(serverFrom, serverTo, {
+      filter: createTemplateCopyFilter(serverFrom),
+    });
 
     // ===== 1. 定义统一的配置对象（从用户输入中提取，不写死）=====
     const config = {
@@ -315,11 +333,6 @@ const createServerSync = (answers: ProjectInfo) => {
       serverTo,
       'src/main/resources/application.properties'
     );
-
-    if (!existsSync(propertiesFilePath)) {
-      log.error(`❌ 未找到 Spring Boot 配置文件：${propertiesFilePath}`);
-      return;
-    }
 
     if (!existsSync(propertiesFilePath)) {
       log.error(`❌ 未找到 Spring Boot 配置文件：${propertiesFilePath}`);
@@ -432,7 +445,9 @@ const createServerSync = (answers: ProjectInfo) => {
           ? undefined
           : config.DATABASE_PASSWORD,
     };
-    copySync(serverFrom, serverTo, { filter: copyServerFilter });
+    copySync(serverFrom, serverTo, {
+      filter: createTemplateCopyFilter(serverFrom),
+    });
     writeFileSync(path.join(serverTo, '.env'), envStr);
     const dockerComposeYaml = readFileSync(
       path.join(serverTo, 'docker-compose.yml')
@@ -591,30 +606,34 @@ const createProjectSync = (answers: ProjectInfo) => {
     const envContent = fs.readFileSync(envPath, { encoding: 'utf8' });
     let updatedEnvContent = envContent;
 
-    // 如果不对接服务端，删除VITE_MOCK_IGNORE配置
+    // 如果不对接服务端，删除VITE_MOCK_IGNORE配置。按行删除、保留其余行的原始格式，
     if (!serverConfirm) {
-      const envConfig = dotenv.parse(envContent);
-      delete envConfig.VITE_MOCK_IGNORE;
-      updatedEnvContent = Object.keys(envConfig)
-        .map((key) => `${key} = ${envConfig[key]}`)
+      updatedEnvContent = updatedEnvContent
+        .split('\n')
+        .filter((line) => !line.trim().startsWith('VITE_MOCK_IGNORE'))
         .join('\n');
     }
 
+    // 兼容 "KEY=value" 与 "KEY = value" 两种格式，无论当前值是 true 还是 false 都能改写
+    const setEnvFlag = (content: string, key: string, enabled: boolean) =>
+      content.replace(
+        new RegExp(`(${key}\\s*=\\s*)(true|false)`),
+        `$1${enabled}`
+      );
+
     // 根据用户选择设置低代码设计器环境变量
     const lowcodeEnabled = lowcodeEngine === LowcodeEngine.Include;
-    updatedEnvContent = updatedEnvContent.replace(
-      /VITE_LOWCODE_DESIGNER_ENABLED=false/,
-      `VITE_LOWCODE_DESIGNER_ENABLED=${lowcodeEnabled}`
+    updatedEnvContent = setEnvFlag(
+      updatedEnvContent,
+      'VITE_LOWCODE_DESIGNER_ENABLED',
+      lowcodeEnabled
     );
 
     // 根据用户多选结果设置各可选功能的环境变量
     const selectedFeatures = features ?? [];
     FEATURE_OPTIONS.forEach((feature) => {
       const enabled = selectedFeatures.includes(feature.value);
-      updatedEnvContent = updatedEnvContent.replace(
-        new RegExp(`${feature.envKey}=(true|false)`),
-        `${feature.envKey}=${enabled}`
-      );
+      updatedEnvContent = setEnvFlag(updatedEnvContent, feature.envKey, enabled);
     });
 
     fs.writeFileSync(envPath, updatedEnvContent);
@@ -652,12 +671,12 @@ const printNextSteps = (answers: ProjectInfo, prefix: string) => {
 
   console.log(
     chalk.green(
-      `${chalk.yellow(`$ cd ${name} && pnpm i`)}         # 安装全部依赖（monorepo 一次安装 web${serverConfirm ? ' + server' : ''}）`
+      `${chalk.yellow(`$ cd ${name} && pnpm i 或者 npm install`)}         # 安装全部依赖（monorepo 一次安装 web${serverConfirm ? ' + server' : ''}）`
     )
   );
   console.log(
     chalk.green(
-      `${chalk.yellow(`$ cd ${name} && pnpm start`)}     # 开启web开发环境`
+      `${chalk.yellow(`$ cd ${name} && pnpm start 或者 npm run start`)}     # 开启web开发环境`
     )
   );
 
