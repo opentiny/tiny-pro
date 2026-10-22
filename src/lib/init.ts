@@ -232,23 +232,28 @@ const createServerSync = (answers: ProjectInfo) => {
       SERVER_PORT: 3000, // 可以改为 answers.serverPort || 3000，如果将来要支持动态端口
     };
 
-    // ===== 2. 拷贝模板后，设置 Spring Boot 配置文件路径 =====
-    const propertiesFilePath = path.join(
+    // ===== 2. 拷贝模板后，设置 Spring Boot 本地配置文件路径 =====
+    const basePropertiesFilePath = path.join(
       serverTo,
       'src/main/resources/application.properties'
     );
+    const propertiesFilePath = path.join(
+      serverTo,
+      'src/main/resources/application-local.properties'
+    );
 
-    if (!existsSync(propertiesFilePath)) {
+    if (!existsSync(basePropertiesFilePath) || !existsSync(propertiesFilePath)) {
       log.error(`❌ 未找到 Spring Boot 配置文件：${propertiesFilePath}`);
       return;
     }
 
-    if (!existsSync(propertiesFilePath)) {
-      log.error(`❌ 未找到 Spring Boot 配置文件：${propertiesFilePath}`);
-      return;
-    }
+    // CLI-generated projects use local settings by default. Production must
+    // explicitly activate the prod profile and provide deployment variables.
+    const baseEditor = createEditor(basePropertiesFilePath);
+    baseEditor.set('spring.profiles.default', 'local');
+    baseEditor.save(basePropertiesFilePath);
 
-    // ✅ 1. 使用 createEditor 读取 properties 文件
+    // ✅ 使用 createEditor 读取本地 properties 文件
     const editor = createEditor(propertiesFilePath);
 
     // ✅ 3. 使用 editor.set(...) 方法逐一设置每一个配置项

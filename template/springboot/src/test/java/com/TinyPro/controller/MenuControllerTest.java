@@ -20,16 +20,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -164,6 +164,26 @@ public class MenuControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Dashboard"))
                 .andExpect(jsonPath("$.path").value("/dashboard"));
+    }
+
+    @Test
+    public void testCreateMenu_ValidatesRequiredFields() throws Exception {
+        mockMvc.perform(post("/api/menu")
+                        .header("Authorization", "Bearer " + Contants.TOKEN)
+                        .contentType("application/json")
+                        .content("""
+                                {
+                                  "name": "Dashboard",
+                                  "path": "/dashboard",
+                                  "component": "DashboardComponent",
+                                  "parentId": null,
+                                  "icon": "icon-dashboard",
+                                  "locale": "zh_CN"
+                                }
+                                """))
+                .andExpect(status().isBadRequest());
+
+        verify(iMenuService, never()).createMenu(any(), anyBoolean());
     }
 
     // ===================== testUpdateMenu =====================

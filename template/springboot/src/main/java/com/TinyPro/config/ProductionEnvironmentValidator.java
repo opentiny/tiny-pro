@@ -19,9 +19,7 @@ public class ProductionEnvironmentValidator {
             "DATABASE_PASSWORD",
             "REDIS_HOST",
             "REDIS_PASSWORD",
-            "JWT_SECRET",
-            "GLOBAL_PREFIX",
-            "FLYWAY_ENABLED"
+            "JWT_SECRET"
     );
 
     private final Environment environment;
