@@ -116,7 +116,7 @@ onMounted(() => {
       }
       const key = findId(tabStore.current.name, tabStore.current.link)
       tree.value.setCurrentKey(key)
-      const { parentId = null } = tree.value.getCurrentNode()
+      const { parentId = null } = tree.value.getCurrentNode() ?? {}
       if (parentId && !expandeArr.value.includes(parentId)) {
         expandeArr.value = expandeArr.value.concat(parentId)
       }
