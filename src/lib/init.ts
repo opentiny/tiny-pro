@@ -328,17 +328,28 @@ const createServerSync = (answers: ProjectInfo) => {
       SERVER_PORT: 3000, // 可以改为 answers.serverPort || 3000，如果将来要支持动态端口
     };
 
-    // ===== 2. 拷贝模板后，设置 Spring Boot 配置文件路径 =====
-    const propertiesFilePath = path.join(
+    // ===== 2. 拷贝模板后，设置 Spring Boot 本地配置文件路径 =====
+    const basePropertiesFilePath = path.join(
       serverTo,
       'src/main/resources/application.properties'
     );
+    const propertiesFilePath = path.join(
+      serverTo,
+      'src/main/resources/application-local.properties'
+    );
 
-    if (!existsSync(propertiesFilePath)) {
+    if (!existsSync(basePropertiesFilePath) || !existsSync(propertiesFilePath)) {
       log.error(`❌ 未找到 Spring Boot 配置文件：${propertiesFilePath}`);
       return;
     }
 
+    // CLI-generated projects use local settings by default. Production must
+    // explicitly activate the prod profile and provide deployment variables.
+    const baseEditor = createEditor(basePropertiesFilePath);
+    baseEditor.set('spring.profiles.default', 'local');
+    baseEditor.save(basePropertiesFilePath);
+
+    // ✅ 使用 createEditor 读取本地 properties 文件
     // ✅ 1. 使用 createEditor 读取 properties 文件
     const editor = createEditor(propertiesFilePath);
 
@@ -363,7 +374,7 @@ const createServerSync = (answers: ProjectInfo) => {
     editor.set('spring.datasource.hikari.maximum-pool-size', '10');
     editor.set('spring.datasource.hikari.auto-commit', 'true');
     editor.set('spring.datasource.hikari.max-lifetime', '180000');
-    editor.set('spring.datasource.hikari.connection-timeout', '30000');
+    editor.set('spring.datasource.hikari.connection-timeout', '5000');
 
     // MyBatis-Plus
     editor.set('mybatis-plus.mapper-locations', 'classpath:mappers/*.xml');
@@ -378,7 +389,8 @@ const createServerSync = (answers: ProjectInfo) => {
     );
 
     // JPA (如同时使用)
-    editor.set('spring.jpa.hibernate.ddl-auto', 'update');
+    // Hibernate only validates the Flyway-managed schema; it must never alter it.
+    editor.set('spring.jpa.hibernate.ddl-auto', 'validate');
     editor.set(
       'spring.jpa.database-platform',
       'org.hibernate.dialect.MySQL8Dialect'
@@ -393,7 +405,7 @@ const createServerSync = (answers: ProjectInfo) => {
     );
     editor.set(
       'spring.jpa.properties.hibernate.globally_quoted_identifiers',
-      'true'
+      'false'
     );
     editor.set(
       'spring.jpa.hibernate.naming.physical-strategy',
@@ -406,6 +418,14 @@ const createServerSync = (answers: ProjectInfo) => {
     // Redis
     editor.set('spring.data.redis.host', config.REDIS_HOST);
     editor.set('spring.data.redis.port', config.REDIS_PORT.toString());
+    editor.set('spring.data.redis.timeout', '2s');
+    editor.set('spring.data.redis.connect-timeout', '2s');
+
+    // Actuator readiness checks the application dependencies used by probes.
+    editor.set(
+      'management.endpoint.health.group.readiness.include',
+      'readinessState,db,redis'
+    );
 
     // ✅ 4. 保存修改后的内容到原 .properties 文件
     editor.save(propertiesFilePath);
