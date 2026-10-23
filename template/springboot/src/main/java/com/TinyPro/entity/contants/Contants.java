@@ -1,9 +1,15 @@
 package com.TinyPro.entity.contants;
 
 public class Contants {
+    public static final String INSTALL_FLAG = "FLAG:INSTALL";
     public static final long H_2=3600*2;
     public static final String UserJwtTop="user:";
     public static final String UserJwtbt=":token";
+    public static final String AccessTokenPrefix="at:";
+    public static final String RefreshTokenPrefix="rt:";
+    public static final String SessionPrefix="session:";
+    public static final String SessionListSuffix=":sessions";
+    public static final String UsedRefreshTokenPrefix="used:rt:";
     //测试的admin账户和密码
     public static final String ADMIN="admin";
     //设置公共的加盐

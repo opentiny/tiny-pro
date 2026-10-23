@@ -29,6 +29,30 @@ export enum LowcodeEngine {
   Skip = '',
 }
 
+/**
+ * 可选集成的页面功能
+ */
+export enum FeatureType {
+  TinyRobot = 'tiny-robot',
+  TinyEditor = 'tiny-editor',
+}
+
+/**
+ * 可选功能清单，后续新增功能时在此追加即可
+ */
+export const FEATURE_OPTIONS = [
+  {
+    name: 'TinyRobot 智能助手（AI 对话）',
+    value: FeatureType.TinyRobot,
+    envKey: 'VITE_TINY_ROBOT_ENABLED',
+  },
+  {
+    name: 'TinyEditor 富文本编辑器',
+    value: FeatureType.TinyEditor,
+    envKey: 'VITE_TINY_EDITOR_ENABLED',
+  },
+];
+
 export enum BuildTool {
   Vite = 'vite',
   Webpack = 'webpack',
@@ -128,6 +152,7 @@ export interface ProjectInfo {
   name: string;
   serverFramework: ServerFrameworks;
   lowcodeEngine?: LowcodeEngine;
+  features?: Array<FeatureType>;
   serverConfirm?: boolean;
   dialect?: string;
   host?: string;

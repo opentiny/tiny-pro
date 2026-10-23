@@ -5,6 +5,7 @@ import com.TinyPro.entity.contants.Contants;
 import com.TinyPro.entity.po.User;
 import com.TinyPro.exception.BusinessException;
 import com.TinyPro.redis.RedisUtil;
+import com.TinyPro.service.TokenService;
 import com.TinyPro.utils.JwtUtil;
 import com.alibaba.fastjson.JSON;
 import io.jsonwebtoken.Claims;
@@ -24,6 +25,8 @@ public class UserGuardsFilter implements HandlerInterceptor {
     private RedisUtil redisUtil;
     @Autowired
     private JwtUtil jwtUtil;
+    @Autowired
+    private TokenService tokenService;
 
     @Override
     public boolean preHandle(HttpServletRequest request,
@@ -48,19 +51,44 @@ public class UserGuardsFilter implements HandlerInterceptor {
             // 3. 校验 token
             String token = extractTokenFromHeader(request);
             if (token == null) {
-                throw new BusinessException("exception.common.tokenExpire", HttpStatus.NOT_FOUND, null);
+                throw new BusinessException("exception.common.tokenError", HttpStatus.UNAUTHORIZED, null);
             }
 
             Claims claims = jwtUtil.parseJwt(token);
             String email = claims.get("email", String.class);
+
+            if ("api".equals(claims.get("type", String.class))) {
+                if (!tokenService.validateApiToken(
+                        email,
+                        claims.get("tokenId", String.class),
+                        token
+                )) {
+                    throw new BusinessException("exception.common.tokenExpire", HttpStatus.UNAUTHORIZED, null);
+                }
+                return true;
+            }
+
+            if (claims.get("id") != null && claims.getId() != null) {
+                if (!tokenService.isAccessTokenActive(token)) {
+                    throw new BusinessException("exception.common.tokenExpire", HttpStatus.UNAUTHORIZED, null);
+                }
+                return true;
+            }
+
             String key = Contants.UserJwtTop + email + Contants.UserJwtbt;
             String cached = redisUtil.getValue(key);
-            User user = JSON.parseObject(cached, User.class);
 
-            if (StringUtils.isBlank(cached) || !user.getEmail().equals(email)) {
+            if (StringUtils.isBlank(cached)) {
+                throw new BusinessException("exception.common.tokenError", HttpStatus.UNAUTHORIZED, null);
+            }
+            User user = JSON.parseObject(cached, User.class);
+            if (user == null || !email.equals(user.getEmail())) {
                 throw new BusinessException("exception.common.tokenError", HttpStatus.UNAUTHORIZED, null);
             }
             return true;
+        } catch (BusinessException businessException) {
+            // Preserve the specific token error and HTTP status for the client.
+            throw businessException;
         } catch (Exception e) {
             throw new BusinessException("exception.common.tokenError", HttpStatus.UNAUTHORIZED, null);
         }

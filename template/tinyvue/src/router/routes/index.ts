@@ -1,6 +1,8 @@
 import type { RouteRecordRaw } from 'vue-router'
 
-const modules = import.meta.glob ? import.meta.glob('./modules/*.ts', { eager: true }) : require.context('./module', false, /\.ts$/, 'sync')
+const modules = BUILD_TOOLS === 'WEBPACK'
+  ? import.meta.webpackContext('./modules', { recursive: false, regExp: /\.ts$/, mode: 'sync' })
+  : import.meta.glob('./modules/*.ts', { eager: true })
 const appRoutes: RouteRecordRaw[] = []
 
 Object.keys(modules).forEach((key) => {
