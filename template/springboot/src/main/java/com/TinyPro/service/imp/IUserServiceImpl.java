@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -91,6 +92,8 @@ public class IUserServiceImpl implements IUserService {
             user.setStatus(createUserDto.getStatus());
 
             return ResponseEntity.ok(UserVo.fromEntity(iUserRepository.save(user)));
+        } catch (DataIntegrityViolationException e) {
+            throw e;
         } catch (Exception e) {
             throw new ResponseStatusException(
                     HttpStatus.INTERNAL_SERVER_ERROR,

@@ -68,7 +68,7 @@ public class UserController {
     @GetMapping
     @PermissionAnnotation("user::query") // 假设你有自定义的@Permission注解
     public ResponseEntity<PageWrapper<UserVo>> getAllUser(
-            @ModelAttribute PaginationQueryDto paginationQuery,
+            @Valid @ModelAttribute PaginationQueryDto paginationQuery,
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Integer[] role,
             @RequestParam(required = false) String email) {

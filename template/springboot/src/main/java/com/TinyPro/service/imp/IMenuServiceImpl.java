@@ -89,9 +89,10 @@ import java.util.stream.Collectors;
         String locale = createMenuDto.getLocale();
 
         // 检查菜单是否已存在
-        Optional<Menu> existingMenu = menuRepository.findByNameAndOrderAndMenuTypeAndParentIdAndPathAndIconAndComponentAndLocale(
+        List<Menu> matchingMenus = menuRepository.findByMenuIdentity(
                 name, order, menuType, parentId, path, icon, component, locale
         );
+        Optional<Menu> existingMenu = matchingMenus.stream().findFirst();
 
         if (isInit && existingMenu.isPresent()) {
             return ResponseEntity.ok(existingMenu.get());

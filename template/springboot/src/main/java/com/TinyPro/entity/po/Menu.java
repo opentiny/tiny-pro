@@ -21,14 +21,21 @@ public class Menu implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
+    @Column(nullable = false)
     private String name;
+    @Column(name = "`order`")
     @TableField("'order'")
     private Integer order;
+    @Column(name = "parentId")
     private Integer parentId;
+    @Column(name = "menuType")
     private String menuType;
+    @Column(name = "icon")
     private String icon;
+    @Column(name = "component")
     private String component;
+    @Column(name = "path")
     private String path;
+    @Column(name = "locale")
     private String locale;
 }
