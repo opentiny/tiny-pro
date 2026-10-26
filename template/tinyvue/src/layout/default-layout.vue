@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { Modal, TabItem, Tabs, Modal as tinyModal } from '@opentiny/vue'
+import { Dropdown, DropdownMenu, Modal, TabItem, Tabs, Modal as tinyModal } from '@opentiny/vue'
 import locale from '@opentiny/vue-locale'
 import TinyThemeTool from '@opentiny/vue-theme/theme-tool'
 import { computed, nextTick, provide, ref, watch } from 'vue'
@@ -82,7 +82,7 @@ function onClose(name: string) {
   let rightIdx = deleteItemIndex + 1
   let leftIdx = deleteItemIndex - 1
   let path = ''
-  const deleteSelf = tabStore.data[deleteItemIndex] === tabStore.current
+  const deleteSelf = deleteItemIndex >= 0 && tabStore.current?.link === name
   if (!deleteSelf) {
     tabStore.delByLink(name)
     return
@@ -116,6 +116,108 @@ function onClose(name: string) {
   // 跳转到最近的一个合法路由
   tabStore.set(curName)
   router.push({ path })
+}
+
+type TabMenuAction = 'close' | 'closeOthers' | 'closeLeft' | 'closeRight' | 'closeAll'
+
+interface TabRecord {
+  name: string
+  link: string
+}
+
+interface TabMenuOption {
+  label: string
+  action: TabMenuAction
+  disabled?: boolean
+  divided?: boolean
+}
+
+const tabMenuList = computed(() => {
+  const total = tabsHistory.value.length
+  return tabsHistory.value.map<TabMenuOption[]>((_, index) => [
+    {
+      label: t('tabs.close'),
+      action: 'close',
+      disabled: total <= 1,
+    },
+    {
+      label: t('tabs.closeOthers'),
+      action: 'closeOthers',
+      disabled: total <= 1,
+    },
+    {
+      label: t('tabs.closeLeft'),
+      action: 'closeLeft',
+      disabled: index <= 0,
+    },
+    {
+      label: t('tabs.closeRight'),
+      action: 'closeRight',
+      disabled: index >= total - 1,
+    },
+    {
+      label: t('tabs.closeAll'),
+      action: 'closeAll',
+      disabled: total <= 1,
+      divided: true,
+    },
+  ])
+})
+
+function openKeptTab(tab: TabRecord) {
+  tabStore.set(tab.name)
+  const currentRoute = router.currentRoute.value
+  if (currentRoute.fullPath !== tab.link && currentRoute.path !== tab.link) {
+    router.push(tab.link)
+  }
+}
+
+function onTabMenuClick(
+  data: { itemData?: TabMenuOption },
+  history: TabRecord,
+) {
+  const action = data?.itemData?.action
+  if (!action || data.itemData?.disabled) {
+    return
+  }
+  const tabs = tabStore.data.slice()
+  const index = tabs.findIndex(tab => tab.link === history.link)
+  if (index < 0) {
+    return
+  }
+  if (action === 'close') {
+    onClose(history.link)
+    return
+  }
+  const currentLink = tabStore.current?.link
+  let removeLinks: string[] = []
+  let nextTab: TabRecord | undefined
+  if (action === 'closeOthers') {
+    removeLinks = tabs.filter(tab => tab.link !== history.link).map(tab => tab.link)
+    nextTab = history
+  }
+  else if (action === 'closeLeft') {
+    removeLinks = tabs.slice(0, index).map(tab => tab.link)
+    nextTab = history
+  }
+  else if (action === 'closeRight') {
+    removeLinks = tabs.slice(index + 1).map(tab => tab.link)
+    nextTab = history
+  }
+  else if (action === 'closeAll') {
+    nextTab = tabs[0]
+    removeLinks = tabs.slice(1).map(tab => tab.link)
+  }
+  if (!removeLinks.length || !nextTab) {
+    return
+  }
+  removeLinks
+    .filter(link => link !== currentLink)
+    .forEach(link => tabStore.delByLink(link))
+  if (currentLink && removeLinks.includes(currentLink)) {
+    tabStore.delByLink(currentLink)
+    openKeptTab(nextTab)
+  }
 }
 
 // 切换简约模式，图标按钮
@@ -227,10 +329,30 @@ watch(appStore.$state, (newValue) => {
           >
             <TabItem
               v-for="(history, idx) of tabsHistory"
-              :key="idx"
-              :title="t(history.name)"
+              :key="history.link"
               :name="history.link"
-            />
+            >
+              <template #title>
+                <Dropdown
+                  trigger="hover"
+                  :show-icon="false"
+                  :show-timeout="300"
+                  :hide-timeout="400"
+                  lazy-show-popper
+                  class="tab-action-dropdown"
+                  :title="t(history.name)"
+                  @item-click="onTabMenuClick($event, history)"
+                >
+                  <template #dropdown>
+                    <DropdownMenu
+                      :options="tabMenuList[idx]"
+                      placement="bottom-start"
+                      :popper-append-to-body="true"
+                    />
+                  </template>
+                </Dropdown>
+              </template>
+            </TabItem>
           </Tabs>
           <PageLayout class="pl-4 pr-4 !h-[calc(100%-100px)]" />
           <Footer v-if="layoutMode[myPattern].footer" class="h-[60px]" />
@@ -289,6 +411,13 @@ watch(appStore.$state, (newValue) => {
 
 :deep(.tiny-tabs--top) {
   padding: 0 16px;
+}
+
+.tab-action-dropdown {
+  max-width: 100%;
+  color: inherit;
+  font-size: inherit;
+  line-height: inherit;
 }
 
 :deep(.tiny-tree-menu .tiny-tree) {
