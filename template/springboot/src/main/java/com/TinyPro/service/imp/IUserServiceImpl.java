@@ -125,6 +125,7 @@ public class IUserServiceImpl implements IUserService {
     public ResponseEntity<UserVo> removeUserInfo(String email) {
         try {
             User user = iUserRepository.findByEmail(email).orElseThrow(() -> new BusinessException("exception.user.userNotFound", HttpStatus.NOT_FOUND, null));
+            authService.revokeUserSessions(user.getEmail());
             iUserRepository.delete(user);
             UserVo result = UserVo.fromEntity(user);
             return ResponseEntity.ok(result);
@@ -182,7 +183,7 @@ public class IUserServiceImpl implements IUserService {
                 .collect(Collectors.joining());
 
         if (!originalRoleIds.equals(newRoleIds)) {
-            authService.logout(updateUserDto.getEmail());
+            authService.revokeUserSessions(updateUserDto.getEmail());
         }
 
         return ResponseEntity.ok(result);
@@ -251,7 +252,7 @@ public class IUserServiceImpl implements IUserService {
             iUserRepository.save(user);
 
             // 3. 强制登出该用户
-            redisUtil.deleteValue(Contants.UserJwtTop + user.getEmail() + Contants.UserJwtbt);
+            authService.revokeUserSessions(user.getEmail());
         } else {
             throw new BusinessException("exception.user.userNotFound",HttpStatus.NOT_FOUND,null);
         }
@@ -276,7 +277,7 @@ public class IUserServiceImpl implements IUserService {
         iUserRepository.save(user);
 
         // 4. 删除redis的信息
-        redisUtil.deleteValue(Contants.UserJwtTop + user.getEmail() + Contants.UserJwtbt);
+        authService.revokeUserSessions(user.getEmail());
     }
 
     @Override
@@ -289,6 +290,7 @@ public class IUserServiceImpl implements IUserService {
             result.add(userVo);
             return item;
         }).collect(Collectors.toList());
+        emails.forEach(authService::revokeUserSessions);
         iUserRepository.deleteByEmailIn(emails);
         return ResponseEntity.ok(result);
     }

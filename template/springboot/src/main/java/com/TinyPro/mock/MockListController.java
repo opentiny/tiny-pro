@@ -119,4 +119,35 @@ public class MockListController {
             return errorResult;
         }
     }
+
+    @PostMapping("/getEmployeeInfo")
+    public Map<String, Object> getEmployeeInfo(@RequestBody(required = false) Map<String, Object> params) {
+        String id = params == null || params.get("id") == null
+                ? null
+                : String.valueOf(params.get("id"));
+        return taskList.stream()
+                .filter(item -> Objects.equals(String.valueOf(item.get("id")), id))
+                .findFirst()
+                .orElseGet(HashMap::new);
+    }
+
+    @PostMapping("/updateEmployeeInfo")
+    public boolean updateEmployeeInfo(@RequestBody(required = false) Map<String, Object> params) {
+        if (params == null || !(params.get("data") instanceof Map<?, ?> data)) {
+            return false;
+        }
+
+        Object id = data.get("id");
+        for (Map<String, Object> item : taskList) {
+            if (Objects.equals(String.valueOf(item.get("id")), String.valueOf(id))) {
+                for (Map.Entry<?, ?> entry : data.entrySet()) {
+                    if (entry.getKey() != null && !"id".equals(entry.getKey().toString())) {
+                        item.put(entry.getKey().toString(), entry.getValue());
+                    }
+                }
+                return true;
+            }
+        }
+        return false;
+    }
 }

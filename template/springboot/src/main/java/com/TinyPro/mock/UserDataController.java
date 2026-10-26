@@ -85,7 +85,6 @@ public class UserDataController {
 
         for (int i = 1; i <= 17; i++) {
             Map<String, Object> monthItem = new HashMap<>();
-            if (i == 1) continue;
             monthItem.put("title", "userInfo.month." + i);
             monthItem.put("value", 0);
             chartDataList.add(monthItem);

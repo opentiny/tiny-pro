@@ -42,7 +42,7 @@ public class IPermissionServiceImpl implements IPermissionService {
         String name = createPermissionDto.getName();
         String desc = createPermissionDto.getDesc();
 
-        Optional<Permission> existingPermission = iPermissionRepository.findByName(name);
+        Optional<Permission> existingPermission = iPermissionRepository.findFirstByNameOrderByIdAsc(name);
 
         // 情况1：初始化模式且权限已存在
         if (isInit && existingPermission.isPresent()) {
