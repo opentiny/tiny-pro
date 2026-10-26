@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { EmployeeInfo, QueryTaskParmas } from '@/api/list'
+import type { EmployeeFilterOptions, EmployeeInfo, EmployeeSearchFilter, QueryTaskParmas } from '@/api/list'
 import {
   Modal,
   Button as TinyButton,
@@ -29,7 +29,7 @@ const { sm } = useResponsive()
 const tags = ref([])
 
 // 搜索配置
-const items = reactive([])
+const items = reactive<Record<string, any>[]>([])
 
 const basePagerConfigAttrs = { currentPage: 1, pageSize: 10, pageSizes: [10, 20, 50, 100], total: 10 }
 
@@ -45,62 +45,116 @@ const pagerConfigLg = {
 
 const taskGrid = ref()
 
-interface FilterOption {
-  label: string
+interface SearchTag {
   field: string
-  value: string
+  value?: string
+  type?: string
+  start?: string
+  end?: string
 }
 
-const filterOptions = ref<FilterOption[]>([])
+const filterOptions = ref<SearchTag[]>([])
 
-function createItems(list: EmployeeInfo[]) {
-  if (!list || !list.length) {
+const statusLabelKey: Record<string, string> = {
+  0: 'searchTable.form.status.offline',
+  1: 'searchTable.form.status.online',
+  2: 'searchTable.form.status.doing',
+}
+
+const filterFields = [
+  { field: 'name', label: 'searchTable.columns.name' },
+  { field: 'employeeNo', label: 'searchTable.columns.employeeNo' },
+  { field: 'departmentLevel', label: 'searchTable.columns.departmentLevel' },
+  { field: 'department', label: 'searchTable.columns.department' },
+  { field: 'status', label: 'searchTable.form.status' },
+  { field: 'workbenchName', label: 'searchTable.columns.workbenchName' },
+  { field: 'project', label: 'searchTable.columns.project' },
+  { field: 'type', label: 'searchTable.columns.type' },
+  { field: 'address', label: 'searchTable.columns.address' },
+  { field: 'roles', label: 'searchTable.columns.roles' },
+  { field: 'lastUpdateUser', label: 'searchTable.columns.lastUpdateUser' },
+] as const
+
+function getStatusText(status: string) {
+  const key = statusLabelKey[status]
+  return key ? t(key) : ''
+}
+
+function statusCodeByLabel(label: string) {
+  return Object.keys(statusLabelKey).find(code => getStatusText(code) === label)
+}
+
+let filterSignature = ''
+
+function applyFilterItems(filters: EmployeeFilterOptions) {
+  const signature = `${getStatusText('0')}|${JSON.stringify(filters)}`
+  if (signature === filterSignature)
     return
+  filterSignature = signature
+
+  const minTime = filters.createTime?.min
+  const maxTime = filters.createTime?.max
+  items.splice(
+    0,
+    items.length,
+    ...filterFields.map(({ field, label }) => ({
+      label: t(label),
+      field,
+      options: (filters[field] || []).map(value => ({
+        label: field === 'status' ? getStatusText(String(value)) : String(value),
+      })),
+    })),
+    {
+      label: t('searchTable.columns.createTime'),
+      field: 'createTime',
+      type: 'datetimeRange',
+      format: 'yyyy-MM-dd HH:mm:ss',
+      min: minTime ? new Date(minTime.replace(' ', 'T')) : undefined,
+      max: maxTime ? new Date(maxTime.replace(' ', 'T')) : undefined,
+    },
+  )
+}
+
+function buildSearchInfo(tags: SearchTag[]) {
+  const filters: EmployeeSearchFilter[] = []
+  const keywords: string[] = []
+
+  tags.forEach((tag) => {
+    if (!tag?.field)
+      return
+    if (tag.field === 'tvpKeyword') {
+      if (tag.value)
+        keywords.push(tag.value)
+      return
+    }
+    if (tag.field === 'createTime' || tag.type === 'datetimeRange') {
+      if (!tag.start && !tag.end)
+        return
+      filters.push({
+        field: 'createTime',
+        start: tag.start,
+        end: tag.end,
+      })
+      return
+    }
+
+    const value = tag.field === 'status'
+      ? (statusCodeByLabel(tag.value || '') || tag.value || '')
+      : (tag.value || '')
+    if (!value)
+      return
+
+    const current = filters.find(item => item.field === tag.field && item.values)
+    if (current?.values)
+      current.values.push(value)
+    else
+      filters.push({ field: tag.field, values: [value] })
+  })
+
+  return {
+    keyword: keywords.join(' '),
+    filters,
   }
-
-  const excludeKeys = ['id', 'rank', 'description']
-  const fieldOptionsMap: Record<string, Set<string>> = {}
-
-  let minDate = new Date()
-  let maxDate = new Date()
-
-  list.forEach((item) => {
-    Object.keys(item).forEach((key) => {
-      if (key === 'createTime') {
-        const currentDate = new Date(item[key])
-        // 使用 getTime() 方法获取时间戳进行比较
-        minDate = minDate.getTime() < currentDate.getTime() ? minDate : currentDate
-        maxDate = maxDate.getTime() > currentDate.getTime() ? maxDate : currentDate
-        return
-      }
-      if (excludeKeys.includes(key))
-        return
-      if (!fieldOptionsMap[key]) {
-        fieldOptionsMap[key] = new Set()
-      }
-
-      fieldOptionsMap[key].add(item[key])
-    })
-  })
-
-  // 清空原 items
-  items.length = 0
-
-  Object.entries(fieldOptionsMap).forEach(([key, valueSet]) => {
-    items.push({
-      label: t(`searchTable.columns.${key}`),
-      field: key,
-      options: Array.from(valueSet).map(i => ({ label: i })),
-    })
-  })
-
-  items.push({
-    label: t(`searchTable.columns.createTime`),
-    field: 'createTime',
-    type: 'datetimeRange',
-    min: minDate,
-    max: maxDate,
-  })
 }
 
 const tableData = ref<EmployeeInfo[]>([])
@@ -109,26 +163,20 @@ const loading = ref(false)
 
 // 请求数据接口方法
 async function fetchData(params: QueryTaskParmas) {
-  const searchInfo = {}
-
-  if (filterOptions.value?.length) {
-    filterOptions.value.forEach((item) => {
-      searchInfo[item.field] = item.value
-    })
-  }
-
-  const queryParmas = {
-    searchInfo,
-    ...params,
+  const queryParmas: QueryTaskParmas = {
+    pageIndex: params.pageIndex,
+    pageSize: params.pageSize,
+    searchInfo: buildSearchInfo(filterOptions.value),
   }
 
   loading.value = true
 
   try {
     const { data } = await queryEmployeeList(queryParmas)
-    const { data: list, total } = data
+    const { data: list, total, filters } = data
     tableData.value = list
-    createItems(list)
+    if (filters)
+      applyFilterItems(filters)
     return {
       result: list,
       page: { total },
@@ -160,32 +208,13 @@ function handleDelete(id: string) {
 }
 
 // form的button
-function reloadGrid(filters) {
-  filterOptions.value = filters
+function reloadGrid(filters: SearchTag[]) {
+  filterOptions.value = Array.isArray(filters) ? filters : []
   taskGrid?.value?.handleFetch?.('reload')
 }
 
 function handleRefresh() {
   taskGrid?.value?.handleFetch?.('reload')
-}
-
-const statusOptions = reactive([
-  {
-    value: '0',
-    label: 'offline',
-  },
-  {
-    value: '1',
-    label: 'online',
-  },
-  {
-    value: '2',
-    label: 'doing',
-  },
-])
-
-function getStatusText(status: string) {
-  return statusOptions.find(({ value }) => status === value)?.label || ''
 }
 
 const updateVisibility = ref(false)
