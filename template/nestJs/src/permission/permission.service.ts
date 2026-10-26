@@ -27,7 +27,7 @@ export class PermissionService {
       throw new HttpException(
         this.i18n.t('exception.permission.exists', {
           args: { name },
-          lang: I18nContext.current().lang,
+          lang: I18nContext.current()?.lang,
         }),
         HttpStatus.BAD_REQUEST
       );
@@ -43,7 +43,7 @@ export class PermissionService {
     if (!permissionInfo) {
       throw new HttpException(
         this.i18n.t('exception.permission.notExists', {
-          lang: I18nContext.current().lang,
+          lang: I18nContext.current()?.lang,
         }),
         HttpStatus.NOT_FOUND
       );

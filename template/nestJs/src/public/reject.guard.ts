@@ -22,7 +22,7 @@ export class RejectRequestGuard implements CanActivate {
     if (!this.cfg.get('PREVIEW_MODE')) {
       return true;
     }
-    const i18n = I18nContext.current<I18nTranslations>();
+    const i18n = I18nContext.current<I18nTranslations>(ctx);
     const rejectRequest = this.reflector.getAllAndOverride('reject', [
       ctx.getHandler(),
       ctx.getClass(),
@@ -31,9 +31,8 @@ export class RejectRequestGuard implements CanActivate {
       return true;
     }
     throw new HttpException(
-      i18n.t('exception.preview.reject-this-request', {
-        lang: I18nContext.current().lang,
-      }),
+      i18n?.t('exception.preview.reject-this-request')
+        ?? 'The server rejected this request',
       HttpStatus.BAD_REQUEST
     );
   }

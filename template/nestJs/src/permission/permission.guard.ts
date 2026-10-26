@@ -21,7 +21,8 @@ interface CustomReq extends Request {
 export class PermissionGuard implements CanActivate {
   constructor(private reflector: Reflector, private userSerivce: UserService) {}
   async canActivate(ctx: ExecutionContext) {
-    const i18n = I18nContext.current<I18nTranslations>();
+    // 传入 ctx 兜底：异步上下文丢失时从请求对象取回 i18nContext，避免 TypeError
+    const i18n = I18nContext.current<I18nTranslations>(ctx);
     const req: CustomReq = ctx.switchToHttp().getRequest();
     const requiredPermission = this.reflector.getAllAndOverride<string[]>(
       PERMISSION_KEYS,
@@ -43,12 +44,11 @@ export class PermissionGuard implements CanActivate {
     }
     if (!isContainedPermission) {
       throw new HttpException(
-        i18n.t('exception.common.forbidden', {
-          lang: I18nContext.current().lang,
+        i18n?.t('exception.common.forbidden', {
           args: {
             permission: requiredPermission.join(','),
           },
-        }),
+        }) ?? 'Forbidden',
         HttpStatus.FORBIDDEN
       );
     }

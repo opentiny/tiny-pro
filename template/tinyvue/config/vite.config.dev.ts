@@ -49,6 +49,10 @@ export default mergeConfig(
       'import.meta.env.VITE_TINY_EDITOR_ENABLED': JSON.stringify(
         process.env.VITE_TINY_EDITOR_ENABLED || 'false',
       ),
+      // 模拟登录开关：仅前端项目为 true，登录不请求后端接口
+      'import.meta.env.VITE_MOCK_LOGIN_ENABLED': JSON.stringify(
+        process.env.VITE_MOCK_LOGIN_ENABLED || 'false',
+      ),
     },
     plugins: [],
   },
