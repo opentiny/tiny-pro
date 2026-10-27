@@ -23,7 +23,9 @@ export class AuthGuard implements CanActivate {
     private readonly tokenService: TokenService
   ) {}
   async canActivate(ctx: ExecutionContext): Promise<boolean> {
-    const i18n = I18nContext.current<I18nTranslations>();
+    // 传入 ctx 作为兜底：异步上下文丢失时也能从请求对象上取回 i18nContext，
+    // 避免 i18n 为 undefined 直接抛 TypeError
+    const i18n = I18nContext.current<I18nTranslations>(ctx);
     const isPublic = this.reflector.getAllAndOverride('isPublic', [
       ctx.getHandler(),
       ctx.getClass(),
@@ -35,9 +37,7 @@ export class AuthGuard implements CanActivate {
     const token = this.extractTokenFromHeader(req);
     if (!token) {
       throw new HttpException(
-        i18n.t('exception.common.tokenError', {
-          lang: I18nContext.current().lang,
-        }),
+        i18n?.t('exception.common.tokenError') ?? 'Token invalid',
         HttpStatus.UNAUTHORIZED
       );
     }
@@ -55,9 +55,7 @@ export class AuthGuard implements CanActivate {
         );
         if (!isValidApiToken) {
           throw new HttpException(
-            i18n.t('exception.common.tokenExpire', {
-              lang: I18nContext.current().lang,
-            }),
+            i18n?.t('exception.common.tokenExpire') ?? 'Token expire',
             HttpStatus.UNAUTHORIZED
           );
         }
@@ -65,19 +63,18 @@ export class AuthGuard implements CanActivate {
         // 原有的登录token验证逻辑
         if (!await this.tokenService.accessTokenAlive(token)){
           throw new HttpException(
-            i18n.t('exception.common.tokenExpire', {
-              lang: I18nContext.current().lang,
-            }),
+            i18n?.t('exception.common.tokenExpire') ?? 'Token expire',
             HttpStatus.UNAUTHORIZED
           );
         }
       }
       return true;
     } catch (err) {
+      if (err instanceof HttpException) {
+        throw err;
+      }
       throw new HttpException(
-        i18n.t('exception.common.tokenExpire', {
-          lang: I18nContext.current().lang,
-        }),
+        i18n?.t('exception.common.tokenExpire') ?? 'Token expire',
         HttpStatus.UNAUTHORIZED
       );
     }

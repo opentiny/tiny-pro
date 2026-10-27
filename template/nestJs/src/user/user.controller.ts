@@ -60,7 +60,7 @@ export class UserController {
     const _email = email ? email : request.user.email;
     if (!_email) {
       throw new HttpException(
-        i18n.t('exception.common.unauth', { lang: I18nContext.current().lang }),
+        i18n.t('exception.common.unauth', { lang: I18nContext.current()?.lang }),
         HttpStatus.UNAUTHORIZED
       );
     }

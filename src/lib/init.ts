@@ -263,6 +263,10 @@ const createMonorepoRootSync = (answers: ProjectInfo) => {
     start: 'pnpm -C web start',
     build: 'pnpm -C web build',
   };
+  if (serverConfirm) {
+    // 已集成服务端：前端直连后端启动（不走 mock 服务）
+    scripts['dev:vite'] = 'pnpm -C web run dev:vite';
+  }
   if (serverConfirm && serverFramework === ServerFrameworks.NestJs) {
     scripts['dev:backend'] = `pnpm -C ${ServerFrameworks.NestJs} run start:dev`;
   }
@@ -275,7 +279,7 @@ const createMonorepoRootSync = (answers: ProjectInfo) => {
     pnpm: {
       overrides: {
         // tiny-robot-chat 依赖 ^1.30.0；低版本 SDK 的 exports 不支持子路径
-        // 目录导入会导致 vite 预构建失败，锁定已知可用版本保证全新安装可运行
+        // 目录导入会导致 vite 预构建失败
         '@modelcontextprotocol/sdk': '1.32.1',
       },
     },
@@ -450,7 +454,8 @@ const createServerSync = (answers: ProjectInfo) => {
       LLM_BASE_URL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
       LLM_API_KEY: '',
       LLM_MODEL: 'qwen-plus',
-      LLM_EXTRA_BODY: '',
+      // 默认开启联网搜索，否则模型无法回答实时性问题
+      LLM_EXTRA_BODY: '{"enable_search":true}',
     };
     const envStr = objToEnv(config);
     const overwriteDockerComposeConfig = {
@@ -656,6 +661,13 @@ const createProjectSync = (answers: ProjectInfo) => {
       updatedEnvContent = setEnvFlag(updatedEnvContent, feature.envKey, enabled);
     });
 
+    // 仅前端项目开启模拟登录：登录不请求后端接口，直接模拟登录成功
+    updatedEnvContent = setEnvFlag(
+      updatedEnvContent,
+      'VITE_MOCK_LOGIN_ENABLED',
+      !serverConfirm
+    );
+
     fs.writeFileSync(envPath, updatedEnvContent);
     log.success(`低代码设计器环境变量已设置为: ${lowcodeEnabled}`);
   } catch (e) {
@@ -696,7 +708,11 @@ const printNextSteps = (answers: ProjectInfo, prefix: string) => {
   );
   console.log(
     chalk.green(
-      `${chalk.yellow(`$ cd ${name} && pnpm start 或者 npm run start`)}     # 开启web开发环境`
+      `${chalk.yellow(
+        serverConfirm
+          ? `$ cd ${name} && pnpm dev:vite 或者 npm run dev:vite`
+          : `$ cd ${name} && pnpm start 或者 npm run start`
+      )}     # 开启web开发环境`
     )
   );
 
