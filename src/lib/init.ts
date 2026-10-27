@@ -692,7 +692,7 @@ const printNextSteps = (answers: ProjectInfo, prefix: string) => {
         serverConfirm
           ? `$ cd ${name} && pnpm dev:vite 或者 npm run dev:vite`
           : `$ cd ${name} && pnpm start 或者 npm run start`
-      )}     # 开启web开发环境`
+      )}     # 开启web开发环境，${serverConfirm ? '使用前后端模式' : '使用mock模式'}`
     )
   );
 
@@ -703,7 +703,7 @@ const printNextSteps = (answers: ProjectInfo, prefix: string) => {
           serverFramework === ServerFrameworks.SpringBoot
             ? `$ cd ${name}/springboot  # Java工程，参考目录内 Dockerfile / docker-compose.yml / pom.xml 启动`
             : `$ cd ${name} && pnpm dev:backend`
-        )}    # 开启server开发环境`
+        )}    # 开启server开发环境，${serverFramework === ServerFrameworks.SpringBoot ? '请确保已安装Java环境' : '请确保已安装Node.js环境'}，同时需安装且启用MySQL和Redis环境。`
       )
     );
   }
