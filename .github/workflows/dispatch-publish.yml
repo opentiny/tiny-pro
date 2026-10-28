@@ -26,6 +26,9 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     outputs:
       version: ${{ steps.ver.outputs.value }}
     steps:
@@ -91,9 +94,14 @@ jobs:
         run: |
           echo "publish version: ${{ needs.build.outputs.version }}"
           echo "publish tag: ${{ inputs.tag }}"
+      - name: Setup Node for trusted publishing
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install OIDC-capable npm
+        run: npm install --global npm@11.6.0
+
       - name: Publish @opentiny/tiny-toolkit-pro
         run: |
-          echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc
           npm publish --tag ${{ inputs.tag }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
