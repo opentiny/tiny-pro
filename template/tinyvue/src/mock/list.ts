@@ -1,51 +1,30 @@
-import Mock from 'mockjs'
+import type { EmployeeQueryBody, EmployeeRecord } from './employee-query'
 import { successResponseWrap } from '../utils/setup-mock'
+import { createEmployeeList, queryEmployeePage, updateEmployeeRecord } from './employee-query'
 
-const taskList = Mock.mock({
-  'list|60': [
-    {
-      'id': '@id',
-      'name': 'xiaoming',
-      'rank': '初级',
-      'description': '一段描述文字',
-      'createTime': '@datetime',
-      'status|1': ['0', '1', '2'],
-      'type': 'Tiny Design',
-      'roles': '前端',
-      'employeeNo': '00022456',
-      'department': '公共服务',
-      'departmentLevel': '中级',
-      'workbenchName': 'work',
-      'project': 'TinyDesign',
-      'address': '西安研究所',
-      'lastUpdateUser': '张三',
-    },
-  ],
-})
-
-let treeData = []
+const employees: EmployeeRecord[] = createEmployeeList(60)
 
 export default [
-  // list
   {
     url: '/api/employee/getEmployee',
     method: 'post',
-    response: (params: { body: any }) => {
-      const { pageIndex = 1, pageSize = 10 } = JSON.parse(
-        JSON.stringify(params.body),
-      )
-      const index = pageIndex as number
-      const size = pageSize as number
-      const offset = (index - 1) * size
-      const count = index * size
-      treeData = taskList.list.slice(offset, count)
-
-      const data = Mock.mock({
-        total: taskList.list.length,
-        data: treeData,
-      })
-
-      return successResponseWrap(data)
+    response: ({ body }: { body?: EmployeeQueryBody }) => {
+      return successResponseWrap(queryEmployeePage(employees, body ?? {}))
+    },
+  },
+  {
+    url: '/api/employee/getEmployeeInfo',
+    method: 'post',
+    response: ({ body }: { body?: { id?: string } }) => {
+      const employee = employees.find(item => item.id === String(body?.id ?? '')) || null
+      return successResponseWrap(employee)
+    },
+  },
+  {
+    url: '/api/employee/updateEmployeeInfo',
+    method: 'post',
+    response: ({ body }: { body?: { data?: Partial<EmployeeRecord> } }) => {
+      return successResponseWrap(updateEmployeeRecord(employees, body?.data ?? {}))
     },
   },
   {
@@ -53,12 +32,9 @@ export default [
     method: 'delete',
     response: ({ query }: { query: URLSearchParams }) => {
       const id = query.get('id')
-      if (id) {
-        const index = taskList.list.findIndex(item => item.id === id)
-        if (index > -1) {
-          taskList.list.splice(index, 1)
-        }
-      }
+      const index = employees.findIndex(item => item.id === id)
+      if (index > -1)
+        employees.splice(index, 1)
       return successResponseWrap(true)
     },
   },
