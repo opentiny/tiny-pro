@@ -3,5 +3,5 @@ export function resolvePlaywrightWebServerCommand(env = process.env) {
   if (override) {
     return override
   }
-  return env.CI ? 'pnpm dev:full' : 'pnpm start'
+  return env.CI ? 'pnpm dev:full' : 'pnpm start:mock'
 }

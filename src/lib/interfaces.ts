@@ -75,8 +75,9 @@ export const buildCommand = {
 };
 
 export const devCommand = {
+  // 与模板 start:mock 语义保持一致：并行启动 8848 mock 服务与 vite，
   // 仅前端项目无需 mysql/redis，全部走 mock 数据
-  vite: 'cross-env VITE_USE_MOCK=true run-p mock dev:vite',
+  vite: 'cross-env VITE_USE_MOCK=true run-p mock dev',
   webpack: 'webpack-dev-server --progress --config webpack.config.js',
   rspack: 'rspack serve',
   farm: 'farm',
@@ -87,7 +88,6 @@ export const removedCommand = [
   'dev:rp',
   'build:wp',
   'build:rp',
-  'dev',
   'dev:fr',
   'build:fr',
 ];
