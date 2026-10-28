@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 // eslint-disable-next-line test/no-import-node-test
 import test from 'node:test'
 import robot from './robot'
-import { dispatchMockRequest } from './server'
+import { dispatchMockRequest } from './dispatch'
 
 test('POST /api/robot/chat/completions returns an OpenAI-compatible SSE stream', async () => {
   const result = await dispatchMockRequest(robot, {

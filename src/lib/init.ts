@@ -435,7 +435,7 @@ const createServerSync = (answers: ProjectInfo) => {
       LLM_API_KEY: '',
       LLM_MODEL: 'qwen-plus',
       // 默认开启联网搜索，否则模型无法回答实时性问题
-      LLM_EXTRA_BODY: '{"enable_search":true}',
+      LLM_EXTRA_BODY: '{"enable_search":true,"search_options":{"forced_search":true}}',
     };
     const envStr = objToEnv(config);
     const overwriteDockerComposeConfig = {

@@ -75,7 +75,8 @@ export const buildCommand = {
 };
 
 export const devCommand = {
-  vite: 'vite --config ./config/vite.config.dev.ts --port 3031',
+  // 仅前端项目无需 mysql/redis，全部走 mock 数据
+  vite: 'cross-env VITE_USE_MOCK=true run-p mock dev:vite',
   webpack: 'webpack-dev-server --progress --config webpack.config.js',
   rspack: 'rspack serve',
   farm: 'farm',
