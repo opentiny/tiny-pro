@@ -98,8 +98,10 @@ const useUserStore = defineStore('user', {
     async login(loginForm: LoginData) {
       // 仅前端项目（VITE_MOCK_LOGIN_ENABLED=true）：不请求后端接口，模拟登录成功
       if (import.meta.env.VITE_MOCK_LOGIN_ENABLED === 'true') {
-        const accessToken = `mock-access-token:${loginForm.email}`
-        const refreshToken = `mock-refresh-token:${loginForm.email}`
+        // 刻意使用 mock-local-access-token 前缀：服务端 mock 登录签发的是
+        // mock-access-token，登出后会被吊销；本地签发的 token 只在前端 mock 模式使用
+        const accessToken = `mock-local-access-token:${loginForm.email}`
+        const refreshToken = `mock-local-refresh-token:${loginForm.email}`
         this.accessToken = accessToken
         this.refreshToken = refreshToken
         setToken(accessToken)
