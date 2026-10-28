@@ -47,8 +47,8 @@
     }
   },
   "scripts": {
-    "dev": "pnpm -F tiny-pro-vue start",
-    "dev:vite": "pnpm -F tiny-pro-vue dev:vite",
+    "dev": "pnpm -F tiny-pro-vue start:mock",
+    "dev:vite": "pnpm -F tiny-pro-vue dev",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",

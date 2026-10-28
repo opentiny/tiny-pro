@@ -16,7 +16,7 @@ import '@opentiny/icons/style/all.css'
 initializeWebMCPPolyfill()
 
 async function bootstrap() {
-  // 仅静态部署（GitHub Pages）走浏览器内 Mock；本地 pnpm start 仍走 8848 HTTP mock
+  // 仅静态部署（GitHub Pages）走浏览器内 Mock；本地 pnpm start:mock 仍走 8848 HTTP mock
   if (import.meta.env.PROD && import.meta.env.VITE_USE_MOCK === 'true') {
     const { setupBrowserMock } = await import('@/mock/browser')
     setupBrowserMock()

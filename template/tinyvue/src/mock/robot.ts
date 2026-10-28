@@ -1,5 +1,5 @@
-import type { MockMethod } from './server'
-import { mockHttpResponse } from './server'
+import type { MockMethod } from './dispatch'
+import { mockHttpResponse } from './dispatch'
 
 interface ChatMessage {
   role: string
@@ -39,8 +39,8 @@ export default [
       const messages = (body as { messages?: ChatMessage[] })?.messages ?? []
       const question = [...messages].reverse().find(item => item.role === 'user')?.content ?? ''
       const answer = `[Mock 模式] 已收到你的问题：“${question}”。`
-        + '当前为前端 mock 数据：联网搜索等真实能力需要启动 NestJS 后端'
-        + '（pnpm -F tiny-pro-vue dev:full）并在后端 .env 配置 LLM_API_KEY。'
+        + '当前为前端 mock 数据：联网搜索等真实能力需要集成 NestJS 服务端'
+        + '（重新执行 tiny init pro 并选择集成 Nest.js），并在 nestJs/.env 配置 LLM_API_KEY。'
       return mockHttpResponse(200, buildSseStream(answer), {
         'content-type': 'text/event-stream; charset=utf-8',
       })

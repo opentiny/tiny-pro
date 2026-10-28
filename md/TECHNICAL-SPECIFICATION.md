@@ -53,14 +53,14 @@ pnpm test             # build + test:**（lint + 后端单测/覆盖率）
 pnpm test:lint        # tslint 检查 + prettier 校验
 pnpm test:unit        # build + lint + 后端 jest 单测 + 覆盖率
 pnpm test:e2e         # Playwright 测试（自动启动 template/tinyvue 前端）
-pnpm dev              # 启动前端模板,采用mock数据，无需后端数据交互（pnpm -F tiny-pro-vue start，端口 3031）
-pnpm dev:vite         # 启动前端模板，需要后端启动，与后端数据交互（pnpm -F tiny-pro-vue start，端口 3031）
-pnpm dev:backend      # 启动 NestJS 后端模板（需要 MySQL / Redis）
+pnpm dev             # 启动前端模板,采用mock数据，无需后端数据交互（pnpm -F tiny-pro-vue start:mock，端口 3031）
+pnpm dev:vite        # 启动前端模板，需要后端启动，与后端数据交互（pnpm -F tiny-pro-vue dev，端口 3031）
+pnpm dev:backend     # 启动 NestJS 后端模板（需要 MySQL / Redis）
 ```
 
 注意：`package.json` 中配置了 ava（测试 `build/main/**/*.spec.js`），但 `test:unit` 实际跑的是后端 jest；`cov` / `cov:check`（nyc 要求 100% 覆盖）脚本来自脚手架模板，目前并非 CI 实际使用的路径。
 
-前端模板内部命令（`template/tinyvue`）：`pnpm start`（vite 开发，端口 3031，base 路径 `/vue-pro`）、`pnpm build`、`pnpm mock`（tsx 启动独立 mock 服务）、`pnpm lint` / `lint:fix`（eslint 9，@antfu/eslint-config）、stylelint 由 lint-staged 触发。
+前端模板内部命令（`template/tinyvue`）：`pnpm start:mock`（vite + 8848 mock 服务并行，端口 3031，base 路径 `/vue-pro`）、`pnpm dev`（直连后端）、`pnpm build`、`pnpm mock`（tsx 启动独立 mock 服务）、`pnpm lint` / `lint:fix`（eslint 9，@antfu/eslint-config）、stylelint 由 lint-staged 触发。
 
 后端模板内部命令（`template/nestJs`）：`pnpm start` / `start:dev` / `start:prod`（pm2）、`pnpm test`（jest）、`pnpm test:cov`、`pnpm migrate:gen` / `migrate:run`（TypeORM 迁移）。
 
@@ -80,7 +80,7 @@ pnpm dev:backend      # 启动 NestJS 后端模板（需要 MySQL / Redis）
 
 ## 运行与部署架构
 
-- 生成的项目统一为 **pnpm workspace monorepo** 结构：根目录 `package.json`（`private: true`，脚本 `pnpm start` / `pnpm build` / `pnpm dev:backend`）+ `pnpm-workspace.yaml` + `.gitignore`；子包为 `tiny-pro/web`（前端，包名 `<项目名>-web`）+ 可选 `tiny-pro/nestJs`（参与pnpm workspace）或 `tiny-pro/springboot`（Java 工程，不参与pnpm workspace）+ 可选 `tiny-pro/lowcode-designer`（参与pnpm workspace）。不集成服务端时同样生成该结构（仅 `web` 一个 workspace 包）。
+- 生成的项目统一为 **pnpm workspace monorepo** 结构：根目录 `package.json`（`private: true`，脚本：仅前端为 `pnpm start:mock` / `pnpm build`，集成服务端为 `pnpm dev` / `pnpm build` / `pnpm dev:backend`）+ `pnpm-workspace.yaml` + `.gitignore`；子包为 `tiny-pro/web`（前端，包名 `<项目名>-web`）+ 可选 `tiny-pro/nestJs`（参与pnpm workspace）或 `tiny-pro/springboot`（Java 工程，不参与pnpm workspace）+ 可选 `tiny-pro/lowcode-designer`（参与pnpm workspace）。不集成服务端时同样生成该结构（仅 `web` 一个 workspace 包）。
 - 前端开发端口 **3031**，base 路径 `/vue-pro`；后端默认端口 **3000**，提供 `/healthCheck` 健康检查。
 - 后端依赖 **MySQL**（typeorm/sequelize，启动时 `DATABASE_SYNCHRONIZE=true` 自动建表并填充种子数据）和 **Redis**（缓存/登录态）。环境变量从 `.env` 读取，模板提供 `.env.example`。
 - NestJS 后端支持 Docker 启动（`template/nestJs/docker-compose.yml` 包含 MySQL/Redis 服务）；SpringBoot 后端有独立 `Dockerfile` 与 `docker-compose.yml`。

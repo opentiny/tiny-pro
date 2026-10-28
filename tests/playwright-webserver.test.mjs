@@ -3,7 +3,7 @@ import test from 'node:test'
 import { resolvePlaywrightWebServerCommand } from '../playwright-webserver.mjs'
 
 test('local runs keep the mock frontend unless the command is overridden', () => {
-  assert.equal(resolvePlaywrightWebServerCommand({}), 'pnpm start')
+  assert.equal(resolvePlaywrightWebServerCommand({}), 'pnpm start:mock')
 })
 
 test('CI defaults to pnpm dev:full so Docker backend is actually exercised', () => {
@@ -20,8 +20,8 @@ test('PLAYWRIGHT_WEB_SERVER_COMMAND overrides both local and CI defaults', () =>
   assert.equal(
     resolvePlaywrightWebServerCommand({
       CI: 'true',
-      PLAYWRIGHT_WEB_SERVER_COMMAND: 'pnpm start',
+      PLAYWRIGHT_WEB_SERVER_COMMAND: 'pnpm start:mock',
     }),
-    'pnpm start',
+    'pnpm start:mock',
   )
 })

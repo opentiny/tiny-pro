@@ -260,12 +260,14 @@ const createMonorepoRootSync = (answers: ProjectInfo) => {
 
   // 根 package.json 提供一键启动脚本，子包通过目录引用，与包名无关
   const scripts: Record<string, string> = {
-    start: 'pnpm -C web start',
     build: 'pnpm -C web build',
   };
   if (serverConfirm) {
     // 已集成服务端：前端直连后端启动（不走 mock 服务）
-    scripts['dev:vite'] = 'pnpm -C web run dev:vite';
+    scripts.dev = 'pnpm -C web run dev';
+  } else {
+    // 仅前端项目：vite + 8848 mock 服务并行启动，无需 mysql/redis
+    scripts['start:mock'] = 'pnpm -C web run start:mock';
   }
   if (serverConfirm && serverFramework === ServerFrameworks.NestJs) {
     scripts['dev:backend'] = `pnpm -C ${ServerFrameworks.NestJs} run start:dev`;
@@ -455,7 +457,7 @@ const createServerSync = (answers: ProjectInfo) => {
       LLM_API_KEY: '',
       LLM_MODEL: 'qwen-plus',
       // 默认开启联网搜索，否则模型无法回答实时性问题
-      LLM_EXTRA_BODY: '{"enable_search":true}',
+      LLM_EXTRA_BODY: '{"enable_search":true,"search_options":{"forced_search":true}}',
     };
     const envStr = objToEnv(config);
     const overwriteDockerComposeConfig = {
@@ -555,7 +557,7 @@ const packageJsonProcess = (
   };
   const replaceDevCommand = () => {
     const command = devCommand[buildTool];
-    replaceScript('start', command);
+    replaceScript('start:mock', command);
   };
   const remove = () => {
     const removedPaths = buildConfigs[buildTool];
@@ -710,9 +712,9 @@ const printNextSteps = (answers: ProjectInfo, prefix: string) => {
     chalk.green(
       `${chalk.yellow(
         serverConfirm
-          ? `$ cd ${name} && pnpm dev:vite 或者 npm run dev:vite`
-          : `$ cd ${name} && pnpm start 或者 npm run start`
-      )}     # 开启web开发环境`
+          ? `$ cd ${name} && pnpm dev 或者 npm run dev`
+          : `$ cd ${name} && pnpm start:mock 或者 npm run start:mock`
+      )}     # 开启web开发环境，${serverConfirm ? '使用前后端模式' : '使用mock模式'}`
     )
   );
 
@@ -723,7 +725,7 @@ const printNextSteps = (answers: ProjectInfo, prefix: string) => {
           serverFramework === ServerFrameworks.SpringBoot
             ? `$ cd ${name}/springboot  # Java工程，参考目录内 Dockerfile / docker-compose.yml / pom.xml 启动`
             : `$ cd ${name} && pnpm dev:backend`
-        )}    # 开启server开发环境`
+        )}    # 开启server开发环境，${serverFramework === ServerFrameworks.SpringBoot ? '请确保已安装Java环境' : '请确保已安装Node.js环境'}，同时需安装且启用MySQL和Redis环境。`
       )
     );
   }
