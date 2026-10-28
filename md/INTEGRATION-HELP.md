@@ -20,6 +20,7 @@ tiny init pro
   │
   ├─ 配置改写 ── src/lib/init.ts createProjectSync()
   │     按选择把 dev.env 中 VITE_TINY_ROBOT_ENABLED / VITE_TINY_EDITOR_ENABLED 改写为 true / false
+  │     （dev.env 模板默认均为 true，不勾选时改写为 false）
   │
   └─ 模板全量复制（template/tinyvue）── 功能代码始终在模板中，
         由环境变量开关控制显隐
@@ -170,7 +171,13 @@ export const modelProviders: ChatProviderConfig[] = [
 
 ### 2.6 ⚠️ dev.env 不会自动注入 import.meta.env
 
-**本项目最大的坑**：Vite 只自动加载项目根目录的 `.env` 文件；`dev.env` 仅被 `vite.config.dev.ts` 中的 `configDotenv` 读取（用于 proxy 配置和显式 `define`）。因此**所有新加的 `VITE_*` 变量必须在 `config/vite.config.dev.ts` 和 `vite.config.prod.ts` 的 `define` 中显式注入**，否则前端读到 `undefined`：
+**本项目最大的坑**：Vite 只自动加载项目根目录的 `.env` 文件；`dev.env` 需要通过 `configDotenv` 显式读取。目前 `config/vite.config.dev.ts` 和 `config/vite.config.prod.ts` **均已**在开头加载 `dev.env`（prod 不加载会导致 CI 构建时开关取不到值、回退为 false——Robot/Editor 被编译排除）：
+
+```ts
+configDotenv({ path: resolve(__dirname, '../dev.env') })
+```
+
+注入链：`dev.env`（两开关模板默认均为 `true`）→ `configDotenv` 写入 `process.env` → 各 config 的 `define` 显式注入 `import.meta.env`；CI 环境变量显式设置时优先（dotenv 不覆盖已有变量），`|| 'false'` 兜底仅在变量完全缺失时生效：
 
 ```ts
 define: {

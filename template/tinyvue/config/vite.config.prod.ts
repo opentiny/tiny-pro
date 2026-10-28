@@ -1,8 +1,16 @@
+import { resolve } from 'node:path'
 import process from 'node:process'
+import { configDotenv } from 'dotenv'
 import { mergeConfig } from 'vite'
 import configCompressPlugin from './plugin/compress'
 import configVisualizerPlugin from './plugin/visualizer'
 import baseConfig from './vite.config.base'
+
+// 加载 dev.env 文件（与 vite.config.dev.ts 保持一致），
+// 让仓库内默认的功能开关在 prod 构建时同样生效；CI 通过环境变量显式设置时优先生效
+configDotenv({
+  path: resolve(__dirname, '../dev.env'),
+})
 
 export default mergeConfig(
   {

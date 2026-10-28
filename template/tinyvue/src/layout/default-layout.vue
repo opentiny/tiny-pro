@@ -368,7 +368,7 @@ watch(appStore.$state, (newValue) => {
         </div>
       </div>
     </div>
-    <div class="theme-box" @click="themeVisible">
+    <div v-if="false" class="theme-box" @click="themeVisible">
       <img src="@/assets/images/theme.png">
     </div>
     <div v-if="disTheme">
