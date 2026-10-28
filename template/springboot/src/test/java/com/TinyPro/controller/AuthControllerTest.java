@@ -221,10 +221,12 @@ public class AuthControllerTest {
 
         mockMvc.perform(post(LOGOUT_ENDPOINT)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization" ,"Bearer "+ Contants.TOKEN)
+                        .header("Authorization", "Bearer " + Contants.TOKEN)
                         .content(objectMapper.writeValueAsString(validLogoutDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true));
+
+        verify(authService).logout(Contants.TOKEN);
     }
 
     // 登出无效token场景（无需修改）
@@ -232,7 +234,7 @@ public class AuthControllerTest {
     public void testLogout_InvalidToken() throws Exception {
         mockMvc.perform(post(LOGOUT_ENDPOINT)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization" ,"Bearer "+ Contants.TOKEN)
+                        .header("Authorization", "Bearer " + Contants.TOKEN)
                         .content(objectMapper.writeValueAsString(invalidLogoutDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").exists());

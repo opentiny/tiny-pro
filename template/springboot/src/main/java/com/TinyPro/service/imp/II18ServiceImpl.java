@@ -12,7 +12,6 @@ import com.TinyPro.exception.BusinessException;
 import com.TinyPro.service.II18Service;
 import com.TinyPro.jpa.I18Repository;
 import com.TinyPro.jpa.LangRepository;
-import com.alibaba.fastjson.JSON;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
@@ -45,7 +44,7 @@ public class II18ServiceImpl implements II18Service {
 
     @Override
     @Transactional
-    public ResponseEntity<String> create(CreateI18Dto createI18Dto) {
+    public ResponseEntity<I18Vo> create(CreateI18Dto createI18Dto) {
         Lang lang = langRepository.findById(Long.valueOf(createI18Dto.getLang())).orElseThrow(() -> new BusinessException("exception.lang.notExists", HttpStatus.NOT_FOUND, null));
         // 校验 key + lang 是否已存在
         if (i18Repository.findByKeyAndLang_Id(createI18Dto.getKey(), Long.valueOf(lang.getId())).isPresent()) {
@@ -58,7 +57,13 @@ public class II18ServiceImpl implements II18Service {
         i18.setContent(createI18Dto.getContent());
         I18 save = i18Repository.save(i18);
 
-        return new ResponseEntity<>(JSON.toJSONString(save), HttpStatus.OK);
+        I18Vo result = new I18Vo(
+                save.getId(),
+                save.getKey(),
+                save.getContent(),
+                new LangVo(lang.getId(), lang.getName())
+        );
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @Override
