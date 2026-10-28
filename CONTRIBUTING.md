@@ -45,9 +45,11 @@
 ```bash
 cd template/tinyvue
 
-pnpm i
+pnpm i                # 安装全部 workspace 依赖
+pnpm dev             # 启动前端模板,采用mock数据，无需后端数据交互（pnpm -F tiny-pro-vue start:mock，端口 3031）
+pnpm dev:vite        # 启动前端模板，需要后端启动，与后端数据交互（pnpm -F tiny-pro-vue dev，端口 3031）
+pnpm dev:backend     # 启动 NestJS 后端模板（需要 MySQL / Redis）
 
-pnpm start
 ```
 
 访问链接：[http://localhost:3031/](http://localhost:3031/)，即可查看效果。
