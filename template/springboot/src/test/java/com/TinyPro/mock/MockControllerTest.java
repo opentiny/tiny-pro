@@ -64,6 +64,20 @@ class MockControllerTest {
     }
 
     @Test
+    void employeeMockSupportsDeleteEndpoint() {
+        MockListController controller = new MockListController();
+
+        assertEquals("60", controller.getEmployeeInfo(Map.of("id", "60")).get("id"));
+
+        ApiResponse<Boolean> response = controller.deleteEmployee("60");
+
+        assertEquals("0", response.getCode());
+        assertEquals("", response.getErrMsg());
+        assertTrue(response.getData());
+        assertTrue(controller.getEmployeeInfo(Map.of("id", "60")).isEmpty());
+    }
+
+    @Test
     void userMockContainsAllSetupMonthData() {
         UserDataController controller = new UserDataController();
 
