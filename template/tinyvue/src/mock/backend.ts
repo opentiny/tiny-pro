@@ -104,7 +104,17 @@ export function createBackendMocks(storage: BackendStorage = createDefaultBacken
     if (!token) {
       return undefined
     }
-    return state.tokens.get(token)
+    const email = state.tokens.get(token)
+    if (email) {
+      return email
+    }
+    // 兼容仅前端项目的模拟登录（VITE_MOCK_LOGIN_ENABLED）：前端本地签发
+    // mock-local-access-token:<email>（刻意与服务端 mock-access-token 区分，
+    // 避免登出后仅靠前缀又被认证），按 token 中的邮箱直接认证
+    if (token.startsWith('mock-local-access-token:')) {
+      return token.slice('mock-local-access-token:'.length)
+    }
+    return undefined
   }
 
   return withBackendPersist([
