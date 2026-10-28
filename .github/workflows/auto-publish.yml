@@ -10,6 +10,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: CheckOut Code
         uses: actions/checkout@master
@@ -69,12 +72,14 @@ jobs:
           VERSION="$(node -p "require('./package.json').version")"
           echo "publish version: $VERSION"
           echo "publish tag: ${{ steps.parse_tag.outputs.dist_tag }}"
+      - name: Setup Node for trusted publishing
+        uses: actions/setup-node@v4
+        with:
+          node-version: '>=24.19.0 <25'
+
       - name: Publish @opentiny/tiny-toolkit-pro
         run: |
-          echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc
           npm publish --tag ${{ steps.parse_tag.outputs.dist_tag }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Release
         if: ${{ steps.parse_tag.outputs.dist_tag == 'latest' }}
