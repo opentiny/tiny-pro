@@ -38,7 +38,7 @@ public class UserController {
     }
 
     @GetMapping({"/info", "/info/", "/info/{email}", "/info/{email}/"})
-    public ResponseEntity<UserVo> getUserInfo(HttpServletRequest request, @PathVariable(required = false) String email) {
+    public ResponseEntity<User> getUserInfo(HttpServletRequest request, @PathVariable(required = false) String email) {
         String authHeader = request.getHeader("Authorization");
         String token = extractToken(authHeader);
         Claims claims = jwtUtil.parseJwt(token);
@@ -48,8 +48,7 @@ public class UserController {
         }
 //        判断email是否存在，如果不存在就取request里面的，如果存在就取email
         email = StringUtils.isNotEmpty(email) ? email :JWTemail;
-        User user = userService.getUserInfo(email).getBody();
-        return ResponseEntity.ok(UserVo.fromEntity(user));
+        return userService.getUserInfo(email);
     }
 
     @Reject()
