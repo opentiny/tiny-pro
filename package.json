@@ -41,9 +41,6 @@
       "@opentiny/tiny-engine-setting-styles>@opentiny/vue-renderless": "~3.20.0",
       "@opentiny/tiny-engine-plugin-materials>@opentiny/vue-renderless": "~3.20.0",
       "@opentiny/tiny-engine-plugin-page>@opentiny/vue-renderless": "~3.20.0"
-    },
-    "patchedDependencies": {
-      "quill@2.0.3": "patches/quill@2.0.3.patch"
     }
   },
   "scripts": {

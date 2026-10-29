@@ -14,11 +14,6 @@ overrides:
   '@opentiny/tiny-engine-plugin-materials>@opentiny/vue-renderless': ~3.20.0
   '@opentiny/tiny-engine-plugin-page>@opentiny/vue-renderless': ~3.20.0
 
-patchedDependencies:
-  quill@2.0.3:
-    hash: 74f599cf1e0379c638d82c6e034b4891a6d95b9217bd71f4a08ebdff26e2a22b
-    path: patches/quill@2.0.3.patch
-
 importers:
 
   .:
@@ -451,7 +446,7 @@ importers:
         version: 1.0.7(yjs@13.6.33)
       y-quill:
         specifier: ^1.0.0
-        version: 1.0.0(quill-cursors@4.3.0)(quill@2.0.3(patch_hash=74f599cf1e0379c638d82c6e034b4891a6d95b9217bd71f4a08ebdff26e2a22b))(yjs@13.6.33)
+        version: 1.0.0(quill-cursors@4.3.0)(quill@2.0.3)(yjs@13.6.33)
       y-websocket:
         specifier: ^3.1.0
         version: 3.1.0(yjs@13.6.33)
@@ -19562,20 +19557,20 @@ snapshots:
   '@opentiny/fluent-editor@3.25.12':
     dependencies:
       lodash-es: 4.17.21
-      quill: 2.0.3(patch_hash=74f599cf1e0379c638d82c6e034b4891a6d95b9217bd71f4a08ebdff26e2a22b)
+      quill: 2.0.3
 
   '@opentiny/fluent-editor@3.25.4':
     dependencies:
       lodash-es: 4.17.21
-      quill: 2.0.3(patch_hash=74f599cf1e0379c638d82c6e034b4891a6d95b9217bd71f4a08ebdff26e2a22b)
+      quill: 2.0.3
 
   '@opentiny/fluent-editor@4.1.2':
     dependencies:
-      quill: 2.0.3(patch_hash=74f599cf1e0379c638d82c6e034b4891a6d95b9217bd71f4a08ebdff26e2a22b)
-      quill-easy-color: 0.0.10(quill@2.0.3(patch_hash=74f599cf1e0379c638d82c6e034b4891a6d95b9217bd71f4a08ebdff26e2a22b))
-      quill-i18n: 0.2.0(quill@2.0.3(patch_hash=74f599cf1e0379c638d82c6e034b4891a6d95b9217bd71f4a08ebdff26e2a22b))
-      quill-shortcut-key: 0.2.1(quill@2.0.3(patch_hash=74f599cf1e0379c638d82c6e034b4891a6d95b9217bd71f4a08ebdff26e2a22b))
-      quill-table-up: 3.6.0(quill@2.0.3(patch_hash=74f599cf1e0379c638d82c6e034b4891a6d95b9217bd71f4a08ebdff26e2a22b))
+      quill: 2.0.3
+      quill-easy-color: 0.0.10(quill@2.0.3)
+      quill-i18n: 0.2.0(quill@2.0.3)
+      quill-shortcut-key: 0.2.1(quill@2.0.3)
+      quill-table-up: 3.6.0(quill@2.0.3)
 
   '@opentiny/huicharts@1.0.1': {}
 
@@ -36446,24 +36441,24 @@ snapshots:
       lodash.clonedeep: 4.5.0
       lodash.isequal: 4.5.0
 
-  quill-easy-color@0.0.10(quill@2.0.3(patch_hash=74f599cf1e0379c638d82c6e034b4891a6d95b9217bd71f4a08ebdff26e2a22b)):
+  quill-easy-color@0.0.10(quill@2.0.3):
     dependencies:
-      quill: 2.0.3(patch_hash=74f599cf1e0379c638d82c6e034b4891a6d95b9217bd71f4a08ebdff26e2a22b)
+      quill: 2.0.3
 
-  quill-i18n@0.2.0(quill@2.0.3(patch_hash=74f599cf1e0379c638d82c6e034b4891a6d95b9217bd71f4a08ebdff26e2a22b)):
+  quill-i18n@0.2.0(quill@2.0.3):
     dependencies:
-      quill: 2.0.3(patch_hash=74f599cf1e0379c638d82c6e034b4891a6d95b9217bd71f4a08ebdff26e2a22b)
+      quill: 2.0.3
 
-  quill-shortcut-key@0.2.1(quill@2.0.3(patch_hash=74f599cf1e0379c638d82c6e034b4891a6d95b9217bd71f4a08ebdff26e2a22b)):
+  quill-shortcut-key@0.2.1(quill@2.0.3):
     dependencies:
-      quill: 2.0.3(patch_hash=74f599cf1e0379c638d82c6e034b4891a6d95b9217bd71f4a08ebdff26e2a22b)
+      quill: 2.0.3
 
-  quill-table-up@3.6.0(quill@2.0.3(patch_hash=74f599cf1e0379c638d82c6e034b4891a6d95b9217bd71f4a08ebdff26e2a22b)):
+  quill-table-up@3.6.0(quill@2.0.3):
     dependencies:
       '@floating-ui/dom': 1.8.0
-      quill: 2.0.3(patch_hash=74f599cf1e0379c638d82c6e034b4891a6d95b9217bd71f4a08ebdff26e2a22b)
+      quill: 2.0.3
 
-  quill@2.0.3(patch_hash=74f599cf1e0379c638d82c6e034b4891a6d95b9217bd71f4a08ebdff26e2a22b):
+  quill@2.0.3:
     dependencies:
       eventemitter3: 5.0.1
       lodash-es: 4.17.21
@@ -40054,10 +40049,10 @@ snapshots:
       lib0: 0.2.119
       yjs: 13.6.33
 
-  y-quill@1.0.0(quill-cursors@4.3.0)(quill@2.0.3(patch_hash=74f599cf1e0379c638d82c6e034b4891a6d95b9217bd71f4a08ebdff26e2a22b))(yjs@13.6.33):
+  y-quill@1.0.0(quill-cursors@4.3.0)(quill@2.0.3)(yjs@13.6.33):
     dependencies:
       lib0: 0.2.119
-      quill: 2.0.3(patch_hash=74f599cf1e0379c638d82c6e034b4891a6d95b9217bd71f4a08ebdff26e2a22b)
+      quill: 2.0.3
       quill-cursors: 4.3.0
       y-protocols: 1.0.7(yjs@13.6.33)
       yjs: 13.6.33
