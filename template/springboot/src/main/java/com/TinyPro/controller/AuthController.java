@@ -59,10 +59,9 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<Map<String, Boolean>> logout(
-             @RequestBody LogoutAuthDto logoutAuthDto,
-            HttpServletRequest request
+             @RequestBody @Valid LogoutAuthDto logoutAuthDto
     ) {
-        authService.logout(extractBearerToken(request));
+        authService.logout(logoutAuthDto.getToken());
         return ResponseEntity.ok(Map.of("success", true));
     }
 

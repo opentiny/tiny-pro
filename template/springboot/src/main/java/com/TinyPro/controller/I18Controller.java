@@ -26,7 +26,7 @@ public class I18Controller {
     @Reject
     @PermissionAnnotation("i18n::add")
     @PostMapping("")
-    public ResponseEntity<String> createI18Dto(@Valid @RequestBody CreateI18Dto createI18Dto) {
+    public ResponseEntity<I18Vo> createI18Dto(@Valid @RequestBody CreateI18Dto createI18Dto) {
         return i18Service.create(createI18Dto);
     }
 
@@ -46,7 +46,7 @@ public class I18Controller {
                                                       @RequestParam (required = false)List<Integer> lang,
                                                       @RequestParam(required = false) String key,
                                                       @RequestParam(required = false) String content) {
-        boolean allBool = !(all != null && all != 0);
+        boolean allBool = all != null && all == 1;
         return i18Service.findAll(page, limit, allBool, lang, key, content);
     }
 

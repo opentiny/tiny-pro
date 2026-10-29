@@ -13,7 +13,7 @@ import java.util.Map;
 
 public interface II18Service {
 
-    ResponseEntity<String>  create(CreateI18Dto createI18Dto);
+    ResponseEntity<I18Vo> create(CreateI18Dto createI18Dto);
 
     Map<String, Map<String, String>> getFormat(String lang);
 

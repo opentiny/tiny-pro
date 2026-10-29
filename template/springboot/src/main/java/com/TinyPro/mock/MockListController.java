@@ -150,4 +150,14 @@ public class MockListController {
         }
         return false;
     }
+
+    @DeleteMapping("/delete")
+    public ApiResponse<Boolean> deleteEmployee(
+            @RequestParam(value = "id", required = false) String id
+    ) {
+        if (id != null && !id.isEmpty()) {
+            taskList.removeIf(item -> Objects.equals(String.valueOf(item.get("id")), id));
+        }
+        return ApiResponse.successSimple(true);
+    }
 }
