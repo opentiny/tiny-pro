@@ -117,6 +117,8 @@ public class IUserServiceImpl implements IUserService {
     @Override
     public ResponseEntity<User> getUserInfo(String email) {
         User user = iUserRepository.findByEmail(email).orElseThrow(() -> new BusinessException("exception.common.unauth",HttpStatus.NOT_FOUND,null));
+        user.setSalt(null);
+        user.setPassword(null);
         return ResponseEntity.ok(user);
     }
 

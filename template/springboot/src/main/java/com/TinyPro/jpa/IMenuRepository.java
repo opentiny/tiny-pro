@@ -22,8 +22,8 @@ public interface IMenuRepository extends JpaRepository<Menu, Long> {
     @Query("""
             SELECT m FROM Menu m
             WHERE m.name = :name
-              AND m.order = :menuOrder
-              AND m.menuType = :menuType
+              AND ((m.order = :menuOrder) OR (m.order IS NULL AND :menuOrder IS NULL))
+              AND ((m.menuType = :menuType) OR (m.menuType IS NULL AND :menuType IS NULL))
               AND ((m.parentId = :parentId) OR (m.parentId IS NULL AND :parentId IS NULL))
               AND ((m.path = :path) OR (m.path IS NULL AND :path IS NULL))
               AND ((m.icon = :icon) OR (m.icon IS NULL AND :icon IS NULL))
