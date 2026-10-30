@@ -2,6 +2,7 @@ package com.TinyPro.service.imp;
 
 import com.TinyPro.entity.po.User;
 import com.TinyPro.entity.vo.ApiToken;
+import com.TinyPro.entity.vo.AuthenticatedPrincipal;
 import com.TinyPro.entity.vo.TokenPair;
 import com.TinyPro.exception.BusinessException;
 import com.TinyPro.jpa.IUserRepository;
@@ -134,6 +135,75 @@ class TokenServiceTest {
         assertEquals("user@example.com", claims.get("email"));
         assertEquals("integration", claims.get("tokenId"));
         verify(redisUtil).setApiToken("user@example.com", "integration", apiToken.getToken(), 604800L);
+    }
+
+    @Test
+    void authenticateValidatesApiTokenAndReturnsEmail() {
+        User user = user(7, "user@example.com");
+        ReflectionTestUtils.setField(tokenService, "apiTokenTtlSeconds", 604800L);
+        ApiToken apiToken = tokenService.issueApiToken(user, "integration");
+
+        when(redisUtil.containsApiToken("user@example.com", "integration", apiToken.getToken()))
+                .thenReturn(true);
+
+        AuthenticatedPrincipal principal = tokenService.authenticate(apiToken.getToken());
+
+        assertEquals("user@example.com", principal.getEmail());
+        assertNull(principal.getUserId());
+        assertEquals(AuthenticatedPrincipal.TokenType.API, principal.getTokenType());
+    }
+
+    @Test
+    void authenticateValidatesAccessTokenAndReturnsUserId() {
+        User user = user(7, "user@example.com");
+        TokenPair pair = tokenService.issue(user);
+        Claims claims = jwtUtil.parseJwt(pair.getAccessToken());
+        String accessJti = claims.getId();
+        String sessionId = claims.get("sid", String.class);
+        String refreshJti = claims.get("refreshTokenJti", String.class);
+
+        when(redisUtil.getValue("at:7:" + accessJti)).thenReturn(pair.getAccessToken());
+        when(redisUtil.getValue("session:7:" + sessionId)).thenReturn(accessJti + "|" + refreshJti);
+
+        AuthenticatedPrincipal principal = tokenService.authenticate(pair.getAccessToken());
+
+        assertEquals("user@example.com", principal.getEmail());
+        assertEquals(7, principal.getUserId());
+        assertEquals(AuthenticatedPrincipal.TokenType.ACCESS, principal.getTokenType());
+    }
+
+    @Test
+    void authenticateKeepsLegacyTokenCompatibility() {
+        String legacyToken = jwtUtil.generateJwt("user@example.com", 3600);
+        when(redisUtil.getValue("user:user@example.com:token"))
+                .thenReturn("{\"id\":7,\"email\":\"user@example.com\"}");
+
+        AuthenticatedPrincipal principal = tokenService.authenticate(legacyToken);
+
+        assertEquals("user@example.com", principal.getEmail());
+        assertEquals(7, principal.getUserId());
+        assertEquals(AuthenticatedPrincipal.TokenType.LEGACY, principal.getTokenType());
+    }
+
+    @Test
+    void authenticateRejectsLegacyTokenWhenCachedUserDoesNotMatch() {
+        String legacyToken = jwtUtil.generateJwt("user@example.com", 3600);
+        when(redisUtil.getValue("user:user@example.com:token"))
+                .thenReturn("{\"id\":7,\"email\":\"other@example.com\"}");
+
+        assertThrows(BusinessException.class, () -> tokenService.authenticate(legacyToken));
+    }
+
+    @Test
+    void authenticateRejectsRefreshTokenAsAccessToken() {
+        TokenPair pair = tokenService.issue(user(7, "user@example.com"));
+
+        BusinessException exception = assertThrows(
+                BusinessException.class,
+                () -> tokenService.authenticate(pair.getRefreshToken())
+        );
+
+        assertEquals(401, exception.getHttpStatus().value());
     }
 
     @Test

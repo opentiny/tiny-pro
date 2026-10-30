@@ -1,10 +1,10 @@
 package com.TinyPro.controller;
 
+import com.TinyPro.annotation.PermissionAnnotation;
 import com.TinyPro.entity.dto.CreateApplicationDto;
 import com.TinyPro.entity.dto.ApplicationPaginationQueryDto;
 import com.TinyPro.entity.po.Application;
 import com.TinyPro.entity.vo.ApplicationVo;
-import com.TinyPro.entity.vo.I18Vo;
 import com.TinyPro.service.ApplicationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -41,6 +41,7 @@ public class ApplicationController {
     @ApiResponse(responseCode = "200", description = "创建成功"),
     @ApiResponse(responseCode = "400", description = "应用已存在")
   })
+  @PermissionAnnotation("i18n::query")
   @PostMapping
   public Application createApplication(@Valid @RequestBody CreateApplicationDto dto,
                                        @RequestParam(defaultValue = "false") boolean isInit) {
