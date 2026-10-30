@@ -1,5 +1,9 @@
 -- Align SpringBoot menu uniqueness with the NestJS full-field duplicate check.
 --
+-- This migration is the source of truth for menu identity uniqueness. The JPA
+-- entity intentionally does not declare an equivalent @UniqueConstraint because
+-- the database enforces uniqueness through the generated hash column below.
+--
 -- Do not index string prefixes here. A prefix index can reject two different
 -- menus whose path/component/etc. values share the first 120 characters,
 -- while findByMenuIdentity compares the complete values. Instead, hash the

@@ -435,15 +435,23 @@ public class TokenServiceImpl implements TokenService {
             return;
         }
 
-        withUserLock(user.getId(), () -> {
-            revokeUserSessionsWithoutLock(email, user);
+        revokeUserSessions(email, user.getId());
+    }
+
+    @Override
+    public void revokeUserSessions(String email, Integer userId) {
+        if (StringUtils.isBlank(email) || userId == null) {
+            return;
+        }
+        withUserLock(userId, () -> {
+            revokeUserSessionsWithoutLock(email, userId);
             return null;
         });
     }
 
-    private void revokeUserSessionsWithoutLock(String email, User user) {
+    private void revokeUserSessionsWithoutLock(String email, Integer userId) {
         String legacyKey = Contants.UserJwtTop + email + Contants.UserJwtbt;
-        String uid = String.valueOf(user.getId());
+        String uid = String.valueOf(userId);
         for (String sessionId : redisUtil.range(sessionListKey(uid), 0, -1)) {
             assertLeaseHeld();
             revokeSession(uid, sessionId);

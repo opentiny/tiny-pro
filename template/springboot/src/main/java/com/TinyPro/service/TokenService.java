@@ -32,4 +32,6 @@ public interface TokenService {
     void logout(String accessToken);
 
     void revokeUserSessions(String email);
+
+    void revokeUserSessions(String email, Integer userId);
 }

@@ -180,21 +180,31 @@ public class ChatServiceImpl implements IChatService {
         }
         long now = System.currentTimeMillis();
         long windowStart = now - Duration.ofMinutes(1).toMillis();
-        Deque<Long> window = requestWindows.computeIfAbsent(userEmail, k -> new ArrayDeque<>());
-        synchronized (window) {
-            while (!window.isEmpty() && window.peekFirst() < windowStart) {
-                window.pollFirst();
+        requestWindows.compute(userEmail, (key, window) -> {
+            if (window == null) {
+                window = new ArrayDeque<>();
             }
+            evictExpired(window, windowStart);
             if (window.size() >= rateLimitPerMinute) {
                 logger.warn("用户对话请求触发限流: user={} limit={}/min", userEmail, rateLimitPerMinute);
                 throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS,
                         "对话请求过于频繁，请稍后再试");
             }
             window.addLast(now);
-        }
-        // 清理已无请求记录的用户，防止 map 无限膨胀
+            return window;
+        });
+
         if (requestWindows.size() > 1024) {
-            requestWindows.entrySet().removeIf(entry -> entry.getValue().isEmpty());
+            requestWindows.keySet().forEach(key -> requestWindows.computeIfPresent(key, (user, window) -> {
+                evictExpired(window, windowStart);
+                return window.isEmpty() ? null : window;
+            }));
+        }
+    }
+
+    private void evictExpired(Deque<Long> window, long windowStart) {
+        while (!window.isEmpty() && window.peekFirst() < windowStart) {
+            window.pollFirst();
         }
     }
 

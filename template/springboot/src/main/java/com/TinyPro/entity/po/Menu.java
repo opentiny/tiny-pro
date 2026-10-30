@@ -12,18 +12,12 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import java.io.Serializable;
 
-
+/**
+ * Menu identity uniqueness is managed by Flyway migration
+ * V2__align_menu_identity.sql through the generated _menu_identity_hash column.
+ */
 @Entity
-@Table(
-        name = "menu",
-        uniqueConstraints = @UniqueConstraint(
-                name = "uk_menu_identity",
-                columnNames = {
-                        "name", "order", "menuType", "parentId",
-                        "path", "icon", "component", "locale"
-                }
-        )
-)
+@Table(name = "menu")
 @Data
 @DynamicUpdate
 public class Menu implements Serializable {

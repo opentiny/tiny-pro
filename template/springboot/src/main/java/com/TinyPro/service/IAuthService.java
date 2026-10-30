@@ -18,6 +18,8 @@ public interface IAuthService {
 
     void revokeUserSessions(String email);
 
+    void revokeUserSessions(String email, Integer userId);
+
     ApiToken generateApiToken(CreateApiTokenDto dto);
 
     void revokeApiToken(RevokeApiTokenDto dto, String requesterEmail);

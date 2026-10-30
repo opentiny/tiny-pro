@@ -53,6 +53,11 @@ public class AuthServiceImpl implements IAuthService {
     }
 
     @Override
+    public void revokeUserSessions(String email, Integer userId) {
+        tokenService.revokeUserSessions(email, userId);
+    }
+
+    @Override
     public ApiToken generateApiToken(CreateApiTokenDto dto) {
         User user = userService.findByEmail(dto.getEmail())
                 .orElseThrow(() -> new BusinessException("exception.auth.userNotExists", HttpStatus.NOT_FOUND, null));

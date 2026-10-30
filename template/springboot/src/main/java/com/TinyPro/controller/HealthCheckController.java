@@ -36,7 +36,7 @@ public class HealthCheckController {
 
     @IsPublic
     @GetMapping
-    @Operation(summary = "健康检查", description = "检查应用、MySQL 和 Redis 是否可用")
+    @Operation(summary = "健康检查", description = "检查应用、MySQL 和 Redis 是否可用,仅用于readiness探针")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "服务正常，返回 success"),
             @ApiResponse(responseCode = "503", description = "MySQL 或 Redis 不可用")
