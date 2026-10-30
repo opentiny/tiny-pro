@@ -92,7 +92,7 @@ export class AuthService {
     if (userInfo === null) {
       throw new HttpException(
         this.i18n.translate('exception.auth.userNotExists', {
-          lang: I18nContext.current().lang,
+          lang: I18nContext.current()?.lang,
         }),
         HttpStatus.NOT_FOUND
       );
@@ -101,7 +101,7 @@ export class AuthService {
     if (encry(password, userInfo.salt) !== userInfo.password) {
       throw new HttpException(
         this.i18n.translate('exception.auth.passwordOrEmailError', {
-          lang: I18nContext.current().lang,
+          lang: I18nContext.current()?.lang,
         }),
         HttpStatus.BAD_REQUEST
       );
@@ -122,7 +122,7 @@ export class AuthService {
     if (userInfo === null) {
       throw new HttpException(
         this.i18n.translate('exception.auth.userNotExists', {
-          lang: I18nContext.current().lang,
+          lang: I18nContext.current()?.lang,
         }),
         HttpStatus.NOT_FOUND
       );
@@ -131,7 +131,7 @@ export class AuthService {
     if (encry(password, userInfo.salt) !== userInfo.password) {
       throw new HttpException(
         this.i18n.translate('exception.auth.passwordOrEmailError', {
-          lang: I18nContext.current().lang,
+          lang: I18nContext.current()?.lang,
         }),
         HttpStatus.BAD_REQUEST
       );

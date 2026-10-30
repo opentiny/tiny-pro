@@ -16,7 +16,7 @@ import {
   useRouter,
 } from 'vue-router'
 import useLoading from '@/hooks/loading'
-import { toRoutes } from '@/router/guard/menu'
+import { registerHiddenSubRoutes, toRoutes } from '@/router/guard/menu'
 import { useUserStore } from '@/store'
 import { useLocales } from '@/store/modules/locales'
 import { useMenuStore } from '@/store/modules/router'
@@ -79,18 +79,30 @@ function handleSubmit() {
         status: 'success',
       })
 
-      await localeStore.fetchLocalTable()
-      const entries = Object.entries(localeStore.localTable)
-      for (let i = 0; i < entries.length; i += 1) {
-        const key = entries[i][0]
-        const messages = entries[i][1]
-        mergeLocaleMessage(key, messages)
+      try {
+        await localeStore.fetchLocalTable()
+        const entries = Object.entries(localeStore.localTable)
+        for (let i = 0; i < entries.length; i += 1) {
+          const key = entries[i][0]
+          const messages = entries[i][1]
+          mergeLocaleMessage(key, messages)
+        }
+        localeStore.$patch({
+          shouldMerge: false,
+        })
       }
-      localeStore.$patch({
-        shouldMerge: false,
-      })
+      catch (e) {
+        // 模拟登录或后端不可用时忽略，使用前端内置语言包
+        if (import.meta.env.DEV) console.warn('[mock-login] 语言包拉取失败，使用内置词条', e)
+      }
 
-      await menuStore.getMenuList()
+      try {
+        await menuStore.getMenuList()
+      }
+      catch (e) {
+        // 模拟登录或后端不可用时忽略，仅使用静态路由
+        if (import.meta.env.DEV) console.warn('[mock-login] 菜单拉取失败，仅使用静态路由', e)
+      }
       const routes = toRoutes(menuStore.menuList)
 
       routes.forEach((route) => {
@@ -98,6 +110,7 @@ function handleSubmit() {
           router.addRoute('root', route)
         }
       })
+      registerHiddenSubRoutes(router)
 
       const route = router.currentRoute
       const { redirect } = route.value.query

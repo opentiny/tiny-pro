@@ -75,6 +75,15 @@
         "icon": "",
         "menuType": "normal",
         "locale": "menu.form.step"
+      },
+      {
+        "label": "Editor",
+        "children": [],
+        "url": "editor",
+        "component": "form/editor/index",
+        "icon": "",
+        "menuType": "normal",
+        "locale": "menu.form.editor"
       }
     ],
     "url": "form",

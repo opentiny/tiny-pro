@@ -35,7 +35,7 @@ export class RoleService {
     if (await roleInfo) {
       throw new HttpException(
         this.i18n.t('exception.role.exists', {
-          lang: I18nContext.current().lang,
+          lang: I18nContext.current()?.lang,
         }),
         HttpStatus.BAD_REQUEST
       );
@@ -92,7 +92,7 @@ export class RoleService {
     if (!roleInfo) {
       throw new HttpException(
         this.i18n.t('exception.role.notExists', {
-          lang: I18nContext.current().lang,
+          lang: I18nContext.current()?.lang,
         }),
         HttpStatus.NOT_FOUND
       );
@@ -120,7 +120,7 @@ export class RoleService {
     if (roleInfo.length === 0) {
       throw new HttpException(
         this.i18n.t('exception.role.notExists', {
-          lang: I18nContext.current().lang,
+          lang: I18nContext.current()?.lang,
         }),
         HttpStatus.BAD_REQUEST
       );
@@ -152,7 +152,7 @@ export class RoleService {
     if (user.length) {
       throw new HttpException(
         this.i18n.t('exception.role.conflict', {
-          lang: I18nContext.current().lang,
+          lang: I18nContext.current()?.lang,
         }),
         HttpStatus.CONFLICT
       );

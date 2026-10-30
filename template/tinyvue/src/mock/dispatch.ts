@@ -23,17 +23,19 @@ export interface MockMethod {
 export interface MockDispatchResult {
   body: unknown
   statusCode: number
+  headers?: MockHeaders
 }
 
 class MockHttpResponse {
   constructor(
     readonly statusCode: number,
     readonly body: unknown,
+    readonly headers?: MockHeaders,
   ) {}
 }
 
-export function mockHttpResponse(statusCode: number, body: unknown) {
-  return new MockHttpResponse(statusCode, body)
+export function mockHttpResponse(statusCode: number, body: unknown, headers?: MockHeaders) {
+  return new MockHttpResponse(statusCode, body, headers)
 }
 
 function matchPath(pattern: string, pathname: string) {
@@ -86,7 +88,7 @@ export async function dispatchMockRequest(
       query: url.searchParams,
     })
     if (body instanceof MockHttpResponse) {
-      return { body: body.body, statusCode: body.statusCode }
+      return { body: body.body, statusCode: body.statusCode, headers: body.headers }
     }
     return { body, statusCode: 200 }
   }

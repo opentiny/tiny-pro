@@ -19,7 +19,7 @@ npm i
 `npm start` 会同时启动 Mock 服务和前端开发服务，无需单独启动后端即可访问。
 
 ```bash
-npm start
+npm run start:mock
 ```
 
 启动成功后访问：[http://localhost:3031/](http://localhost:3031/)

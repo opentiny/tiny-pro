@@ -21,7 +21,7 @@ export class I18LangService {
     if (item) {
       throw new HttpException(
         this.i18n.t('exception.lang.exists', {
-          lang: I18nContext.current().lang,
+          lang: I18nContext.current()?.lang,
           args: {
             name,
           },
@@ -41,7 +41,7 @@ export class I18LangService {
     if (!item) {
       throw new HttpException(
         this.i18n.t('exception.lang.notExistsCommon', {
-          lang: I18nContext.current().lang,
+          lang: I18nContext.current()?.lang,
         }),
         HttpStatus.NOT_FOUND
       );
@@ -54,7 +54,7 @@ export class I18LangService {
     if (!item) {
       throw new HttpException(
         this.i18n.t('exception.lang.notExistsCommon', {
-          lang: I18nContext.current().lang,
+          lang: I18nContext.current()?.lang,
         }),
         HttpStatus.NOT_FOUND
       );
@@ -63,7 +63,7 @@ export class I18LangService {
     if (i18Record) {
       throw new HttpException(
         this.i18n.t('exception.lang.DELETE_LANG_CONFLICT', {
-          lang: I18nContext.current().lang,
+          lang: I18nContext.current()?.lang,
           args: {
             name: item.name,
           },

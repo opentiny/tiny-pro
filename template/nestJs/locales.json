@@ -688,7 +688,10 @@
     "locale.remove": "Remove",
     "locale.batchRemove": "Batch Remove",
     "component.error": "Component Error",
-    "component.error.contact": "Please contact the administrator or log in again"
+    "component.error.contact": "Please contact the administrator or log in again",
+    "menu.form.editor": "Rich Text",
+    "menu.form.editor.create": "Start Creating",
+    "menu.form.editor.collaboration": "Collaborative Editing"
   },
   "zhCN": {
     "en-US": "English",
@@ -1380,6 +1383,9 @@
     "locale.remove": "删除",
     "locale.batchRemove": "批量删除",
     "component.error": "组件错误",
-    "component.error.contact": "请联系管理员或重新登录"
+    "component.error.contact": "请联系管理员或重新登录",
+    "menu.form.editor": "富文本文档",
+    "menu.form.editor.create": "内容创作",
+    "menu.form.editor.collaboration": "多人协同"
   }
 }
