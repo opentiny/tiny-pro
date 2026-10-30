@@ -28,6 +28,7 @@ public class User {
     private String name;
     @Column(nullable = false, unique = true)
     private String email;
+    @JsonIgnore
     private String password;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -59,6 +60,7 @@ public class User {
 
     /* 密码盐 */
     @Column(name = "salt", length = 64)
+    @JsonIgnore
     private String salt;
 
     /* 加密钩子 */
