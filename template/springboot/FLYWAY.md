@@ -37,6 +37,8 @@ flyway validate \
 
 The baseline records the existing schema as version `1`; it does not execute `V1__init_schema.sql`. Subsequent application startup can then apply `V2` and `V3`. `V2` aligns the menu identity index, while `V3` creates the application table when needed, normalizes application timestamp columns, and handles the legacy `I18` table-name casing. These migrations do not repair an arbitrary incomplete schema.
 
+Note that an existing database baselined at version `1` does not automatically receive the other constraints declared by `V1`, including `uk_permission_name`, `uk_role_name`, `uk_lang_name`, `uk_user_email`, and `uk_i18_lang_key`. A newly created database gets these constraints from `V1`, so the new-database and baselined-database schemas can differ in this respect. This is intentional for the current migration flow and is not fixed by `V2` or `V3`; adding the missing constraints requires a separate migration after checking and resolving any existing duplicate data.
+
 Keep `FLYWAY_BASELINE_ON_MIGRATE=false` during the CLI baseline flow. The production rollout order is:
 
 1. Verify the existing schema and back up the database.
