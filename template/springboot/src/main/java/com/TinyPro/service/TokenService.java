@@ -2,6 +2,7 @@ package com.TinyPro.service;
 
 import com.TinyPro.entity.po.User;
 import com.TinyPro.entity.vo.ApiToken;
+import com.TinyPro.entity.vo.AuthenticatedPrincipal;
 import com.TinyPro.entity.vo.TokenPair;
 import io.jsonwebtoken.Claims;
 
@@ -10,6 +11,11 @@ public interface TokenService {
     TokenPair issue(User user);
 
     ApiToken issueApiToken(User user, String tokenName);
+
+    /**
+     * Parses and validates an access, API, or legacy token and returns its identity.
+     */
+    AuthenticatedPrincipal authenticate(String token);
 
     boolean isApiTokenActive(String token, Claims claims);
 

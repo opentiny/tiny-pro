@@ -1,17 +1,11 @@
 package com.TinyPro.filter;
 
 import com.TinyPro.annotation.IsPublic;
-import com.TinyPro.entity.contants.Contants;
-import com.TinyPro.entity.po.User;
+import com.TinyPro.entity.vo.AuthenticatedPrincipal;
 import com.TinyPro.exception.BusinessException;
-import com.TinyPro.redis.RedisUtil;
 import com.TinyPro.service.TokenService;
-import com.TinyPro.utils.JwtUtil;
-import com.alibaba.fastjson.JSON;
-import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -21,10 +15,6 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @Component
 public class UserGuardsFilter implements HandlerInterceptor {
 
-    @Autowired
-    private RedisUtil redisUtil;
-    @Autowired
-    private JwtUtil jwtUtil;
     @Autowired
     private TokenService tokenService;
 
@@ -54,37 +44,8 @@ public class UserGuardsFilter implements HandlerInterceptor {
                 throw new BusinessException("exception.common.tokenError", HttpStatus.UNAUTHORIZED, null);
             }
 
-            Claims claims = jwtUtil.parseJwt(token);
-            String email = claims.get("email", String.class);
-
-            if ("api".equals(claims.get("type", String.class))) {
-                if (!tokenService.validateApiToken(
-                        email,
-                        claims.get("tokenId", String.class),
-                        token
-                )) {
-                    throw new BusinessException("exception.common.tokenExpire", HttpStatus.UNAUTHORIZED, null);
-                }
-                return true;
-            }
-
-            if (claims.get("id") != null && claims.getId() != null) {
-                if (!tokenService.isAccessTokenActive(token)) {
-                    throw new BusinessException("exception.common.tokenExpire", HttpStatus.UNAUTHORIZED, null);
-                }
-                return true;
-            }
-
-            String key = Contants.UserJwtTop + email + Contants.UserJwtbt;
-            String cached = redisUtil.getValue(key);
-
-            if (StringUtils.isBlank(cached)) {
-                throw new BusinessException("exception.common.tokenError", HttpStatus.UNAUTHORIZED, null);
-            }
-            User user = JSON.parseObject(cached, User.class);
-            if (user == null || !email.equals(user.getEmail())) {
-                throw new BusinessException("exception.common.tokenError", HttpStatus.UNAUTHORIZED, null);
-            }
+            AuthenticatedPrincipal principal = tokenService.authenticate(token);
+            request.setAttribute(AuthenticatedPrincipal.REQUEST_ATTRIBUTE, principal);
             return true;
         } catch (BusinessException businessException) {
             // Preserve the specific token error and HTTP status for the client.

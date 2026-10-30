@@ -3,6 +3,7 @@ package com.TinyPro.service.imp;
 import com.TinyPro.entity.contants.Contants;
 import com.TinyPro.entity.po.User;
 import com.TinyPro.entity.vo.ApiToken;
+import com.TinyPro.entity.vo.AuthenticatedPrincipal;
 import com.TinyPro.entity.vo.TokenPair;
 import com.TinyPro.exception.BusinessException;
 import com.TinyPro.jpa.IUserRepository;
@@ -76,6 +77,40 @@ public class TokenServiceImpl implements TokenService {
         return new ApiToken(token, tokenId, apiTokenTtlSeconds);
     }
 
+    @Override
+    public AuthenticatedPrincipal authenticate(String token) {
+        Claims claims = parseAuthenticationToken(token);
+        String email = claims.get("email", String.class);
+        if (StringUtils.isBlank(email)) {
+            throw tokenError();
+        }
+
+        if ("api".equals(claims.get("type", String.class))) {
+            String tokenId = claims.get("tokenId", String.class);
+            if (!validateApiToken(email, tokenId, token)) {
+                throw expiredError();
+            }
+            return new AuthenticatedPrincipal(
+                    email,
+                    null,
+                    AuthenticatedPrincipal.TokenType.API
+            );
+        }
+
+        if (claims.get("id") != null && claims.getId() != null) {
+            if (!isAccessTokenActive(token)) {
+                throw expiredError();
+            }
+            return new AuthenticatedPrincipal(
+                    email,
+                    userId(claims),
+                    AuthenticatedPrincipal.TokenType.ACCESS
+            );
+        }
+
+        return authenticateLegacy(email);
+    }
+
     public boolean isApiTokenActive(String token, Claims claims) {
         if (!"api".equals(claims.get("type", String.class))) {
             return false;
@@ -84,6 +119,29 @@ public class TokenServiceImpl implements TokenService {
         String tokenId = claims.get("tokenId", String.class);
         return StringUtils.isNotBlank(email)
                 && validateApiToken(email, tokenId, token);
+    }
+
+    private AuthenticatedPrincipal authenticateLegacy(String email) {
+        String cached = redisUtil.getValue(Contants.UserJwtTop + email + Contants.UserJwtbt);
+        if (StringUtils.isBlank(cached)) {
+            throw tokenError();
+        }
+
+        try {
+            User user = JSON.parseObject(cached, User.class);
+            if (user == null || !email.equals(user.getEmail())) {
+                throw tokenError();
+            }
+            return new AuthenticatedPrincipal(
+                    email,
+                    user.getId(),
+                    AuthenticatedPrincipal.TokenType.LEGACY
+            );
+        } catch (BusinessException ex) {
+            throw ex;
+        } catch (RuntimeException ex) {
+            throw tokenError();
+        }
     }
 
     /**
@@ -454,6 +512,19 @@ public class TokenServiceImpl implements TokenService {
             throw ex;
         } catch (RuntimeException ex) {
             throw expiredError();
+        }
+    }
+
+    private Claims parseAuthenticationToken(String token) {
+        if (StringUtils.isBlank(token)) {
+            throw tokenError();
+        }
+        try {
+            return jwtUtil.parseJwt(token);
+        } catch (BusinessException ex) {
+            throw ex;
+        } catch (RuntimeException ex) {
+            throw tokenError();
         }
     }
 
