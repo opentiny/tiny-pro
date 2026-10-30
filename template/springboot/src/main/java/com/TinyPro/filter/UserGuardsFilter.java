@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 @Component
@@ -50,6 +51,9 @@ public class UserGuardsFilter implements HandlerInterceptor {
         } catch (BusinessException businessException) {
             // Preserve the specific token error and HTTP status for the client.
             throw businessException;
+        } catch (ResponseStatusException statusException) {
+            // Preserve infrastructure failures such as Redis 503 responses.
+            throw statusException;
         } catch (Exception e) {
             throw new BusinessException("exception.common.tokenError", HttpStatus.UNAUTHORIZED, null);
         }

@@ -14,30 +14,35 @@ import com.TinyPro.utils.JwtUtil;
 import com.alibaba.fastjson.JSON;
 import io.jsonwebtoken.Claims;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.util.*;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 
 @Service
 public class TokenServiceImpl implements TokenService {
+
+    private static final Logger logger = LoggerFactory.getLogger(TokenServiceImpl.class);
 
     private static final String ACCESS_PREFIX = "at:";
     private static final String REFRESH_PREFIX = "rt:";
     private static final String SESSION_PREFIX = "session:";
     private static final String USED_REFRESH_PREFIX = "used:rt:";
     private static final String SESSION_LIST_SUFFIX = ":sessions";
+    private static final Pattern API_TOKEN_NAME_PATTERN =
+            Pattern.compile("^(?!ids$)[A-Za-z0-9][A-Za-z0-9_-]{0,63}$");
 
     private final JwtUtil jwtUtil;
     private final RedisUtil redisUtil;
     private final IUserRepository userRepository;
-
-    @Autowired
-    private RedisLockService redisLockService;
+    private final RedisLockService redisLockService;
 
     @Value("${auth.access-token-ttl-seconds:7200}")
     private long accessTokenTtlSeconds;
@@ -51,10 +56,15 @@ public class TokenServiceImpl implements TokenService {
     @Value("${auth.device-limit:-1}")
     private long deviceLimit;
 
-    public TokenServiceImpl(JwtUtil jwtUtil, RedisUtil redisUtil, IUserRepository userRepository) {
+    public TokenServiceImpl(
+            JwtUtil jwtUtil,
+            RedisUtil redisUtil,
+            IUserRepository userRepository,
+            RedisLockService redisLockService) {
         this.jwtUtil = jwtUtil;
         this.redisUtil = redisUtil;
         this.userRepository = userRepository;
+        this.redisLockService = redisLockService;
     }
 
     public TokenPair issue(User user) {
@@ -64,6 +74,12 @@ public class TokenServiceImpl implements TokenService {
     public ApiToken issueApiToken(User user, String tokenName) {
         if (apiTokenTtlSeconds <= 0) {
             throw new IllegalStateException("API token TTL must be positive");
+        }
+        if (tokenName != null && !tokenName.isBlank()
+                && !API_TOKEN_NAME_PATTERN.matcher(tokenName).matches()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "tokenName must use letters, numbers, '-' or '_' and cannot be 'ids'");
         }
 
         String tokenId = StringUtils.defaultIfBlank(tokenName,
@@ -367,28 +383,35 @@ public class TokenServiceImpl implements TokenService {
     }
 
     public boolean isAccessTokenActive(String accessToken) {
+        Claims claims = parseToken(accessToken);
+        String type = claims.get("typ", String.class);
+        if ((type != null && !"access".equals(type))
+                || claims.get("refreshTokenJti") == null) {
+            return false;
+        }
+
+        int userId = userId(claims);
+        String accessJti = requiredClaim(claims, "jti");
+        String refreshJti = requiredClaim(claims, "refreshTokenJti");
+        String sessionId = StringUtils.defaultIfBlank(claims.get("sid", String.class), accessJti);
+        String uid = String.valueOf(userId);
         try {
-            Claims claims = parseToken(accessToken);
-            String type = claims.get("typ", String.class);
-            if ((type != null && !"access".equals(type))
-                    || claims.get("refreshTokenJti") == null) {
-                return false;
-            }
-            int userId = userId(claims);
-            String accessJti = requiredClaim(claims, "jti");
-            String sessionId = StringUtils.defaultIfBlank(claims.get("sid", String.class), accessJti);
-            String storedToken = redisUtil.getValue(accessKey(String.valueOf(userId), accessJti));
-            String sessionValue = redisUtil.getValue(sessionKey(String.valueOf(userId), sessionId));
+            String storedToken = redisUtil.getValue(accessKey(uid, accessJti));
+            String sessionValue = redisUtil.getValue(sessionKey(uid, sessionId));
             if (!accessToken.equals(storedToken)) {
                 return false;
             }
             if (sessionContainsAccess(sessionValue, accessJti)) {
                 return true;
             }
-            String refreshJti = requiredClaim(claims, "refreshTokenJti");
-            return StringUtils.isNotBlank(redisUtil.getValue(refreshKey(String.valueOf(userId), refreshJti)));
+            return StringUtils.isNotBlank(redisUtil.getValue(refreshKey(uid, refreshJti)));
         } catch (RuntimeException ex) {
-            return false;
+            logger.warn("Redis error while validating access token", ex);
+            throw new ResponseStatusException(
+                    HttpStatus.SERVICE_UNAVAILABLE,
+                    "认证服务暂时不可用，请稍后重试",
+                    ex
+            );
         }
     }
 
@@ -422,6 +445,7 @@ public class TokenServiceImpl implements TokenService {
         User user = userRepository.findByEmail(email).orElse(null);
         if (user == null || user.getId() == null) {
             redisUtil.deleteValue(legacyKey);
+            redisUtil.deleteAllApiTokens(email);
             return;
         }
 
@@ -462,6 +486,8 @@ public class TokenServiceImpl implements TokenService {
         redisUtil.deleteValue("user:" + uid + ":rt");
         assertLeaseHeld();
         redisUtil.deleteValue(legacyKey);
+        assertLeaseHeld();
+        redisUtil.deleteAllApiTokens(email);
     }
 
     public void revokeSession(String uid, String sessionId) {
@@ -583,16 +609,11 @@ public class TokenServiceImpl implements TokenService {
     }
 
     private <T> T withUserLock(int userId, Supplier<T> action) {
-        if (redisLockService == null) {
-            return action.get();
-        }
         return redisLockService.execute("user-token:" + userId, action);
     }
 
     private void assertLeaseHeld() {
-        if (redisLockService != null) {
-            redisLockService.assertLeaseHeld();
-        }
+        redisLockService.assertLeaseHeld();
     }
 
     private void validateTtl(long accessTtlMillis, long refreshTtlMillis) {

@@ -130,6 +130,21 @@ public class RedisUtil {
         redisTemplate.opsForSet().remove(apiTokenIdsKey(email), tokenId);
     }
 
+    public void deleteAllApiTokens(String email) {
+        String indexKey = apiTokenIdsKey(email);
+        Set<String> tokenIds = redisTemplate.opsForSet().members(indexKey);
+        if (tokenIds != null && !tokenIds.isEmpty()) {
+            Set<String> keys = tokenIds.stream()
+                    .filter(Objects::nonNull)
+                    .map(tokenId -> apiTokenKey(email, tokenId))
+                    .collect(java.util.stream.Collectors.toCollection(LinkedHashSet::new));
+            if (!keys.isEmpty()) {
+                redisTemplate.delete(keys);
+            }
+        }
+        redisTemplate.delete(indexKey);
+    }
+
     public boolean containsApiToken(String email, String tokenId, String token) {
         if (tokenId == null || tokenId.isBlank()) {
             return false;

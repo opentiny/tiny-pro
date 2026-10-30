@@ -214,6 +214,31 @@ public class AuthControllerTest {
         verify(authService, never()).revokeApiToken(any(), anyString());
     }
 
+    @Test
+    public void testRevokeApiTokenUsesRequesterEmailForRedisKey() throws Exception {
+        Claims claims = Mockito.mock(Claims.class);
+        when(claims.get("email", String.class)).thenReturn("Test@Example.com");
+        when(jwtUtil.parseJwt(Contants.TOKEN)).thenReturn(claims);
+
+        mockMvc.perform(post(REVOKE_API_TOKEN_ENDPOINT)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + Contants.TOKEN)
+                        .content("{\"email\":\"test@example.com\",\"tokenId\":\"integration\"}"))
+                .andExpect(status().isCreated());
+
+        verify(authService).revokeApiToken(any(), eq("Test@Example.com"));
+    }
+
+    @Test
+    public void testGenerateApiTokenRejectsReservedTokenName() throws Exception {
+        mockMvc.perform(post(API_TOKEN_ENDPOINT)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"test@example.com\",\"password\":\"admin\",\"tokenName\":\"ids\"}"))
+                .andExpect(status().isBadRequest());
+
+        verify(authService, never()).generateApiToken(any());
+    }
+
     // 登出成功场景
     @Test
     public void testLogout_Success() throws Exception {

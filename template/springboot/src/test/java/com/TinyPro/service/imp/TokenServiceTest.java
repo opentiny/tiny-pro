@@ -6,6 +6,7 @@ import com.TinyPro.entity.vo.AuthenticatedPrincipal;
 import com.TinyPro.entity.vo.TokenPair;
 import com.TinyPro.exception.BusinessException;
 import com.TinyPro.jpa.IUserRepository;
+import com.TinyPro.redis.RedisLockService;
 import com.TinyPro.redis.RedisUtil;
 import com.TinyPro.service.TokenService;
 import com.TinyPro.utils.JwtUtil;
@@ -16,12 +17,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Map;
+import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,13 +37,20 @@ class TokenServiceTest {
     @Mock
     private IUserRepository userRepository;
 
+    @Mock
+    private RedisLockService redisLockService;
+
     private TokenService tokenService;
     private JwtUtil jwtUtil;
 
     @BeforeEach
     void setUp() {
         jwtUtil = new JwtUtil("token-service-test-secret");
-        tokenService = new TokenServiceImpl(jwtUtil, redisUtil, userRepository);
+        tokenService = new TokenServiceImpl(jwtUtil, redisUtil, userRepository, redisLockService);
+        doAnswer(invocation -> {
+            Supplier<?> action = invocation.getArgument(1);
+            return action.get();
+        }).when(redisLockService).execute(anyString(), org.mockito.ArgumentMatchers.<Supplier<Object>>any());
         ReflectionTestUtils.setField(tokenService, "accessTokenTtlSeconds", 7200L);
         ReflectionTestUtils.setField(tokenService, "refreshTokenTtlMillis", 604800000L);
     }
@@ -109,6 +120,31 @@ class TokenServiceTest {
         );
 
         assertEquals(401, exception.getHttpStatus().value());
+        assertEquals("exception.common.tokenReplay", exception.getErrorCode());
+        verify(redisUtil).deleteValue("at:7:" + accessClaims.getId());
+        verify(redisUtil).deleteValue("rt:7:" + refreshClaims.getId());
+    }
+
+    @Test
+    void rotateRejectsExpiredRefreshTokenWithDifferentErrorCode() {
+        User user = user(7, "user@example.com");
+        TokenPair original = tokenService.issue(user);
+        Claims refreshClaims = jwtUtil.parseJwt(original.getRefreshToken());
+        Claims accessClaims = jwtUtil.parseJwt(original.getAccessToken());
+        String sessionId = accessClaims.get("sid", String.class);
+
+        when(redisUtil.getValue("session:7:" + sessionId))
+                .thenReturn(accessClaims.getId() + "|" + refreshClaims.getId());
+        when(redisUtil.consumeRefreshToken(anyString(), anyString(), anyString(), anyString(), anyString(), anyLong()))
+                .thenReturn(0L);
+
+        BusinessException exception = assertThrows(
+                BusinessException.class,
+                () -> tokenService.rotate(original.getRefreshToken())
+        );
+
+        assertEquals(401, exception.getHttpStatus().value());
+        assertEquals("exception.common.tokenExpire", exception.getErrorCode());
     }
 
     @Test
@@ -119,6 +155,19 @@ class TokenServiceTest {
         when(redisUtil.getValue(anyString())).thenReturn(null);
 
         assertFalse(tokenService.isAccessTokenActive(pair.getAccessToken()));
+    }
+
+    @Test
+    void redisFailureWhileCheckingAccessTokenReturnsServiceUnavailable() {
+        TokenPair pair = tokenService.issue(user(7, "user@example.com"));
+        when(redisUtil.getValue(anyString())).thenThrow(new IllegalStateException("redis unavailable"));
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> tokenService.isAccessTokenActive(pair.getAccessToken())
+        );
+
+        assertEquals(503, exception.getStatusCode().value());
     }
 
     @Test
@@ -215,6 +264,13 @@ class TokenServiceTest {
         tokenService.revokeApiToken("user@example.com", "integration");
 
         verify(redisUtil).deleteApiToken("user@example.com", "integration");
+    }
+
+    @Test
+    void revokeUserSessionsAlsoDeletesApiTokens() {
+        tokenService.revokeUserSessions("user@example.com", 7);
+
+        verify(redisUtil).deleteAllApiTokens("user@example.com");
     }
 
     @Test

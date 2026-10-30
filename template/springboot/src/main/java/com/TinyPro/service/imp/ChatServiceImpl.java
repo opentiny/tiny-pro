@@ -15,7 +15,9 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.ByteArrayOutputStream;
 import java.net.URI;
+import java.net.SocketTimeoutException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -26,6 +28,11 @@ import java.util.Deque;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * 对话补全服务实现，与 NestJS 模板的 ChatService.proxyChatCompletions 逻辑一致：
@@ -48,6 +55,13 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ChatServiceImpl implements IChatService {
 
     private static final Logger logger = LoggerFactory.getLogger(ChatServiceImpl.class);
+    private static final long UPSTREAM_READ_IDLE_TIMEOUT_SECONDS = 30L;
+    private static final ScheduledExecutorService READ_TIMEOUT_EXECUTOR =
+            Executors.newSingleThreadScheduledExecutor(runnable -> {
+                Thread thread = new Thread(runnable, "llm-upstream-read-timeout");
+                thread.setDaemon(true);
+                return thread;
+            });
 
     private final String baseUrl;
     private final String apiKey;
@@ -115,11 +129,52 @@ public class ChatServiceImpl implements IChatService {
 
         try (InputStream upstreamStream = upstream.body();
              OutputStream out = response.getOutputStream()) {
-            upstreamStream.transferTo(out);
+            transferWithIdleTimeout(upstreamStream, out);
             out.flush();
+        } catch (SocketTimeoutException timeoutException) {
+            logger.warn("上游对话流读取空闲超时: user={} {}", userEmail, timeoutException.getMessage());
         } catch (IOException ioException) {
             // 响应已开始，客户端断开或连接异常，无法也不再需要返回错误
             logger.warn("对话请求已中断: user={} {}", userEmail, ioException.getMessage());
+        }
+    }
+
+    private void transferWithIdleTimeout(InputStream upstreamStream, OutputStream out) throws IOException {
+        byte[] buffer = new byte[8192];
+        while (true) {
+            AtomicBoolean timedOut = new AtomicBoolean(false);
+            ScheduledFuture<?> timeoutTask = READ_TIMEOUT_EXECUTOR.schedule(() -> {
+                timedOut.set(true);
+                try {
+                    upstreamStream.close();
+                } catch (IOException ignored) {
+                    // The read below will report the timeout or the closed stream.
+                }
+            }, UPSTREAM_READ_IDLE_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+
+            int read;
+            try {
+                read = upstreamStream.read(buffer);
+            } catch (IOException exception) {
+                if (timedOut.get()) {
+                    throw new SocketTimeoutException("上游响应读取空闲超过 "
+                            + UPSTREAM_READ_IDLE_TIMEOUT_SECONDS + " 秒");
+                }
+                throw exception;
+            } finally {
+                timeoutTask.cancel(false);
+            }
+
+            if (timedOut.get()) {
+                throw new SocketTimeoutException("上游响应读取空闲超过 "
+                        + UPSTREAM_READ_IDLE_TIMEOUT_SECONDS + " 秒");
+            }
+            if (read < 0) {
+                return;
+            }
+            if (read > 0) {
+                out.write(buffer, 0, read);
+            }
         }
     }
 
@@ -168,7 +223,9 @@ public class ChatServiceImpl implements IChatService {
 
     private String readErrorBody(HttpResponse<InputStream> upstream) {
         try (InputStream body = upstream.body()) {
-            return new String(body.readAllBytes(), StandardCharsets.UTF_8);
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            transferWithIdleTimeout(body, output);
+            return output.toString(StandardCharsets.UTF_8);
         } catch (IOException e) {
             return "";
         }

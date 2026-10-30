@@ -78,6 +78,6 @@ public class AuthServiceImpl implements IAuthService {
         if (!StringUtils.equalsIgnoreCase(requesterEmail, dto.getEmail())) {
             throw new BusinessException("common.forbidden", HttpStatus.FORBIDDEN, "api-token-owner");
         }
-        tokenService.revokeApiToken(dto.getEmail(), dto.getTokenId());
+        tokenService.revokeApiToken(requesterEmail, dto.getTokenId());
     }
 }
