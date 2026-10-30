@@ -4,8 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
-import org.springframework.data.redis.core.Cursor;
-import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -120,9 +118,6 @@ public class RedisUtil {
                     .forEach(keys::add);
         }
 
-        // Include tokens created before the per-user index was introduced.
-        // SCAN is incremental and does not block Redis like KEYS.
-        keys.addAll(scanApiTokenKeys(email));
         if (keys == null || keys.isEmpty()) {
             return List.of();
         }
@@ -135,21 +130,11 @@ public class RedisUtil {
         redisTemplate.opsForSet().remove(apiTokenIdsKey(email), tokenId);
     }
 
-    /**
-     * NestJS currently does not include tokenId in the API JWT payload, so
-     * validation falls back to matching the token under the user's API keys.
-     */
     public boolean containsApiToken(String email, String tokenId, String token) {
-        if (tokenId != null && !tokenId.isBlank()) {
-            return token.equals(getApiToken(email, tokenId));
+        if (tokenId == null || tokenId.isBlank()) {
+            return false;
         }
-
-        // Legacy NestJS tokens may predate the index. Keep this fallback
-        // incremental and non-blocking while those tokens expire naturally.
-        return scanApiTokenKeys(email).stream()
-                .map(redisTemplate.opsForValue()::get)
-                .filter(Objects::nonNull)
-                .anyMatch(token::equals);
+        return token.equals(getApiToken(email, tokenId));
     }
 
     private String apiTokenKey(String email, String tokenId) {
@@ -158,31 +143,6 @@ public class RedisUtil {
 
     private String apiTokenIdsKey(String email) {
         return "user:" + email + ":api:ids";
-    }
-
-    private Set<String> scanApiTokenKeys(String email) {
-        Set<String> keys = new LinkedHashSet<>();
-        String escapedEmail = escapeRedisGlob(email);
-        ScanOptions options = ScanOptions.scanOptions()
-                .match("user:" + escapedEmail + ":api:*")
-                .count(100)
-                .build();
-        try (Cursor<String> cursor = redisTemplate.scan(options)) {
-            cursor.forEachRemaining(key -> {
-                if (!key.equals(apiTokenIdsKey(email))) {
-                    keys.add(key);
-                }
-            });
-        }
-        return keys;
-    }
-
-    private String escapeRedisGlob(String value) {
-        return value
-                .replace("\\", "\\\\")
-                .replace("*", "\\*")
-                .replace("?", "\\?")
-                .replace("[", "\\[");
     }
 
     /**

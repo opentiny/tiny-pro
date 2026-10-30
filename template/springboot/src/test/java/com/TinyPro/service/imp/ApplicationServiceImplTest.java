@@ -22,7 +22,7 @@ class ApplicationServiceImplTest {
         dto.setName("Tag array application");
         dto.setTag(objectMapper.readTree("[{\"type\":\"success\",\"value\":\"dev\"}]"));
 
-        Application saved = service.createApplication(dto, false);
+        Application saved = service.createApplication(dto);
 
         assertEquals("[{\"type\":\"success\",\"value\":\"dev\"}]", saved.getTag());
     }
@@ -37,7 +37,7 @@ class ApplicationServiceImplTest {
         dto.setName("String tag application");
         dto.setTag(objectMapper.readTree("\"[{\\\"type\\\":\\\"success\\\"}]\""));
 
-        Application saved = service.createApplication(dto, false);
+        Application saved = service.createApplication(dto);
 
         assertEquals("[{\"type\":\"success\"}]", saved.getTag());
     }

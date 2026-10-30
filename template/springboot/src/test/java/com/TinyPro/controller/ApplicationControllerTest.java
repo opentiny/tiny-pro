@@ -49,7 +49,7 @@ class ApplicationControllerTest {
     }
 
     @Override
-    public Application createApplication(CreateApplicationDto dto, boolean isInit) {
+    public Application createApplication(CreateApplicationDto dto) {
       throw new UnsupportedOperationException("Not used in this test");
     }
   }

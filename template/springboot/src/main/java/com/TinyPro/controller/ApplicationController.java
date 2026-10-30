@@ -36,15 +36,14 @@ public class ApplicationController {
     return new ResponseEntity<>(applicationService.findAllApplication(searchInfo), HttpStatus.OK);
   }
 
-  @Operation(summary = "创建应用", description = "创建新应用，支持初始化模式（已存在则返回）")
+  @Operation(summary = "创建应用", description = "创建新应用")
   @ApiResponses(value = {
     @ApiResponse(responseCode = "200", description = "创建成功"),
     @ApiResponse(responseCode = "400", description = "应用已存在")
   })
-  @PermissionAnnotation("i18n::query")
+  @PermissionAnnotation("application:add")
   @PostMapping
-  public Application createApplication(@Valid @RequestBody CreateApplicationDto dto,
-                                       @RequestParam(defaultValue = "false") boolean isInit) {
-    return applicationService.createApplication(dto, isInit);
+  public Application createApplication(@Valid @RequestBody CreateApplicationDto dto) {
+    return applicationService.createApplication(dto);
   }
 }

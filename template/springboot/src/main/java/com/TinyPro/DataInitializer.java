@@ -256,7 +256,7 @@ public class DataInitializer implements CommandLineRunner {
         permissions.put("menu", new String[]{"add", "remove", "update", "query"});
         permissions.put("i18n", new String[]{"add", "remove", "update", "query", "batch-remove"});
         permissions.put("lang", new String[]{"add", "remove", "update", "query"});
-		permissions.put("application", new String[]{"add"});
+        permissions.put("application", new String[]{"add"});
 
         createPermissionIfAbsent("*", "super permission");
 

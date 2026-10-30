@@ -144,9 +144,6 @@ public class TokenServiceImpl implements TokenService {
         }
     }
 
-    /**
-     * Equivalent to NestJS AuthService.validateApiToken(email, token).
-     */
     public boolean validateApiToken(String email, String token) {
         return StringUtils.isNotBlank(email)
                 && StringUtils.isNotBlank(token)
@@ -333,13 +330,6 @@ public class TokenServiceImpl implements TokenService {
         String sessionId = StringUtils.defaultIfBlank(claims.get("sid", String.class), accessJti);
         String uid = String.valueOf(userId);
         String sessionValue = redisUtil.getValue(sessionKey(uid, sessionId));
-        if (StringUtils.isBlank(sessionValue)) {
-            String storedRefreshToken = redisUtil.getValue(refreshKey(uid, refreshJti));
-            if (presentedRefreshToken.equals(storedRefreshToken)) {
-                // Allows rotation of NestJS sessions, which do not have our session key.
-                sessionValue = accessJti + "|" + refreshJti;
-            }
-        }
 
         if (!matchesSession(sessionValue, accessJti, refreshJti)) {
             if (sessionId.equals(redisUtil.getValue(usedRefreshKey(uid, refreshJti)))) {

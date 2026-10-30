@@ -78,18 +78,14 @@ public class ApplicationServiceImpl implements ApplicationService {
     return new ApplicationVo(items, pageResult.getTotalElements());
   }
 
-  // 创建应用（支持 isInit）
+  // 创建应用
   @Transactional
-  public Application createApplication(@Valid CreateApplicationDto dto, boolean isInit) {
+  public Application createApplication(@Valid CreateApplicationDto dto) {
     String name = dto.getName();
     Application existing = applicationRepository.findByName(name);
     Locale locale = LocaleContextHolder.getLocale();
 
-    if (isInit && existing != null) {
-      return existing;
-    }
-
-    if (!isInit && existing != null) {
+    if (existing != null) {
       String msg = messageSource.getMessage(
         "exception.applicationInfo.exists",
         new Object[]{name},
