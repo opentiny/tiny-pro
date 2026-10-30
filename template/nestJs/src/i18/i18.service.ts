@@ -48,7 +48,7 @@ export class I18Service {
       throw new HttpException(
         this.i18n.t('exception.lang.notExists', {
           args: { lang },
-          lang: I18nContext.current().lang,
+          lang: I18nContext.current()?.lang,
         }),
         HttpStatus.NOT_FOUND
       );
@@ -62,7 +62,7 @@ export class I18Service {
     if (i18Item) {
       throw new HttpException(
         this.i18n.t('exception.i18.exists', {
-          lang: I18nContext.current().lang,
+          lang: I18nContext.current()?.lang,
         }),
         HttpStatus.BAD_REQUEST
       );
@@ -140,7 +140,7 @@ export class I18Service {
     if (!item) {
       throw new HttpException(
         this.i18n.t('exception.i18.notExists', {
-          lang: I18nContext.current().lang,
+          lang: I18nContext.current()?.lang,
         }),
         HttpStatus.NOT_FOUND
       );
@@ -160,7 +160,7 @@ export class I18Service {
     if (!lang) {
       throw new HttpException(
         this.i18n.t('exception.lang.notExists', {
-          lang: I18nContext.current().lang,
+          lang: I18nContext.current()?.lang,
         }),
         HttpStatus.NOT_FOUND
       );

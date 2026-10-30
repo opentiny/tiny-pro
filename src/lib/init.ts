@@ -27,6 +27,24 @@ import { existsSync, readFileSync, rmSync, writeFileSync } from 'fs';
 const log = logs('tiny-toolkit-pro');
 const VUE_TEMPLATE_PATH = 'tinyvue';
 const DEFAULT_PROJECT_NAME = 'tiny-pro';
+// 拷贝模板时需要排除的本地开发残留目录名（相对于模板根目录逐段匹配）
+const TEMPLATE_EXCLUDED_DIRS = ['node_modules', 'dist', 'logs'];
+
+/**
+ * 生成模板拷贝过滤器，必须基于模板根目录的相对路径匹配
+ */
+const createTemplateCopyFilter = (from: string) => {
+  const root = path.resolve(from);
+  return (src: string) => {
+    const relative = path.relative(root, path.resolve(src));
+    if (!relative) {
+      return true;
+    }
+    return !relative
+      .split(path.sep)
+      .some((segment) => TEMPLATE_EXCLUDED_DIRS.includes(segment));
+  };
+};
 
 // Keep the generated value compatible with the legacy 8-character Base64
 // secret format, e.g. `0Zi4SA==`.
@@ -268,6 +286,7 @@ const createMonorepoRootSync = (answers: ProjectInfo) => {
     start: 'pnpm -C web start',
     build: 'pnpm -C web build',
   };
+
   if (serverConfirm && serverFramework === ServerFrameworks.NestJs) {
     scripts['dev:backend'] = `pnpm -C ${ServerFrameworks.NestJs} run start:dev`;
   }
@@ -355,6 +374,7 @@ const createServerSync = (answers: ProjectInfo) => {
     baseEditor.save(basePropertiesFilePath);
 
     // ✅ 使用 createEditor 读取本地 properties 文件
+
     // ✅ 1. 使用 createEditor 读取 properties 文件
     const editor = createEditor(propertiesFilePath);
 
@@ -457,7 +477,8 @@ const createServerSync = (answers: ProjectInfo) => {
       LLM_BASE_URL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
       LLM_API_KEY: '',
       LLM_MODEL: 'qwen-plus',
-      LLM_EXTRA_BODY: '',
+      // 默认开启联网搜索，否则模型无法回答实时性问题
+      LLM_EXTRA_BODY: '{"enable_search":true,"search_options":{"forced_search":true}}',
     };
     const envStr = objToEnv(config);
     const overwriteDockerComposeConfig = {
@@ -557,7 +578,7 @@ const packageJsonProcess = (
   };
   const replaceDevCommand = () => {
     const command = devCommand[buildTool];
-    replaceScript('start', command);
+    replaceScript('start:mock', command);
   };
   const remove = () => {
     const removedPaths = buildConfigs[buildTool];
@@ -654,6 +675,21 @@ const createProjectSync = (answers: ProjectInfo) => {
       updatedEnvContent,
       'VITE_LOWCODE_DESIGNER_ENABLED',
       lowcodeEnabled
+
+    );
+
+    // 根据用户多选结果设置各可选功能的环境变量
+    const selectedFeatures = features ?? [];
+    FEATURE_OPTIONS.forEach((feature) => {
+      const enabled = selectedFeatures.includes(feature.value);
+      updatedEnvContent = setEnvFlag(updatedEnvContent, feature.envKey, enabled);
+    });
+
+    // 仅前端项目开启模拟登录：登录不请求后端接口，直接模拟登录成功
+    updatedEnvContent = setEnvFlag(
+      updatedEnvContent,
+      'VITE_MOCK_LOGIN_ENABLED',
+      !serverConfirm
     );
 
     // 根据用户多选结果设置各可选功能的环境变量
@@ -703,7 +739,11 @@ const printNextSteps = (answers: ProjectInfo, prefix: string) => {
   );
   console.log(
     chalk.green(
-      `${chalk.yellow(`$ cd ${name} && pnpm start 或者 npm run start`)}     # 开启web开发环境`
+      `${chalk.yellow(
+        serverConfirm
+          ? `$ cd ${name} && pnpm dev 或者 npm run dev`
+          : `$ cd ${name} && pnpm start:mock 或者 npm run start:mock`
+      )}     # 开启web开发环境，${serverConfirm ? '使用前后端模式' : '使用mock模式'}`
     )
   );
 
@@ -714,7 +754,7 @@ const printNextSteps = (answers: ProjectInfo, prefix: string) => {
           serverFramework === ServerFrameworks.SpringBoot
             ? `$ cd ${name}/springboot  # Java工程，参考目录内 Dockerfile / docker-compose.yml / pom.xml 启动`
             : `$ cd ${name} && pnpm dev:backend`
-        )}    # 开启server开发环境`
+        )}    # 开启server开发环境，${serverFramework === ServerFrameworks.SpringBoot ? '请确保已安装Java环境' : '请确保已安装Node.js环境'}，同时需安装且启用MySQL和Redis环境。`
       )
     );
   }

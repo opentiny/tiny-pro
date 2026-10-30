@@ -62,6 +62,7 @@ const menuTree = [
   menu('Form', 'form', 'form/index', 'menu.form', [
     menu('Base', 'base', 'form/base/index', 'menu.form.base'),
     menu('Step', 'step', 'form/step/index', 'menu.form.step'),
+    menu('Editor', 'editor', 'form/editor/index', 'menu.form.editor'),
   ], 'IconSetting'),
   menu('Profile', 'profile', 'profile/index', 'menu.profile', [
     menu('Detail', 'detail', 'profile/detail/index', 'menu.profile.detail'),

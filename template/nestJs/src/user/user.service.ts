@@ -46,7 +46,7 @@ export class UserService {
     if (!email || !password || !name) {
       throw new HttpException(
         this.i18n.translate('exception.user.requiredFieldsMissing', {
-          lang: I18nContext.current().lang,
+          lang: I18nContext.current()?.lang,
         }),
         HttpStatus.BAD_REQUEST
       );
@@ -59,7 +59,7 @@ export class UserService {
     if (await userInfo) {
       throw new HttpException(
         this.i18n.translate('exception.user.userExists', {
-          lang: I18nContext.current().lang,
+          lang: I18nContext.current()?.lang,
         }),
         HttpStatus.BAD_REQUEST
       );
@@ -255,7 +255,7 @@ export class UserService {
     }
     throw new HttpException(
       this.i18n.translate('exception.user.userNumberNull', {
-        lang: I18nContext.current().lang,
+        lang: I18nContext.current()?.lang,
       }),
       HttpStatus.BAD_REQUEST
     );
@@ -282,7 +282,7 @@ export class UserService {
       ) {
         throw new HttpException(
           this.i18n.translate('exception.user.oldPasswordError', {
-            lang: I18nContext.current().lang,
+            lang: I18nContext.current()?.lang,
           }),
           HttpStatus.BAD_REQUEST
         );
@@ -334,7 +334,7 @@ export class UserService {
     if (!email || !name) {
       throw new HttpException(
         this.i18n.translate('exception.user.requiredFieldsMissing', {
-          lang: I18nContext.current().lang,
+          lang: I18nContext.current()?.lang,
         }),
         HttpStatus.BAD_REQUEST
       );
@@ -344,7 +344,7 @@ export class UserService {
     if (!user) {
       throw new HttpException(
         this.i18n.translate('exception.user.userNotFound', {
-          lang: I18nContext.current().lang,
+          lang: I18nContext.current()?.lang,
         }),
         HttpStatus.NOT_FOUND
       );

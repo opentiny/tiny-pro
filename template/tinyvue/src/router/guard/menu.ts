@@ -3,6 +3,7 @@ import { nextTick } from 'vue'
 import { useMenuStore } from '@/store/modules/router'
 import NotFound from '@/views/not-found/404/index.vue'
 import constant from '../constant'
+import appRoutes from '../routes'
 
 export interface ITreeNodeData {
   // node-key='id' 设置节点的唯一标识
@@ -61,6 +62,7 @@ export async function flushRouter(router: Router) {
   routes.forEach((route) => {
     router.addRoute('root', route)
   })
+  registerHiddenSubRoutes(router)
 }
 
 export function toRoutes(menus: ITreeNodeData[]) {
@@ -96,6 +98,25 @@ export function toRoutes(menus: ITreeNodeData[]) {
   return router
 }
 
+// 将静态路由中标记为 hidden 的子页面挂到已注册的菜单路由下（如富文本创作页），这些页面不显示在侧边栏
+export function registerHiddenSubRoutes(router: Router) {
+  const registerHiddenChildren = (parent: RouteRecordRaw) => {
+    for (const child of parent.children ?? []) {
+      if (
+        child.meta?.hidden
+        && child.name
+        && parent.name
+        && router.hasRoute(parent.name)
+        && !router.hasRoute(child.name)
+      ) {
+        router.addRoute(parent.name, child)
+      }
+      registerHiddenChildren(child)
+    }
+  }
+  appRoutes.forEach(registerHiddenChildren)
+}
+
 export function setupMenuGuard(router: Router) {
   let has404 = false
   router.beforeEach(async (to, from, next) => {
@@ -124,6 +145,7 @@ export function setupMenuGuard(router: Router) {
         router.addRoute('root', route)
       }
     })
+    registerHiddenSubRoutes(router)
     next({ path: to.path, query: to.query, hash: to.hash, replace: true })
   })
 }

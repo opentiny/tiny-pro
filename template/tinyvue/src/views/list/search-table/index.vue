@@ -297,7 +297,7 @@ function toCsvEvent() {
           </div>
           <TinyGrid
             :key="sm ? 'sm' : 'lg'" ref="taskGrid" :fetch-data="fetchDataOption"
-            :pager="sm ? pagerConfigSm : pagerConfigLg" :loading="loading" :size="gridSize" :height="640"
+            :pager="sm ? pagerConfigSm : pagerConfigLg" :loading="loading" :size="gridSize" :height="540"
             :auto-resize="true" align="center"
           >
             <TinyGridColumn type="selection" width="60" />

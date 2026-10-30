@@ -12,6 +12,6 @@ yarn.lock
 .env
 .history
 playwright-report
-pnpm-lock.yaml
+package-lock.json
 docs/.vitepress/cache
 docs/.vitepress/dist

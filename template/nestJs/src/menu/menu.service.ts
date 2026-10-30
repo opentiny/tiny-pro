@@ -120,7 +120,7 @@ export class MenuService {
       throw new HttpException(
         this.i18n.t('exception.menu.exists', {
           args: { name },
-          lang: I18nContext.current().lang,
+          lang: I18nContext.current()?.lang,
         }),
         HttpStatus.BAD_REQUEST
       );

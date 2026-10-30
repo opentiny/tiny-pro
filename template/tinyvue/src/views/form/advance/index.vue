@@ -132,6 +132,7 @@ async function fetchData() {
   background: #fff;
   border-radius: 10px;
   padding: 20px;
+  justify-content: flex-end;
 }
 
 .header {

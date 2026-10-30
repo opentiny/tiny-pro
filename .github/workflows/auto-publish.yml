@@ -72,7 +72,7 @@ jobs:
       - name: Publish @opentiny/tiny-toolkit-pro
         run: |
           echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc
-          npm publish --tag ${{ steps.parse_tag.outputs.dist_tag }}
+          npm publish --ignore-scripts --tag ${{ steps.parse_tag.outputs.dist_tag }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 

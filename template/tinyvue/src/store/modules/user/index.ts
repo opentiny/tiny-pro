@@ -96,6 +96,25 @@ const useUserStore = defineStore('user', {
 
     // Login
     async login(loginForm: LoginData) {
+      // 仅前端项目（VITE_MOCK_LOGIN_ENABLED=true）：不请求后端接口，模拟登录成功
+      if (import.meta.env.VITE_MOCK_LOGIN_ENABLED === 'true') {
+        // 刻意使用 mock-local-access-token 前缀：服务端 mock 登录签发的是
+        // mock-access-token，登出后会被吊销；本地签发的 token 只在前端 mock 模式使用
+        const accessToken = `mock-local-access-token:${loginForm.email}`
+        const refreshToken = `mock-local-refresh-token:${loginForm.email}`
+        this.accessToken = accessToken
+        this.refreshToken = refreshToken
+        setToken(accessToken)
+        setRefreshToken(refreshToken)
+        // 权限指令支持 '*' 通配，授予全部权限；其余用户信息沿用 state 默认值
+        this.setInfo({
+          role: 'admin',
+          roleId: 1,
+          rolePermission: ['*'],
+        } as Partial<UserState>)
+        return
+      }
+
       try {
         const res = await userLogin(loginForm)
         const { accessToken, refreshToken } = res.data
