@@ -44,38 +44,49 @@ const departmentLevelOptions = reactive([
   { label: '一级', value: '一级' },
   { label: '二级', value: '二级' },
   { label: '三级', value: '三级' },
+  { label: '四级', value: '四级' },
 ])
 
 const departmentOptions = reactive([
-  { label: '公共服务部', value: '公共服务部' },
-  { label: '计算管理部', value: '计算管理部' },
+  { label: '公共服务', value: '公共服务' },
+  { label: '技术部', value: '技术部' },
+  { label: '产品部', value: '产品部' },
+  { label: '设计部', value: '设计部' },
+  { label: '测试部', value: '测试部' },
+  { label: '运营部', value: '运营部' },
 ])
 
 const statusOptions = reactive([
   {
     value: '0',
-    label: 'offline',
+    label: t('searchTable.form.status.offline'),
   },
   {
     value: '1',
-    label: 'online',
+    label: t('searchTable.form.status.online'),
   },
   {
     value: '2',
-    label: 'doing',
+    label: t('searchTable.form.status.doing'),
   },
 ])
 
 const rolesOptions = reactive([
   { label: '前端', value: '前端' },
   { label: '后端', value: '后端' },
+  { label: '全栈', value: '全栈' },
   { label: '测试', value: '测试' },
+  { label: '产品', value: '产品' },
+  { label: '设计', value: '设计' },
 ])
 
 const lastUpdateUserOptions = reactive([
   { label: '张三', value: '张三' },
   { label: '李四', value: '李四' },
   { label: '王五', value: '王五' },
+  { label: '赵六', value: '赵六' },
+  { label: '钱七', value: '钱七' },
+  { label: '孙八', value: '孙八' },
 ])
 
 const localeForm = ref()
@@ -100,8 +111,9 @@ function handleUpdateSubmit() {
 
 async function fetchEmployeeInfo(id: string) {
   const res = await getEmployeeInfo(id)
+  const info = res?.data && typeof res.data === 'object' ? res.data : res
   Object.keys(formModel).forEach((key) => {
-    formModel[key] = res[key] || ''
+    formModel[key] = info?.[key] || ''
   })
 }
 
