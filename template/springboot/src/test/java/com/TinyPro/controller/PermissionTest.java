@@ -6,6 +6,7 @@ import com.TinyPro.entity.dto.CreateAuthDto;
 import com.TinyPro.entity.dto.LogoutAuthDto;
 import com.TinyPro.entity.po.Permission;
 import com.TinyPro.entity.po.User;
+import com.TinyPro.entity.vo.AuthenticatedPrincipal;
 import com.TinyPro.filter.RejectInterceptor;
 import com.TinyPro.redis.RedisUtil;
 import com.TinyPro.service.IAuthService;
@@ -28,6 +29,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.lang.reflect.Method;
@@ -107,8 +109,13 @@ public class PermissionTest {
         permission.setDesc("测试");
         List<Permission> permissions = Arrays.asList(permission);
         when(request.getHeader("Authorization")).thenReturn("Bearer " + token);
-        when(jwtUtil.parseJwt(token)).thenReturn(mock(Claims.class));
-        when(redisUtil.getValue(anyString())).thenReturn("{\"email\":\"user@example.com\"}");
+        when(request.getAttribute(AuthenticatedPrincipal.REQUEST_ATTRIBUTE))
+                .thenReturn(new AuthenticatedPrincipal(
+                        email,
+                        null,
+                        AuthenticatedPrincipal.TokenType.ACCESS
+                ));
+        when(iUserService.getUserInfo(email)).thenReturn(ResponseEntity.ok(user));
         when(iUserService.getRoleByUserId(user)).thenReturn(permissions);
         permissionCheckService.checkPermission(request, testMethod, methodAnnotation, classAnnotation);
         assertDoesNotThrow(() -> permissionCheckService.checkPermission(request, testMethod, methodAnnotation, classAnnotation));
