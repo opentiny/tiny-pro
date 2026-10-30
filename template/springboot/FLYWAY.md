@@ -18,21 +18,21 @@ If the database is valid and does not contain `flyway_schema_history`, run a one
 
 ```bash
 flyway info \
-  -url="$DATABASE_URL" \
-  -user="$DATABASE_USERNAME" \
-  -password="$DATABASE_PASSWORD"
+  -url="$SPRING_DATASOURCE_URL" \
+  -user="$SPRING_DATASOURCE_USERNAME" \
+  -password="$SPRING_DATASOURCE_PASSWORD"
 
 flyway baseline \
-  -url="$DATABASE_URL" \
-  -user="$DATABASE_USERNAME" \
-  -password="$DATABASE_PASSWORD" \
+  -url="$SPRING_DATASOURCE_URL" \
+  -user="$SPRING_DATASOURCE_USERNAME" \
+  -password="$SPRING_DATASOURCE_PASSWORD" \
   -baselineVersion=1 \
   -baselineDescription="Existing TinyPro schema"
 
 flyway validate \
-  -url="$DATABASE_URL" \
-  -user="$DATABASE_USERNAME" \
-  -password="$DATABASE_PASSWORD"
+  -url="$SPRING_DATASOURCE_URL" \
+  -user="$SPRING_DATASOURCE_USERNAME" \
+  -password="$SPRING_DATASOURCE_PASSWORD"
 ```
 
 The baseline records the existing schema as version `1`; it does not execute `V1__init_schema.sql`. Subsequent application startup can then apply `V2` and `V3`. `V2` aligns the menu identity index, while `V3` creates the application table when needed, normalizes application timestamp columns, and handles the legacy `I18` table-name casing. These migrations do not repair an arbitrary incomplete schema.
