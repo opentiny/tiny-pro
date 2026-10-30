@@ -1,4 +1,5 @@
 import { parse, stringify } from 'yaml';
+import { randomBytes } from 'crypto';
 import * as path from 'path';
 import { copySync } from 'fs-extra';
 import chalk from 'chalk';
@@ -26,6 +27,10 @@ import { existsSync, readFileSync, rmSync, writeFileSync } from 'fs';
 const log = logs('tiny-toolkit-pro');
 const VUE_TEMPLATE_PATH = 'tinyvue';
 const DEFAULT_PROJECT_NAME = 'tiny-pro';
+
+// Keep the generated value compatible with the legacy 8-character Base64
+// secret format, e.g. `0Zi4SA==`.
+const generateJwtSecret = (): string => randomBytes(4).toString('base64');
 // 拷贝模板时需要排除的本地开发残留目录名（相对于模板根目录逐段匹配）
 const TEMPLATE_EXCLUDED_DIRS = ['node_modules', 'dist', 'logs'];
 
@@ -260,15 +265,9 @@ const createMonorepoRootSync = (answers: ProjectInfo) => {
 
   // 根 package.json 提供一键启动脚本，子包通过目录引用，与包名无关
   const scripts: Record<string, string> = {
+    start: 'pnpm -C web start',
     build: 'pnpm -C web build',
   };
-  if (serverConfirm) {
-    // 已集成服务端：前端直连后端启动（不走 mock 服务）
-    scripts.dev = 'pnpm -C web run dev';
-  } else {
-    // 仅前端项目：vite + 8848 mock 服务并行启动，无需 mysql/redis
-    scripts['start:mock'] = 'pnpm -C web run start:mock';
-  }
   if (serverConfirm && serverFramework === ServerFrameworks.NestJs) {
     scripts['dev:backend'] = `pnpm -C ${ServerFrameworks.NestJs} run start:dev`;
   }
@@ -281,7 +280,7 @@ const createMonorepoRootSync = (answers: ProjectInfo) => {
     pnpm: {
       overrides: {
         // tiny-robot-chat 依赖 ^1.30.0；低版本 SDK 的 exports 不支持子路径
-        // 目录导入会导致 vite 预构建失败
+        // 目录导入会导致 vite 预构建失败，锁定已知可用版本保证全新安装可运行
         '@modelcontextprotocol/sdk': '1.32.1',
       },
     },
@@ -419,7 +418,9 @@ const createServerSync = (answers: ProjectInfo) => {
     );
 
     // JWT
-    editor.set('jwt.secret', '0Zi4SA==');
+    // Generate a project-specific fallback once. Deployments can override it
+    // with JWT_SECRET without changing the generated project files.
+    editor.set('jwt.secret', `\${JWT_SECRET:${generateJwtSecret()}}`);
 
     // Redis
     editor.set('spring.data.redis.host', config.REDIS_HOST);
@@ -456,8 +457,7 @@ const createServerSync = (answers: ProjectInfo) => {
       LLM_BASE_URL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
       LLM_API_KEY: '',
       LLM_MODEL: 'qwen-plus',
-      // 默认开启联网搜索，否则模型无法回答实时性问题
-      LLM_EXTRA_BODY: '{"enable_search":true,"search_options":{"forced_search":true}}',
+      LLM_EXTRA_BODY: '',
     };
     const envStr = objToEnv(config);
     const overwriteDockerComposeConfig = {
@@ -557,7 +557,7 @@ const packageJsonProcess = (
   };
   const replaceDevCommand = () => {
     const command = devCommand[buildTool];
-    replaceScript('start:mock', command);
+    replaceScript('start', command);
   };
   const remove = () => {
     const removedPaths = buildConfigs[buildTool];
@@ -663,13 +663,6 @@ const createProjectSync = (answers: ProjectInfo) => {
       updatedEnvContent = setEnvFlag(updatedEnvContent, feature.envKey, enabled);
     });
 
-    // 仅前端项目开启模拟登录：登录不请求后端接口，直接模拟登录成功
-    updatedEnvContent = setEnvFlag(
-      updatedEnvContent,
-      'VITE_MOCK_LOGIN_ENABLED',
-      !serverConfirm
-    );
-
     fs.writeFileSync(envPath, updatedEnvContent);
     log.success(`低代码设计器环境变量已设置为: ${lowcodeEnabled}`);
   } catch (e) {
@@ -710,11 +703,7 @@ const printNextSteps = (answers: ProjectInfo, prefix: string) => {
   );
   console.log(
     chalk.green(
-      `${chalk.yellow(
-        serverConfirm
-          ? `$ cd ${name} && pnpm dev 或者 npm run dev`
-          : `$ cd ${name} && pnpm start:mock 或者 npm run start:mock`
-      )}     # 开启web开发环境，${serverConfirm ? '使用前后端模式' : '使用mock模式'}`
+      `${chalk.yellow(`$ cd ${name} && pnpm start 或者 npm run start`)}     # 开启web开发环境`
     )
   );
 
@@ -725,7 +714,7 @@ const printNextSteps = (answers: ProjectInfo, prefix: string) => {
           serverFramework === ServerFrameworks.SpringBoot
             ? `$ cd ${name}/springboot  # Java工程，参考目录内 Dockerfile / docker-compose.yml / pom.xml 启动`
             : `$ cd ${name} && pnpm dev:backend`
-        )}    # 开启server开发环境，${serverFramework === ServerFrameworks.SpringBoot ? '请确保已安装Java环境' : '请确保已安装Node.js环境'}，同时需安装且启用MySQL和Redis环境。`
+        )}    # 开启server开发环境`
       )
     );
   }
