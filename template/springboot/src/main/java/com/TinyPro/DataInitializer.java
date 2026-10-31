@@ -162,79 +162,86 @@ public class DataInitializer implements CommandLineRunner {
     private void initApplications() {
         List<Application> applicationData = List.of(
                 new Application(
-                        "Tiny Design 设计体系",
-                        "华为云产品和服务的规范体系，包括交互视觉设计、业务流程、国际化、术语词条。",
-                        "[{ \"type\": \"\", \"value\": \"机会点定义\" }, { \"type\": \"danger\", \"value\": \"交互设计\" }]",
+                        "TinyVue 组件库",
+                        "OpenTiny 企业级 UI 组件库，同时支持 Vue.js 2 与 Vue.js 3，以及 PC 与移动端。",
+                        "[{ \"type\": \"success\", \"value\": \"开发\" }]",
+                        "card-list-application-default.png",
+                        "dev"
+                ),
+                new Application(
+                        "TinyEngine 低代码引擎",
+                        "TinyEngine低代码引擎，AI时代的智能低代码基座。",
+                        "[{ \"type\": \"success\", \"value\": \"开发\" }, { \"type\": \"danger\", \"value\": \"交互设计\" }]",
+                        "card-list-console-framework.png",
+                        "dev"
+                ),
+                new Application(
+                        "TinyTheme 主题配置系统",
+                        "OpenTiny 主题配置系统，支持在线定制组件主题与视觉风格。",
+                        "[{ \"type\": \"danger\", \"value\": \"交互设计\" }, { \"type\": \"warning\", \"value\": \"视觉设计\" }]",
                         "card-list-application-default.png",
                         "design"
                 ),
                 new Application(
-                        "Tiny DesignLink 设计流水线工具",
-                        "设计+协同+资源管理，一个工具就够了，在线原型设计、设计过程融入DevOps流程。",
-                        "[{ \"type\": \"error\", \"value\": \"交互设计\" }, { \"type\": \"warning\", \"value\": \"视觉设计\" }]",
+                        "OpenTiny Icons 图标库",
+                        "OpenTiny Design Icons 图标库，为组件与业务页面提供统一图标资源。",
+                        "[{ \"type\": \"warning\", \"value\": \"视觉设计\" }]",
                         "card-list-application-default.png",
                         "design"
                 ),
                 new Application(
-                        "TinyUI3.0 开发工具 ",
-                        "Cloud Design System 提供了丰富的规范文档及开发组件。",
-                        "[{ \"type\": \"success\", \"value\": \"开发\" }]",
-                        "card-list-application-default.png",
-                        "dev"
-                ),
-                new Application(
-                        "TinyPlus3.0 开发工具",
-                        "TinyPlus3.0 是基于Angular + Typescript的Web前端云业务组件库。",
-                        "[{ \"type\": \"success\", \"value\": \"开发\" }]",
-                        "card-list-tiny-plus.png",
-                        "dev"
-                ),
-                new Application(
-                        "Tiny Stage 工程工具 ",
-                        "一个跨平台的前端工程化cli工具，为开发提供一系列开发套件和工程插件",
+                        "TinyCLI 命令行工具",
+                        "灵活可扩展的 OpenTiny 前端命令行工具，提供工程化套件与插件。",
                         "[{ \"type\": \"success\", \"value\": \"开发\" }]",
                         "card-list-console-framework.png",
                         "dev"
                 ),
                 new Application(
-                        "Tiny Flow 接口编排工具 ",
-                        "端到端的API编排解决方案，通过可视化编程的方式快速生成、发布、调试的API编排。",
+                        "TinyPro 中后台模板",
+                        "基于 TinyVue 的前后端分离后台管理系统，支持在线配置菜单、路由、国际化，开箱即用。",
+                        "[{ \"type\": \"success\", \"value\": \"开发\" }, { \"type\": \"warning\", \"value\": \"上线\" }]",
+                        "card-list-console-framework.png",
+                        "dev"
+                ),
+                new Application(
+                        "TinyEditor 富文本编辑器",
+                        "基于 Quill 2.0 的富文本编辑器，扩展丰富模块与格式，功能强大、开箱即用。",
                         "[{ \"type\": \"success\", \"value\": \"开发\" }]",
                         "card-list-console-framework.png",
                         "dev"
                 ),
                 new Application(
-                        "Tiny Gate 门禁系统",
-                        "门禁系统，通过卡点方式集成到伏羲流水线，在服务发布时生成预览页面。",
-                        "[{ \"type\": \"info\", \"value\": \"测试验证\" }]",
-                        "card-list-console-framework.png",
-                        "dev"
-                ),
-                new Application(
-                        "Console Framework 控制台框架",
-                        "华为云各服务快速构建管理控制台的平台。",
-                        "[{ \"type\": \"success\", \"value\": \"开发\" },{ \"type\": \"info\", \"value\": \"测试验证\" },{ \"type\": \"warning\", \"value\": \"上线\" }]",
-                        "card-list-console-framework.png",
-                        "dev"
-                ),
-                new Application(
-                        "Nodejs Framework Nodejs应用",
-                        "基于egg的定制化web服务框架，让你快速上手Nodejs做BFF意见微服务。",
-                        "[{ \"type\": \"success\", \"value\": \"开发\" },{ \"type\": \"info\", \"value\": \"测试验证\" }]",
-                        "card-list-console-framework.png",
-                        "dev"
-                ),
-                new Application(
-                        "Furion 前端体验监控",
-                        "提供端到端前端用户体验度量，让产品用户体验可度量、可监控、可优化。",
-                        "[{ \"type\": \"\", \"value\": \"机会点定义\" }]",
+                        "TinyRobot AI 对话组件库",
+                        "AI 对话组件库，提供丰富的 AI 交互组件，助力快速构建企业级 AI 应用。",
+                        "[{ \"type\": \"success\", \"value\": \"开发\" }]",
                         "card-list-furion.png",
                         "dev"
                 ),
                 new Application(
-                        "Tiny Mock API 管理",
-                        "功能强大的API管理平台，旨在为开发、产品、测试人员提供更优雅的接口管理服务。",
-                        "[{ \"type\": \"success\", \"value\": \"开发\" },{ \"type\": \"warning\", \"value\": \"视觉设计\" }]",
+                        "TinyVue Mobile 移动端组件",
+                        "基于 OpenTiny 设计规范的 Vue3 移动端组件库，支持 TypeScript、主题切换与国际化。",
+                        "[{ \"type\": \"success\", \"value\": \"开发\" }]",
+                        "card-list-application-default.png",
+                        "dev"
+                ),
+                new Application(
+                        "TinyCharts 可视化图表库",
+                        "前端可视化图表库，提供 40 多个图表组件，支持主题定制、响应式和无障碍，兼容 ECharts API。",
+                        "[{ \"type\": \"success\", \"value\": \"开发\" }, { \"type\": \"warning\", \"value\": \"视觉设计\" }]",
+                        "card-list-application-default.png",
+                        "dev"
+                ),
+                new Application(
+                        "WebMCP SDK",
+                        "前端 AI 与浏览器自动化工具包，通过 WebMCP + WebSkills 构建 AI 原生应用。",
+                        "[{ \"type\": \"success\", \"value\": \"开发\" }]",
+                        "card-list-console-framework.png",
+                        "dev"
+                ),
+                new Application(
+                        "GenUI SDK",
+                        "面向 Vue、Angular 的 Generative UI SDK，帮助快速生成交互界面。",
+                        "[{ \"type\": \"success\", \"value\": \"开发\" }]",
                         "card-list-application-default.png",
                         "dev"
                 )
