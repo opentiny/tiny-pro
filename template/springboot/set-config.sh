@@ -14,9 +14,8 @@ REDIS_PORT=${7:-6379}
 REDIS_PASSWORD=${8:-}
 
 # Use a caller-provided secret when available; otherwise generate a unique
-# Keep the generated value compatible with the legacy 8-character Base64
-# secret format, e.g. 0Zi4SA==.
-JWT_SECRET=${JWT_SECRET:-$(openssl rand -base64 4)}
+# 32-byte Base64-encoded secret.
+JWT_SECRET=${JWT_SECRET:-$(openssl rand -base64 32)}
 
 # 提示用户输入配置（如果运行时不提供参数）
 if [ "$#" -eq 0 ]; then

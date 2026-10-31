@@ -48,25 +48,8 @@ const createTemplateCopyFilter = (from: string) => {
 
 // Keep the generated value compatible with the legacy 8-character Base64
 // secret format, e.g. `0Zi4SA==`.
-const generateJwtSecret = (): string => randomBytes(4).toString('base64');
-// 拷贝模板时需要排除的本地开发残留目录名（相对于模板根目录逐段匹配）
-const TEMPLATE_EXCLUDED_DIRS = ['node_modules', 'dist', 'logs'];
+const generateJwtSecret = (): string => randomBytes(32).toString('base64');
 
-/**
- * 生成模板拷贝过滤器，必须基于模板根目录的相对路径匹配
- */
-const createTemplateCopyFilter = (from: string) => {
-  const root = path.resolve(from);
-  return (src: string) => {
-    const relative = path.relative(root, path.resolve(src));
-    if (!relative) {
-      return true;
-    }
-    return !relative
-      .split(path.sep)
-      .some((segment) => TEMPLATE_EXCLUDED_DIRS.includes(segment));
-  };
-};
 
 /**
  * 询问创建项目的描述，使用的技术栈
@@ -283,10 +266,15 @@ const createMonorepoRootSync = (answers: ProjectInfo) => {
 
   // 根 package.json 提供一键启动脚本，子包通过目录引用，与包名无关
   const scripts: Record<string, string> = {
-    start: 'pnpm -C web start',
     build: 'pnpm -C web build',
   };
-
+  if (serverConfirm) {
+    // 已集成服务端：前端直连后端启动（不走 mock 服务）
+    scripts.dev = 'pnpm -C web run dev';
+  } else {
+    // 仅前端项目：vite + 8848 mock 服务并行启动，无需 mysql/redis
+    scripts['start:mock'] = 'pnpm -C web run start:mock';
+  }
   if (serverConfirm && serverFramework === ServerFrameworks.NestJs) {
     scripts['dev:backend'] = `pnpm -C ${ServerFrameworks.NestJs} run start:dev`;
   }
