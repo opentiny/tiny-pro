@@ -100,21 +100,21 @@ public class RedisUtil {
     }
 
     public void setApiToken(String email, String tokenId, String token, long ttlSeconds) {
-        setValue(apiTokenKey(email, tokenId), token, ttlSeconds);
-        redisTemplate.opsForSet().add(apiTokenIdsKey(email), tokenId);
+        setValue(TokenRedisKeys.apiToken(email, tokenId), token, ttlSeconds);
+        redisTemplate.opsForSet().add(TokenRedisKeys.apiTokenIds(email), tokenId);
     }
 
     public String getApiToken(String email, String tokenId) {
-        return getValue(apiTokenKey(email, tokenId));
+        return getValue(TokenRedisKeys.apiToken(email, tokenId));
     }
 
     public List<String> getAllApiTokens(String email) {
-        Set<String> tokenIds = redisTemplate.opsForSet().members(apiTokenIdsKey(email));
+        Set<String> tokenIds = redisTemplate.opsForSet().members(TokenRedisKeys.apiTokenIds(email));
         Set<String> keys = new LinkedHashSet<>();
         if (tokenIds != null) {
             tokenIds.stream()
                     .filter(Objects::nonNull)
-                    .map(tokenId -> apiTokenKey(email, tokenId))
+                    .map(tokenId -> TokenRedisKeys.apiToken(email, tokenId))
                     .forEach(keys::add);
         }
 
@@ -126,17 +126,17 @@ public class RedisUtil {
     }
 
     public void deleteApiToken(String email, String tokenId) {
-        deleteValue(apiTokenKey(email, tokenId));
-        redisTemplate.opsForSet().remove(apiTokenIdsKey(email), tokenId);
+        deleteValue(TokenRedisKeys.apiToken(email, tokenId));
+        redisTemplate.opsForSet().remove(TokenRedisKeys.apiTokenIds(email), tokenId);
     }
 
     public void deleteAllApiTokens(String email) {
-        String indexKey = apiTokenIdsKey(email);
+        String indexKey = TokenRedisKeys.apiTokenIds(email);
         Set<String> tokenIds = redisTemplate.opsForSet().members(indexKey);
         if (tokenIds != null && !tokenIds.isEmpty()) {
             Set<String> keys = tokenIds.stream()
                     .filter(Objects::nonNull)
-                    .map(tokenId -> apiTokenKey(email, tokenId))
+                    .map(tokenId -> TokenRedisKeys.apiToken(email, tokenId))
                     .collect(java.util.stream.Collectors.toCollection(LinkedHashSet::new));
             if (!keys.isEmpty()) {
                 redisTemplate.delete(keys);
@@ -152,14 +152,6 @@ public class RedisUtil {
         return token.equals(getApiToken(email, tokenId));
     }
 
-    private String apiTokenKey(String email, String tokenId) {
-        return "user:" + email + ":api:" + tokenId;
-    }
-
-    private String apiTokenIdsKey(String email) {
-        return "user:" + email + ":api:ids";
-    }
-
     /**
      * Atomically consumes a refresh token. Return values: 1 consumed, 2 replay,
      * 0 missing or mismatched token.
@@ -172,13 +164,13 @@ public class RedisUtil {
             String sessionId,
             long replayTtlMillis
     ) {
-        String refreshKey = "rt:" + uid + ":" + refreshJti;
-        String accessKey = "at:" + uid + ":" + accessJti;
-        String usedKey = "used:rt:" + uid + ":" + refreshJti;
-        String sessionKey = "session:" + uid + ":" + sessionId;
-        String sessionListKey = "user:" + uid + ":sessions";
-        String refreshListKey = "user:" + uid + ":rt";
-        String accessListKey = "user:" + uid + ":at";
+        String refreshKey = TokenRedisKeys.refresh(uid, refreshJti);
+        String accessKey = TokenRedisKeys.access(uid, accessJti);
+        String usedKey = TokenRedisKeys.usedRefresh(uid, refreshJti);
+        String sessionKey = TokenRedisKeys.session(uid, sessionId);
+        String sessionListKey = TokenRedisKeys.sessions(uid);
+        String refreshListKey = TokenRedisKeys.refreshIndex(uid);
+        String accessListKey = TokenRedisKeys.accessIndex(uid);
 
         return redisTemplate.execute(
                 CONSUME_REFRESH_TOKEN_SCRIPT,
