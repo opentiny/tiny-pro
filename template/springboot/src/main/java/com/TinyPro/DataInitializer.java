@@ -15,6 +15,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.stereotype.Component;
@@ -28,6 +29,7 @@ import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Component
@@ -52,6 +54,9 @@ public class DataInitializer implements CommandLineRunner {
     @Autowired
     private I18Repository i18Repository;
 
+    @Autowired
+    private ApplicationRepository applicationRepository;
+
     @Override
     public void run(String... args) throws Exception {
         // 1. 测试 MySQL
@@ -64,6 +69,8 @@ public class DataInitializer implements CommandLineRunner {
             logger.warn("Lock file exists, if you want init again, please remove data/lock");
             return;
         }
+        // 初始化应用数据
+        initApplications();
 
         // 初始化国际化信息
         initI18n();
@@ -80,7 +87,10 @@ public class DataInitializer implements CommandLineRunner {
         // 初始化用户
         initUser(role);
 
-        // 创建锁文件
+
+
+
+      // 创建锁文件
         lockFile.getParentFile().mkdirs();
         Files.createFile(lockFile.toPath());
     }
@@ -131,6 +141,7 @@ public class DataInitializer implements CommandLineRunner {
         permissions.put("menu", new String[]{"add", "remove", "update", "query"});
         permissions.put("i18n", new String[]{"add", "remove", "update", "query","batch-remove"});
         permissions.put("lang", new String[]{"add", "remove", "update", "query"});
+        permissions.put("application", new String[]{"add"});
 
         Permission superPermission = new Permission();
         superPermission.setName("*");
@@ -260,7 +271,101 @@ public class DataInitializer implements CommandLineRunner {
         logger.info("[APP]: password: 'admin'");
         logger.info("Enjoy!");
     }
+  private void initApplications() {
+    List<Application> applicationData = List.of(
+      new Application(
+        "TinyVue 组件库",
+        "OpenTiny 企业级 UI 组件库，同时支持 Vue.js 2 与 Vue.js 3，以及 PC 与移动端。",
+        "[{ \"type\": \"success\", \"value\": \"开发\" }]",
+        "card-list-application-default.png",
+        "dev"
+      ),
+      new Application(
+        "TinyEngine 低代码引擎",
+        "TinyEngine低代码引擎，AI时代的智能低代码基座。",
+        "[{ \"type\": \"success\", \"value\": \"开发\" }, { \"type\": \"danger\", \"value\": \"交互设计\" }]",
+        "card-list-console-framework.png",
+        "dev"
+      ),
+      new Application(
+        "TinyTheme 主题配置系统",
+        "OpenTiny 主题配置系统，支持在线定制组件主题与视觉风格。",
+        "[{ \"type\": \"danger\", \"value\": \"交互设计\" }, { \"type\": \"warning\", \"value\": \"视觉设计\" }]",
+        "card-list-application-default.png",
+        "design"
+      ),
+      new Application(
+        "OpenTiny Icons 图标库",
+        "OpenTiny Design Icons 图标库，为组件与业务页面提供统一图标资源。",
+        "[{ \"type\": \"warning\", \"value\": \"视觉设计\" }]",
+        "card-list-application-default.png",
+        "design"
+      ),
+      new Application(
+        "TinyCLI 命令行工具",
+        "灵活可扩展的 OpenTiny 前端命令行工具，提供工程化套件与插件。",
+        "[{ \"type\": \"success\", \"value\": \"开发\" }]",
+        "card-list-console-framework.png",
+        "dev"
+      ),
+      new Application(
+        "TinyPro 中后台模板",
+        "基于 TinyVue 的前后端分离后台管理系统，支持在线配置菜单、路由、国际化，开箱即用。",
+        "[{ \"type\": \"success\", \"value\": \"开发\" }, { \"type\": \"warning\", \"value\": \"上线\" }]",
+        "card-list-console-framework.png",
+        "dev"
+      ),
+      new Application(
+        "TinyEditor 富文本编辑器",
+        "基于 Quill 2.0 的富文本编辑器，扩展丰富模块与格式，功能强大、开箱即用。",
+        "[{ \"type\": \"success\", \"value\": \"开发\" }]",
+        "card-list-console-framework.png",
+        "dev"
+      ),
+      new Application(
+        "TinyRobot AI 对话组件库",
+        "AI 对话组件库，提供丰富的 AI 交互组件，助力快速构建企业级 AI 应用。",
+        "[{ \"type\": \"success\", \"value\": \"开发\" }]",
+        "card-list-furion.png",
+        "dev"
+      ),
+      new Application(
+        "TinyVue Mobile 移动端组件",
+        "基于 OpenTiny 设计规范的 Vue3 移动端组件库，支持 TypeScript、主题切换与国际化。",
+        "[{ \"type\": \"success\", \"value\": \"开发\" }]",
+        "card-list-application-default.png",
+        "dev"
+      ),
+      new Application(
+        "TinyCharts 可视化图表库",
+        "前端可视化图表库，提供 40 多个图表组件，支持主题定制、响应式和无障碍，兼容 ECharts API。",
+        "[{ \"type\": \"success\", \"value\": \"开发\" }, { \"type\": \"warning\", \"value\": \"视觉设计\" }]",
+        "card-list-application-default.png",
+        "dev"
+      ),
+      new Application(
+        "WebMCP SDK",
+        "前端 AI 与浏览器自动化工具包，通过 WebMCP + WebSkills 构建 AI 原生应用。",
+        "[{ \"type\": \"success\", \"value\": \"开发\" }]",
+        "card-list-console-framework.png",
+        "dev"
+      ),
+      new Application(
+        "GenUI SDK",
+        "面向 Vue、Angular 的 Generative UI SDK，帮助快速生成交互界面。",
+        "[{ \"type\": \"success\", \"value\": \"开发\" }]",
+        "card-list-application-default.png",
+        "dev"
+      )
+    );
 
+    for (Application application : applicationData) {
+      findOrInsert(
+        () -> applicationRepository.findByName(application.getName()),
+        () -> applicationRepository.saveAndFlush(application)
+      );
+    }
+  }
     private String capitalizeFirst(String str) {
         if (str == null || str.isEmpty()) {
             return str;
@@ -282,4 +387,20 @@ public class DataInitializer implements CommandLineRunner {
             logger.error("[❌ ERROR] Redis 连接失败！", e);
         }
     }
+  private <T> T findOrInsert(Supplier<T> lookupAction, Supplier<T> insertAction) {
+    T existing = lookupAction.get();
+    if (existing != null) {
+      return existing;
+    }
+
+    try {
+      return insertAction.get();
+    } catch (DataIntegrityViolationException ex) {
+      T concurrent = lookupAction.get();
+      if (concurrent != null) {
+        return concurrent;
+      }
+      throw ex;
+    }
+  }
 }
