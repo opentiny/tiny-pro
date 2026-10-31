@@ -25,7 +25,7 @@ import java.util.function.Supplier;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -47,7 +47,7 @@ class TokenServiceTest {
     void setUp() {
         jwtUtil = new JwtUtil("token-service-test-secret");
         tokenService = new TokenServiceImpl(jwtUtil, redisUtil, userRepository, redisLockService);
-        doAnswer(invocation -> {
+        lenient().doAnswer(invocation -> {
             Supplier<?> action = invocation.getArgument(1);
             return action.get();
         }).when(redisLockService).execute(anyString(), org.mockito.ArgumentMatchers.<Supplier<Object>>any());
@@ -135,6 +135,8 @@ class TokenServiceTest {
 
         when(redisUtil.getValue("session:7:" + sessionId))
                 .thenReturn(accessClaims.getId() + "|" + refreshClaims.getId());
+        when(redisUtil.getValue("user:user@example.com:token"))
+                .thenReturn("{\"id\":7,\"email\":\"user@example.com\"}");
         when(redisUtil.consumeRefreshToken(anyString(), anyString(), anyString(), anyString(), anyString(), anyLong()))
                 .thenReturn(0L);
 
