@@ -75,9 +75,9 @@ public class ChatServiceImpl implements IChatService {
 
     public ChatServiceImpl(
             @Value("${tinypro.llm.base-url:${LLM_BASE_URL:https://dashscope.aliyuncs.com/compatible-mode/v1}}") String baseUrl,
-            @Value("${tinypro.llm.api-key:${LLM_API_KEY}}") String apiKey,
+            @Value("${tinypro.llm.api-key}") String apiKey,
             @Value("${tinypro.llm.model:${LLM_MODEL:qwen-plus}}") String defaultModel,
-            @Value("${tinypro.llm.extra-body:${LLM_EXTRA_BODY}}") String extraBodyJson,
+            @Value("${tinypro.llm.extra-body}") String extraBodyJson,
             @Value("${tinypro.llm.rate-limit-per-minute:${LLM_RATE_LIMIT_PER_MINUTE:20}}") int rateLimitPerMinute) {
         this.baseUrl = baseUrl.replaceAll("/+$", "");
         this.apiKey = apiKey;
