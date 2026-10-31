@@ -25,9 +25,13 @@ import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
@@ -38,6 +42,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class IUserServiceImpl implements IUserService {
+    private static final Logger logger = LoggerFactory.getLogger(IUserServiceImpl.class);
+
     @Autowired
     private IUserRepository iUserRepository;
     @Autowired
@@ -123,14 +129,11 @@ public class IUserServiceImpl implements IUserService {
     @Override
     @Transactional
     public ResponseEntity<UserVo> removeUserInfo(String email) {
-        try {
-            User user = iUserRepository.findByEmail(email).orElseThrow(() -> new BusinessException("exception.user.userNotFound", HttpStatus.NOT_FOUND, null));
-            iUserRepository.delete(user);
-            UserVo result = UserVo.fromEntity(user);
-            return ResponseEntity.ok(result);
-        } catch (Exception  e) {
-            throw new BusinessException("exception.user.userNumberNull",HttpStatus.BAD_REQUEST,null);
-        }
+        User user = iUserRepository.findByEmail(email)
+                .orElseThrow(() -> new BusinessException("exception.user.userNotFound", HttpStatus.NOT_FOUND, null));
+        iUserRepository.delete(user);
+        registerSessionRevocation(List.of(new UserSession(user.getEmail(), user.getId())));
+        return ResponseEntity.ok(UserVo.fromEntity(user));
     }
 
     @Override
@@ -182,7 +185,7 @@ public class IUserServiceImpl implements IUserService {
                 .collect(Collectors.joining());
 
         if (!originalRoleIds.equals(newRoleIds)) {
-            authService.logout(updateUserDto.getEmail());
+            authService.revokeUserSessions(updateUserDto.getEmail());
         }
 
         return ResponseEntity.ok(result);
@@ -251,7 +254,7 @@ public class IUserServiceImpl implements IUserService {
             iUserRepository.save(user);
 
             // 3. 强制登出该用户
-            redisUtil.deleteValue(Contants.UserJwtTop + user.getEmail() + Contants.UserJwtbt);
+            authService.revokeUserSessions(user.getEmail());
         } else {
             throw new BusinessException("exception.user.userNotFound",HttpStatus.NOT_FOUND,null);
         }
@@ -276,21 +279,51 @@ public class IUserServiceImpl implements IUserService {
         iUserRepository.save(user);
 
         // 4. 删除redis的信息
-        redisUtil.deleteValue(Contants.UserJwtTop + user.getEmail() + Contants.UserJwtbt);
+        authService.revokeUserSessions(user.getEmail());
     }
 
     @Override
     @Transactional
     public ResponseEntity<List<UserVo>> batchDeleteUser(List<String> emails) {
+        List<User> users = iUserRepository.finByEmailBatch(emails);
         List<UserVo> result = new ArrayList<>();
-        iUserRepository.finByEmailBatch(emails).stream().map(item -> {
+        users.forEach(item -> {
             UserVo userVo = new UserVo();
             BeanUtils.copyProperties(item, userVo);
             result.add(userVo);
-            return item;
-        }).collect(Collectors.toList());
+        });
         iUserRepository.deleteByEmailIn(emails);
+        List<UserSession> sessions = users.stream()
+                .map(user -> new UserSession(user.getEmail(), user.getId()))
+                .toList();
+        registerSessionRevocation(sessions);
         return ResponseEntity.ok(result);
+    }
+
+    /** Register Redis cleanup only after the user deletion transaction commits. */
+    private void registerSessionRevocation(List<UserSession> sessions) {
+        Runnable revoke = () -> sessions.forEach(session -> {
+            try {
+                authService.revokeUserSessions(session.email(), session.userId());
+            } catch (RuntimeException exception) {
+                logger.error("Failed to revoke sessions after user deletion: email={}", session.email(), exception);
+            }
+        });
+
+        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+            revoke.run();
+            return;
+        }
+
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                revoke.run();
+            }
+        });
+    }
+
+    private record UserSession(String email, Integer userId) {
     }
 
     private boolean verifyPassword(String inputPassword, String storedPassword, String salt) {

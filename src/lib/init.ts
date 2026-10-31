@@ -1,4 +1,5 @@
 import { parse, stringify } from 'yaml';
+import { randomBytes } from 'crypto';
 import * as path from 'path';
 import { copySync } from 'fs-extra';
 import chalk from 'chalk';
@@ -44,6 +45,11 @@ const createTemplateCopyFilter = (from: string) => {
       .some((segment) => TEMPLATE_EXCLUDED_DIRS.includes(segment));
   };
 };
+
+// Keep the generated value compatible with the legacy 8-character Base64
+// secret format, e.g. `0Zi4SA==`.
+const generateJwtSecret = (): string => randomBytes(32).toString('base64');
+
 
 /**
  * 询问创建项目的描述，使用的技术栈
@@ -281,7 +287,7 @@ const createMonorepoRootSync = (answers: ProjectInfo) => {
     pnpm: {
       overrides: {
         // tiny-robot-chat 依赖 ^1.30.0；低版本 SDK 的 exports 不支持子路径
-        // 目录导入会导致 vite 预构建失败
+        // 目录导入会导致 vite 预构建失败，锁定已知可用版本保证全新安装可运行
         '@modelcontextprotocol/sdk': '1.32.1',
       },
     },
@@ -334,16 +340,28 @@ const createServerSync = (answers: ProjectInfo) => {
       SERVER_PORT: 3000, // 可以改为 answers.serverPort || 3000，如果将来要支持动态端口
     };
 
-    // ===== 2. 拷贝模板后，设置 Spring Boot 配置文件路径 =====
-    const propertiesFilePath = path.join(
+    // ===== 2. 拷贝模板后，设置 Spring Boot 本地配置文件路径 =====
+    const basePropertiesFilePath = path.join(
       serverTo,
       'src/main/resources/application.properties'
     );
+    const propertiesFilePath = path.join(
+      serverTo,
+      'src/main/resources/application-local.properties'
+    );
 
-    if (!existsSync(propertiesFilePath)) {
+    if (!existsSync(basePropertiesFilePath) || !existsSync(propertiesFilePath)) {
       log.error(`❌ 未找到 Spring Boot 配置文件：${propertiesFilePath}`);
       return;
     }
+
+    // CLI-generated projects use local settings by default. Production must
+    // explicitly activate the prod profile and provide deployment variables.
+    const baseEditor = createEditor(basePropertiesFilePath);
+    baseEditor.set('spring.profiles.default', 'local');
+    baseEditor.save(basePropertiesFilePath);
+
+    // ✅ 使用 createEditor 读取本地 properties 文件
 
     // ✅ 1. 使用 createEditor 读取 properties 文件
     const editor = createEditor(propertiesFilePath);
@@ -369,7 +387,7 @@ const createServerSync = (answers: ProjectInfo) => {
     editor.set('spring.datasource.hikari.maximum-pool-size', '10');
     editor.set('spring.datasource.hikari.auto-commit', 'true');
     editor.set('spring.datasource.hikari.max-lifetime', '180000');
-    editor.set('spring.datasource.hikari.connection-timeout', '30000');
+    editor.set('spring.datasource.hikari.connection-timeout', '5000');
 
     // MyBatis-Plus
     editor.set('mybatis-plus.mapper-locations', 'classpath:mappers/*.xml');
@@ -384,7 +402,8 @@ const createServerSync = (answers: ProjectInfo) => {
     );
 
     // JPA (如同时使用)
-    editor.set('spring.jpa.hibernate.ddl-auto', 'update');
+    // Hibernate only validates the Flyway-managed schema; it must never alter it.
+    editor.set('spring.jpa.hibernate.ddl-auto', 'validate');
     editor.set(
       'spring.jpa.database-platform',
       'org.hibernate.dialect.MySQL8Dialect'
@@ -399,7 +418,7 @@ const createServerSync = (answers: ProjectInfo) => {
     );
     editor.set(
       'spring.jpa.properties.hibernate.globally_quoted_identifiers',
-      'true'
+      'false'
     );
     editor.set(
       'spring.jpa.hibernate.naming.physical-strategy',
@@ -407,11 +426,21 @@ const createServerSync = (answers: ProjectInfo) => {
     );
 
     // JWT
-    editor.set('jwt.secret', '0Zi4SA==');
+    // Generate a project-specific fallback once. Deployments can override it
+    // with JWT_SECRET without changing the generated project files.
+    editor.set('jwt.secret', `\${JWT_SECRET:${generateJwtSecret()}}`);
 
     // Redis
     editor.set('spring.data.redis.host', config.REDIS_HOST);
     editor.set('spring.data.redis.port', config.REDIS_PORT.toString());
+    editor.set('spring.data.redis.timeout', '2s');
+    editor.set('spring.data.redis.connect-timeout', '2s');
+
+    // Actuator readiness checks the application dependencies used by probes.
+    editor.set(
+      'management.endpoint.health.group.readiness.include',
+      'readinessState,db,redis'
+    );
 
     // ✅ 4. 保存修改后的内容到原 .properties 文件
     editor.save(propertiesFilePath);
@@ -634,6 +663,7 @@ const createProjectSync = (answers: ProjectInfo) => {
       updatedEnvContent,
       'VITE_LOWCODE_DESIGNER_ENABLED',
       lowcodeEnabled
+
     );
 
     // 根据用户多选结果设置各可选功能的环境变量
@@ -649,6 +679,13 @@ const createProjectSync = (answers: ProjectInfo) => {
       'VITE_MOCK_LOGIN_ENABLED',
       !serverConfirm
     );
+
+    // 根据用户多选结果设置各可选功能的环境变量
+    const selectedFeatures = features ?? [];
+    FEATURE_OPTIONS.forEach((feature) => {
+      const enabled = selectedFeatures.includes(feature.value);
+      updatedEnvContent = setEnvFlag(updatedEnvContent, feature.envKey, enabled);
+    });
 
     fs.writeFileSync(envPath, updatedEnvContent);
     log.success(`低代码设计器环境变量已设置为: ${lowcodeEnabled}`);

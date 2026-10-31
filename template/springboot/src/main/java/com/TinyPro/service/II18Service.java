@@ -5,7 +5,6 @@ import com.TinyPro.entity.dto.UpdateI18Dto;
 import com.TinyPro.entity.page.PageWrapper;
 import com.TinyPro.entity.po.I18;
 import com.TinyPro.entity.vo.I18Vo;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 
@@ -14,9 +13,9 @@ import java.util.Map;
 
 public interface II18Service {
 
-    ResponseEntity<String>  create(CreateI18Dto createI18Dto);
+    ResponseEntity<I18Vo> create(CreateI18Dto createI18Dto);
 
-    Map<String, Map<String, String>> getFormat( HttpServletRequest request);
+    Map<String, Map<String, String>> getFormat(String lang);
 
     ResponseEntity<PageWrapper<I18Vo>> findAll(Integer page, Integer limit, Boolean allBool, List<Integer> lang, String key, String content);
 

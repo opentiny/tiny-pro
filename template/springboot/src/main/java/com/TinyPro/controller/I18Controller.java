@@ -8,10 +8,8 @@ import com.TinyPro.entity.page.PageWrapper;
 import com.TinyPro.entity.po.I18;
 import com.TinyPro.entity.vo.I18Vo;
 import com.TinyPro.service.II18Service;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,13 +26,14 @@ public class I18Controller {
     @Reject
     @PermissionAnnotation("i18n::add")
     @PostMapping("")
-    public ResponseEntity<String> createI18Dto(@Valid @RequestBody CreateI18Dto createI18Dto) {
+    public ResponseEntity<I18Vo> createI18Dto(@Valid @RequestBody CreateI18Dto createI18Dto) {
         return i18Service.create(createI18Dto);
     }
 
     @GetMapping("/format")
-    public ResponseEntity<Map<String, Map<String, String>>> getFormat(HttpServletRequest request) {
-        Map<String, Map<String, String>> result = i18Service.getFormat(request);
+    public ResponseEntity<Map<String, Map<String, String>>> getFormat(
+            @RequestParam(name = "lang", required = false) String lang) {
+        Map<String, Map<String, String>> result = i18Service.getFormat(lang);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
@@ -47,7 +46,7 @@ public class I18Controller {
                                                       @RequestParam (required = false)List<Integer> lang,
                                                       @RequestParam(required = false) String key,
                                                       @RequestParam(required = false) String content) {
-        boolean allBool = !(all != null && all != 0);
+        boolean allBool = all != null && all == 1;
         return i18Service.findAll(page, limit, allBool, lang, key, content);
     }
 
