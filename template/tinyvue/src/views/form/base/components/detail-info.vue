@@ -3,12 +3,11 @@ import {
   Col as TinyCol,
   Form as TinyForm,
   FormItem as TinyFormItem,
-  Input as TinyInput,
   Layout as TinyLayout,
   Radio as TinyRadio,
   Row as TinyRow,
 } from '@opentiny/vue'
-import { reactive, toRefs } from 'vue'
+import { computed, defineAsyncComponent, reactive, toRefs } from 'vue'
 
 interface FilterOptions {
   culture: string
@@ -29,6 +28,15 @@ const state = reactive<{
   } as FilterOptions,
 })
 const { filterOptions } = toRefs(state)
+
+// 检查是否启用 TinyEditor 富文本编辑器
+const isTinyEditorEnabled = computed(() => {
+  return import.meta.env.VITE_TINY_EDITOR_ENABLED === 'true'
+})
+// 未启用时不加载富文本组件对应的 chunk
+const RichTextItem = defineAsyncComponent(
+  () => import('./rich-text-item.vue'),
+)
 
 function objectiveReset() {
   state.filterOptions = {
@@ -122,20 +130,13 @@ defineExpose({
               </div>
             </TinyFormItem>
           </TinyCol>
-          <TinyCol :span="12">
+          <TinyCol v-if="isTinyEditorEnabled" :span="12">
             <TinyFormItem
               :label="$t('baseForm.form.label.remark')"
               prop="condition"
               class="max-sm:mb-4"
             >
-              <TinyInput
-                v-model="filterOptions.remark"
-                type="textarea"
-                class="w-1/2 max-md:w-3/4 max-sm:w-full"
-                :placeholder="$t('searchTable.form.input')"
-                show-word-limit
-                :maxlength="1000"
-              />
+              <RichTextItem />
             </TinyFormItem>
           </TinyCol>
         </transition-fade-down-group>

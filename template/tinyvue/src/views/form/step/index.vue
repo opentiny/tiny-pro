@@ -86,7 +86,7 @@ function handleFormRestore() {
 
 <style scoped lang="less">
 .form-card {
-  padding: 24px 14px;
+  padding: 60px 400px 32px;
 }
 
 .form-scroll {

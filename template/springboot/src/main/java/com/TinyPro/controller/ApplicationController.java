@@ -41,7 +41,7 @@ public class ApplicationController {
     @ApiResponse(responseCode = "200", description = "创建成功"),
     @ApiResponse(responseCode = "400", description = "应用已存在")
   })
-  @PermissionAnnotation("application:add")
+  @PermissionAnnotation("application::add")
   @PostMapping
   public Application createApplication(@Valid @RequestBody CreateApplicationDto dto) {
     return applicationService.createApplication(dto);

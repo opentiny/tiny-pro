@@ -1,19 +1,19 @@
 <script lang="ts" setup>
 import {
-  TinyInput,
-  TinySelect,
+  Modal,
+  TinyButton,
+  TinyDatePicker,
   TinyGrid,
   TinyGridColumn,
-  TinyButton,
+  TinyInput,
   TinyPopconfirm,
-  Modal,
-  TinyDatePicker,
+  TinySelect,
 } from '@opentiny/vue'
-import { iconSave, iconDel, iconEdit } from '@opentiny/vue-icon'
+import { iconDel, iconEdit, iconSave } from '@opentiny/vue-icon'
 import { t } from '@opentiny/vue-locale'
 import { ref } from 'vue'
-import StatusRender from './status-render.vue'
 import SelectRender from './select-render.vue'
+import StatusRender from './status-render.vue'
 
 interface CompProps {
   options?: {
@@ -43,7 +43,7 @@ const gridTable = ref({
 
 const defaultRender = (h, { row, column }) => row[column.property] ?? '--'
 
-const addRow = () => {
+function addRow() {
   if (gridRef.value.getActiveRow()) {
     Modal.message({
       message: t('advanceForm.form.validError.add'),
@@ -56,19 +56,19 @@ const addRow = () => {
   })
 }
 
-const saveRow = (row) => {
+function saveRow(row) {
   gridRef.value.clearActived()
 }
 
-const deleteRow = (row) => {
+function deleteRow(row) {
   gridRef.value.remove(row)
 }
 
-const editRow = (row) => {
+function editRow(row) {
   gridRef.value.setActiveRow(row)
 }
 
-const resetGrid = () => {
+function resetGrid() {
   gridTable.value.data = []
 }
 

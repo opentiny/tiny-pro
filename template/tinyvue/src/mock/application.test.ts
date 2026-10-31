@@ -44,10 +44,10 @@ test('GET /api/application filters by classify and keywords', async () => {
 
   const search = await dispatchMockRequest(application, {
     method: 'get',
-    url: '/api/application?page=1&limit=10&keywords=TinyRobot&classify=all',
+    url: '/api/application?page=1&limit=10&keywords=TinyEditor&classify=all',
   })
   const searchBody = search.body as { data: Array<{ name: string }>, total: number }
   assert.equal(search.statusCode, 200)
   assert.equal(searchBody.total, 1)
-  assert.match(searchBody.data[0].name, /TinyRobot/)
+  assert.match(searchBody.data[0].name, /TinyEditor/)
 })

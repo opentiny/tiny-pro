@@ -41,6 +41,8 @@ jobs:
           VITE_MOCK_SERVER_HOST: /mock
           VITE_USE_MOCK: true
           VITE_LOWCODE_DESIGNER_ENABLED: false
+          VITE_TINY_ROBOT_ENABLED: true
+          VITE_TINY_EDITOR_ENABLED: true
       - name: Prepare GitHub Pages
         run: |
           touch ./template/tinyvue/dist/.nojekyll
