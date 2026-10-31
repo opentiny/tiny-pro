@@ -340,17 +340,16 @@ public class DataInitializer implements CommandLineRunner {
         Permission superPermission = permissionRepository.findFirstByNameOrderByIdAsc("*")
                 .orElseThrow(() -> new IllegalStateException("super permission not initialized"));
 
+        Role persisted = roleRepository.findFirstByNameOrderByIdAsc(Contants.ADMIN).orElse(null);
+        if (persisted != null) {
+            return persisted;
+        }
+
         Role role = new Role();
         role.setName(Contants.ADMIN);
-
-        Role persisted = findOrInsert(
-                () -> roleRepository.findFirstByNameOrderByIdAsc(Contants.ADMIN).orElse(null),
-                () -> roleRepository.saveAndFlush(role)
-        );
-
-        persisted.setPermission(new HashSet<>(List.of(superPermission)));
-        persisted.setMenus(new HashSet<>(menuRepository.findAll()));
-        return roleRepository.saveAndFlush(persisted);
+        role.setPermission(new HashSet<>(List.of(superPermission)));
+        role.setMenus(new HashSet<>(menuRepository.findAll()));
+        return roleRepository.saveAndFlush(role);
     }
 
     private void initUser(Role role) {
