@@ -30,6 +30,10 @@ public final class TokenRedisKeys {
         return "used:rt:" + uid + ":" + refreshJti;
     }
 
+    public static String refreshRotationResult(String uid, String refreshJti) {
+        return usedRefresh(uid, refreshJti) + ":result";
+    }
+
     public static String sessions(String uid) {
         return USER_PREFIX + uid + ":sessions";
     }

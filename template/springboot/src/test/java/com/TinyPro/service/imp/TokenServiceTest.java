@@ -7,9 +7,11 @@ import com.TinyPro.entity.vo.TokenPair;
 import com.TinyPro.exception.BusinessException;
 import com.TinyPro.jpa.IUserRepository;
 import com.TinyPro.redis.RedisLockService;
+import com.TinyPro.redis.TokenRedisKeys;
 import com.TinyPro.redis.RedisUtil;
 import com.TinyPro.service.TokenService;
 import com.TinyPro.utils.JwtUtil;
+import com.alibaba.fastjson.JSON;
 import io.jsonwebtoken.Claims;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,6 +55,7 @@ class TokenServiceTest {
         }).when(redisLockService).execute(anyString(), org.mockito.ArgumentMatchers.<Supplier<Object>>any());
         ReflectionTestUtils.setField(tokenService, "accessTokenTtlSeconds", 7200L);
         ReflectionTestUtils.setField(tokenService, "refreshTokenTtlMillis", 604800000L);
+        ReflectionTestUtils.setField(tokenService, "refreshRetryGraceMillis", 1000L);
     }
 
     @Test
@@ -97,6 +100,28 @@ class TokenServiceTest {
 
         assertNotEquals(original.getAccessToken(), rotated.getAccessToken());
         assertNotEquals(original.getRefreshToken(), rotated.getRefreshToken());
+        verify(redisUtil).setValueMillis(
+                eq(TokenRedisKeys.refreshRotationResult(uid, refreshClaims.getId())),
+                contains(rotated.getAccessToken()),
+                eq(1000L));
+    }
+
+    @Test
+    void rotateReturnsGraceResultForConcurrentRetry() {
+        TokenPair original = tokenService.issue(user(7, "user@example.com"));
+        Claims refreshClaims = jwtUtil.parseJwt(original.getRefreshToken());
+        Claims accessClaims = jwtUtil.parseJwt(original.getAccessToken());
+        String sessionId = accessClaims.get("sid", String.class);
+        TokenPair gracePair = new TokenPair("grace-access", "grace-refresh", 7200000L, 604800000L);
+
+        when(redisUtil.getValue(TokenRedisKeys.session("7", sessionId)))
+                .thenReturn("new-access|new-refresh");
+        when(redisUtil.getValue(TokenRedisKeys.refreshRotationResult("7", refreshClaims.getId())))
+                .thenReturn(JSON.toJSONString(gracePair));
+
+        TokenPair result = tokenService.rotate(original.getRefreshToken());
+
+        assertEquals(gracePair, result);
     }
 
     @Test
@@ -123,6 +148,19 @@ class TokenServiceTest {
         assertEquals("exception.common.tokenReplay", exception.getErrorCode());
         verify(redisUtil).deleteValue("at:7:" + accessClaims.getId());
         verify(redisUtil).deleteValue("rt:7:" + refreshClaims.getId());
+    }
+
+    @Test
+    void rotateRejectsAccessTokenAsBadRequest() {
+        TokenPair pair = tokenService.issue(user(7, "user@example.com"));
+
+        BusinessException exception = assertThrows(
+                BusinessException.class,
+                () -> tokenService.rotate(pair.getAccessToken())
+        );
+
+        assertEquals(400, exception.getHttpStatus().value());
+        assertEquals("exception.common.tokenError", exception.getErrorCode());
     }
 
     @Test

@@ -45,6 +45,9 @@ public class TokenServiceImpl implements TokenService {
     @Value("${auth.refresh-token-ttl-millis:604800000}")
     private long refreshTokenTtlMillis;
 
+    @Value("${auth.refresh-retry-grace-millis:1000}")
+    private long refreshRetryGraceMillis;
+
     @Value("${auth.api-token-ttl-seconds:604800}")
     private long apiTokenTtlSeconds;
 
@@ -328,12 +331,12 @@ public class TokenServiceImpl implements TokenService {
         Claims claims = parseToken(presentedRefreshToken);
         String type = claims.get("typ", String.class);
         if (type != null && !"refresh".equals(type)) {
-            throw tokenError();
+            throw refreshTokenRequestError();
         }
         String refreshJti = requiredClaim(claims, "jti");
         String accessJti = requiredClaim(claims, "accessTokenJti");
         if (claims.get("refreshTokenJti") != null) {
-            throw tokenError();
+            throw refreshTokenRequestError();
         }
 
         int userId = userId(claims);
@@ -343,6 +346,16 @@ public class TokenServiceImpl implements TokenService {
         String sessionValue = redisUtil.getValue(TokenRedisKeys.session(uid, sessionId));
 
         if (!matchesSession(sessionValue, accessJti, refreshJti)) {
+            String rotationResult = redisUtil.getValue(
+                    TokenRedisKeys.refreshRotationResult(uid, refreshJti));
+            if (StringUtils.isNotBlank(rotationResult)) {
+                try {
+                    return JSON.parseObject(rotationResult, TokenPair.class);
+                } catch (RuntimeException exception) {
+                    logger.warn("Invalid refresh rotation grace result: uid={} refreshJti={}",
+                            uid, refreshJti, exception);
+                }
+            }
             if (sessionId.equals(redisUtil.getValue(TokenRedisKeys.usedRefresh(uid, refreshJti)))) {
                 revokeSession(uid, sessionId);
                 throw replayError();
@@ -374,7 +387,17 @@ public class TokenServiceImpl implements TokenService {
             throw expiredError();
         }
 
-        return issue(userId, email, userJson, sessionId);
+        TokenPair rotated = issue(userId, email, userJson, sessionId);
+        if (refreshRetryGraceMillis > 0) {
+            assertLeaseHeld();
+            redisUtil.setValueMillis(
+                    TokenRedisKeys.refreshRotationResult(uid, refreshJti),
+                    JSON.toJSONString(rotated),
+                    refreshRetryGraceMillis
+            );
+            assertLeaseHeld();
+        }
+        return rotated;
     }
 
     public boolean isAccessTokenActive(String accessToken) {
@@ -573,6 +596,10 @@ public class TokenServiceImpl implements TokenService {
 
     private BusinessException tokenError() {
         return new BusinessException("exception.common.tokenError", HttpStatus.UNAUTHORIZED, null);
+    }
+
+    private BusinessException refreshTokenRequestError() {
+        return new BusinessException("exception.common.tokenError", HttpStatus.BAD_REQUEST, null);
     }
 
     private BusinessException expiredError() {
