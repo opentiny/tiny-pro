@@ -99,7 +99,15 @@ public class ApplicationServiceImpl implements ApplicationService {
       return null;
     }
     if (tag.isTextual()) {
-      return tag.textValue();
+      try {
+        JsonNode parsed = objectMapper.readTree(tag.textValue());
+        if (parsed == null) {
+          throw new BusinessException("applicationInfo.invalidTag", HttpStatus.BAD_REQUEST, null);
+        }
+        return objectMapper.writeValueAsString(parsed);
+      } catch (JsonProcessingException ex) {
+        throw new BusinessException("applicationInfo.invalidTag", HttpStatus.BAD_REQUEST, null);
+      }
     }
     try {
       return objectMapper.writeValueAsString(tag);
