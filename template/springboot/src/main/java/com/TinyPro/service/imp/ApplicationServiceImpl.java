@@ -4,6 +4,7 @@ import com.TinyPro.entity.dto.CreateApplicationDto;
 import com.TinyPro.entity.dto.ApplicationPaginationQueryDto;
 import com.TinyPro.entity.po.Application;
 import com.TinyPro.entity.vo.ApplicationVo;
+import com.TinyPro.exception.BusinessException;
 import com.TinyPro.jpa.ApplicationRepository;
 import com.TinyPro.service.ApplicationService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -12,8 +13,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,18 +21,15 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
 public class ApplicationServiceImpl implements ApplicationService {
 
   private final ApplicationRepository applicationRepository;
-  private final MessageSource messageSource;
   private final ObjectMapper objectMapper;
 
   // 分页查询
@@ -83,16 +79,9 @@ public class ApplicationServiceImpl implements ApplicationService {
   public Application createApplication(@Valid CreateApplicationDto dto) {
     String name = dto.getName();
     Application existing = applicationRepository.findByName(name);
-    Locale locale = LocaleContextHolder.getLocale();
 
     if (existing != null) {
-      String msg = messageSource.getMessage(
-        "exception.applicationInfo.exists",
-        new Object[]{name},
-        "应用已存在",
-        locale
-      );
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, msg);
+      throw new BusinessException("applicationInfo.exists", HttpStatus.BAD_REQUEST, name);
     }
 
     Application newApp = new Application(
@@ -115,7 +104,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     try {
       return objectMapper.writeValueAsString(tag);
     } catch (JsonProcessingException ex) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid tag format", ex);
+      throw new BusinessException("applicationInfo.invalidTag", HttpStatus.BAD_REQUEST, null);
     }
   }
 }

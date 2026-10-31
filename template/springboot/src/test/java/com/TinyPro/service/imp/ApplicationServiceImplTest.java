@@ -16,7 +16,7 @@ class ApplicationServiceImplTest {
     void serializesTagArrayBeforeSaving() throws Exception {
         ApplicationRepository repository = repositoryStub();
         ObjectMapper objectMapper = new ObjectMapper();
-        ApplicationServiceImpl service = new ApplicationServiceImpl(repository, null, objectMapper);
+        ApplicationServiceImpl service = new ApplicationServiceImpl(repository, objectMapper);
 
         CreateApplicationDto dto = new CreateApplicationDto();
         dto.setName("Tag array application");
@@ -31,7 +31,7 @@ class ApplicationServiceImplTest {
     void keepsJsonStringTagCompatible() throws Exception {
         ApplicationRepository repository = repositoryStub();
         ObjectMapper objectMapper = new ObjectMapper();
-        ApplicationServiceImpl service = new ApplicationServiceImpl(repository, null, objectMapper);
+        ApplicationServiceImpl service = new ApplicationServiceImpl(repository, objectMapper);
 
         CreateApplicationDto dto = new CreateApplicationDto();
         dto.setName("String tag application");

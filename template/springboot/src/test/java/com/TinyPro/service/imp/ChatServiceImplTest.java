@@ -1,6 +1,7 @@
 package com.TinyPro.service.imp;
 
 import com.TinyPro.entity.dto.ChatCompletionDto;
+import com.TinyPro.exception.BusinessException;
 import com.sun.net.httpserver.HttpServer;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
@@ -8,7 +9,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -148,31 +148,34 @@ class ChatServiceImplTest {
     void 未配置LLMApiKey时应抛出500() {
         ChatServiceImpl service = new ChatServiceImpl(
                 "http://127.0.0.1:1/v1", "", "qwen-plus", "", 0);
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+        BusinessException exception = assertThrows(BusinessException.class,
                 () -> service.proxyChatCompletions(
                         dto("hi"), mockRequest(), mock(HttpServletResponse.class), "user@a.com"));
-        assertEquals(500, exception.getStatusCode().value());
+        assertEquals(500, exception.getHttpStatus().value());
+        assertEquals("chat.llm.apiKeyMissing", exception.getErrorCode());
     }
 
     @Test
     void LLMExtraBody非法JSON时应抛出500() {
         ChatServiceImpl service = new ChatServiceImpl(
                 "http://127.0.0.1:1/v1", "sk-test-key", "qwen-plus", "{invalid", 0);
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+        BusinessException exception = assertThrows(BusinessException.class,
                 () -> service.proxyChatCompletions(
                         dto("hi"), mockRequest(), mock(HttpServletResponse.class), "user@a.com"));
-        assertEquals(500, exception.getStatusCode().value());
+        assertEquals(500, exception.getHttpStatus().value());
+        assertEquals("chat.llm.extraBodyInvalid", exception.getErrorCode());
     }
 
     @Test
     void 上游返回错误时应包装为502并携带上游错误信息() {
         String baseUrl = startStub("unauthorized");
         ChatServiceImpl service = new ChatServiceImpl(baseUrl, "sk-wrong-key", "qwen-plus", "", 0);
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+        BusinessException exception = assertThrows(BusinessException.class,
                 () -> service.proxyChatCompletions(
                         dto("hi"), mockRequest(), mock(HttpServletResponse.class), "user@a.com"));
-        assertEquals(502, exception.getStatusCode().value());
-        assertTrue(exception.getReason().contains("Invalid API-key"));
+        assertEquals(502, exception.getHttpStatus().value());
+        assertEquals("chat.llm.upstreamError", exception.getErrorCode());
+        assertTrue(exception.getArgs().toString().contains("Invalid API-key"));
     }
 
     @Test
@@ -240,9 +243,10 @@ class ChatServiceImplTest {
         HttpServletRequest request = mockRequest();
         service.proxyChatCompletions(dto("1"), request, response, "user@a.com");
         service.proxyChatCompletions(dto("2"), request, response, "user@a.com");
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+        BusinessException exception = assertThrows(BusinessException.class,
                 () -> service.proxyChatCompletions(dto("3"), request, response, "user@a.com"));
-        assertEquals(429, exception.getStatusCode().value());
+        assertEquals(429, exception.getHttpStatus().value());
+        assertEquals("chat.rateLimited", exception.getErrorCode());
 
         // 其他用户不受影响
         service.proxyChatCompletions(dto("4"), request, response, "other@a.com");

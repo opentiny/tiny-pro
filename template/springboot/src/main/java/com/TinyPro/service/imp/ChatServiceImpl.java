@@ -1,6 +1,7 @@
 package com.TinyPro.service.imp;
 
 import com.TinyPro.entity.dto.ChatCompletionDto;
+import com.TinyPro.exception.BusinessException;
 import com.TinyPro.service.IChatService;
 import com.alibaba.fastjson2.JSON;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -98,8 +98,7 @@ public class ChatServiceImpl implements IChatService {
         checkRateLimit(userEmail);
 
         if (apiKey == null || apiKey.isBlank()) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
-                    "服务端未配置 LLM_API_KEY，请在环境变量中配置后重启服务");
+            throw new BusinessException("chat.llm.apiKeyMissing", HttpStatus.INTERNAL_SERVER_ERROR, null);
         }
 
         Map<String, Object> extraBody = parseExtraBody();
@@ -115,8 +114,10 @@ public class ChatServiceImpl implements IChatService {
 
         if (upstream.statusCode() < 200 || upstream.statusCode() >= 300 || upstream.body() == null) {
             String detail = readErrorBody(upstream);
-            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY,
-                    detail == null || detail.isBlank() ? "大模型服务请求失败" : detail);
+            if (detail == null || detail.isBlank()) {
+                throw new BusinessException("chat.llm.upstreamRequestFailed", HttpStatus.BAD_GATEWAY, null);
+            }
+            throw new BusinessException("chat.llm.upstreamError", HttpStatus.BAD_GATEWAY, detail);
         }
 
         // 客户端断开时由容器关闭输出流；这里对上游 InputStream 使用 try-with-resources，
@@ -191,19 +192,17 @@ public class ChatServiceImpl implements IChatService {
                     .build();
         } catch (Exception e) {
             logger.error("构造大模型请求失败: {}", e.getMessage());
-            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY,
-                    "大模型服务连接失败，请检查 LLM_BASE_URL 与服务网络");
+            throw new BusinessException("chat.llm.connectionFailed", HttpStatus.BAD_GATEWAY, null);
         }
 
         try {
             return httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofInputStream());
         } catch (IOException e) {
             logger.error("调用大模型服务失败: {}", e.getMessage());
-            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY,
-                    "大模型服务连接失败，请检查 LLM_BASE_URL 与服务网络");
+            throw new BusinessException("chat.llm.connectionFailed", HttpStatus.BAD_GATEWAY, null);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "大模型服务请求被中断");
+            throw new BusinessException("chat.llm.requestInterrupted", HttpStatus.BAD_GATEWAY, null);
         }
     }
 
@@ -216,8 +215,7 @@ public class ChatServiceImpl implements IChatService {
             Map<String, Object> parsed = JSON.parseObject(extraBodyJson, Map.class);
             return parsed == null ? Map.of() : parsed;
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
-                    "LLM_EXTRA_BODY 不是合法的 JSON 字符串");
+            throw new BusinessException("chat.llm.extraBodyInvalid", HttpStatus.INTERNAL_SERVER_ERROR, null);
         }
     }
 
@@ -244,8 +242,7 @@ public class ChatServiceImpl implements IChatService {
             evictExpired(window, windowStart);
             if (window.size() >= rateLimitPerMinute) {
                 logger.warn("用户对话请求触发限流: user={} limit={}/min", userEmail, rateLimitPerMinute);
-                throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS,
-                        "对话请求过于频繁，请稍后再试");
+                throw new BusinessException("chat.rateLimited", HttpStatus.TOO_MANY_REQUESTS, null);
             }
             window.addLast(now);
             return window;
