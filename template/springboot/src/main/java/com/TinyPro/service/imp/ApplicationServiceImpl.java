@@ -98,21 +98,39 @@ public class ApplicationServiceImpl implements ApplicationService {
     if (tag == null || tag.isNull()) {
       return null;
     }
+
+    JsonNode normalizedTag = tag;
     if (tag.isTextual()) {
       try {
-        JsonNode parsed = objectMapper.readTree(tag.textValue());
-        if (parsed == null) {
-          throw new BusinessException("applicationInfo.invalidTag", HttpStatus.BAD_REQUEST, null);
-        }
-        return objectMapper.writeValueAsString(parsed);
+        normalizedTag = objectMapper.readTree(tag.textValue());
       } catch (JsonProcessingException ex) {
-        throw new BusinessException("applicationInfo.invalidTag", HttpStatus.BAD_REQUEST, null);
+        throw invalidTag();
       }
     }
+
+    validateTagArray(normalizedTag);
     try {
-      return objectMapper.writeValueAsString(tag);
+      return objectMapper.writeValueAsString(normalizedTag);
     } catch (JsonProcessingException ex) {
-      throw new BusinessException("applicationInfo.invalidTag", HttpStatus.BAD_REQUEST, null);
+      throw invalidTag();
     }
+  }
+
+  private void validateTagArray(JsonNode tag) {
+    if (tag == null || !tag.isArray()) {
+      throw invalidTag();
+    }
+
+    for (JsonNode item : tag) {
+      if (item == null || !item.isObject()
+          || !item.has("type") || !item.get("type").isTextual()
+          || !item.has("value") || !item.get("value").isTextual()) {
+        throw invalidTag();
+      }
+    }
+  }
+
+  private BusinessException invalidTag() {
+    return new BusinessException("applicationInfo.invalidTag", HttpStatus.BAD_REQUEST, null);
   }
 }
