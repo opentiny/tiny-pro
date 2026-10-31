@@ -129,8 +129,12 @@ public class ChatServiceImpl implements IChatService {
 
         try (InputStream upstreamStream = upstream.body();
              OutputStream out = response.getOutputStream()) {
-            transferWithIdleTimeout(upstreamStream, out);
-            out.flush();
+            byte[] buffer = new byte[8192];
+            int read;
+            while ((read = upstreamStream.read(buffer)) != -1) {
+                out.write(buffer, 0, read);
+                out.flush();
+            }
         } catch (SocketTimeoutException timeoutException) {
             logger.warn("上游对话流读取空闲超时: user={} {}", userEmail, timeoutException.getMessage());
         } catch (IOException ioException) {
