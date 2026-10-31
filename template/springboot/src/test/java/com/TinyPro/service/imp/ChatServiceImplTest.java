@@ -16,6 +16,7 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -117,11 +118,11 @@ class ChatServiceImplTest {
     }
 
     private ChatCompletionDto dto(String content) {
-        ChatCompletionDto.ChatMessage message = new ChatCompletionDto.ChatMessage();
-        message.setRole("user");
-        message.setContent(content);
         ChatCompletionDto dto = new ChatCompletionDto();
-        dto.setMessages(List.of(message));
+        dto.setMessages(List.of(Map.of(
+                "role", "user",
+                "content", content
+        )));
         return dto;
     }
 
