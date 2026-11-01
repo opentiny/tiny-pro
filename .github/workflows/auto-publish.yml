@@ -12,7 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write
+    outputs:
+      dist_tag: ${{ steps.parse_tag.outputs.dist_tag }}
     steps:
       - name: CheckOut Code
         uses: actions/checkout@master
@@ -72,17 +73,41 @@ jobs:
           VERSION="$(node -p "require('./package.json').version")"
           echo "publish version: $VERSION"
           echo "publish tag: ${{ steps.parse_tag.outputs.dist_tag }}"
+      - name: Pack publish artifact
+        run: |
+          mkdir -p "$RUNNER_TEMP/npm-package"
+          npm pack --pack-destination "$RUNNER_TEMP/npm-package"
+      - name: Upload publish artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-package
+          path: ${{ runner.temp }}/npm-package/*.tgz
+          if-no-files-found: error
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
       - name: Setup Node for trusted publishing
         uses: actions/setup-node@v4
         with:
-          node-version: '>=24.19.0 <25'
+          node-version: '>=24.19.0 <25' # OIDC 需要 Node >=22.14.0 和 npm >=11.5.1；Node 24.5.0 起内置 npm >=11.5.1
+
+      - name: Download publish artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: npm-package
+          path: ${{ runner.temp }}/npm-package
 
       - name: Publish @opentiny/tiny-toolkit-pro
         run: |
-          npm publish --tag ${{ steps.parse_tag.outputs.dist_tag }}
+          npm publish "$RUNNER_TEMP"/npm-package/*.tgz --ignore-scripts --tag ${{ needs.build.outputs.dist_tag }}
 
       - name: Release
-        if: ${{ steps.parse_tag.outputs.dist_tag == 'latest' }}
+        if: ${{ needs.build.outputs.dist_tag == 'latest' }}
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ github.ref_name }}
