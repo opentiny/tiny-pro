@@ -657,13 +657,13 @@ const createProjectSync = (answers: ProjectInfo) => {
         `$1${enabled}`
       );
 
-
-
-    // 仅前端项目开启模拟登录：登录不请求后端接口，直接模拟登录成功
+    // 根据用户选择设置低代码设计器环境变量
+    const lowcodeEnabled = lowcodeEngine === LowcodeEngine.Include;
     updatedEnvContent = setEnvFlag(
       updatedEnvContent,
-      'VITE_MOCK_LOGIN_ENABLED',
-      !serverConfirm
+      'VITE_LOWCODE_DESIGNER_ENABLED',
+      lowcodeEnabled
+
     );
 
     // 根据用户多选结果设置各可选功能的环境变量
@@ -672,6 +672,15 @@ const createProjectSync = (answers: ProjectInfo) => {
       const enabled = selectedFeatures.includes(feature.value);
       updatedEnvContent = setEnvFlag(updatedEnvContent, feature.envKey, enabled);
     });
+
+    // 仅前端项目开启模拟登录：登录不请求后端接口，直接模拟登录成功
+    updatedEnvContent = setEnvFlag(
+      updatedEnvContent,
+      'VITE_MOCK_LOGIN_ENABLED',
+      !serverConfirm
+    );
+
+   
 
     fs.writeFileSync(envPath, updatedEnvContent);
     log.success(`低代码设计器环境变量已设置为: ${lowcodeEnabled}`);
