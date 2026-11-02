@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "application")
 @Data
+@DynamicUpdate
 public class Application {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,7 +23,6 @@ public class Application {
 
   private String description;
   @Lob
-  @Column(columnDefinition = "TEXT")
   private String tag;
 
   private String icon;
