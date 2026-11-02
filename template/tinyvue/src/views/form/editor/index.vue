@@ -13,19 +13,20 @@ const router = useRouter()
 
 type EditorView = 'documents' | 'collaboration'
 
-const currentView = ref<EditorView>('documents')
+// 从创作页返回时,按来源高亮对应列表（多人协同 / 开始创作）
+const currentView = ref<EditorView>(route.query.view === 'collaboration' ? 'collaboration' : 'documents')
 
 const menus = [
   {
     key: 'create' as const,
-    title: '内容创作',
-    desc: '创建并编辑你的富文本文档',
+    title: '开始创作',
+    desc: '创建文档',
     icon: IconEdit,
   },
   {
     key: 'collaboration' as EditorView,
     title: '多人协同',
-    desc: '与团队成员实时协同编辑',
+    desc: '多人协同编辑',
     icon: IconGroup,
   },
 ]
@@ -131,10 +132,10 @@ function handleMenuClick(key: 'create' | EditorView) {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: 36px;
-  height: 36px;
+  width: 20px;
+  height: 20px;
   margin-right: 12px;
-  font-size: 22px;
+  font-size: 20px;
   color: #333;
 }
 
@@ -147,19 +148,20 @@ function handleMenuClick(key: 'create' | EditorView) {
 
 .editor-menu-item-title {
   font-size: 14px;
-  font-weight: 600;
-  line-height: 22px;
-  color: #333;
+  font-weight: 700;
+  line-height: 16px;
+  color: #595959;
 }
 
 .editor-menu-item-desc {
   font-size: 14px;
   font-weight: 400;
-  line-height: 22px;
-  color: #666;
+  line-height: 16px;
+  color: #808080;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
+  margin-top: 4px;
 }
 
 .editor-content {
