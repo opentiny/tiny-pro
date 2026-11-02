@@ -11,6 +11,7 @@ import java.util.Optional;
 
 public interface IUserRepository extends JpaRepository<User, Long> , JpaSpecificationExecutor<User> {
     Optional<User> findByEmail(String email);
+    List<User> findAllByEmail(String email);
     boolean existsByRoleId(Long roleId);
     @Modifying
     void deleteByRoleId(Long roleId);

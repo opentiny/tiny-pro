@@ -1,16 +1,40 @@
 package com.TinyPro.redis;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
+import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Component
 public class RedisUtil {
 
+    private static final RedisScript<Long> CONSUME_REFRESH_TOKEN_SCRIPT = new DefaultRedisScript<>("""
+            local current = redis.call('GET', KEYS[1])
+            if current == ARGV[1] then
+                redis.call('DEL', KEYS[1], KEYS[2], KEYS[4])
+                redis.call('LREM', KEYS[5], 0, ARGV[4])
+                redis.call('LREM', KEYS[6], 0, ARGV[2])
+                redis.call('LREM', KEYS[7], 0, ARGV[3])
+                redis.call('SET', KEYS[3], ARGV[4], 'PX', ARGV[5])
+                return 1
+            end
+
+            if redis.call('GET', KEYS[3]) == ARGV[4] then
+                return 2
+            end
+            return 0
+            """, Long.class);
+
     @Autowired
-    private RedisTemplate<String, String> redisTemplate;
+    private StringRedisTemplate redisTemplate;
 
     /**
      * 设置 Redis 中的值，并设置过期时间
@@ -23,6 +47,14 @@ public class RedisUtil {
         redisTemplate.opsForValue().set(key, value, timeout, TimeUnit.SECONDS);
     }
 
+    public void setValueMillis(String key, String value, long timeoutMillis) {
+        redisTemplate.opsForValue().set(key, value, timeoutMillis, TimeUnit.MILLISECONDS);
+    }
+
+    public void expireMillis(String key, long timeoutMillis) {
+        redisTemplate.expire(key, timeoutMillis, TimeUnit.MILLISECONDS);
+    }
+
     /**
      * 获取 Redis 中的值
      *
@@ -33,6 +65,18 @@ public class RedisUtil {
         return redisTemplate.opsForValue().get(key);
     }
 
+    public boolean exists(String key) {
+        return Boolean.TRUE.equals(redisTemplate.hasKey(key));
+    }
+
+    /**
+     * Stores a value without a TTL. Used for installation state that must
+     * survive application restarts until it is explicitly removed.
+     */
+    public void setPersistentValue(String key, String value) {
+        redisTemplate.opsForValue().set(key, value);
+    }
+
     /**
      * 删除 Redis 中的值
      *
@@ -40,5 +84,110 @@ public class RedisUtil {
      */
     public void deleteValue(String key) {
         redisTemplate.delete(key);
+    }
+
+    public void leftPush(String key, String value) {
+        redisTemplate.opsForList().leftPush(key, value);
+    }
+
+    public List<String> range(String key, long start, long end) {
+        List<String> values = redisTemplate.opsForList().range(key, start, end);
+        return values == null ? List.of() : values;
+    }
+
+    public void removeList(String key, String value) {
+        redisTemplate.opsForList().remove(key, 0, value);
+    }
+
+    public void setApiToken(String email, String tokenId, String token, long ttlSeconds) {
+        setValue(TokenRedisKeys.apiToken(email, tokenId), token, ttlSeconds);
+        redisTemplate.opsForSet().add(TokenRedisKeys.apiTokenIds(email), tokenId);
+    }
+
+    public String getApiToken(String email, String tokenId) {
+        return getValue(TokenRedisKeys.apiToken(email, tokenId));
+    }
+
+    public List<String> getAllApiTokens(String email) {
+        Set<String> tokenIds = redisTemplate.opsForSet().members(TokenRedisKeys.apiTokenIds(email));
+        Set<String> keys = new LinkedHashSet<>();
+        if (tokenIds != null) {
+            tokenIds.stream()
+                    .filter(Objects::nonNull)
+                    .map(tokenId -> TokenRedisKeys.apiToken(email, tokenId))
+                    .forEach(keys::add);
+        }
+
+        if (keys == null || keys.isEmpty()) {
+            return List.of();
+        }
+        List<String> values = redisTemplate.opsForValue().multiGet(keys);
+        return values == null ? List.of() : values.stream().filter(Objects::nonNull).toList();
+    }
+
+    public void deleteApiToken(String email, String tokenId) {
+        deleteValue(TokenRedisKeys.apiToken(email, tokenId));
+        redisTemplate.opsForSet().remove(TokenRedisKeys.apiTokenIds(email), tokenId);
+    }
+
+    public void deleteAllApiTokens(String email) {
+        String indexKey = TokenRedisKeys.apiTokenIds(email);
+        Set<String> tokenIds = redisTemplate.opsForSet().members(indexKey);
+        if (tokenIds != null && !tokenIds.isEmpty()) {
+            Set<String> keys = tokenIds.stream()
+                    .filter(Objects::nonNull)
+                    .map(tokenId -> TokenRedisKeys.apiToken(email, tokenId))
+                    .collect(java.util.stream.Collectors.toCollection(LinkedHashSet::new));
+            if (!keys.isEmpty()) {
+                redisTemplate.delete(keys);
+            }
+        }
+        redisTemplate.delete(indexKey);
+    }
+
+    public boolean containsApiToken(String email, String tokenId, String token) {
+        if (tokenId == null || tokenId.isBlank()) {
+            return false;
+        }
+        return token.equals(getApiToken(email, tokenId));
+    }
+
+    /**
+     * Atomically consumes a refresh token. Return values: 1 consumed, 2 replay,
+     * 0 missing or mismatched token.
+     */
+    public Long consumeRefreshToken(
+            String uid,
+            String refreshJti,
+            String refreshToken,
+            String accessJti,
+            String sessionId,
+            long replayTtlMillis
+    ) {
+        String refreshKey = TokenRedisKeys.refresh(uid, refreshJti);
+        String accessKey = TokenRedisKeys.access(uid, accessJti);
+        String usedKey = TokenRedisKeys.usedRefresh(uid, refreshJti);
+        String sessionKey = TokenRedisKeys.session(uid, sessionId);
+        String sessionListKey = TokenRedisKeys.sessions(uid);
+        String refreshListKey = TokenRedisKeys.refreshIndex(uid);
+        String accessListKey = TokenRedisKeys.accessIndex(uid);
+
+        return redisTemplate.execute(
+                CONSUME_REFRESH_TOKEN_SCRIPT,
+                Arrays.asList(
+                        refreshKey,
+                        accessKey,
+                        usedKey,
+                        sessionKey,
+                        sessionListKey,
+                        refreshListKey,
+                        accessListKey
+                ),
+                refreshToken,
+                refreshJti,
+                accessJti,
+                sessionId,
+                String.valueOf(replayTtlMillis)
+        );
     }
 }

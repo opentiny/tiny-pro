@@ -6,6 +6,7 @@ import lombok.Data;
 import org.springframework.beans.BeanUtils;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,7 +51,9 @@ public class UserVo {
         vo.setProtocolEnd(user.getProtocol_end());
         vo.setAddress(user.getAddress());
         vo.setStatus(user.getStatus());
-        List<RoleSimpleVo> collect = user.getRole().stream().map(item -> {
+        List<RoleSimpleVo> collect = user.getRole() == null
+                ? Collections.emptyList()
+                : user.getRole().stream().map(item -> {
             RoleSimpleVo roleSimpleVo = new RoleSimpleVo();
             BeanUtils.copyProperties(item, roleSimpleVo);
             return roleSimpleVo;

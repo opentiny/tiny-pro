@@ -134,6 +134,8 @@ class UserControllerTest {
         User user = new User();
         user.setEmail("admin@no-reply.com");
         user.setName("Info User");
+        user.setPassword("should-not-be-returned");
+        user.setSalt("should-not-be-returned");
 
         when(userService.getUserInfo("admin@no-reply.com"))
                 .thenReturn(new ResponseEntity<>(user, HttpStatus.OK));
@@ -142,7 +144,9 @@ class UserControllerTest {
                         .header("Authorization", "Bearer "+Contants.TOKEN))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value("admin@no-reply.com"))
-                .andExpect(jsonPath("$.name").value("Info User"));
+                .andExpect(jsonPath("$.name").value("Info User"))
+                .andExpect(jsonPath("$.password").doesNotExist())
+                .andExpect(jsonPath("$.salt").doesNotExist());
     }
 
     // ==================== DELETE /user/{email} 【删除用户】====================

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <springProperty scope="context" name="logFile" source="tinypro.logging.file"
+                    defaultValue="logs/tiny-pro.log"/>
+    <springProperty scope="context" name="logMaxFileSize" source="tinypro.logging.max-file-size"
+                    defaultValue="50MB"/>
+    <springProperty scope="context" name="logMaxHistory" source="tinypro.logging.max-history"
+                    defaultValue="30"/>
+    <springProperty scope="context" name="logTotalSizeCap" source="tinypro.logging.total-size-cap"
+                    defaultValue="2GB"/>
+    <springProperty scope="context" name="logLevel" source="LOG_LEVEL" defaultValue="INFO"/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="com.TinyPro.logging.MaskingPatternLayout">
+                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n%ex</pattern>
+            </layout>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${logFile}</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${logFile}.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <maxFileSize>${logMaxFileSize}</maxFileSize>
+            <maxHistory>${logMaxHistory}</maxHistory>
+            <totalSizeCap>${logTotalSizeCap}</totalSizeCap>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="com.TinyPro.logging.MaskingPatternLayout">
+                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n%ex</pattern>
+            </layout>
+        </encoder>
+    </appender>
+
+    <root level="${logLevel}">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
+</configuration>
