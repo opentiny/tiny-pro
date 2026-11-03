@@ -234,6 +234,62 @@ class ChatServiceImplTest {
     }
 
     @Test
+    void 上游响应头返回后迟迟没有首段数据时应触发空闲超时() throws IOException {
+        stub.createContext("/v1/chat/completions", exchange -> {
+            exchange.getResponseHeaders().set("Content-Type", "text/event-stream");
+            exchange.sendResponseHeaders(200, 0);
+            try {
+                Thread.sleep(2_000L);
+            } catch (InterruptedException exception) {
+                Thread.currentThread().interrupt();
+            } finally {
+                exchange.close();
+            }
+        });
+        stub.start();
+
+        ChatServiceImpl service = new ChatServiceImpl(
+                "http://127.0.0.1:" + stub.getAddress().getPort() + "/v1",
+                "sk-test-key", "qwen-plus", "", 0, 1);
+        long startedAt = System.nanoTime();
+
+        service.proxyChatCompletions(
+                dto("hi"), mockRequest(), mockResponse(new ByteArrayOutputStream(), false), "user@a.com");
+
+        long elapsedMillis = (System.nanoTime() - startedAt) / 1_000_000L;
+        assertTrue(elapsedMillis < 1_800L, "idle timeout should stop the read before the upstream closes");
+    }
+
+    @Test
+    void 上游输出首段后持续静默时应触发空闲超时并保留已输出内容() throws IOException {
+        stub.createContext("/v1/chat/completions", exchange -> {
+            exchange.getResponseHeaders().set("Content-Type", "text/event-stream");
+            exchange.sendResponseHeaders(200, 0);
+            try (OutputStream out = exchange.getResponseBody()) {
+                out.write("data: first\n\n".getBytes(StandardCharsets.UTF_8));
+                out.flush();
+                Thread.sleep(2_000L);
+                out.write("data: second\n\n".getBytes(StandardCharsets.UTF_8));
+                out.flush();
+            } catch (InterruptedException exception) {
+                Thread.currentThread().interrupt();
+            }
+        });
+        stub.start();
+
+        ChatServiceImpl service = new ChatServiceImpl(
+                "http://127.0.0.1:" + stub.getAddress().getPort() + "/v1",
+                "sk-test-key", "qwen-plus", "", 0, 1);
+        ByteArrayOutputStream sink = new ByteArrayOutputStream();
+
+        service.proxyChatCompletions(dto("hi"), mockRequest(), mockResponse(sink, false), "user@a.com");
+
+        String output = sink.toString(StandardCharsets.UTF_8);
+        assertTrue(output.contains("data: first"));
+        assertTrue(!output.contains("data: second"));
+    }
+
+    @Test
     void 单用户超过限流阈值时应抛出429() throws IOException {
         // 用正常上游保证前两次请求成功到达限流计数，第三次触发 429
         String baseUrl = startStub("ok");
