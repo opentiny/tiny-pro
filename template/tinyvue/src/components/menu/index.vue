@@ -50,7 +50,7 @@ const localMenuIconComponents = Object.fromEntries(
 )
 
 function resolveMenuIcon(name: string) {
-  if (localMenuIconComponents[name]) {
+  if (Object.prototype.hasOwnProperty.call(localMenuIconComponents, name)) {
     return localMenuIconComponents[name]
   }
   try {
