@@ -47,7 +47,7 @@ public class II18ServiceImpl implements II18Service {
     public ResponseEntity<I18Vo> create(CreateI18Dto createI18Dto) {
         Lang lang = langRepository.findById(Long.valueOf(createI18Dto.getLang())).orElseThrow(() -> new BusinessException("exception.lang.notExists", HttpStatus.NOT_FOUND, null));
         // 校验 key + lang 是否已存在
-        if (i18Repository.findByKeyAndLang_Id(createI18Dto.getKey(), Long.valueOf(lang.getId())).isPresent()) {
+        if (i18Repository.findFirstByKeyAndLang_IdOrderByIdAsc(createI18Dto.getKey(), Long.valueOf(lang.getId())).isPresent()) {
             throw new BusinessException("exception.i18.exists", HttpStatus.BAD_REQUEST, null);
         }
         lang.setI18ns(null);
