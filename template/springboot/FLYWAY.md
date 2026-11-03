@@ -9,14 +9,23 @@ Migration files belong in `src/main/resources/db/migration` and use Flyway names
 Create the configured MySQL database, then start the application. Flyway runs `V1__init_schema.sql` through the latest migration (`V3__upgrade_legacy_schema.sql`) before `DataInitializer` inserts the default permissions, menus, roles, languages, applications, and admin user.
 
 ## Existing database
+#现有数据库
 
 Back up the database before the first deployment. Do not start the application against an existing non-empty database until its schema has been verified and a Flyway history has been created.
+首次部署前请备份数据库。在验证现有数据库的 schema 并创建 Flyway 历史记录之前，不要针对已有的非空数据库启动应用程序。
 
 First verify that the existing schema matches the expected TinyPro schema. The compatibility migrations cover only the documented differences; they are not a replacement for checking the schema. Do not baseline a database with arbitrary missing tables or columns; reconcile it with a reviewed migration first.
+首先验证现有 schema 是否与预期的 TinyPro schema 匹配。兼容性迁移仅涵盖已记录的差异，不能替代对 schema 的检查。不要对存在任意缺失表或缺失列的数据库执行基线操作；应先用经过审核的迁移脚本对其进行协调修复
+
+
+
 
 If the database is valid and does not contain `flyway_schema_history`, run a one-time baseline with the Flyway CLI:
 
 ```bash
+export SPRING_DATASOURCE_URL='jdbc:mysql://localhost:3306/tinypro_baseline_test?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC'
+export SPRING_DATASOURCE_USERNAME='root'
+export SPRING_DATASOURCE_PASSWORD='你的密码'
 flyway info \
   -url="$SPRING_DATASOURCE_URL" \
   -user="$SPRING_DATASOURCE_USERNAME" \

@@ -10,5 +10,12 @@ Start with the local profile:
 mvn spring-boot:run -Dspring-boot.run.profiles=local
 ```
 
-`application-local.properties` contains localhost settings and development-only fallback values. 
+启动之前，请先在本地 MySQL 中创建数据库，并在 src/main/resources/application-local.yml 中配置数据库用户名和密码。
+如果是在ide中运行，可以在 Run/Debug Configurations 中的 Environment variables 添加环境变量：
+MYSQL_USERNAME=root;
+REDIS_HOST=localhost;
+REDIS_PASSWORD=(你的redis密码，没有可以不用配置）;
+JWT_SECRET=你的jwt秘钥;
+MYSQL_PASSWORD=你的数据库密码
+
 
