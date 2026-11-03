@@ -22,7 +22,7 @@ public class Application {
   private String name;
 
   private String description;
-  @Lob
+  @Column(columnDefinition = "TEXT")
   private String tag;
 
   private String icon;
