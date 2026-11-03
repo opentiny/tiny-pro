@@ -24,6 +24,9 @@ jobs:
           java-version: '17'
           cache: maven
 
+      - name: Verify Docker for Testcontainers
+        run: docker info
+
       - name: Run SpringBoot tests
         working-directory: template/springboot
         run: mvn --batch-mode test

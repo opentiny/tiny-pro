@@ -35,11 +35,13 @@ class ApplicationServiceImplTest {
 
         CreateApplicationDto dto = new CreateApplicationDto();
         dto.setName("String tag application");
-        dto.setTag(objectMapper.readTree("\"[{\\\"type\\\":\\\"success\\\"}]\""));
+        dto.setTag(objectMapper.readTree(
+                "\"[{\\\"type\\\":\\\"success\\\",\\\"value\\\":\\\"dev\\\"}]\""
+        ));
 
         Application saved = service.createApplication(dto);
 
-        assertEquals("[{\"type\":\"success\"}]", saved.getTag());
+        assertEquals("[{\"type\":\"success\",\"value\":\"dev\"}]", saved.getTag());
     }
 
     private ApplicationRepository repositoryStub() {
