@@ -98,9 +98,10 @@ public class IUserServiceImpl implements IUserService {
 
             return ResponseEntity.ok(UserVo.fromEntity(iUserRepository.save(user)));
         } catch (Exception e) {
+            logger.error("Failed to create user", e);
             throw new ResponseStatusException(
                     HttpStatus.INTERNAL_SERVER_ERROR,
-                    e.getMessage()
+                    Contants.PUBLIC_ERROR
             );
         }
     }
