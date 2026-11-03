@@ -353,8 +353,7 @@ const createServerSync = (answers: ProjectInfo) => {
       throw new Error(`❌ 未找到 Spring Boot 配置文件：${propertiesFilePath}`);
     }
 
-    // CLI-generated projects use local settings by default. Production must
-    // explicitly activate the prod profile and provide deployment variables.
+    // CLI-generated projects use local settings by default. 
     const baseEditor = createEditor(basePropertiesFilePath);
     baseEditor.set('spring.profiles.default', 'local');
     baseEditor.save(basePropertiesFilePath);
