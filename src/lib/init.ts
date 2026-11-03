@@ -50,7 +50,6 @@ const createTemplateCopyFilter = (from: string) => {
 // secret format, e.g. `0Zi4SA==`.
 const generateJwtSecret = (): string => randomBytes(32).toString('base64');
 
-
 /**
  * 询问创建项目的描述，使用的技术栈
  *
@@ -351,8 +350,7 @@ const createServerSync = (answers: ProjectInfo) => {
     );
 
     if (!existsSync(basePropertiesFilePath) || !existsSync(propertiesFilePath)) {
-      log.error(`❌ 未找到 Spring Boot 配置文件：${propertiesFilePath}`);
-      return;
+      throw new Error(`❌ 未找到 Spring Boot 配置文件：${propertiesFilePath}`);
     }
 
     // CLI-generated projects use local settings by default. Production must
@@ -679,8 +677,6 @@ const createProjectSync = (answers: ProjectInfo) => {
       'VITE_MOCK_LOGIN_ENABLED',
       !serverConfirm
     );
-
-   
 
     fs.writeFileSync(envPath, updatedEnvContent);
     log.success(`低代码设计器环境变量已设置为: ${lowcodeEnabled}`);
