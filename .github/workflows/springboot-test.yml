@@ -1,0 +1,29 @@
+name: SpringBoot Test
+
+on:
+  pull_request:
+    paths:
+      - 'template/springboot/**'
+      - '.github/workflows/springboot-test.yml'
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Run SpringBoot tests
+        working-directory: template/springboot
+        run: mvn --batch-mode test

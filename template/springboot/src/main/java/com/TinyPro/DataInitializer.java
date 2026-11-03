@@ -30,6 +30,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Profile;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
@@ -45,6 +46,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 @Component
+@Profile("!test")
 public class DataInitializer implements CommandLineRunner {
   private static final Logger logger = LoggerFactory.getLogger(DataInitializer.class);
 

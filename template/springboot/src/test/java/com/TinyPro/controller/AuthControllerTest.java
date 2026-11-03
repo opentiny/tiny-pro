@@ -26,6 +26,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.context.ActiveProfiles;
 
 
 
@@ -42,6 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 public class AuthControllerTest {
 
     @Autowired
@@ -217,8 +219,15 @@ public class AuthControllerTest {
     @Test
     public void testRevokeApiTokenUsesRequesterEmailForRedisKey() throws Exception {
         Claims claims = Mockito.mock(Claims.class);
-        when(claims.get("email", String.class)).thenReturn("test@example.com");
+        when(claims.get("email", String.class)).thenReturn("Test@Example.com");
         when(jwtUtil.parseJwt(Contants.TOKEN)).thenReturn(claims);
+        when(redisUtil.getValue(anyString())).thenReturn("""
+                {
+                    "id": 1,
+                    "email": "Test@Example.com",
+                    "name": "Test User"
+                }
+                """);
 
         mockMvc.perform(post(REVOKE_API_TOKEN_ENDPOINT)
                         .contentType(MediaType.APPLICATION_JSON)
