@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -68,22 +69,38 @@ public class ChatServiceImpl implements IChatService {
     private final String defaultModel;
     private final String extraBodyJson;
     private final int rateLimitPerMinute;
+    private final long upstreamReadIdleTimeoutSeconds;
     private final HttpClient httpClient;
 
     /** 每个用户的请求时间戳滑动窗口，用于单用户限流。 */
     private final ConcurrentHashMap<String, Deque<Long>> requestWindows = new ConcurrentHashMap<>();
 
+    @Autowired
     public ChatServiceImpl(
             @Value("${tinypro.llm.base-url:${LLM_BASE_URL:https://dashscope.aliyuncs.com/compatible-mode/v1}}") String baseUrl,
             @Value("${tinypro.llm.api-key}") String apiKey,
             @Value("${tinypro.llm.model:${LLM_MODEL:qwen-plus}}") String defaultModel,
             @Value("${tinypro.llm.extra-body}") String extraBodyJson,
             @Value("${tinypro.llm.rate-limit-per-minute:${LLM_RATE_LIMIT_PER_MINUTE:20}}") int rateLimitPerMinute) {
+        this(baseUrl, apiKey, defaultModel, extraBodyJson, rateLimitPerMinute,
+                UPSTREAM_READ_IDLE_TIMEOUT_SECONDS);
+    }
+
+    ChatServiceImpl(String baseUrl,
+                   String apiKey,
+                   String defaultModel,
+                   String extraBodyJson,
+                   int rateLimitPerMinute,
+                   long upstreamReadIdleTimeoutSeconds) {
+        if (upstreamReadIdleTimeoutSeconds <= 0) {
+            throw new IllegalArgumentException("Upstream read idle timeout must be positive");
+        }
         this.baseUrl = baseUrl.replaceAll("/+$", "");
         this.apiKey = apiKey;
         this.defaultModel = defaultModel;
         this.extraBodyJson = extraBodyJson;
         this.rateLimitPerMinute = rateLimitPerMinute;
+        this.upstreamReadIdleTimeoutSeconds = upstreamReadIdleTimeoutSeconds;
         this.httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(10))
                 .followRedirects(HttpClient.Redirect.NEVER)
@@ -130,12 +147,7 @@ public class ChatServiceImpl implements IChatService {
 
         try (InputStream upstreamStream = upstream.body();
              OutputStream out = response.getOutputStream()) {
-            byte[] buffer = new byte[8192];
-            int read;
-            while ((read = upstreamStream.read(buffer)) != -1) {
-                out.write(buffer, 0, read);
-                out.flush();
-            }
+            transferWithIdleTimeout(upstreamStream, out);
         } catch (SocketTimeoutException timeoutException) {
             logger.warn("上游对话流读取空闲超时: user={} {}", userEmail, timeoutException.getMessage());
         } catch (IOException ioException) {
@@ -155,7 +167,7 @@ public class ChatServiceImpl implements IChatService {
                 } catch (IOException ignored) {
                     // The read below will report the timeout or the closed stream.
                 }
-            }, UPSTREAM_READ_IDLE_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+            }, upstreamReadIdleTimeoutSeconds, TimeUnit.SECONDS);
 
             int read;
             try {
@@ -163,7 +175,7 @@ public class ChatServiceImpl implements IChatService {
             } catch (IOException exception) {
                 if (timedOut.get()) {
                     throw new SocketTimeoutException("上游响应读取空闲超过 "
-                            + UPSTREAM_READ_IDLE_TIMEOUT_SECONDS + " 秒");
+                            + upstreamReadIdleTimeoutSeconds + " 秒");
                 }
                 throw exception;
             } finally {
@@ -172,13 +184,14 @@ public class ChatServiceImpl implements IChatService {
 
             if (timedOut.get()) {
                 throw new SocketTimeoutException("上游响应读取空闲超过 "
-                        + UPSTREAM_READ_IDLE_TIMEOUT_SECONDS + " 秒");
+                        + upstreamReadIdleTimeoutSeconds + " 秒");
             }
             if (read < 0) {
                 return;
             }
             if (read > 0) {
                 out.write(buffer, 0, read);
+                out.flush();
             }
         }
     }
