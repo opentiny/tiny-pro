@@ -25,6 +25,7 @@
         <commons.codec.version>1.18.0</commons.codec.version>
         <commons.io.version>2.15.1</commons.io.version>
         <jwt.version>0.11.2</jwt.version>
+        <testcontainers.version>1.20.6</testcontainers.version>
         <!--    <springdoc-openapi-ui>2.2.0</springdoc-openapi-ui>-->
     </properties>
     <dependencies>
@@ -170,13 +171,13 @@
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>1.19.8</version>
+            <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>mysql</artifactId>
-            <version>1.19.8</version>
+            <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
