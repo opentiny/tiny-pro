@@ -3,7 +3,7 @@ import type { MockMethod } from './dispatch'
 import { createBackendState } from './backend-data'
 
 export const MOCK_BACKEND_STORAGE_KEY = 'tiny-pro-mock-backend-state'
-const MOCK_BACKEND_STATE_VERSION = 2
+const MOCK_BACKEND_STATE_VERSION = 3
 
 export interface BackendStorage {
   getItem: (key: string) => string | null
