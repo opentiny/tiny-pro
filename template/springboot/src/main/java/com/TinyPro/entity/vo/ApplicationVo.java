@@ -11,22 +11,22 @@ import java.util.List;
 @AllArgsConstructor
 @Schema(description = "应用分页响应")
 public class ApplicationVo {
-  @Schema(description = "应用列表")
-  private List<ApplicationItem> data;
+    @Schema(description = "应用列表")
+    private List<ApplicationItem> data;
 
-  @Schema(description = "总记录数")
-  private long total;
+    @Schema(description = "总记录数")
+    private long total;
 
-  @Data
-  @NoArgsConstructor
-  @AllArgsConstructor
-  @Schema(description = "应用条目")
-  public static class ApplicationItem {
-    private Long id;
-    private String name;
-    private String description;
-    private Object tag;
-    private String icon;
-    private String classify;
-  }
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Schema(description = "应用条目")
+    public static class ApplicationItem {
+        private Long id;
+        private String name;
+        private String description;
+        private Object tag;
+        private String icon;
+        private String classify;
+    }
 }
