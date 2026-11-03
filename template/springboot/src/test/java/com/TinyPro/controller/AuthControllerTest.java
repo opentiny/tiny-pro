@@ -217,7 +217,7 @@ public class AuthControllerTest {
     @Test
     public void testRevokeApiTokenUsesRequesterEmailForRedisKey() throws Exception {
         Claims claims = Mockito.mock(Claims.class);
-        when(claims.get("email", String.class)).thenReturn("Test@Example.com");
+        when(claims.get("email", String.class)).thenReturn("test@example.com");
         when(jwtUtil.parseJwt(Contants.TOKEN)).thenReturn(claims);
 
         mockMvc.perform(post(REVOKE_API_TOKEN_ENDPOINT)
