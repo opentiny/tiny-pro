@@ -9,6 +9,7 @@ import { debounce } from '@/hooks/responsive'
 const { t } = useI18n()
 const { currentLocale } = useLocale()
 const ringRef = ref()
+const legendLeft = ref('60%')
 
 const resolvedData = computed(() => [
   { value: 300, name: '5G' },
@@ -38,7 +39,7 @@ const chartExtend = computed(() => {
   return {
     color: ['#bf0a1c', '#f23030', '#ffb700', '#ff8800'],
     title: {
-      text: `${total.toLocaleString()} GB`,
+      text: `${total.toLocaleString(currentLocale.value === 'zhCN' ? 'zh-CN' : 'en-US')} GB`,
       subtext: t('home.round.total'),
       left: '36%',
       top: '50%',
@@ -63,7 +64,7 @@ const chartExtend = computed(() => {
     },
     legend: {
       orient: 'vertical',
-      left: '60%',
+      left: legendLeft.value,
       top: 'middle',
       icon: 'circle',
       itemWidth: 10,
@@ -125,7 +126,10 @@ onMounted(() => {
   const el = ringRef.value?.$el || ringRef.value
   let observer: ResizeObserver | null = null
   if (el) {
-    observer = new ResizeObserver(() => ringRef.value?.resize())
+    observer = new ResizeObserver(() => {
+      ringRef.value?.resize()
+      updateLegendPosition()
+    })
     observer.observe(el)
   }
 
@@ -148,15 +152,26 @@ function getLegendLeft() {
   const w = el.clientWidth
   const h = el.clientHeight || 320
   const ringRightEdge = 0.36 * w + 0.66 * (Math.min(w, h) / 2)
-  return Math.round(ringRightEdge + 160)
+  const preferred = Math.round(ringRightEdge + 160)
+  return Math.max(0, Math.min(preferred, w - measureLegendWidth()))
 }
 
-function getEchartsIns() {
-  return ringRef.value?.integrateChart?.echartsIns
+function measureLegendWidth() {
+  const total = totalValue.value
+  const ctx = document.createElement('canvas').getContext('2d')
+  if (!ctx)
+    return 0
+  ctx.font = '14px sans-serif'
+  const maxTextWidth = Math.max(
+    ...resolvedData.value.map(item =>
+      ctx.measureText(`${item.name}  ${((item.value / total) * 100).toFixed(1)}%`).width,
+    ),
+  )
+  return maxTextWidth + 20
 }
 
 function updateLegendPosition() {
-  getEchartsIns()?.setOption({ legend: { left: getLegendLeft() } })
+  legendLeft.value = getLegendLeft()
 }
 
 watch(currentLocale, () => {
@@ -309,6 +324,10 @@ watch(currentLocale, () => {
   .round-body {
     flex-direction: column;
     gap: 24px;
+  }
+
+  .resource {
+    min-width: 0;
   }
 }
 </style>

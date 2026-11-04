@@ -61,18 +61,12 @@ const chartExtend = ref({
       min: 0,
       max: 40,
       interval: 5,
-      axisLabel: {
-        formatter: '{value} s',
-      },
     },
   ],
   tooltip: {
     trigger: 'axis',
     axisPointer: {
       type: 'shadow',
-    },
-    valueFormatter(value: any) {
-      return `${value} s`
     },
   },
   series: [

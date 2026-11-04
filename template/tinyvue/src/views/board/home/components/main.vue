@@ -70,8 +70,12 @@ const trendIcons = {
           v-for="item in ranges"
           :key="item.key"
           class="range-item"
+          role="button"
+          tabindex="0"
           :class="{ active: currentRange === item.key }"
           @click="currentRange = item.key"
+          @keydown.enter.prevent="currentRange = item.key"
+          @keydown.space.prevent="currentRange = item.key"
         >
           {{ $t(item.labelKey) }}
         </div>
@@ -195,6 +199,7 @@ const trendIcons = {
 
   .cards {
     display: flex;
+    flex-wrap: wrap;
     gap: 24px;
   }
 
@@ -203,6 +208,7 @@ const trendIcons = {
     flex: 1;
     justify-content: space-between;
     gap: 8px;
+    min-width: 280px;
     height: 110px;
     padding: 24px 16px;
     background: #f5f5f5;

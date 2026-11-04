@@ -141,7 +141,7 @@ onMounted(() => {
 
 <style scoped lang="less">
 .region-box {
-  height: 600px;
+  min-height: 600px;
   margin-top: 20px;
   padding: 24px;
   background: #fff;
