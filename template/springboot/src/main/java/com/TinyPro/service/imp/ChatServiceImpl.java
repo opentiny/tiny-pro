@@ -57,6 +57,7 @@ public class ChatServiceImpl implements IChatService {
 
     private static final Logger logger = LoggerFactory.getLogger(ChatServiceImpl.class);
     private static final long UPSTREAM_READ_IDLE_TIMEOUT_SECONDS = 30L;
+    private static final int MAX_UPSTREAM_ERROR_BODY_BYTES = 64 * 1024;
     private static final ScheduledExecutorService READ_TIMEOUT_EXECUTOR =
             Executors.newSingleThreadScheduledExecutor(runnable -> {
                 Thread thread = new Thread(runnable, "llm-upstream-read-timeout");
@@ -130,11 +131,10 @@ public class ChatServiceImpl implements IChatService {
         HttpResponse<InputStream> upstream = sendUpstream(upstreamBody);
 
         if (upstream.statusCode() < 200 || upstream.statusCode() >= 300 || upstream.body() == null) {
-            String detail = readErrorBody(upstream);
-            if (detail == null || detail.isBlank()) {
-                throw new BusinessException("chat.llm.upstreamRequestFailed", HttpStatus.BAD_GATEWAY, null);
-            }
-            throw new BusinessException("chat.llm.upstreamError", HttpStatus.BAD_GATEWAY, detail);
+            String detail = upstream.body() == null ? "" : readErrorBody(upstream);
+            logger.warn("模型服务返回错误: status={} bodyLength={}",
+                    upstream.statusCode(), detail.length());
+            throw new BusinessException("chat.llm.upstreamRequestFailed", HttpStatus.BAD_GATEWAY, null);
         }
 
         // 客户端断开时由容器关闭输出流；这里对上游 InputStream 使用 try-with-resources，
@@ -145,19 +145,73 @@ public class ChatServiceImpl implements IChatService {
         response.setHeader("Cache-Control", "no-cache");
         response.setHeader("X-Accel-Buffering", "no");
 
-        try (InputStream upstreamStream = upstream.body();
-             OutputStream out = response.getOutputStream()) {
-            transferWithIdleTimeout(upstreamStream, out);
-        } catch (SocketTimeoutException timeoutException) {
-            logger.warn("上游对话流读取空闲超时: user={} {}", userEmail, timeoutException.getMessage());
+        try (InputStream upstreamStream = upstream.body()) {
+            OutputStream out = null;
+            try {
+                out = response.getOutputStream();
+                transferWithIdleTimeout(upstreamStream, out);
+            } catch (SocketTimeoutException timeoutException) {
+                logger.warn("上游对话流读取空闲超时: user={} {}", userEmail, timeoutException.getMessage());
+                if (out != null) {
+                    try {
+                        writeUpstreamTimeoutResponse(response, out);
+                    } catch (IOException responseException) {
+                        logger.warn("无法向客户端写入上游超时事件: user={} {}",
+                                userEmail, responseException.getMessage());
+                    }
+                }
+            } catch (IOException ioException) {
+                // 响应已开始，客户端断开或连接异常，无法也不再需要返回错误
+                logger.warn("对话请求已中断: user={} {}", userEmail, ioException.getMessage());
+            } finally {
+                if (out != null) {
+                    try {
+                        out.close();
+                    } catch (IOException ignored) {
+                        // The client may already have closed the response stream.
+                    }
+                }
+            }
         } catch (IOException ioException) {
-            // 响应已开始，客户端断开或连接异常，无法也不再需要返回错误
-            logger.warn("对话请求已中断: user={} {}", userEmail, ioException.getMessage());
+            logger.warn("上游响应流关闭失败: user={} {}", userEmail, ioException.getMessage());
         }
     }
 
+    private void writeUpstreamTimeoutResponse(HttpServletResponse response, OutputStream out)
+            throws IOException {
+        String payload = JSON.toJSONString(Map.of(
+                "error", Map.of(
+                        "message", "Upstream response timed out before completion",
+                        "type", "upstream_timeout")));
+
+        if (response.isCommitted()) {
+            // The HTTP status can no longer be changed after partial SSE output was flushed.
+            // Emit an error event and deliberately omit [DONE], so the client cannot treat
+            // the partial assistant response as a successful completion.
+            out.write(("data: " + payload + "\n\n").getBytes(StandardCharsets.UTF_8));
+        } else {
+            response.resetBuffer();
+            response.setStatus(HttpStatus.GATEWAY_TIMEOUT.value());
+            response.setContentType("application/json");
+            out.write(payload.getBytes(StandardCharsets.UTF_8));
+        }
+        out.flush();
+    }
+
     private void transferWithIdleTimeout(InputStream upstreamStream, OutputStream out) throws IOException {
+        transferWithIdleTimeout(upstreamStream, out, Integer.MAX_VALUE);
+    }
+
+    /**
+     * Copies the upstream stream while enforcing the existing per-read idle timeout
+     * and an optional cumulative byte limit. A limit is used for upstream error
+     * responses so a slow, unbounded error body cannot grow the heap indefinitely.
+     */
+    private void transferWithIdleTimeout(InputStream upstreamStream,
+                                         OutputStream out,
+                                         int maxBytes) throws IOException {
         byte[] buffer = new byte[8192];
+        int remainingBytes = maxBytes;
         while (true) {
             AtomicBoolean timedOut = new AtomicBoolean(false);
             ScheduledFuture<?> timeoutTask = READ_TIMEOUT_EXECUTOR.schedule(() -> {
@@ -171,7 +225,7 @@ public class ChatServiceImpl implements IChatService {
 
             int read;
             try {
-                read = upstreamStream.read(buffer);
+                read = upstreamStream.read(buffer, 0, Math.min(buffer.length, remainingBytes));
             } catch (IOException exception) {
                 if (timedOut.get()) {
                     throw new SocketTimeoutException("上游响应读取空闲超过 "
@@ -192,6 +246,10 @@ public class ChatServiceImpl implements IChatService {
             if (read > 0) {
                 out.write(buffer, 0, read);
                 out.flush();
+                remainingBytes -= read;
+                if (remainingBytes == 0) {
+                    return;
+                }
             }
         }
     }
@@ -238,8 +296,9 @@ public class ChatServiceImpl implements IChatService {
 
     private String readErrorBody(HttpResponse<InputStream> upstream) {
         try (InputStream body = upstream.body()) {
-            ByteArrayOutputStream output = new ByteArrayOutputStream();
-            transferWithIdleTimeout(body, output);
+            ByteArrayOutputStream output = new ByteArrayOutputStream(
+                    Math.min(8192, MAX_UPSTREAM_ERROR_BODY_BYTES));
+            transferWithIdleTimeout(body, output, MAX_UPSTREAM_ERROR_BODY_BYTES);
             return output.toString(StandardCharsets.UTF_8);
         } catch (IOException e) {
             return "";

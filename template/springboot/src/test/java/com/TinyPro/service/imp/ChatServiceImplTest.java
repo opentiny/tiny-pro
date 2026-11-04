@@ -22,10 +22,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -110,6 +112,7 @@ class ChatServiceImplTest {
                 sink.write(buf, off, len);
             }
         });
+        when(response.isCommitted()).thenAnswer(invocation -> sink.size() > 0);
         return response;
     }
 
@@ -174,8 +177,33 @@ class ChatServiceImplTest {
                 () -> service.proxyChatCompletions(
                         dto("hi"), mockRequest(), mock(HttpServletResponse.class), "user@a.com"));
         assertEquals(502, exception.getHttpStatus().value());
-        assertEquals("chat.llm.upstreamError", exception.getErrorCode());
-        assertTrue(exception.getArgs().toString().contains("Invalid API-key"));
+        assertEquals("chat.llm.upstreamRequestFailed", exception.getErrorCode());
+        assertNull(exception.getArgs());
+    }
+
+    @Test
+    void upstreamErrorBodyIsCappedAndNotExposedToClient() {
+        stub.createContext("/v1/chat/completions", exchange -> {
+            exchange.getRequestBody().readAllBytes();
+            String oversizedMessage = "x".repeat(128 * 1024);
+            byte[] errorBody = ("{\"error\":{\"message\":\"" + oversizedMessage
+                    + "\"}}").getBytes(StandardCharsets.UTF_8);
+            exchange.sendResponseHeaders(502, errorBody.length);
+            exchange.getResponseBody().write(errorBody);
+            exchange.close();
+        });
+        stub.start();
+
+        ChatServiceImpl service = new ChatServiceImpl(
+                "http://127.0.0.1:" + stub.getAddress().getPort() + "/v1",
+                "sk-test-key", "qwen-plus", "", 0);
+
+        BusinessException exception = assertThrows(BusinessException.class,
+                () -> service.proxyChatCompletions(
+                        dto("hi"), mockRequest(), mock(HttpServletResponse.class), "user@a.com"));
+
+        assertEquals("chat.llm.upstreamRequestFailed", exception.getErrorCode());
+        assertNull(exception.getArgs());
     }
 
     @Test
@@ -252,12 +280,16 @@ class ChatServiceImplTest {
                 "http://127.0.0.1:" + stub.getAddress().getPort() + "/v1",
                 "sk-test-key", "qwen-plus", "", 0, 1);
         long startedAt = System.nanoTime();
+        ByteArrayOutputStream sink = new ByteArrayOutputStream();
+        HttpServletResponse response = mockResponse(sink, false);
 
         service.proxyChatCompletions(
-                dto("hi"), mockRequest(), mockResponse(new ByteArrayOutputStream(), false), "user@a.com");
+                dto("hi"), mockRequest(), response, "user@a.com");
 
         long elapsedMillis = (System.nanoTime() - startedAt) / 1_000_000L;
         assertTrue(elapsedMillis < 1_800L, "idle timeout should stop the read before the upstream closes");
+        assertTrue(sink.toString(StandardCharsets.UTF_8).contains("upstream_timeout"));
+        verify(response).setStatus(504);
     }
 
     @Test
@@ -287,6 +319,8 @@ class ChatServiceImplTest {
         String output = sink.toString(StandardCharsets.UTF_8);
         assertTrue(output.contains("data: first"));
         assertTrue(!output.contains("data: second"));
+        assertTrue(output.contains("\"type\":\"upstream_timeout\""));
+        assertTrue(!output.contains("data: [DONE]"));
     }
 
     @Test
