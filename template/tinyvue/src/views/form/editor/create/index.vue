@@ -59,6 +59,11 @@ const moreUsers = computed(() =>
 // 协同同步状态：connecting 连接中 / syncing 正在同步中 / connected 同步成功 / disconnected 同步失败
 const collabSyncStatus = ref<'connecting' | 'syncing' | 'connected' | 'disconnected'>('connecting')
 let collabStatusHandler: ((event: { status: string }) => void) | null = null
+// 首次与远端完成内容同步后才允许显示“同步成功”，避免仅连接成功就误报
+let hasSyncedRemote = false
+// 离线兜底标记：provider 断连且本地缓存读取完成后，房间无内容则用 mock 内容初始化
+let providerOffline = false
+let persistenceSynced = false
 
 const IconSync = computed(() => {
   if (collabSyncStatus.value === 'connected') {
@@ -136,6 +141,9 @@ function destroyEditor() {
   }
   collabStatusHandler = null
   collabSyncStatus.value = 'connecting'
+  hasSyncedRemote = false
+  providerOffline = false
+  persistenceSynced = false
   collabBinding?.destroy()
   collabBinding = null
   collabProvider?.destroy()
@@ -245,11 +253,6 @@ async function initCollabEditor(content: string) {
   collabProvider = provider
   collabPersistence = persistence
   collabSyncStatus.value = 'connecting'
-  const onStatus = (event: { status: string }) => {
-    collabSyncStatus.value = event.status === 'connected' ? 'connected' : 'disconnected'
-  }
-  provider.on('status', onStatus)
-  collabStatusHandler = onStatus
   const ytext = ydoc.getText('quill')
   _editor = new TinyEditor(editorRef.value, {
     theme: 'snow',
@@ -277,7 +280,7 @@ async function initCollabEditor(content: string) {
       }
       syncBackTimer = setTimeout(() => {
         syncBackTimer = null
-        if (collabSyncStatus.value === 'syncing') {
+        if (collabSyncStatus.value === 'syncing' && hasSyncedRemote) {
           collabSyncStatus.value = 'connected'
         }
       }, 800)
@@ -325,7 +328,6 @@ async function initCollabEditor(content: string) {
   awareness.on('change', updateCollabUsers)
   updateCollabUsers()
   // 房间为空（无协作者、本地也无缓存）时，用 mock 内容作为初始文档。
-  // 离线场景 websocket 不会触发 sync，因此同时监听本地缓存同步并做兜底
   const maybeSeed = () => {
     if (epoch !== editorEpoch) {
       return
@@ -336,16 +338,40 @@ async function initCollabEditor(content: string) {
       isSeedingContent = false
     }
   }
+  // 在线：等 provider 完成远端同步后再回填，避免与远端内容重复
   provider.on('sync', (isSynced: boolean) => {
     if (isSynced) {
+      hasSyncedRemote = true
+      providerOffline = false
       maybeSeed()
-      if (collabSyncStatus.value === 'syncing') {
+      if (collabSyncStatus.value === 'connecting' || collabSyncStatus.value === 'syncing') {
         collabSyncStatus.value = 'connected'
       }
     }
   })
-  persistence.on('synced', maybeSeed)
-  setTimeout(maybeSeed, 1500)
+  // 离线：websocket 不会触发 sync，本地缓存读取完成且确认断连后，房间无内容则用 mock 内容兜底
+  persistence.on('synced', () => {
+    persistenceSynced = true
+    if (providerOffline) {
+      maybeSeed()
+    }
+  })
+  const onStatus = (event: { status: string }) => {
+    if (event.status === 'connected') {
+      // 连接成功但尚未与远端完成内容同步时，保持“同步中”而不是“同步成功”
+      collabSyncStatus.value = hasSyncedRemote ? 'connected' : 'connecting'
+    }
+    else {
+      providerOffline = true
+      collabSyncStatus.value = 'disconnected'
+      // 离线时本地缓存已读完且房间无内容，则用 mock 内容兜底（maybeSeed 内有 epoch 与空内容守卫）
+      if (persistenceSynced) {
+        maybeSeed()
+      }
+    }
+  }
+  provider.on('status', onStatus)
+  collabStatusHandler = onStatus
   if (route.query.id === undefined) {
     _editor.focus()
   }

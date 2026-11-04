@@ -92,12 +92,21 @@ function handleDelete(row: any) {
 
 .editor-collaboration-op {
   display: inline-flex;
+  padding: 0;
   font-size: 16px;
   color: #666;
   cursor: pointer;
+  background: transparent;
+  border: none;
 
   &:hover {
     color: #1890ff;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #1890ff;
+    outline-offset: 2px;
+    border-radius: 2px;
   }
 }
 
