@@ -14,6 +14,7 @@ import { iconCheckOut, iconEdit, iconUser } from '@opentiny/vue-icon'
 import { computed, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { updatePwdUser } from '@/api/user'
+import Theme from '@/components/theme/index.vue'
 import useLocale from '@/hooks/locale'
 import { useResponsive, useResponsiveSize } from '@/hooks/responsive'
 import useUser from '@/hooks/user'
@@ -126,6 +127,12 @@ function handlePwdUpdateCancel() {
   state.pwdData = {} as any
 }
 
+// 页面主题
+const disTheme = ref(false)
+function themeVisible() {
+  disTheme.value = !disTheme.value
+}
+
 async function handlePwdUpdateSubmit() {
   const data = state.pwdData
   const newTemp = {
@@ -212,6 +219,9 @@ async function handlePwdUpdateSubmit() {
         <li>
           <span @click="setVisible">{{ $t('settings.title') }}</span>
         </li>
+        <li>
+          <span @click="themeVisible">{{ $t('theme.title.first') }}</span>
+        </li>
         <li v-if="isLowcodeDesignerEnabled">
           <span @click="openLowCodeDesigner">设计器</span>
         </li>
@@ -290,6 +300,17 @@ async function handlePwdUpdateSubmit() {
       </template>
     </TinyModal>
   </div>
+  <div v-if="disTheme">
+    <TinyModal
+      v-model="disTheme" show-header show-footer :title="$t('theme.title.main')" :mask-closable="true"
+      height="auto" :width="modalSize"
+    >
+      <template #default>
+        <Theme />
+      </template>
+      <template #footer />
+    </TinyModal>
+  </div>
 </template>
 
 <style scoped lang="less">
@@ -361,6 +382,11 @@ async function handlePwdUpdateSubmit() {
 
 .navbar-right {
   position: relative;
+}
+
+// 组件无法固定非message的modal类型距离顶部距离
+:deep(.tiny-modal__box) {
+  top: 8px !important;
 }
 
 .menu-toggle {
