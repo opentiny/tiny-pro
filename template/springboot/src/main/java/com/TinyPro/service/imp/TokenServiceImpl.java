@@ -80,15 +80,17 @@ public class TokenServiceImpl implements TokenService {
                     "tokenName must use letters, numbers, '-' or '_' and cannot be 'ids'");
         }
 
-        String tokenId = StringUtils.defaultIfBlank(tokenName,
-                "api_" + System.currentTimeMillis() + "_" + UUID.randomUUID().toString().replace("-", ""));
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("email", user.getEmail());
-        claims.put("type", "api");
-        claims.put("tokenId", tokenId);
-        String token = jwtUtil.generateToken(claims, tokenId, apiTokenTtlSeconds * 1000L);
-        redisUtil.setApiToken(user.getEmail(), tokenId, token, apiTokenTtlSeconds);
-        return new ApiToken(token, tokenId, apiTokenTtlSeconds);
+        return withUserLock(user.getId(), () -> {
+            String tokenId = StringUtils.defaultIfBlank(tokenName,
+                    "api_" + System.currentTimeMillis() + "_" + UUID.randomUUID().toString().replace("-", ""));
+            Map<String, Object> claims = new HashMap<>();
+            claims.put("email", user.getEmail());
+            claims.put("type", "api");
+            claims.put("tokenId", tokenId);
+            String token = jwtUtil.generateToken(claims, tokenId, apiTokenTtlSeconds * 1000L);
+            redisUtil.setApiToken(user.getEmail(), tokenId, token, apiTokenTtlSeconds);
+            return new ApiToken(token, tokenId, apiTokenTtlSeconds);
+        });
     }
 
     @Override
@@ -172,6 +174,9 @@ public class TokenServiceImpl implements TokenService {
     }
 
     public void revokeApiToken(String email, String tokenId) {
+        if ("ids".equals(tokenId)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "tokenId cannot be 'ids'");
+        }
         redisUtil.deleteApiToken(email, tokenId);
     }
 

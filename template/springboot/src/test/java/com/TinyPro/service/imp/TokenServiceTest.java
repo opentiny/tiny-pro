@@ -28,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -224,6 +225,17 @@ class TokenServiceTest {
         assertEquals("user@example.com", claims.get("email"));
         assertEquals("integration", claims.get("tokenId"));
         verify(redisUtil).setApiToken("user@example.com", "integration", apiToken.getToken(), 604800L);
+        verify(redisLockService).execute(eq("user-token:7"), org.mockito.ArgumentMatchers.<Supplier<Object>>any());
+    }
+
+    @Test
+    void revokeApiTokenRejectsReservedIndexTokenId() {
+        assertThrows(
+                ResponseStatusException.class,
+                () -> tokenService.revokeApiToken("user@example.com", "ids")
+        );
+
+        verify(redisUtil, never()).deleteApiToken(anyString(), anyString());
     }
 
     @Test
