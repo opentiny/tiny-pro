@@ -3,7 +3,7 @@ import TinyEditor from '@opentiny/fluent-editor'
 import { Modal, Dropdown as TinyDropdown, Input as TinyInput } from '@opentiny/vue'
 import { iconAdd, iconChevronLeft, iconDel, iconEdit, iconEllipsis, iconError, iconFullscreenRight, iconGroup, IconLoadingShadow, iconMinscreenRight, iconSuccess, iconUser } from '@opentiny/vue-icon'
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router'
 import {
   addCollaborationDocument,
   addDocument,
@@ -492,6 +492,16 @@ function scheduleAutoSave() {
     doSave()
   }, 800)
 }
+
+// 切换文档前立即落盘未保存的编辑：守卫执行时 route.query.id 仍指向原文档，
+// 否则编辑器被替换/卸载时会清掉定时器，最近 800ms 内的编辑会丢失
+onBeforeRouteUpdate(() => {
+  if (saveTimer) {
+    clearTimeout(saveTimer)
+    saveTimer = null
+    doSave()
+  }
+})
 
 watch(title, (value) => {
   // 文档加载时回填的标题不触发自动保存：协同模式下正文尚未同步完成，此时保存会把空内容写进文档；标题与文档名一致说明是回填或未改动，也无需保存
