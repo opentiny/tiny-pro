@@ -21,23 +21,28 @@ First verify that the existing schema matches the expected TinyPro schema. The c
 
 
 If the database is valid and does not contain `flyway_schema_history`, run a one-time baseline with the Flyway CLI:
-
 ```bash
 export SPRING_DATASOURCE_URL='jdbc:mysql://localhost:3306/tinypro_baseline_test?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC'
 export SPRING_DATASOURCE_USERNAME='root'
 export SPRING_DATASOURCE_PASSWORD='你的密码'
+#查看数据库迁移状态
 flyway info \
   -url="$SPRING_DATASOURCE_URL" \
   -user="$SPRING_DATASOURCE_USERNAME" \
   -password="$SPRING_DATASOURCE_PASSWORD"
-
+#标记旧数据库为 V1
 flyway baseline \
   -url="$SPRING_DATASOURCE_URL" \
   -user="$SPRING_DATASOURCE_USERNAME" \
   -password="$SPRING_DATASOURCE_PASSWORD" \
   -baselineVersion=1 \
   -baselineDescription="Existing TinyPro schema"
-
+#执行 V2、V3  
+flyway migrate \
+  -url="$SPRING_DATASOURCE_URL" \
+  -user="$SPRING_DATASOURCE_USERNAME" \
+  -password="$SPRING_DATASOURCE_PASSWORD"
+#验证
 flyway validate \
   -url="$SPRING_DATASOURCE_URL" \
   -user="$SPRING_DATASOURCE_USERNAME" \
