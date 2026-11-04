@@ -318,7 +318,7 @@ async function initCollabEditor(content: string) {
       }, 800)
     }
   })
-  collabBinding = new QuillBinding(ytext, _editor, provider.awareness)
+  collabBinding = new QuillBinding(ytext, _editor, awareness)
   // 远端编辑到达时同步文档内容与“最后更新时间”，避免列表时间比内容新；本地编辑由自动保存负责更新（transaction.origin 为 binding）
   ytext.observe((_event: unknown, transaction: { origin: unknown }) => {
     if (transaction.origin === collabBinding) {
@@ -628,6 +628,8 @@ function handleDelete() {
     }
     const id = isCreateMode.value ? pendingId! : Number(route.query.id)
     if (isCollaborationMode.value) {
+      // 未落盘的自动保存先触发并清掉定时器，避免删除后残留的 saveTimer 以“新建”名义把已删内容写回来
+      flushPendingSave()
       // 当前打开的协同房间还持有 IndexedDB 连接，先销毁编辑器释放连接，避免数据清理被阻塞
       destroyEditor()
       // 首次清理可能因删除被其他连接阻塞而超时，但超时的 deleteDatabase 仍可能在后台继续执行：

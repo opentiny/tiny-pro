@@ -222,11 +222,21 @@ export function waitCollabRoomDataSettled(room: string, timeoutMs = 5000): Promi
 // 避免新文档与远端仍存活的同名协同房间（tiny-pro-collab-${id}）串内容
 const COLLAB_DOC_ID_KEY = 'tiny-pro-collab-doc-id'
 
+// 9 位随机量：localStorage 读-改-写无法跨标签页串行化，并发新建可能读到同一计数，
+// 在单调下限之上叠加随机量把碰撞概率降到可忽略（非安全场景，crypto 不可用时退化 Math.random）
+function randomIdSuffix(): number {
+  if (globalThis.crypto?.getRandomValues) {
+    return globalThis.crypto.getRandomValues(new Uint32Array(1))[0] % 1_000_000_000
+  }
+  return Math.floor(Math.random() * 1_000_000_000)
+}
+
 function nextCollaborationDocumentId(): number {
   const maxId = Math.max(100, ...collaborationDocuments.map(doc => doc.id))
   try {
     const stored = Number(localStorage.getItem(COLLAB_DOC_ID_KEY))
-    const next = Math.max(Number.isInteger(stored) ? stored : 100, maxId) + 1
+    const floor = Math.max(Number.isInteger(stored) ? stored : 100, maxId) + 1
+    const next = Math.max(floor, 1_000_000_000) + randomIdSuffix()
     localStorage.setItem(COLLAB_DOC_ID_KEY, String(next))
     return next
   }
