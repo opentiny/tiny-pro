@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { TinyHuichartsHistogram as TinyChartHistogram } from '@opentiny/vue-huicharts'
+import { TinyHuichartsLine as TinyChartLine } from '@opentiny/vue-huicharts'
 import { onMounted, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import useLocale from '@/hooks/locale'
@@ -13,304 +13,108 @@ function getLegendConfig() {
   return {
     data: [t('home.main.down'), t('home.curve.play'), t('home.curve.page')],
     top: '10',
-    left: 'center',
-    icon: '',
-    itemHeight: 16,
-    itemWidth: isMobile ? 22 : 26,
-    itemGap: isMobile ? 5 : 30,
+    left: 'auto',
+    right: '24',
+    icon: 'circle',
+    itemHeight: 10,
+    itemWidth: 10,
+    itemGap: isMobile ? 10 : 24,
     textStyle: {
       fontSize: isMobile ? 11 : 14,
     },
   }
 }
 
+function getAreaStyle(startColor: string) {
+  return {
+    color: {
+      type: 'linear',
+      x: 0,
+      y: 0,
+      x2: 0,
+      y2: 1,
+      colorStops: [
+        {
+          offset: 0,
+          color: startColor,
+        },
+        {
+          offset: 1,
+          color: 'rgba(58,132,255, 0)',
+        },
+      ],
+      global: false,
+    },
+  }
+}
+
+const timeData = Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2, '0')}:00`)
+const pvData = [18, 20, 22, 25, 24, 22, 19, 17, 18, 20, 23, 26, 28, 27, 24, 21, 19, 18, 20, 22, 24, 23, 21, 19]
+const playData = [25, 24, 26, 28, 30, 29, 27, 25, 24, 26, 28, 30, 31, 30, 28, 26, 25, 24, 25, 27, 29, 28, 26, 25]
+const pageData = [30, 32, 31, 29, 27, 26, 28, 30, 32, 33, 31, 29, 27, 26, 28, 30, 32, 33, 32, 30, 28, 27, 29, 31]
+
+function buildRows() {
+  return pvData.map((_, index) => ({
+    time: timeData[index],
+    [t('home.main.down')]: pvData[index],
+    [t('home.curve.play')]: playData[index],
+    [t('home.curve.page')]: pageData[index],
+  }))
+}
+
 const chartRef = ref()
-const dataZoom = ref([
-  {
-    type: 'inside',
-    start: 10,
-  },
-  {
-    type: 'slider',
-  },
-])
 const options = ref({
-  grid: {
-    left: '8%',
-    right: '8%',
-  },
-  data: Array.from({ length: 20 }).fill({
-    time: '16:00',
-  }),
+  data: buildRows(),
   xAxis: [
     {
-      type: 'category',
-      data: Array.from({ length: 20 }).fill('16:00'),
-      axisPointer: {
-        type: 'shadow',
-      },
-      axisLabel: {
-        formatter(value: any, index: any) {
-          if (index % 2 !== 0) {
-            return value
-          }
-          return value
-        },
-      },
-    },
-  ],
-  yAxis: [
-    {
-      type: 'value',
-      min: 0,
-      max: 50,
-      interval: 5,
-      boundaryGap: ['0%', '0%'],
-      axisLabel: {
-        formatter: '{value} s',
-      },
-    },
-    {
-      type: 'value',
-      min: 0,
-      max: 30,
-      interval: 5,
-      boundaryGap: ['0%', '0%'],
-      axisLabel: {
-        formatter: '{value}',
-      },
+      keyName: 'time',
     },
   ],
 })
 const chartExtend = ref({
+  grid: {
+    left: '8%',
+    right: '8%',
+  },
+  color: ['#fcc800', '#62b42e', '#bfb9fa'],
   legend: getLegendConfig(),
-  xAxis: [
-    {
-      type: 'category',
-      boundaryGap: true,
-    },
-  ],
   yAxis: [
     {
-      type: 'value',
-      boundaryGap: ['0%', '0%'],
-    },
-    {
-      type: 'value',
-      boundaryGap: ['0%', '0%'],
+      min: 0,
+      max: 40,
+      interval: 5,
+      axisLabel: {
+        formatter: '{value} s',
+      },
     },
   ],
   tooltip: {
     trigger: 'axis',
-    axisPointer: {
-      type: 'cross',
-      crossStyle: {
-        color: '#999',
-      },
-      label: {
-        backgroundColor: '#666',
-      },
-    },
   },
   series: [
     {
-      name: t('home.main.down'),
-      type: 'bar',
-      barWidth: 12,
-      itemStyle: {
-        color: '#4e85f4',
-        borderRadius: [5, 5, 0, 0],
-      },
-      tooltip: {
-        valueFormatter(value: any) {
-          return `${value} s`
-        },
-      },
-      data: [
-        22,
-        4.9,
-        7.0,
-        23.2,
-        25.6,
-        16.7,
-        15.6,
-        22.2,
-        12.6,
-        22.0,
-        6.4,
-        33.3,
-        22,
-        4.9,
-        7.0,
-        23.2,
-        25.6,
-        16.7,
-        15.6,
-        22.2,
-        12.6,
-        22.0,
-        6.4,
-        33.3,
-        22,
-        4.9,
-        7.0,
-        23.2,
-        25.6,
-        16.7,
-        15.6,
-        22.2,
-        12.6,
-        22.0,
-        6.4,
-        33.3,
-      ],
-    },
-    {
-      name: t('home.curve.play'),
-      type: 'line',
       smooth: true,
       showSymbol: false,
-      yAxisIndex: 1,
       lineStyle: {
-        color: '#5f45ff',
+        color: '#fcc800',
       },
-      // 区域填充样式
-      areaStyle: {
-        color: {
-          type: 'linear',
-          x: 0,
-          y: 0,
-          x2: 0,
-          y2: 1,
-          colorStops: [
-            {
-              offset: 0,
-              color: 'rgba(163, 156, 211,0.2)',
-            },
-            {
-              offset: 1,
-              color: 'rgba(58,132,255, 0)',
-            },
-          ],
-          global: false,
-        },
-      },
-      tooltip: {
-        valueFormatter(value: any) {
-          return value
-        },
-      },
-      data: [
-        22,
-        4.9,
-        7.0,
-        23.2,
-        25.6,
-        16.7,
-        15.6,
-        22.2,
-        12.6,
-        22.0,
-        6.4,
-        3.3,
-        22,
-        4.9,
-        7.0,
-        23.2,
-        25.6,
-        16.7,
-        15.6,
-        22.2,
-        12.6,
-        22.0,
-        6.4,
-        3.3,
-        22,
-        4.9,
-        7.0,
-        23.2,
-        25.6,
-        16.7,
-        15.6,
-        22.2,
-        12.6,
-        22.0,
-        6.4,
-        33.3,
-      ],
+      areaStyle: getAreaStyle('rgba(252,200,0,0.25)'),
     },
     {
-      name: t('home.curve.page'),
-      type: 'line',
       smooth: true,
       showSymbol: false,
-      yAxisIndex: 1,
       lineStyle: {
-        color: '#ff9e03',
+        color: '#62b42e',
       },
-      areaStyle: {
-        color: {
-          type: 'linear',
-          x: 0,
-          y: 0,
-          x2: 0,
-          y2: 1,
-          colorStops: [
-            {
-              offset: 0,
-              color: 'rgba(226, 210, 66,0.2)',
-            },
-            {
-              offset: 1,
-              color: 'rgba(58,132,255, 0)',
-            },
-          ],
-          global: false,
-        },
+      areaStyle: getAreaStyle('rgba(98,180,46,0.25)'),
+    },
+    {
+      smooth: true,
+      showSymbol: false,
+      lineStyle: {
+        color: '#bfb9fa',
       },
-      tooltip: {
-        valueFormatter(value: any) {
-          return value
-        },
-      },
-      data: [
-        22,
-        9,
-        17.0,
-        27.2,
-        15.6,
-        26.7,
-        25.6,
-        22.2,
-        12.6,
-        22.0,
-        26.4,
-        13.3,
-        22,
-        24.9,
-        12.0,
-        23.2,
-        25.6,
-        26.7,
-        25.6,
-        22.2,
-        22.6,
-        22.0,
-        26.4,
-        23.3,
-        22,
-        24,
-        27.0,
-        13.2,
-        15.6,
-        16.7,
-        11.6,
-        22.2,
-        22.6,
-        32.0,
-        16.4,
-        13.3,
-      ],
+      areaStyle: getAreaStyle('rgba(191,185,250,0.25)'),
     },
   ],
 })
@@ -319,7 +123,7 @@ onMounted(() => {
   const resizeHandler = debounce(() => {
     chartExtend.value.legend = getLegendConfig()
     chartRef.value?.resize()
-    chartRef.value?.setOption({ legend: chartExtend.value.legend })
+    chartRef.value?.integrateChart?.echartsIns?.setOption({ legend: chartExtend.value.legend })
   }, 200)
 
   window.addEventListener('resize', resizeHandler)
@@ -337,43 +141,26 @@ onMounted(() => {
     window.removeEventListener('resize', resizeHandler)
     observer?.disconnect()
   })
-  setTimeout(() => {
-    chartRef.value?.resize()
-  }, 200)
 })
 
-watch(currentLocale, (newValue) => {
-  if (newValue === 'zhCN') {
-    chartExtend.value.legend.data = ['采样PV', '首屏可见', '页面Onload']
-    chartExtend.value.series[0].name = '采样PV'
-    chartExtend.value.series[1].name = '首屏可见'
-    chartExtend.value.series[2].name = '页面Onload'
-  }
-  else {
-    chartExtend.value.legend.data = [
-      'Sampling PV',
-      'Visible on the first screen',
-      'Page Onload',
-    ]
-    chartExtend.value.series[0].name = 'Sampling PV'
-    chartExtend.value.series[1].name = 'Visible on the first screen'
-    chartExtend.value.series[2].name = 'Page Onload'
-  }
+watch(currentLocale, () => {
+  chartExtend.value.legend = getLegendConfig()
+  options.value.data = buildRows()
   chartRef.value?.resize()
 })
 </script>
 
 <template>
   <div class="curve-box">
-    <img src="@/assets/images/map-background3.png" class="image">
-    <h3>{{ $t('home.curve.trend') }}</h3>
+    <h3 class="title">
+      {{ $t('home.curve.trend') }}
+    </h3>
 
     <div class="curve">
-      <TinyChartHistogram
+      <TinyChartLine
         ref="chartRef"
         width="100%"
         height="100%"
-        :data-zoom="dataZoom"
         :options="options"
         :extend="chartExtend" class="max-md:pt-[26px]"
       />
@@ -383,35 +170,23 @@ watch(currentLocale, (newValue) => {
 
 <style scoped lang="less">
 .curve-box {
-  margin-top: 20px;
-  padding: 20px 16px;
+  margin-top: 16px;
+  padding: 24px;
   background: #fff;
-  border-radius: 6px;
+  border-radius: 8px;
   box-shadow: 0 3px 10px #4062e133;
 }
 
 .curve {
   width: 100%;
-  height: 491px;
+  height: 400px;
 }
 
-.image {
-  float: left;
-  width: 25px;
-  margin-top: 0.5%;
-  margin-left: 0.5%;
-  background-color: #a125ff;
-  border-radius: 4px;
-  opacity: 0.6;
-}
-
-h3 {
-  float: left;
-  width: 200px;
-  margin-top: 0.4%;
-  margin-left: 0.5%;
-  color: #524343;
-  font-weight: 700;
-  font-size: 18px;
+.title {
+  margin-bottom: 16px;
+  color: #191919;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
 }
 </style>
