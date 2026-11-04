@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { TinyHuichartsWaterfall as TinyChartWaterfall } from '@opentiny/vue-huicharts'
+import { TinyHuichartsBar as TinyChartBar } from '@opentiny/vue-huicharts'
 import { onMounted, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import useLocale from '@/hooks/locale'
@@ -8,218 +8,126 @@ import { debounce } from '@/hooks/responsive'
 const { t } = useI18n()
 const { currentLocale } = useLocale()
 
-const list = [
-  {
-    label: 'Dns',
-    value: 'Dns',
-  },
-  {
-    label: t('home.falls.tcp'),
-    value: 'TCP',
-  },
-  {
-    label: t('home.falls.ssl'),
-    value: 'SSL',
-  },
-  {
-    label: 'Dns',
-    value: 'Dns',
-  },
-  {
-    label: t('home.falls.tcp'),
-    value: 'TCP',
-  },
-  {
-    label: t('home.falls.ssl'),
-    value: 'SSL',
-  },
-  {
-    label: 'Dns',
-    value: 'Dns',
-  },
-  {
-    label: t('home.falls.tcp'),
-    value: 'TCP',
-  },
-  {
-    label: t('home.falls.ssl'),
-    value: 'SSL',
-  },
-  {
-    label: 'Dns',
-    value: 'Dns',
-  },
-  {
-    label: t('home.falls.tcp'),
-    value: 'TCP',
-  },
-  {
-    label: t('home.falls.ssl'),
-    value: 'SSL',
-  },
-]
-const waterFallRef = ref()
+const playData = [12, 22, 10, 18, 25, 14]
+const pageData = [20, 15, 26, 22, 18, 24]
+const pvData = [8, 18, 14, 26, 12, 20]
+
+function getPhases() {
+  return ['DNS', t('home.falls.tcp'), t('home.falls.ssl'), 'Dns', t('home.falls.tcp'), t('home.falls.ssl')]
+}
+
+function buildRows() {
+  const phases = getPhases()
+  return phases.map((phase, index) => ({
+    phase,
+    [t('home.curve.play')]: playData[index],
+    [t('home.curve.page')]: pageData[index],
+    [t('home.main.down')]: pvData[index],
+  }))
+}
+
+const barRef = ref()
 const options = ref({
-  data: [],
+  data: buildRows(),
+  xAxis: [
+    {
+      keyName: 'phase',
+    },
+  ],
+})
+const chartExtend = ref({
   grid: {
     left: '3%',
     right: '4%',
     bottom: '3%',
     containLabel: true,
   },
-  xAxis: {
-    type: 'value',
-    show: false,
-    boundaryGap: ['0%', '0%'],
-  },
-  yAxis: {
-    type: 'category',
-    axisLabel: {
-      formatter(value: any, index: any) {
-        return (
-          // eslint-disable-next-line prefer-template
-          list[index]?.label + '  ' + list[index]?.value + '  ' + value + 's'
-        )
-      },
-      margin: 20,
-    },
-    axisLine: {
-      show: true,
-      lineStyle: {
-        color: '#333',
-      },
-    },
-    axisTick: {
-      show: true,
-      inside: false,
-      lineStyle: {
-        color: '#333',
-      },
-    },
-    splitLine: {
-      show: false,
+  color: ['#4e85f4', '#5f45ff', '#ff9e03'],
+  legend: {
+    data: [t('home.curve.play'), t('home.curve.page'), t('home.main.down')],
+    top: '10',
+    left: 'auto',
+    right: '24',
+    icon: 'circle',
+    itemWidth: 10,
+    itemHeight: 10,
+    itemGap: 24,
+    textStyle: {
+      fontSize: 14,
     },
   },
-})
-const chartExtend = ref({
-  xAxis: {
-    type: 'value',
-    boundaryGap: ['0%', '0%'],
-  },
+  yAxis: [
+    {
+      min: 0,
+      max: 40,
+      interval: 5,
+    },
+  ],
   tooltip: {
     trigger: 'axis',
     axisPointer: {
       type: 'shadow',
     },
-    formatter(params: any) {
-      let tar
-      if (params[1].value !== '-') {
-        tar = params[1]
-      }
-      else {
-        tar = params[0]
-      }
-      // eslint-disable-next-line prefer-template
-      return tar.name + '<br/>' + tar.seriesName + ' : ' + tar.value
-    },
   },
   series: [
     {
-      name: 'Placeholder',
-      type: 'bar',
-      stack: 'Total',
+      barWidth: 10,
       itemStyle: {
-        borderColor: 'transparent',
-        color: 'transparent',
+        borderRadius: [3, 3, 0, 0],
       },
-      emphasis: {
-        itemStyle: {
-          borderColor: 'transparent',
-          color: 'transparent',
-        },
-      },
-      data: [0, 900, 405, 250, 136, 236, 651, 169, 156, 195, 192],
     },
     {
-      name: 'Income',
-      type: 'bar',
-      stack: 'Total',
+      barWidth: 10,
       itemStyle: {
-        color: '#4e85f4',
-        borderRadius: [2, 2, 2, 2],
+        borderRadius: [3, 3, 0, 0],
       },
-      label: {
-        show: false,
-      },
-      data: [500, '-', 593, '-', '-', 135, 178, 286, '-', '-', '-'],
     },
     {
-      name: 'Expenses',
-      type: 'bar',
-      stack: 'Total',
+      barWidth: 10,
       itemStyle: {
-        color: '#5f45ff',
-        borderRadius: [5, 5, 5, 5],
+        borderRadius: [3, 3, 0, 0],
       },
-      label: {
-        show: false,
-      },
-      data: ['-', '-', '-', 408, 154, '-', '-', '-', 119, 361, '-'],
-    },
-    {
-      name: 'test',
-      type: 'bar',
-      stack: 'Total',
-      itemStyle: {
-        color: '#e2b525 ',
-        borderRadius: [5, 5, 5, 5],
-      },
-      label: {
-        show: false,
-      },
-      data: ['-', 99, '-', '-', '-', '-', '-', '-', '-', '-', 32],
     },
   ],
 })
 
 onMounted(() => {
-  const resizeHandler = debounce(() => waterFallRef.value?.resize(), 200)
+  const resizeHandler = debounce(() => barRef.value?.resize(), 200)
   window.addEventListener('resize', resizeHandler)
 
-  const el = waterFallRef.value?.$el || waterFallRef.value
+  const el = barRef.value?.$el || barRef.value
   let observer: ResizeObserver | null = null
   if (el) {
-    observer = new ResizeObserver(() => waterFallRef.value?.resize())
+    observer = new ResizeObserver(() => barRef.value?.resize())
     observer.observe(el)
   }
 
   setTimeout(() => {
-    waterFallRef.value?.resize()
+    barRef.value?.resize()
   }, 200)
 
   onUnmounted(() => {
     window.removeEventListener('resize', resizeHandler)
     observer?.disconnect()
   })
-  setTimeout(() => {
-    waterFallRef.value?.resize()
-  }, 200)
 })
 
 watch(currentLocale, () => {
-  waterFallRef.value?.resize()
+  options.value.data = buildRows()
+  chartExtend.value.legend.data = [t('home.curve.play'), t('home.curve.page'), t('home.main.down')]
+  barRef.value?.resize()
 })
 </script>
 
 <template>
   <div class="falls-box">
-    <div class="falls">
-      <img src="@/assets/images/map-background2.png" class="image">
-      <h3>{{ $t('home.falls.line') }}</h3>
+    <h3 class="title">
+      {{ $t('home.falls.line') }}
+    </h3>
 
-      <TinyChartWaterfall
-        id="flow"
-        ref="waterFallRef"
+    <div class="falls">
+      <TinyChartBar
+        ref="barRef"
         width="100%"
         height="100%"
         :options="options"
@@ -231,40 +139,23 @@ watch(currentLocale, () => {
 
 <style scoped lang="less">
 .falls-box {
-  margin-top: 20px;
-  padding: 20px 16px;
+  margin-top: 16px;
+  padding: 24px;
   background: #fff;
-  border-radius: 6px;
+  border-radius: 8px;
   box-shadow: 0 3px 10px #4062e133;
 }
 
 .falls {
   width: 100%;
-  height: 406px;
-  margin-top: 2%;
+  height: 400px;
 }
 
-#flow {
-  width: 100%;
-  height: inherit;
-}
-
-.image {
-  float: left;
-  width: 25px;
-  margin-top: 0.5%;
-  margin-left: 0.5%;
-  border-radius: 4px;
-  opacity: 0.6;
-}
-
-h3 {
-  float: left;
-  width: 200px;
-  margin-top: 0.5%;
-  margin-left: 0.5%;
-  color: #524343;
-  font-weight: 700;
-  font-size: 18px;
+.title {
+  margin-bottom: 16px;
+  color: #191919;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
 }
 </style>
