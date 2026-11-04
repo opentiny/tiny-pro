@@ -25,6 +25,11 @@ const IconEllipsis = iconEllipsis()
 const route = useRoute()
 const router = useRouter()
 
+// 协同编辑使用的 y-websocket 服务地址：默认为 Yjs 公共演示服务，仅供本地体验。
+// 生产环境需部署自建 y-websocket 服务并通过 VITE_COLLAB_WEBSOCKET_URL 替换，
+// 否则文档内容会同步到公共服务器，且房间名可预测，存在内容泄露风险
+const collabWebsocketUrl = import.meta.env.VITE_COLLAB_WEBSOCKET_URL || 'wss://demos.yjs.dev/ws'
+
 const editorRef = ref<HTMLElement>()
 const title = ref('')
 const isFullscreen = ref(false)
@@ -36,6 +41,8 @@ let collabBinding: { destroy: () => void } | null = null
 let collabProvider: { destroy: () => void, off?: (event: string, handler: (event: { status: string }) => void) => void } | null = null
 let collabPersistence: { destroy: () => void } | null = null
 let collabDoc: { destroy: () => void } | null = null
+// y-indexeddb 构造函数缓存：协同初始化后用于房间重绑，避免重复动态导入
+let IndexeddbPersistenceClass: any = null
 let collabAwareness: { off: (event: string, handler: () => void) => void } | null = null
 let collabAwarenessHandler: (() => void) | null = null
 let collabHeartbeatTimer: ReturnType<typeof setInterval> | null = null
@@ -150,13 +157,29 @@ function destroyEditor() {
 // 每个协同文档一个房间，已有文档按 id 区分，新建文档用临时种子房间
 function currentCollabRoom(): string {
   const id = route.query.id !== undefined ? Number(route.query.id) : pendingDocId.value
-  if (id != null) {
+  if (id != null && Number.isInteger(id)) {
     return `tiny-pro-collab-${id}`
   }
   if (!collabRoomSeed) {
     collabRoomSeed = `tiny-pro-collab-new-${Math.random().toString(36).slice(2, 10)}`
   }
   return collabRoomSeed
+}
+
+// 新建协同文档首次保存后，把当前会话的 provider 与本地缓存重绑到正式房间，
+// 保证后续从列表按 id 打开该文档的用户与当前会话处在同一房间
+function rebindCollabRoom(id: number) {
+  if (!collabProvider || !collabDoc || !IndexeddbPersistenceClass) {
+    return
+  }
+  const room = `tiny-pro-collab-${id}`
+  const provider = collabProvider as any
+  provider.disconnect()
+  provider.roomname = room
+  provider.bcChannel = `${provider.serverUrl}/${room}`
+  provider.connect()
+  collabPersistence?.destroy()
+  collabPersistence = new IndexeddbPersistenceClass(room, collabDoc)
 }
 
 function attachAutoSave(editor: TinyEditor) {
@@ -172,7 +195,13 @@ function initEditor(content = '') {
   hasUserContentEdit = false
   if (isCollaborationMode.value) {
     // 多人协同：实时协同编辑器，内容通过 yjs 在协作者间同步
-    initCollabEditor(content)
+    const epoch = editorEpoch
+    initCollabEditor(content).catch(() => {
+      // 动态导入或初始化失败：仅当用户仍在当前文档时标记断连，避免影响已切换的新会话
+      if (epoch === editorEpoch) {
+        collabSyncStatus.value = 'disconnected'
+      }
+    })
     return
   }
   _editor = new TinyEditor(editorRef.value, {
@@ -206,10 +235,11 @@ async function initCollabEditor(content: string) {
   if (epoch !== editorEpoch || !editorRef.value) {
     return
   }
+  IndexeddbPersistenceClass = IndexeddbPersistence
   TinyEditor.register('modules/cursors', QuillCursors, true)
   const room = currentCollabRoom()
   const ydoc = new Y.Doc()
-  const provider = new WebsocketProvider('wss://demos.yjs.dev/ws', room, ydoc)
+  const provider = new WebsocketProvider(collabWebsocketUrl, room, ydoc)
   const persistence = new IndexeddbPersistence(room, ydoc)
   collabDoc = ydoc
   collabProvider = provider
@@ -254,6 +284,16 @@ async function initCollabEditor(content: string) {
     }
   })
   collabBinding = new QuillBinding(ytext, _editor, provider.awareness)
+  // 远端编辑到达时刷新列表的“最后更新时间”；本地编辑由自动保存负责更新（transaction.origin 为 binding）
+  ytext.observe((_event: unknown, transaction: { origin: unknown }) => {
+    if (transaction.origin === collabBinding) {
+      return
+    }
+    const docId = route.query.id !== undefined ? Number(route.query.id) : pendingDocId.value
+    if (docId != null && Number.isInteger(docId)) {
+      updateCollaborationDocument(docId, { time: new Date().toLocaleString('zh-CN', { hour12: false }).replaceAll('/', '-') })
+    }
+  })
   // color: `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}`,
   const localUser = {
     name: `user${Math.random().toString(36).slice(2, 8)}`,
@@ -313,6 +353,12 @@ async function initCollabEditor(content: string) {
 
 function syncForm() {
   const id = route.query.id === undefined ? undefined : Number(route.query.id)
+  if (id !== undefined && !docList.value.some(doc => doc.id === id)) {
+    // 文档不存在（已删除或非法链接）：提示并返回列表，不为未知 id 打开协同房间
+    Modal.message({ message: '文档不存在或已被删除', status: 'warning' })
+    router.replace({ name: 'Editor', query: isCollaborationMode.value ? { view: 'collaboration' } : {} })
+    return
+  }
   if (id === loadedDocId) {
     return
   }
@@ -413,7 +459,13 @@ function scheduleAutoSave() {
   }, 800)
 }
 
-watch(title, () => scheduleAutoSave())
+watch(title, (value) => {
+  // 文档加载时回填的标题不触发自动保存：协同模式下正文尚未同步完成，此时保存会把空内容写进文档；标题与文档名一致说明是回填或未改动，也无需保存
+  if (value === activeDocument.value?.name) {
+    return
+  }
+  scheduleAutoSave()
+})
 
 function doSave(): boolean {
   const name = title.value.trim()
@@ -427,7 +479,8 @@ function doSave(): boolean {
     if (!userName || !hasUserContentEdit) {
       return members
     }
-    return [...new Set([...members, userName])]
+    // 新建文档时的「我」占位替换为真实协同用户名
+    return [...new Set([...members.filter(member => member !== '我'), userName])]
   }
   const pendingId = pendingDocId.value
   const id = route.query.id !== undefined ? Number(route.query.id) : pendingId
@@ -437,6 +490,8 @@ function doSave(): boolean {
     if (isCollaborationMode.value) {
       doc = addCollaborationDocument({ name, content })
       updateCollaborationDocument(doc.id, { members: mergeMembers(doc.members) })
+      // 首次保存拿到正式 id 后重绑到正式房间，后续协同编辑对列表用户可见
+      rebindCollabRoom(doc.id)
     }
     else {
       doc = addDocument({ name, content, department: '未分类' })
@@ -451,7 +506,10 @@ function doSave(): boolean {
     updateCollaborationDocument(id, { name, content, time: now, members: mergeMembers(doc?.members ?? []) })
   }
   else {
-    updateDocument(id, { name, content, time: now })
+    // 文档可能已被删除（如 id 不存在），保存失败时不再向上报成功
+    if (!updateDocument(id, { name, content, time: now })) {
+      return false
+    }
   }
   return true
 }
@@ -504,10 +562,14 @@ function toggleFullscreen() {
 function handleKeydown(event: KeyboardEvent) {
   if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
     event.preventDefault()
+    if (!title.value.trim()) {
+      Modal.message({ message: '请输入文档标题', status: 'warning' })
+      return
+    }
     const saved = doSave()
     Modal.message({
-      message: saved ? '文档已自动保存，无需手动保存' : '请输入文档标题',
-      status: saved ? 'success' : 'warning',
+      message: saved ? '文档已自动保存，无需手动保存' : '保存失败，文档不存在或已被删除',
+      status: saved ? 'success' : 'error',
     })
     return
   }

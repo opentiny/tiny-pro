@@ -24,6 +24,7 @@ declare global {
     readonly VITE_MOCK_HOST: string
     readonly VITE_USE_MOCK: string
     readonly VITE_MOCK_IGNORE: string
+    readonly VITE_COLLAB_WEBSOCKET_URL: string
   }
   declare const BUILD_TOOLS: string
   declare interface NodeRequire {

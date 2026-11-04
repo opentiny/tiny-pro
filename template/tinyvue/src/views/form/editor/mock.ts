@@ -168,7 +168,21 @@ export function removeCollaborationDocument(id: number): boolean {
   if (index === -1)
     return false
   collaborationDocuments.splice(index, 1)
+  clearCollabRoomData(id)
   return true
+}
+
+// 清理本地 IndexedDB 中的协同房间数据，避免同 id 重建文档时复活旧内容
+async function clearCollabRoomData(id: number) {
+  try {
+    const [{ IndexeddbPersistence }, Y] = await Promise.all([import('y-indexeddb'), import('yjs')])
+    const persistence = new IndexeddbPersistence(`tiny-pro-collab-${id}`, new Y.Doc())
+    await persistence.clearData()
+    persistence.destroy()
+  }
+  catch {
+    // 本地缓存清理失败不影响删除结果
+  }
 }
 
 export function addCollaborationDocument(data: Pick<CollaborationDocument, 'name' | 'content'>): CollaborationDocument {
