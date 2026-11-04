@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { TinyHuichartsMap as TinyChartMap } from '@opentiny/vue-huicharts'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 import chinaData from '@/assets/china.json'
 import { debounce } from '@/hooks/responsive'
 import RegionTable from './regiontable.vue'
@@ -51,8 +51,8 @@ const chartSettings = ref({
   position: 'china',
   mapOrigin: chinaData, // 用户自己的地图数据
   roam: false,
-  zoom: 1.2,
-  top: '30px',
+  zoom: 1.5,
+  center: [98, 36], // 视角中心西移，地图视觉上右移；经度越小右移越多
   itemStyle: {
     borderColor: 'skyblue',
     borderWidth: 1,
@@ -73,8 +73,8 @@ const chartSettings = ref({
 const legendVisible = ref(false)
 const visualMap = ref({
   show: true,
-  top: 'bottom',
-  left: 'left',
+  top: '32px',
+  left: '32px',
   realtime: false,
   splitList: [
     { start: 5000, end: 500000 },
@@ -87,11 +87,8 @@ const visualMap = ref({
   color: ['#9feaa5', '#5475f5', '#85daef', '#74e2ca', '#e6ac53', '#9fb5ea'],
 })
 
-const windowWidth = ref(0)
-
 onMounted(() => {
   const resizeHandler = debounce(() => {
-    windowWidth.value = window.innerWidth
     mapChartsRef.value?.resize()
   }, 200)
 
@@ -113,32 +110,29 @@ onMounted(() => {
     window.removeEventListener('resize', resizeHandler)
     observer?.disconnect()
   })
-  setTimeout(() => {
-    mapChartsRef.value?.resize()
-  }, 200)
 })
-
-const chartWidth = computed(() => windowWidth.value <= 768 ? '80vw' : '30vw')
 </script>
 
 <template>
   <div class="region-box">
-    <div class="region-title">
-      <img src="@/assets/images/map-background3.png" class="image">
-      <h3>{{ $t('home.region.title') }}</h3>
-    </div>
+    <h3 class="region-title">
+      {{ $t('home.region.title') }}
+    </h3>
 
-    <div class="region w-full flex max-md:flex-col max-md:items-center">
-      <TinyChartMap
-        v-if="chartSettings.mapOrigin"
-        ref="mapChartsRef"
-        :width="chartWidth"
-        :settings="chartSettings"
-        :data="chartData"
-        :visual-map="visualMap"
-        :legend-visible="legendVisible"
-      />
-      <div class="region-from ml-[5%] w-[46vw] max-md:ml-[0%] max-md:w-[100%] max-md:pt-[5%] max-sm:pt-[10%]">
+    <div class="region-body">
+      <div class="region">
+        <TinyChartMap
+          v-if="chartSettings.mapOrigin"
+          ref="mapChartsRef"
+          width="100%"
+          height="460px"
+          :settings="chartSettings"
+          :data="chartData"
+          :visual-map="visualMap"
+          :legend-visible="legendVisible"
+        />
+      </div>
+      <div class="region-table">
         <RegionTable />
       </div>
     </div>
@@ -147,28 +141,38 @@ const chartWidth = computed(() => windowWidth.value <= 768 ? '80vw' : '30vw')
 
 <style scoped lang="less">
 .region-box {
+  min-height: 600px;
   margin-top: 20px;
-  padding: 20px 16px;
+  padding: 24px;
   background: #fff;
-  border-radius: 6px;
+  border-radius: 8px;
   box-shadow: 0 3px 10px #4062e133;
 }
 
+.region-body {
+  display: flex;
+  align-items: flex-start;
+  gap: 40px;
+}
+
 .region {
-  justify-content: space-between;
+  flex: 1;
+  min-width: 0;
+}
+
+.region-table {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  top: -16px;
 }
 
 .region-title {
-  display: flex;
-}
-
-h3 {
-  width: 300px;
-  margin-top: 1.5%;
-  margin-left: 10px;
-  color: #524343;
-  font-weight: 700;
-  font-size: 18px;
+  margin-bottom: 16px;
+  color: #191919;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
 }
 
 .image {
@@ -179,5 +183,12 @@ h3 {
   background: tomato;
   border-radius: 4px;
   opacity: 0.6;
+}
+
+@media (max-width: 768px) {
+  .region-body {
+    flex-direction: column;
+    gap: 24px;
+  }
 }
 </style>

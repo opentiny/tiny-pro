@@ -23,9 +23,14 @@ import Round from './components/round.vue'
   .container {
   width: 100%;
   height: calc(100% - 60px);
+  padding: 0 16px 10px 16px;
   margin: 0 auto;
   overflow-x: hidden;
   overflow-y: auto;
+}
+
+.contain {
+  width: 100%;
 }
 </style>
 
