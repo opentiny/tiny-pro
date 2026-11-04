@@ -163,25 +163,32 @@ export function updateCollaborationDocument(id: number, patch: Partial<Omit<Coll
   return true
 }
 
-export function removeCollaborationDocument(id: number): boolean {
+export async function removeCollaborationDocument(id: number): Promise<boolean> {
   const index = collaborationDocuments.findIndex(doc => doc.id === id)
   if (index === -1)
     return false
+  // 先清理本地 IndexedDB 中的房间数据，清理失败不移除记录，避免同 id 重建文档时复活旧内容
+  if (!await clearCollabRoomData(id)) {
+    return false
+  }
   collaborationDocuments.splice(index, 1)
-  clearCollabRoomData(id)
   return true
 }
 
-// 清理本地 IndexedDB 中的协同房间数据，避免同 id 重建文档时复活旧内容
-async function clearCollabRoomData(id: number) {
+// 清理本地 IndexedDB 中的协同房间数据；返回是否清理成功
+async function clearCollabRoomData(id: number): Promise<boolean> {
   try {
-    const [{ IndexeddbPersistence }, Y] = await Promise.all([import('y-indexeddb'), import('yjs')])
-    const persistence = new IndexeddbPersistence(`tiny-pro-collab-${id}`, new Y.Doc())
-    await persistence.clearData()
-    persistence.destroy()
+    const { clearDocument } = await import('y-indexeddb')
+    // 其他页面或标签页仍打开该房间连接时 deleteDatabase 会被阻塞，超时按失败处理
+    await Promise.race([
+      clearDocument(`tiny-pro-collab-${id}`),
+      new Promise((_resolve, reject) => setTimeout(() => reject(new Error('clear collab room data timeout')), 3000)),
+    ])
+    return true
   }
-  catch {
-    // 本地缓存清理失败不影响删除结果
+  catch (error) {
+    console.error('清理协同文档本地缓存失败', error)
+    return false
   }
 }
 

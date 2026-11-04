@@ -92,6 +92,8 @@ let editorEpoch = 0
 let collabRoomSeed = ''
 // 当前用户是否真实编辑过内容（mock 内容回填不算），只有编辑过才写入文档成员
 let hasUserContentEdit = false
+// 自上次成功保存以来是否有未落盘的编辑，用于返回前判断是否需要未保存提示
+let hasUnsavedEdits = false
 // mock 内容回填标记，回填产生的 text-change 不算用户编辑
 let isSeedingContent = false
 
@@ -201,6 +203,7 @@ function attachAutoSave(editor: TinyEditor) {
 function initEditor(content = '') {
   destroyEditor()
   hasUserContentEdit = false
+  hasUnsavedEdits = false
   if (isCollaborationMode.value) {
     // 多人协同：实时协同编辑器，内容通过 yjs 在协作者间同步
     const epoch = editorEpoch
@@ -287,15 +290,19 @@ async function initCollabEditor(content: string) {
     }
   })
   collabBinding = new QuillBinding(ytext, _editor, provider.awareness)
-  // 远端编辑到达时刷新列表的“最后更新时间”；本地编辑由自动保存负责更新（transaction.origin 为 binding）
+  // 远端编辑到达时同步文档内容与“最后更新时间”，避免列表时间比内容新；本地编辑由自动保存负责更新（transaction.origin 为 binding）
   ytext.observe((_event: unknown, transaction: { origin: unknown }) => {
     if (transaction.origin === collabBinding) {
       return
     }
     const docId = route.query.id !== undefined ? Number(route.query.id) : pendingDocId.value
-    if (docId != null && Number.isInteger(docId)) {
-      updateCollaborationDocument(docId, { time: new Date().toLocaleString('zh-CN', { hour12: false }).replaceAll('/', '-') })
+    if (!_editor || docId == null || !Number.isInteger(docId)) {
+      return
     }
+    updateCollaborationDocument(docId, {
+      time: new Date().toLocaleString('zh-CN', { hour12: false }).replaceAll('/', '-'),
+      content: _editor.getSemanticHTML(),
+    })
   })
   // color: `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}`,
   const localUser = {
@@ -416,9 +423,9 @@ onBeforeUnmount(() => {
 })
 
 function goBack() {
-  // 有内容但没有标题时自动保存不会生效，返回会丢失内容，先提示用户
   const hasContent = !!(_editor?.getText().trim())
-  if (hasContent && !title.value.trim() && pendingDocId.value == null) {
+  // 有未保存的编辑但缺少标题时自动保存不会生效，返回会丢失这些编辑，先提示用户
+  if (hasContent && !title.value.trim() && hasUnsavedEdits) {
     Modal.confirm({
       title: '提示',
       message: '文档尚未保存：已填写内容但缺少标题，返回后内容将丢失。确定要返回吗？',
@@ -476,6 +483,7 @@ let saveTimer: ReturnType<typeof setTimeout> | null = null
 let syncBackTimer: ReturnType<typeof setTimeout> | null = null
 
 function scheduleAutoSave() {
+  hasUnsavedEdits = true
   if (saveTimer) {
     clearTimeout(saveTimer)
   }
@@ -524,18 +532,21 @@ function doSave(): boolean {
     }
     pendingDocId.value = doc.id
     loadedDocId = doc.id
+    hasUnsavedEdits = false
     return true
   }
   const now = new Date().toLocaleString('zh-CN', { hour12: false }).replaceAll('/', '-')
   if (isCollaborationMode.value) {
     const doc = collaborationDocuments.find(item => item.id === id)
     updateCollaborationDocument(id, { name, content, time: now, members: mergeMembers(doc?.members ?? []) })
+    hasUnsavedEdits = false
   }
   else {
     // 文档可能已被删除（如 id 不存在），保存失败时不再向上报成功
     if (!updateDocument(id, { name, content, time: now })) {
       return false
     }
+    hasUnsavedEdits = false
   }
   return true
 }
@@ -565,13 +576,19 @@ function handleDelete() {
   Modal.confirm({
     title: '删除确认',
     message: `确定要删除文档「${title.value || '未命名文档'}」吗？删除后不可恢复。`,
-  }).then((res: string) => {
+  }).then(async (res: string) => {
     if (res !== 'confirm') {
       return
     }
     const id = isCreateMode.value ? pendingId! : Number(route.query.id)
     if (isCollaborationMode.value) {
-      removeCollaborationDocument(id)
+      // 当前打开的协同房间还持有 IndexedDB 连接，先销毁编辑器释放连接，避免数据清理被阻塞
+      destroyEditor()
+      const removed = await removeCollaborationDocument(id)
+      if (!removed) {
+        Modal.message({ message: '删除失败：本地协同数据清理未完成，请重试', status: 'error' })
+        return
+      }
     }
     else {
       removeDocument(id)

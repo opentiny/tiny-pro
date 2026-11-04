@@ -25,10 +25,13 @@ function handleDelete(row: any) {
   Modal.confirm({
     title: '删除确认',
     message: `确定要删除协同文档「${row.name}」吗？删除后不可恢复。`,
-  }).then((res: string) => {
+  }).then(async (res: string) => {
     if (res === 'confirm') {
-      removeCollaborationDocument(row.id)
-      Modal.message({ message: '删除成功', status: 'success' })
+      const removed = await removeCollaborationDocument(row.id)
+      Modal.message({
+        message: removed ? '删除成功' : '删除失败：本地协同数据清理未完成，请重试',
+        status: removed ? 'success' : 'error',
+      })
     }
   })
 }
