@@ -415,7 +415,7 @@ public class TokenServiceImpl implements TokenService {
 
         int userId = userId(claims);
         String accessJti = requiredClaim(claims, "jti");
-        String refreshJti = requiredClaim(claims, "refreshTokenJti");
+        requiredClaim(claims, "refreshTokenJti");
         String sessionId = StringUtils.defaultIfBlank(claims.get("sid", String.class), accessJti);
         String uid = String.valueOf(userId);
         try {
@@ -427,7 +427,7 @@ public class TokenServiceImpl implements TokenService {
             if (sessionContainsAccess(sessionValue, accessJti)) {
                 return true;
             }
-            return StringUtils.isNotBlank(redisUtil.getValue(TokenRedisKeys.refresh(uid, refreshJti)));
+            return sessionContainsAccess(sessionValue, accessJti);
         } catch (RuntimeException ex) {
             logger.warn("Redis error while validating access token", ex);
             throw new ResponseStatusException(

@@ -199,6 +199,24 @@ class TokenServiceTest {
     }
 
     @Test
+    void accessTokenIsInactiveWhenSessionBindingIsMissingEvenIfRefreshKeyRemains() {
+        TokenPair pair = tokenService.issue(user(7, "user@example.com"));
+        Claims claims = jwtUtil.parseJwt(pair.getAccessToken());
+        String uid = "7";
+        String accessJti = claims.getId();
+        String refreshJti = claims.get("refreshTokenJti", String.class);
+        String sessionId = claims.get("sid", String.class);
+
+        when(redisUtil.getValue(TokenRedisKeys.access(uid, accessJti)))
+                .thenReturn(pair.getAccessToken());
+        when(redisUtil.getValue(TokenRedisKeys.session(uid, sessionId)))
+                .thenReturn(null);
+
+        assertFalse(tokenService.isAccessTokenActive(pair.getAccessToken()));
+        verify(redisUtil, never()).getValue(TokenRedisKeys.refresh(uid, refreshJti));
+    }
+
+    @Test
     void redisFailureWhileCheckingAccessTokenReturnsServiceUnavailable() {
         TokenPair pair = tokenService.issue(user(7, "user@example.com"));
         when(redisUtil.getValue(anyString())).thenThrow(new IllegalStateException("redis unavailable"));
