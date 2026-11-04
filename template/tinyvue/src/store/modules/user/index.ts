@@ -106,8 +106,10 @@ const useUserStore = defineStore('user', {
         this.refreshToken = refreshToken
         setToken(accessToken)
         setRefreshToken(refreshToken)
-        // 权限指令支持 '*' 通配，授予全部权限；其余用户信息沿用 state 默认值
+        // 权限指令支持 '*' 通配，授予全部权限；mock 模式无后端用户档案，
+        // 账号名取登录邮箱，保证多人协同等场景能区分不同登录者
         this.setInfo({
+          name: loginForm.email,
           role: 'admin',
           roleId: 1,
           rolePermission: ['*'],
