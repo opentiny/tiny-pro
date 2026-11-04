@@ -169,4 +169,23 @@ class RedisLockServiceTest {
         assertTrue(interruptedAfterExecute.get());
         verify(redisTemplate).execute(any(RedisScript.class), anyList(), any(Object[].class));
     }
+
+    @Test
+    void capsLeaseDurationForLongRunningCallers() {
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        when(valueOperations.get("lock:session")).thenReturn(null);
+        when(valueOperations.setIfAbsent(
+                eq("lock:session"), anyString(), eq(300_000L), eq(TimeUnit.MILLISECONDS)))
+                .thenReturn(true);
+        doReturn(1L).when(redisTemplate).execute(
+                any(RedisScript.class), anyList(), any(Object[].class)
+        );
+
+        lockService = new RedisLockService();
+        ReflectionTestUtils.setField(lockService, "redisTemplate", redisTemplate);
+
+        assertTrue(lockService.execute("session", 0L, 900_000L, () -> "ok").equals("ok"));
+        verify(valueOperations).setIfAbsent(
+                eq("lock:session"), anyString(), eq(300_000L), eq(TimeUnit.MILLISECONDS));
+    }
 }

@@ -36,6 +36,9 @@ public class RedisLockService {
     private static final String KEY_PREFIX = "lock:";
     private static final long DEFAULT_WAIT_MILLIS = 10_000L;
     private static final long DEFAULT_LEASE_MILLIS = 30_000L;
+    private static final long MAX_LEASE_MILLIS = 300_000L;
+    private static final int RENEWAL_THREAD_COUNT =
+            Math.max(4, Runtime.getRuntime().availableProcessors());
 
     private static final RedisScript<Long> REENTER_SCRIPT = new DefaultRedisScript<>("""
             if redis.call('GET', KEYS[1]) == ARGV[1] then
@@ -64,7 +67,7 @@ public class RedisLockService {
             ThreadLocal.withInitial(HashMap::new);
     private final ThreadLocal<LeaseState> activeLease = new ThreadLocal<>();
     private final ScheduledExecutorService renewExecutor = Executors.newScheduledThreadPool(
-            1,
+            RENEWAL_THREAD_COUNT,
             new DaemonThreadFactory()
     );
 
@@ -77,6 +80,7 @@ public class RedisLockService {
 
     public boolean tryLock(String key, long waitMillis, long leaseMillis) {
         validateArguments(key, waitMillis, leaseMillis);
+        leaseMillis = boundLeaseMillis(leaseMillis);
 
         String redisKey = lockKey(key);
         String owner = ownerId();
@@ -130,6 +134,7 @@ public class RedisLockService {
 
     public boolean renew(String key, long leaseMillis) {
         validateArguments(key, 0L, leaseMillis);
+        leaseMillis = boundLeaseMillis(leaseMillis);
         String redisKey = lockKey(key);
         if (!holdCounts.get().containsKey(redisKey)) {
             return false;
@@ -152,7 +157,8 @@ public class RedisLockService {
     }
 
     public <T> T execute(String key, long waitMillis, long leaseMillis, Supplier<T> action) {
-        if (!tryLock(key, waitMillis, leaseMillis)) {
+        long effectiveLeaseMillis = boundLeaseMillis(leaseMillis);
+        if (!tryLock(key, waitMillis, effectiveLeaseMillis)) {
             throw new IllegalStateException("Failed to acquire Redis lock: " + key);
         }
 
@@ -161,11 +167,11 @@ public class RedisLockService {
         LeaseState leaseState = new LeaseState();
         LeaseState previousLease = activeLease.get();
         activeLease.set(leaseState);
-        long renewInterval = Math.max(leaseMillis / 3L, 100L);
+        long renewInterval = Math.max(effectiveLeaseMillis / 3L, 100L);
         ScheduledFuture<?> renewal = renewExecutor.scheduleAtFixedRate(
                 () -> {
                     try {
-                        if (!renewLease(lockKey(key), owner, leaseMillis)) {
+                        if (!renewLease(lockKey(key), owner, effectiveLeaseMillis)) {
                             markLeaseLost(key, actionThread, leaseState,
                                     new IllegalStateException("Redis lock lease renewal failed: " + key));
                         }
@@ -271,6 +277,10 @@ public class RedisLockService {
         if (waitMillis < 0 || leaseMillis <= 0) {
             throw new IllegalArgumentException("Invalid Redis lock timeout");
         }
+    }
+
+    private long boundLeaseMillis(long leaseMillis) {
+        return Math.min(leaseMillis, MAX_LEASE_MILLIS);
     }
 
     private void sleep(long millis) {
