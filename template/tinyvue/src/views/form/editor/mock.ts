@@ -171,7 +171,10 @@ export async function removeCollaborationDocument(id: number): Promise<boolean> 
   if (!await clearCollabRoomData(id)) {
     return false
   }
-  collaborationDocuments.splice(index, 1)
+  // 清理期间列表可能已被其他删除操作改变，移除前重新按 id 查找，避免删错文档
+  const currentIndex = collaborationDocuments.findIndex(doc => doc.id === id)
+  if (currentIndex !== -1)
+    collaborationDocuments.splice(currentIndex, 1)
   return true
 }
 
@@ -192,8 +195,26 @@ async function clearCollabRoomData(id: number): Promise<boolean> {
   }
 }
 
+// 协同文档 id 分配自持久化计数器（localStorage）：删除文档（包括最大 id）或刷新页面后都不会复用旧 id，
+// 避免新文档与远端仍存活的同名协同房间（tiny-pro-collab-${id}）串内容
+const COLLAB_DOC_ID_KEY = 'tiny-pro-collab-doc-id'
+
+function nextCollaborationDocumentId(): number {
+  const maxId = Math.max(100, ...collaborationDocuments.map(doc => doc.id))
+  try {
+    const stored = Number(localStorage.getItem(COLLAB_DOC_ID_KEY))
+    const next = Math.max(Number.isInteger(stored) ? stored : 100, maxId) + 1
+    localStorage.setItem(COLLAB_DOC_ID_KEY, String(next))
+    return next
+  }
+  catch {
+    // localStorage 不可用（如隐私模式）时退化为时间戳，同样保证 id 不复用
+    return Math.max(maxId + 1, Date.now())
+  }
+}
+
 export function addCollaborationDocument(data: Pick<CollaborationDocument, 'name' | 'content'>): CollaborationDocument {
-  const id = Math.max(100, ...collaborationDocuments.map(doc => doc.id)) + 1
+  const id = nextCollaborationDocumentId()
   const doc: CollaborationDocument = {
     ...data,
     id,

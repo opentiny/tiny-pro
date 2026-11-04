@@ -3,7 +3,9 @@ import TinyEditor from '@opentiny/fluent-editor'
 import { Modal, Dropdown as TinyDropdown, Input as TinyInput } from '@opentiny/vue'
 import { iconAdd, iconChevronLeft, iconDel, iconEdit, iconEllipsis, iconError, iconFullscreenRight, iconGroup, IconLoadingShadow, iconMinscreenRight, iconSuccess, iconUser } from '@opentiny/vue-icon'
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
-import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router'
+import { onBeforeRouteLeave, onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router'
+import { useUserStore } from '@/store'
+import { getToken } from '@/utils/auth'
 import {
   addCollaborationDocument,
   addDocument,
@@ -24,11 +26,11 @@ const IconEllipsis = iconEllipsis()
 
 const route = useRoute()
 const router = useRouter()
+const userStore = useUserStore()
 
-// 协同编辑使用的 y-websocket 服务地址：默认为 Yjs 公共演示服务，仅供本地体验。
-// 生产环境需部署自建 y-websocket 服务并通过 VITE_COLLAB_WEBSOCKET_URL 替换，
-// 否则文档内容会同步到公共服务器，且房间名可预测，存在内容泄露风险
-const collabWebsocketUrl = import.meta.env.VITE_COLLAB_WEBSOCKET_URL || 'wss://demos.yjs.dev/ws'
+// 协同编辑使用的自建 y-websocket 服务地址：未配置时不建立任何网络连接（协同不可用，仅本地编辑）。
+// 禁止回退到 Yjs 公共演示服务（wss://demos.yjs.dev/ws），否则文档内容会同步到第三方服务器，且房间名可预测，存在内容泄露风险
+const collabWebsocketUrl = import.meta.env.VITE_COLLAB_WEBSOCKET_URL
 
 const editorRef = ref<HTMLElement>()
 const title = ref('')
@@ -164,6 +166,19 @@ function destroyEditor() {
   _editor = null
 }
 
+// 协同展示名：优先用户档案 name。mock 模式（含 mock 后端与 VITE_MOCK_LOGIN_ENABLED 纯前端登录）
+// 签发的 token 内嵌登录邮箱（mock-access-token:{email} / mock-local-access-token:{email}），
+// 当档案姓名未随登录账号区分（仍是默认 admin 且与登录邮箱不符）时，兜底用登录邮箱标识协作者
+function currentLoginName(): string {
+  const token = getToken() ?? ''
+  const tokenEmail = token.startsWith('mock-') ? token.slice(token.indexOf(':') + 1) : ''
+  const name = userStore.name?.trim()
+  if (name && (name !== 'admin' || !tokenEmail || tokenEmail === userStore.email)) {
+    return name
+  }
+  return tokenEmail || name || `user${Math.random().toString(36).slice(2, 8)}`
+}
+
 // 每个协同文档一个房间，已有文档按 id 区分，新建文档用临时种子房间
 function currentCollabRoom(): string {
   const id = route.query.id !== undefined ? Number(route.query.id) : pendingDocId.value
@@ -179,15 +194,17 @@ function currentCollabRoom(): string {
 // 新建协同文档首次保存后，把当前会话的 provider 与本地缓存重绑到正式房间，
 // 保证后续从列表按 id 打开该文档的用户与当前会话处在同一房间
 function rebindCollabRoom(id: number) {
-  if (!collabProvider || !collabDoc || !IndexeddbPersistenceClass) {
+  if (!collabDoc || !IndexeddbPersistenceClass) {
     return
   }
   const room = `tiny-pro-collab-${id}`
-  const provider = collabProvider as any
-  provider.disconnect()
-  provider.roomname = room
-  provider.bcChannel = `${provider.serverUrl}/${room}`
-  provider.connect()
+  if (collabProvider) {
+    const provider = collabProvider as any
+    provider.disconnect()
+    provider.roomname = room
+    provider.bcChannel = `${provider.serverUrl}/${room}`
+    provider.connect()
+  }
   collabPersistence?.destroy()
   collabPersistence = new IndexeddbPersistenceClass(room, collabDoc)
 }
@@ -235,12 +252,14 @@ async function initCollabEditor(content: string) {
     { QuillBinding },
     { WebsocketProvider },
     { IndexeddbPersistence },
+    { Awareness },
   ] = await Promise.all([
     import('quill-cursors'),
     import('yjs'),
     import('y-quill'),
     import('y-websocket'),
     import('y-indexeddb'),
+    import('y-protocols/awareness'),
   ])
   // 初始化期间用户已切换文档或离开页面，丢弃本次结果
   if (epoch !== editorEpoch || !editorRef.value) {
@@ -250,12 +269,21 @@ async function initCollabEditor(content: string) {
   TinyEditor.register('modules/cursors', QuillCursors, true)
   const room = currentCollabRoom()
   const ydoc = new Y.Doc()
-  const provider = new WebsocketProvider(collabWebsocketUrl, room, ydoc)
+  // 未配置协同服务地址时不创建网络连接：仅本地 IndexedDB 编辑，状态直接标记为断连
+  const provider = collabWebsocketUrl ? new WebsocketProvider(collabWebsocketUrl, room, ydoc) : null
   const persistence = new IndexeddbPersistence(room, ydoc)
   collabDoc = ydoc
   collabProvider = provider
   collabPersistence = persistence
-  collabSyncStatus.value = 'connecting'
+  if (provider) {
+    collabSyncStatus.value = 'connecting'
+  }
+  else {
+    providerOffline = true
+    collabSyncStatus.value = 'disconnected'
+  }
+  // 无网络连接时使用本地 awareness，保证光标组件与本地用户状态可用
+  const awareness = provider ? provider.awareness : new Awareness(ydoc)
   const ytext = ydoc.getText('quill')
   _editor = new TinyEditor(editorRef.value, {
     theme: 'snow',
@@ -304,19 +332,20 @@ async function initCollabEditor(content: string) {
       content: _editor.getSemanticHTML(),
     })
   })
-  // color: `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}`,
+  // 协同身份使用当前登录用户的账号名，未取到时退化为随机名
   const localUser = {
-    name: `user${Math.random().toString(36).slice(2, 8)}`,
+    name: currentLoginName(),
   }
   currentCollabUser.value = localUser
-  provider.awareness.setLocalStateField('user', localUser)
-  provider.awareness.setLocalStateField('ts', Date.now())
+  awareness.setLocalStateField('user', localUser)
+  awareness.setLocalStateField('ts', Date.now())
   // 心跳：定期刷新时间戳，协作者据此判断彼此是否在线（直接关浏览器时服务端可能检测不到断连）
-  collabHeartbeatTimer = setInterval(() => {
-    provider.awareness.setLocalStateField('ts', Date.now())
-  }, 5000)
+  if (provider) {
+    collabHeartbeatTimer = setInterval(() => {
+      provider.awareness.setLocalStateField('ts', Date.now())
+    }, 5000)
+  }
   // 同步当前房间的协作用户列表（awareness 变化时实时更新）
-  const awareness = provider.awareness
   const updateCollabUsers = () => {
     const users: { name: string, color?: string }[] = []
     const now = Date.now()
@@ -346,7 +375,7 @@ async function initCollabEditor(content: string) {
     }
   }
   // 在线：等 provider 完成远端同步后再回填，避免与远端内容重复
-  provider.on('sync', (isSynced: boolean) => {
+  provider?.on('sync', (isSynced: boolean) => {
     if (isSynced) {
       hasSyncedRemote = true
       providerOffline = false
@@ -370,6 +399,8 @@ async function initCollabEditor(content: string) {
     }
     else {
       providerOffline = true
+      // 断连后重置远端同步标记，重连完成新的 sync 前保持“同步中”，避免误报“同步成功”
+      hasSyncedRemote = false
       collabSyncStatus.value = 'disconnected'
       // 离线时本地缓存已读完且房间无内容，则用 mock 内容兜底（maybeSeed 内有 epoch 与空内容守卫）
       if (persistenceSynced) {
@@ -377,7 +408,7 @@ async function initCollabEditor(content: string) {
       }
     }
   }
-  provider.on('status', onStatus)
+  provider?.on('status', onStatus)
   collabStatusHandler = onStatus
   if (route.query.id === undefined) {
     _editor.focus()
@@ -493,15 +524,19 @@ function scheduleAutoSave() {
   }, 800)
 }
 
-// 切换文档前立即落盘未保存的编辑：守卫执行时 route.query.id 仍指向原文档，
+// 离开当前文档前立即落盘未保存的编辑：守卫执行时 route.query.id 仍指向原文档，
 // 否则编辑器被替换/卸载时会清掉定时器，最近 800ms 内的编辑会丢失
-onBeforeRouteUpdate(() => {
+function flushPendingSave() {
   if (saveTimer) {
     clearTimeout(saveTimer)
     saveTimer = null
     doSave()
   }
-})
+}
+
+onBeforeRouteUpdate(flushPendingSave)
+// 返回列表等离开本路由的场景会卸载组件，onBeforeRouteUpdate 不会触发，同样需要落盘
+onBeforeRouteLeave(flushPendingSave)
 
 watch(title, (value) => {
   // 文档加载时回填的标题不触发自动保存：协同模式下正文尚未同步完成，此时保存会把空内容写进文档；标题与文档名一致说明是回填或未改动，也无需保存
@@ -594,8 +629,15 @@ function handleDelete() {
     if (isCollaborationMode.value) {
       // 当前打开的协同房间还持有 IndexedDB 连接，先销毁编辑器释放连接，避免数据清理被阻塞
       destroyEditor()
-      const removed = await removeCollaborationDocument(id)
+      // 首次清理可能因删除被其他连接阻塞而超时（超时后删除仍可能在后台完成），稍候重试一次再判定
+      let removed = await removeCollaborationDocument(id)
       if (!removed) {
+        await new Promise(resolve => setTimeout(resolve, 500))
+        removed = await removeCollaborationDocument(id)
+      }
+      if (!removed) {
+        // 清理仍未完成：恢复编辑器并重建房间连接（优先使用房间实时内容，快照仅在房间为空时兜底），避免页面空白不可用
+        initEditor(activeDocument.value?.content ?? '')
         Modal.message({ message: '删除失败：本地协同数据清理未完成，请重试', status: 'error' })
         return
       }
