@@ -186,7 +186,7 @@ public class IUserServiceImpl implements IUserService {
                 .collect(Collectors.joining());
 
         if (!originalRoleIds.equals(newRoleIds)) {
-            authService.revokeUserSessions(updateUserDto.getEmail());
+            registerSessionRevocation(List.of(new UserSession(user.getEmail(), user.getId())));
         }
 
         return ResponseEntity.ok(result);
