@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { Dropdown, DropdownMenu, Modal, TabItem, Tabs, Modal as tinyModal } from '@opentiny/vue'
+import { Dropdown, DropdownMenu, Modal, TabItem, Tabs } from '@opentiny/vue'
 import locale from '@opentiny/vue-locale'
 import TinyThemeTool from '@opentiny/vue-theme/theme-tool'
 import { computed, defineAsyncComponent, nextTick, provide, ref, watch } from 'vue'
@@ -8,13 +8,9 @@ import { useRouter } from 'vue-router'
 import Footer from '@/components/footer/index.vue'
 import Menu from '@/components/menu/index.vue'
 import NavBar from '@/components/navbar/index.vue'
-import Theme from '@/components/theme/index.vue'
-import { useResponsiveSize } from '@/hooks/responsive'
 import { useTheme } from '@/hooks/useTheme'
 import { useAppStore, useTabStore } from '@/store'
 import PageLayout from './page-layout.vue'
-
-const { modalSize } = useResponsiveSize()
 
 // 动态切换
 const router = useRouter()
@@ -265,7 +261,6 @@ const layoutMode = {
 }
 
 // 主题配置
-const disTheme = ref(false)
 const theme = new TinyThemeTool()
 useTheme(theme)
 provide('THEME', theme)
@@ -278,10 +273,6 @@ const isTinyRobotEnabled = computed(() => {
 const TinyRobotChat = defineAsyncComponent(
   () => import('@/tiny-robot-chat/TinyRobotChat.vue'),
 )
-
-function themeVisible() {
-  disTheme.value = !disTheme.value
-}
 
 watch(appStore.$state, (newValue) => {
   if (!newValue.navbar) {
@@ -368,20 +359,6 @@ watch(appStore.$state, (newValue) => {
         </div>
       </div>
     </div>
-    <div v-if="false" class="theme-box" @click="themeVisible">
-      <img src="@/assets/images/theme.png">
-    </div>
-    <div v-if="disTheme">
-      <tiny-modal
-        v-model="disTheme" show-header show-footer :title="$t('theme.title.main')" :mask-closable="true"
-        height="auto" :width="modalSize"
-      >
-        <template #default>
-          <Theme />
-        </template>
-        <template #footer />
-      </tiny-modal>
-    </div>
     <img v-if="!appStore.navbar" src="@/assets/images/global.png" class="global-setting" @click="switchSet">
     <TinyRobotChat v-if="isTinyRobotEnabled" />
   </div>
@@ -400,11 +377,6 @@ watch(appStore.$state, (newValue) => {
   z-index: 99;
   width: 30px;
   height: 30px;
-}
-
-// 组件无法固定非message的modal类型距离顶部距离
-:deep(.tiny-modal__box) {
-  top: 8px !important;
 }
 
 :deep(.tiny-tabs__content) {
@@ -433,26 +405,5 @@ watch(appStore.$state, (newValue) => {
 :deep(.tiny-tree-menu .tiny-tree) {
   height: 100%;
   overflow: auto;
-}
-
-.theme-box {
-  position: fixed;
-  top: 88%;
-  right: 30px;
-  z-index: 99;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  background-color: #fff;
-  border-radius: 100%;
-  cursor: pointer;
-
-  img {
-    display: block;
-    width: inherit;
-    height: inherit;
-  }
 }
 </style>
