@@ -167,30 +167,33 @@ public class RedisLockService {
         LeaseState leaseState = new LeaseState();
         LeaseState previousLease = activeLease.get();
         activeLease.set(leaseState);
-        long renewInterval = Math.max(effectiveLeaseMillis / 3L, 100L);
-        ScheduledFuture<?> renewal = renewExecutor.scheduleAtFixedRate(
-                () -> {
-                    try {
-                        if (!renewLease(lockKey(key), owner, effectiveLeaseMillis)) {
-                            markLeaseLost(key, actionThread, leaseState,
-                                    new IllegalStateException("Redis lock lease renewal failed: " + key));
-                        }
-                    } catch (RuntimeException ex) {
-                        markLeaseLost(key, actionThread, leaseState, ex);
-                    }
-                },
-                renewInterval,
-                renewInterval,
-                TimeUnit.MILLISECONDS
-        );
-
+        ScheduledFuture<?> renewal = null;
         try {
+            long renewInterval = Math.max(effectiveLeaseMillis / 3L, 100L);
+            renewal = renewExecutor.scheduleAtFixedRate(
+                    () -> {
+                        try {
+                            if (!renewLease(lockKey(key), owner, effectiveLeaseMillis)) {
+                                markLeaseLost(key, actionThread, leaseState,
+                                        new IllegalStateException("Redis lock lease renewal failed: " + key));
+                            }
+                        } catch (RuntimeException ex) {
+                            markLeaseLost(key, actionThread, leaseState, ex);
+                        }
+                    },
+                    renewInterval,
+                    renewInterval,
+                    TimeUnit.MILLISECONDS
+            );
+
             assertLeaseHeld();
             T result = action.get();
             assertLeaseHeld();
             return result;
         } finally {
-            renewal.cancel(false);
+            if (renewal != null) {
+                renewal.cancel(false);
+            }
             boolean interrupted = Thread.interrupted();
             try {
                 if (!unlock(key)) {

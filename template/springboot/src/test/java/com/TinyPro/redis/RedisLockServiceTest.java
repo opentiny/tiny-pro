@@ -13,6 +13,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -187,5 +188,28 @@ class RedisLockServiceTest {
         assertTrue(lockService.execute("session", 0L, 900_000L, () -> "ok").equals("ok"));
         verify(valueOperations).setIfAbsent(
                 eq("lock:session"), anyString(), eq(300_000L), eq(TimeUnit.MILLISECONDS));
+    }
+
+    @Test
+    void releasesLockWhenRenewalSchedulingFails() {
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        when(valueOperations.get("lock:session")).thenReturn(null);
+        when(valueOperations.setIfAbsent(eq("lock:session"), anyString(),
+                eq(30_000L), eq(TimeUnit.MILLISECONDS))).thenReturn(true);
+        doReturn(1L).when(redisTemplate).execute(
+                any(RedisScript.class), anyList(), any(Object[].class)
+        );
+
+        lockService = new RedisLockService();
+        ReflectionTestUtils.setField(lockService, "redisTemplate", redisTemplate);
+        lockService.shutdown();
+
+        assertThrows(
+                RejectedExecutionException.class,
+                () -> lockService.execute("session", 0L, 30_000L, () -> "unreachable")
+        );
+
+        assertFalse(lockService.unlock("session"));
+        verify(redisTemplate).execute(any(RedisScript.class), anyList(), any(Object[].class));
     }
 }
