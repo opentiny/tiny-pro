@@ -247,7 +247,7 @@ onMounted(() => {
 }
 
 .menu-router .tiny-tree-menu {
-  padding-left: 10px;
+  padding-left: 6px;
   width: 276px;
   overflow-y: auto;
 
