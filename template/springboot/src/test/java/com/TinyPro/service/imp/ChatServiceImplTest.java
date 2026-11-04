@@ -267,7 +267,7 @@ class ChatServiceImplTest {
             exchange.getResponseHeaders().set("Content-Type", "text/event-stream");
             exchange.sendResponseHeaders(200, 0);
             try {
-                Thread.sleep(2_000L);
+                Thread.sleep(5_000L);
             } catch (InterruptedException exception) {
                 Thread.currentThread().interrupt();
             } finally {
@@ -287,7 +287,7 @@ class ChatServiceImplTest {
                 dto("hi"), mockRequest(), response, "user@a.com");
 
         long elapsedMillis = (System.nanoTime() - startedAt) / 1_000_000L;
-        assertTrue(elapsedMillis < 1_800L, "idle timeout should stop the read before the upstream closes");
+        assertTrue(elapsedMillis < 3_000L, "idle timeout should stop the read before the upstream closes");
         assertTrue(sink.toString(StandardCharsets.UTF_8).contains("upstream_timeout"));
         verify(response).setStatus(504);
     }

@@ -22,10 +22,12 @@ class TinyProPropertiesTest {
     @Test
     void rejectsBlankJwtSecretAndInvalidLogSize() {
         TinyProProperties properties = new TinyProProperties();
-        properties.getJwt().setSecret(" ");
+        properties.getJwt().setSecret("        ");
         properties.getLogging().setMaxFileSize("not-a-size");
 
-        assertFalse(validator.validate(properties).isEmpty());
+        assertTrue(validator.validate(properties).stream()
+                .anyMatch(violation ->
+                        "tinypro.jwt.secret must not be blank".equals(violation.getMessage())));
     }
 
     @Test
