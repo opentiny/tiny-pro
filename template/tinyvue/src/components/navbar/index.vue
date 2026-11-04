@@ -303,7 +303,7 @@ async function handlePwdUpdateSubmit() {
   <div v-if="disTheme">
     <TinyModal
       v-model="disTheme" show-header show-footer :title="$t('theme.title.main')" :mask-closable="true"
-      height="auto" :width="modalSize"
+      height="900" :width="modalSize"
     >
       <template #default>
         <Theme />
