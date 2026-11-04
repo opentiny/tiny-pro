@@ -1,10 +1,17 @@
 package com.TinyPro.exception;
 
+import com.TinyPro.entity.dto.ApplicationPaginationQueryDto;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
@@ -61,5 +68,38 @@ class GlobalExceptionHandlerTest {
 
         assertEquals("Need `api-token-owner` permission, but you don't have it",
                 MessageFormat.format(pattern, "api-token-owner"));
+    }
+
+    @Test
+    void formatsPaginationValidationMessageWithFieldAndConstraintArguments() {
+        ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
+        messageSource.setBasenames("i18n.messages");
+        messageSource.setDefaultEncoding("UTF-8");
+        ReflectionTestUtils.setField(handler, "messageSource", messageSource);
+        LocaleContextHolder.setLocale(Locale.SIMPLIFIED_CHINESE);
+
+        try {
+            ApplicationPaginationQueryDto target = new ApplicationPaginationQueryDto();
+            BeanPropertyBindingResult bindingResult =
+                    new BeanPropertyBindingResult(target, "searchInfo");
+            bindingResult.addError(new FieldError(
+                    "searchInfo",
+                    "page",
+                    0,
+                    false,
+                    new String[]{"Min.searchInfo.page", "Min.page", "Min"},
+                    null,
+                    "{0} 不能小于 {1}"));
+
+            ResponseEntity<?> response = handler.handleException(
+                    new MethodArgumentNotValidException(null, bindingResult),
+                    new MockHttpServletRequest("GET", "/application"));
+
+            assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode().value());
+            NoExistErrorResponse body = (NoExistErrorResponse) response.getBody();
+            assertEquals("页码 不能小于 1", body.getMessage()[0]);
+        } finally {
+            LocaleContextHolder.resetLocaleContext();
+        }
     }
 }

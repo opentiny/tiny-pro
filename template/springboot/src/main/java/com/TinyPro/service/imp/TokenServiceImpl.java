@@ -354,12 +354,29 @@ public class TokenServiceImpl implements TokenService {
             String rotationResult = redisUtil.getValue(
                     TokenRedisKeys.refreshRotationResult(uid, refreshJti));
             if (StringUtils.isNotBlank(rotationResult)) {
+                TokenPair cachedPair;
                 try {
-                    return JSON.parseObject(rotationResult, TokenPair.class);
+                    cachedPair = JSON.parseObject(rotationResult, TokenPair.class);
                 } catch (RuntimeException exception) {
                     logger.warn("Invalid refresh rotation grace result: uid={} refreshJti={}",
                             uid, refreshJti, exception);
+                    throw expiredError();
                 }
+                boolean cachedPairActive = false;
+                if (cachedPair != null && StringUtils.isNotBlank(cachedPair.getAccessToken())) {
+                    try {
+                        cachedPairActive = isAccessTokenActive(cachedPair.getAccessToken());
+                    } catch (BusinessException exception) {
+                        logger.warn("Invalid access token in refresh rotation grace result: uid={} refreshJti={}",
+                                uid, refreshJti, exception);
+                    }
+                }
+                if (!cachedPairActive) {
+                    logger.warn("Refresh rotation grace result is no longer active: uid={} refreshJti={}",
+                            uid, refreshJti);
+                    throw expiredError();
+                }
+                return cachedPair;
             }
             if (sessionId.equals(redisUtil.getValue(TokenRedisKeys.usedRefresh(uid, refreshJti)))) {
                 revokeSession(uid, sessionId);

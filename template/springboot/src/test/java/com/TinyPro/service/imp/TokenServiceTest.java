@@ -113,6 +113,32 @@ class TokenServiceTest {
         Claims refreshClaims = jwtUtil.parseJwt(original.getRefreshToken());
         Claims accessClaims = jwtUtil.parseJwt(original.getAccessToken());
         String sessionId = accessClaims.get("sid", String.class);
+        TokenPair gracePair = ((TokenServiceImpl) tokenService).issue(
+                7,
+                "user@example.com",
+                "{\"id\":7,\"email\":\"user@example.com\"}",
+                sessionId);
+        Claims graceAccessClaims = jwtUtil.parseJwt(gracePair.getAccessToken());
+        Claims graceRefreshClaims = jwtUtil.parseJwt(gracePair.getRefreshToken());
+
+        when(redisUtil.getValue(TokenRedisKeys.session("7", sessionId)))
+                .thenReturn("new-access|new-refresh", graceAccessClaims.getId() + "|" + graceRefreshClaims.getId());
+        when(redisUtil.getValue(TokenRedisKeys.access("7", graceAccessClaims.getId())))
+                .thenReturn(gracePair.getAccessToken());
+        when(redisUtil.getValue(TokenRedisKeys.refreshRotationResult("7", refreshClaims.getId())))
+                .thenReturn(JSON.toJSONString(gracePair));
+
+        TokenPair result = tokenService.rotate(original.getRefreshToken());
+
+        assertEquals(gracePair, result);
+    }
+
+    @Test
+    void rotateRejectsInactiveGraceResult() {
+        TokenPair original = tokenService.issue(user(7, "user@example.com"));
+        Claims refreshClaims = jwtUtil.parseJwt(original.getRefreshToken());
+        Claims accessClaims = jwtUtil.parseJwt(original.getAccessToken());
+        String sessionId = accessClaims.get("sid", String.class);
         TokenPair gracePair = new TokenPair("grace-access", "grace-refresh", 7200000L, 604800000L);
 
         when(redisUtil.getValue(TokenRedisKeys.session("7", sessionId)))
@@ -120,9 +146,12 @@ class TokenServiceTest {
         when(redisUtil.getValue(TokenRedisKeys.refreshRotationResult("7", refreshClaims.getId())))
                 .thenReturn(JSON.toJSONString(gracePair));
 
-        TokenPair result = tokenService.rotate(original.getRefreshToken());
+        BusinessException exception = assertThrows(
+                BusinessException.class,
+                () -> tokenService.rotate(original.getRefreshToken())
+        );
 
-        assertEquals(gracePair, result);
+        assertEquals("exception.common.tokenExpire", exception.getErrorCode());
     }
 
     @Test

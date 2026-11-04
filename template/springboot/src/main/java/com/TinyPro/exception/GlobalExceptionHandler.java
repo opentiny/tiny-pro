@@ -4,6 +4,8 @@ import com.TinyPro.entity.contants.Contants;
 import com.TinyPro.utils.LocaleUntil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,12 +14,14 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import java.lang.reflect.Field;
 import java.text.MessageFormat;
 import java.util.stream.Collectors;
 
@@ -72,7 +76,8 @@ public class GlobalExceptionHandler {
             String errorMessage = validationException.getBindingResult()
                     .getFieldErrors()
                     .stream()
-                    .map(error -> MessageFormat.format(error.getDefaultMessage(), error.getField()))
+                    .map(error -> formatValidationMessage(
+                            error, validationException.getBindingResult().getTarget()))
                     .collect(Collectors.joining(", "));
             logger.warn("Request validation failed: {} {} -> {}",
                     request.getMethod(), request.getRequestURI(), errorMessage);
@@ -101,6 +106,63 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ErrorResponse(Contants.PUBLIC_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.value()));
+    }
+
+    private String formatValidationMessage(FieldError error, Object target) {
+        String fieldLabel = messageSource.getMessage(
+                error.getField(), null, error.getField(), LocaleUntil.getLocale());
+        Object constraintValue = constraintValue(target, error);
+        Object[] arguments = constraintValue == null
+                ? new Object[]{fieldLabel}
+                : new Object[]{fieldLabel, constraintValue};
+        return MessageFormat.format(error.getDefaultMessage(), arguments);
+    }
+
+    private Object constraintValue(Object target, FieldError error) {
+        if (target == null || error.getField() == null) {
+            return null;
+        }
+
+        Field field = findField(target.getClass(), error.getField());
+        if (field == null) {
+            return null;
+        }
+        if (hasConstraint(error, "Min")) {
+            Min annotation = field.getAnnotation(Min.class);
+            return annotation == null ? null : annotation.value();
+        }
+        if (hasConstraint(error, "Max")) {
+            Max annotation = field.getAnnotation(Max.class);
+            return annotation == null ? null : annotation.value();
+        }
+        return null;
+    }
+
+    private boolean hasConstraint(FieldError error, String constraintName) {
+        if (constraintName.equals(error.getCode())) {
+            return true;
+        }
+        String[] codes = error.getCodes();
+        if (codes != null) {
+            for (String code : codes) {
+                if (constraintName.equals(code) || code.startsWith(constraintName + ".")) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private Field findField(Class<?> type, String fieldName) {
+        Class<?> current = type;
+        while (current != null) {
+            try {
+                return current.getDeclaredField(fieldName);
+            } catch (NoSuchFieldException ignored) {
+                current = current.getSuperclass();
+            }
+        }
+        return null;
     }
 
     private ResponseEntity<ErrorResponse> handleBusinessException(BusinessException exception) {
