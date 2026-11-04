@@ -161,16 +161,26 @@ public class TokenServiceImpl implements TokenService {
     }
 
     public boolean validateApiToken(String email, String token) {
-        return StringUtils.isNotBlank(email)
-                && StringUtils.isNotBlank(token)
-                && redisUtil.getAllApiTokens(email).contains(token);
+        if (StringUtils.isBlank(email) || StringUtils.isBlank(token)) {
+            return false;
+        }
+        try {
+            return redisUtil.getAllApiTokens(email).contains(token);
+        } catch (RuntimeException ex) {
+            throw redisUnavailable("API", ex);
+        }
     }
 
     @Override
     public boolean validateApiToken(String email, String tokenId, String token) {
-        return StringUtils.isNotBlank(email)
-                && StringUtils.isNotBlank(token)
-                && redisUtil.containsApiToken(email, tokenId, token);
+        if (StringUtils.isBlank(email) || StringUtils.isBlank(token)) {
+            return false;
+        }
+        try {
+            return redisUtil.containsApiToken(email, tokenId, token);
+        } catch (RuntimeException ex) {
+            throw redisUnavailable("API", ex);
+        }
     }
 
     public void revokeApiToken(String email, String tokenId) {
@@ -446,13 +456,17 @@ public class TokenServiceImpl implements TokenService {
             }
             return sessionContainsAccess(sessionValue, accessJti);
         } catch (RuntimeException ex) {
-            logger.warn("Redis error while validating access token", ex);
-            throw new ResponseStatusException(
-                    HttpStatus.SERVICE_UNAVAILABLE,
-                    "认证服务暂时不可用，请稍后重试",
-                    ex
-            );
+            throw redisUnavailable("access", ex);
         }
+    }
+
+    private ResponseStatusException redisUnavailable(String tokenType, RuntimeException cause) {
+        logger.warn("Redis error while validating {} token", tokenType, cause);
+        return new ResponseStatusException(
+                HttpStatus.SERVICE_UNAVAILABLE,
+                "认证服务暂时不可用，请稍后重试",
+                cause
+        );
     }
 
     public void logout(String accessToken) {

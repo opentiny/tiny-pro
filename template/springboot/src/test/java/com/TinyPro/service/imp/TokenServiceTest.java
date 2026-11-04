@@ -302,6 +302,23 @@ class TokenServiceTest {
     }
 
     @Test
+    void authenticateReturnsServiceUnavailableWhenRedisFailsForApiToken() {
+        User user = user(7, "user@example.com");
+        ReflectionTestUtils.setField(tokenService, "apiTokenTtlSeconds", 604800L);
+        ApiToken apiToken = tokenService.issueApiToken(user, "integration");
+
+        when(redisUtil.containsApiToken("user@example.com", "integration", apiToken.getToken()))
+                .thenThrow(new IllegalStateException("redis unavailable"));
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> tokenService.authenticate(apiToken.getToken())
+        );
+
+        assertEquals(503, exception.getStatusCode().value());
+    }
+
+    @Test
     void authenticateValidatesAccessTokenAndReturnsUserId() {
         User user = user(7, "user@example.com");
         TokenPair pair = tokenService.issue(user);
