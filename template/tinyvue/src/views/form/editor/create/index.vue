@@ -15,6 +15,7 @@ import {
   richTextDocuments,
   updateCollaborationDocument,
   updateDocument,
+  waitCollabRoomDataSettled,
 } from '../mock'
 import '@opentiny/fluent-editor/style.css'
 
@@ -629,14 +630,15 @@ function handleDelete() {
     if (isCollaborationMode.value) {
       // 当前打开的协同房间还持有 IndexedDB 连接，先销毁编辑器释放连接，避免数据清理被阻塞
       destroyEditor()
-      // 首次清理可能因删除被其他连接阻塞而超时（超时后删除仍可能在后台完成），稍候重试一次再判定
+      // 首次清理可能因删除被其他连接阻塞而超时，但超时的 deleteDatabase 仍可能在后台继续执行：
+      // 等 pending 的删除落定后再重试/恢复编辑器，避免新连接排在删除之后、房间数据在编辑器使用过程中被清掉
       let removed = await removeCollaborationDocument(id)
       if (!removed) {
-        await new Promise(resolve => setTimeout(resolve, 500))
+        await waitCollabRoomDataSettled(`tiny-pro-collab-${id}`)
         removed = await removeCollaborationDocument(id)
       }
       if (!removed) {
-        // 清理仍未完成：恢复编辑器并重建房间连接（优先使用房间实时内容，快照仅在房间为空时兜底），避免页面空白不可用
+        // 仍有其他页面持有该房间连接导致清理无法完成：恢复编辑器并重建房间连接（优先使用房间实时内容，快照仅在房间为空时兜底），避免页面空白不可用
         initEditor(activeDocument.value?.content ?? '')
         Modal.message({ message: '删除失败：本地协同数据清理未完成，请重试', status: 'error' })
         return

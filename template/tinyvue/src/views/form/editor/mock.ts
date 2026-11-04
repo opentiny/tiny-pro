@@ -195,6 +195,29 @@ async function clearCollabRoomData(id: number): Promise<boolean> {
   }
 }
 
+// 等待未完成的房间数据删除落定：主动发起一次 deleteDatabase，
+// onsuccess 表示数据库已删除（此前的 pending 删除已落定）；onblocked 表示仍有连接持有该房间，
+// 轮询直至删除完成或超时。用于删除失败后恢复编辑器前，避免新连接排在 pending 删除之后、
+// 房间数据在编辑器使用过程中被清掉
+export function waitCollabRoomDataSettled(room: string, timeoutMs = 5000): Promise<void> {
+  return new Promise((resolve) => {
+    const start = Date.now()
+    const attempt = () => {
+      const request = indexedDB.deleteDatabase(room)
+      request.onsuccess = () => resolve()
+      request.onerror = () => resolve()
+      request.onblocked = () => {
+        if (Date.now() - start > timeoutMs) {
+          resolve()
+          return
+        }
+        setTimeout(attempt, 300)
+      }
+    }
+    attempt()
+  })
+}
+
 // 协同文档 id 分配自持久化计数器（localStorage）：删除文档（包括最大 id）或刷新页面后都不会复用旧 id，
 // 避免新文档与远端仍存活的同名协同房间（tiny-pro-collab-${id}）串内容
 const COLLAB_DOC_ID_KEY = 'tiny-pro-collab-doc-id'
