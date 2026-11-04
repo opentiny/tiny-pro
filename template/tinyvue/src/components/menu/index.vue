@@ -1,8 +1,17 @@
 <script lang="ts" setup>
+import type { Component } from 'vue'
 import type { ITreeNodeData } from '@/router/guard/menu'
 import { TreeMenu as tinyTreeMenu } from '@opentiny/vue'
 import * as icons from '@opentiny/vue-icon'
-import { computed, h, onMounted, ref, unref, watch } from 'vue'
+import { computed, defineComponent, h, onMounted, ref, unref, watch } from 'vue'
+import BoardIcon from '@/assets/images/boardIcon.svg'
+import ExceptionIcon from '@/assets/images/exceptionIcon.svg'
+import FormIcon from '@/assets/images/formIcon.svg'
+import ListIcon from '@/assets/images/listIcon.svg'
+import ProfileIcon from '@/assets/images/profileIcon.svg'
+import ResultIcon from '@/assets/images/resultIcon.svg'
+import SystemIcon from '@/assets/images/systemIcon.svg'
+import UserIcon from '@/assets/images/userIcon.svg'
 import { useDeepClone } from '@/hooks/useDeepClone'
 import router from '@/router'
 import { useAppStore, useTabStore } from '@/store'
@@ -12,6 +21,48 @@ type SideMenuData = (ITreeNodeData & { meta: { url: string } })[]
 
 let routerTitle = [] as any
 const appStore = useAppStore()
+
+const localMenuIcons: Record<string, Component> = {
+  IconApplication: BoardIcon,
+  IconCueL: ExceptionIcon,
+  IconFiletext: ProfileIcon,
+  IconFiles: ListIcon,
+  IconSetting: FormIcon,
+  IconSuccessful: ResultIcon,
+  IconTotal: SystemIcon,
+  IconUser: UserIcon,
+}
+
+function createLocalMenuIcon(icon: Component, name: string) {
+  return defineComponent({
+    name,
+    setup() {
+      return () => h(icon, { class: 'menu-local-icon' })
+    },
+  })
+}
+
+const localMenuIconComponents = Object.fromEntries(
+  Object.entries(localMenuIcons).map(([name, icon]) => [
+    name,
+    createLocalMenuIcon(icon, `${name}Local`),
+  ]),
+)
+
+function resolveMenuIcon(name: string) {
+  if (Object.prototype.hasOwnProperty.call(localMenuIconComponents, name)) {
+    return localMenuIconComponents[name]
+  }
+  try {
+    return icons[name]()
+  }
+  catch {
+    return h('i', {
+      class: `ci-${name} tiny-svg`,
+      style: { marginRight: 'var(--tv-TreeMenu-prefix-icon-margin-right)' },
+    })
+  }
+}
 
 function filtter(treeNodeDatas: ITreeNodeData[]) {
   const menus: SideMenuData = []
@@ -23,12 +74,7 @@ function filtter(treeNodeDatas: ITreeNodeData[]) {
     temp.label = treeNodeData.label
     temp.locale = treeNodeData.locale
     if (treeNodeData.customIcon) {
-      try {
-        temp.customIcon = icons[treeNodeData.customIcon]()
-      }
-      catch {
-        temp.customIcon = h('i', { class: `ci-${treeNodeData.customIcon} tiny-svg `, style: { marginRight: 'var(--tv-TreeMenu-prefix-icon-margin-right)' } })
-      }
+      temp.customIcon = resolveMenuIcon(treeNodeData.customIcon)
     }
     routerTitle.push(temp)
     menus.push({
@@ -154,8 +200,54 @@ onMounted(() => {
 </template>
 
 <style lang="less">
+.menu-router .menu-local-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: var(--tv-TreeMenu-prefix-icon-margin-right);
+  vertical-align: middle;
+  color: var(--tv-color-text-control);
+}
+
+.menu-router .tree-node-name:hover .menu-local-icon {
+  color: var(--tv-color-border-hover);
+}
+
+.menu-router .tiny-tree-node.is-current > .tiny-tree-node__content .menu-local-icon {
+  color: var(--tv-color-border-active);
+}
+
+.menu-router .tiny-tree-menu .tiny-tree .tiny-tree-node .tiny-tree-node__content .tree-node-name svg.menu-local-icon,
+.menu-router .tiny-tree-menu .tiny-tree .tiny-tree-node .tiny-tree-node__content .tree-node-name:hover svg.menu-local-icon,
+.menu-router .tiny-tree-menu .tiny-tree .tiny-tree-node.is-current > .tiny-tree-node__content svg.menu-local-icon {
+  fill: none;
+  background-color: transparent;
+}
+
+.menu-router .tiny-tree-menu .tiny-tree .tiny-tree-node .tiny-tree-node__content .tree-node-name svg.menu-local-icon > rect,
+.menu-router .tiny-tree-menu .tiny-tree .tiny-tree-node .tiny-tree-node__content .tree-node-name:hover svg.menu-local-icon > rect,
+.menu-router .tiny-tree-menu .tiny-tree .tiny-tree-node.is-current > .tiny-tree-node__content svg.menu-local-icon > rect {
+  fill: none;
+  stroke: none;
+}
+
+.menu-router .menu-local-icon path[stroke] {
+  stroke: currentColor;
+}
+
+.menu-router .menu-local-icon path[fill]:not([fill='none']) {
+  fill: currentColor;
+}
+
+.menu-router .tiny-tree-menu .tiny-tree .tiny-tree-node .tiny-tree-node__content .tree-node-name svg {
+  margin-right: 16px;
+}
+
+.menu-router .tiny-tree-menu .tiny-tree .tiny-tree-node .tiny-tree-node__children .tiny-tree-node__content {
+  margin-left: 16px;
+}
+
 .menu-router .tiny-tree-menu {
-  padding-left: 10px;
+  padding-left: 6px;
   width: 276px;
   overflow-y: auto;
 

@@ -2,7 +2,7 @@ const { resolve } = require('path');
 const { VueLoaderPlugin } = require('vue-loader');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { DefinePlugin } = require('webpack');
-const { configDotenv, parse } = require('dotenv');
+const { configDotenv } = require('dotenv');
 configDotenv({
   path: './.env',
 });
@@ -60,7 +60,29 @@ module.exports = {
         },
       },
       {
-        test: /.(png|jpg|jpeg|gif|svg)$/, // 匹配图片文件
+        test: /\.svg$/,
+        oneOf: [
+          {
+            // JS/Vue 里的 SVG 编译成组件，与 Vite 的 vite-svg-loader 一致。
+            issuer: /\.(vue|mjs|cjs|[jt]sx?)($|\?)/,
+            type: 'javascript/esm',
+            loader: resolve(__dirname, 'loaders/svg-component-loader.cjs'),
+          },
+          {
+            type: 'asset',
+            parser: {
+              dataUrlCondition: {
+                maxSize: 10 * 1024,
+              },
+            },
+            generator: {
+              filename: 'static/images/[name].[contenthash:8][ext]',
+            },
+          },
+        ],
+      },
+      {
+        test: /.(png|jpg|jpeg|gif)$/, // 匹配图片文件
         type: 'asset', // type选择asset
         parser: {
           dataUrlCondition: {

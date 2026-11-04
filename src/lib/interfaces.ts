@@ -61,16 +61,16 @@ export enum BuildTool {
 }
 
 export const buildConfigs = {
-  vite: ['webpack.config.js', 'rspack.config.js', 'farm.config.ts'],
-  webpack: ['config', 'rspack.config.js', 'farm.config.ts'],
-  rspack: ['config', 'webpack.config.js', 'farm.config.ts'],
-  farm: ['config', 'webpack.config.js', 'rspack.config.js'],
+  vite: ['webpack.config.cjs', 'rspack.config.cjs', 'farm.config.ts'],
+  webpack: ['config', 'rspack.config.cjs', 'farm.config.ts'],
+  rspack: ['config', 'webpack.config.cjs', 'farm.config.ts'],
+  farm: ['config', 'webpack.config.cjs', 'rspack.config.cjs'],
 };
 
 export const buildCommand = {
   vite: 'vite build --config ./config/vite.config.prod.ts',
-  webpack: 'webpack --config webpack.config.js',
-  rspack: 'rspack build',
+  webpack: 'webpack --config webpack.config.cjs',
+  rspack: 'rspack build --config rspack.config.cjs',
   farm: 'farm build',
 };
 
@@ -78,8 +78,8 @@ export const devCommand = {
   // 与模板 start:mock 语义保持一致：并行启动 8848 mock 服务与 vite，
   // 仅前端项目无需 mysql/redis，全部走 mock 数据
   vite: 'cross-env VITE_USE_MOCK=true run-p mock dev',
-  webpack: 'webpack-dev-server --progress --config webpack.config.js',
-  rspack: 'rspack serve',
+  webpack: 'webpack-dev-server --progress --config webpack.config.cjs',
+  rspack: 'rspack serve --config rspack.config.cjs',
   farm: 'farm',
 };
 
