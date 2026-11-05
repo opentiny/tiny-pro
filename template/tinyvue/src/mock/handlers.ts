@@ -5,6 +5,7 @@ import { createBackendMocks } from './backend'
 import board from './board'
 import list from './list'
 import profile from './profile'
+import project from './project'
 import robot from './robot'
 import user from './user'
 
@@ -12,6 +13,7 @@ export function createMockHandlers(): MockMethod[] {
   return [
     ...createBackendMocks(),
     ...list,
+    ...project,
     ...froms,
     ...profile,
     ...board,

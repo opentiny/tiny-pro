@@ -58,6 +58,7 @@ const menuTree = [
   menu('List', 'list', 'list/index', 'menu.list', [
     menu('Table', 'table', 'list/search-table/index', 'menu.list.searchTable'),
     menu('Card', 'card', 'list/card-list/index', 'menu.list.cardList'),
+    menu('AdvancedList', 'advanced-list', 'list/advanced-list/index', 'menu.list.advancedList'),
   ], 'IconFiles'),
   menu('Form', 'form', 'form/index', 'menu.form', [
     menu('Base', 'base', 'form/base/index', 'menu.form.base'),
