@@ -135,160 +135,200 @@ public class MockListController {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private Map<String, Object> readSearchInfo(Map<String, Object> params) {
-        if (params == null) {
-            return Collections.emptyMap();
-        }
-        Object source = params.get("body") instanceof Map ? params.get("body") : params;
-        if (!(source instanceof Map)) {
-            return Collections.emptyMap();
-        }
-        Object searchInfo = ((Map<String, Object>) source).get("searchInfo");
-        if (searchInfo instanceof Map) {
-            return (Map<String, Object>) searchInfo;
-        }
-        return Collections.emptyMap();
-    }
-
-    @SuppressWarnings("unchecked")
-    private List<Map<String, Object>> filterTasks(Map<String, Object> searchInfo) {
-        String keyword = searchInfo.get("keyword") instanceof String
-                ? ((String) searchInfo.get("keyword")).trim()
-                : "";
-        List<Map<String, Object>> filters = new ArrayList<>();
-        Object rawFilters = searchInfo.get("filters");
-        if (rawFilters instanceof List) {
-            for (Object item : (List<?>) rawFilters) {
-                if (item instanceof Map) {
-                    filters.add((Map<String, Object>) item);
-                }
-            }
-        }
+    @PostMapping("/getEmployeeInfo")
+    public Map<String, Object> getEmployeeInfo(@RequestBody(required = false) Map<String, Object> params) {
+        String id = params == null || params.get("id") == null
+                ? null
+                : String.valueOf(params.get("id"));
         return taskList.stream()
-                .filter(row -> matchKeyword(row, keyword) && filters.stream().allMatch(filter -> matchFilter(row, filter)))
-                .collect(Collectors.toList());
+                .filter(item -> Objects.equals(String.valueOf(item.get("id")), id))
+                .findFirst()
+                .orElseGet(HashMap::new);
     }
 
-    private boolean matchKeyword(Map<String, Object> row, String keyword) {
-        if (keyword.isBlank()) {
-            return true;
+    @PostMapping("/updateEmployeeInfo")
+    public boolean updateEmployeeInfo(@RequestBody(required = false) Map<String, Object> params) {
+        if (params == null || !(params.get("data") instanceof Map<?, ?> data)) {
+            return false;
         }
-        String haystack = buildHaystack(row);
-        for (String token : keyword.split("\\s+")) {
-            if (!haystack.contains(token.toLowerCase(Locale.ROOT))) {
-                return false;
-            }
-        }
-        return true;
-    }
 
-    private String buildHaystack(Map<String, Object> row) {
-        List<String> parts = new ArrayList<>();
-        for (String field : List.of(
-                "name", "employeeNo", "department", "departmentLevel", "workbenchName",
-                "project", "type", "address", "roles", "lastUpdateUser", "createTime", "status"
-        )) {
-            Object value = row.get(field);
-            if (value != null) {
-                parts.add(String.valueOf(value));
-            }
-        }
-        List<String> statusText = STATUS_KEYWORDS.get(String.valueOf(row.get("status")));
-        if (statusText != null) {
-            parts.addAll(statusText);
-        }
-        return String.join("\n", parts).toLowerCase(Locale.ROOT);
-    }
-
-    private boolean matchFilter(Map<String, Object> row, Map<String, Object> filter) {
-        Object fieldValue = filter.get("field");
-        if (!(fieldValue instanceof String) || !row.containsKey(fieldValue)) {
-            return true;
-        }
-        String field = (String) fieldValue;
-        String start = filter.get("start") instanceof String ? (String) filter.get("start") : null;
-        String end = filter.get("end") instanceof String ? (String) filter.get("end") : null;
-        if ((start != null && !start.isBlank()) || (end != null && !end.isBlank())) {
-            Long current = parseTime(String.valueOf(row.get(field)));
-            if (current == null) {
-                return false;
-            }
-            Long startTime = parseTime(start);
-            Long endTime = parseTime(end);
-            if (startTime != null && current < startTime) {
-                return false;
-            }
-            return endTime == null || current <= endTime;
-        }
-        List<String> values = readValues(filter.get("values"));
-        if (values.isEmpty()) {
-            return true;
-        }
-        String current = String.valueOf(row.get(field)).trim().toLowerCase(Locale.ROOT);
-        if (FUZZY_FIELDS.contains(field)) {
-            return values.stream().anyMatch(value -> current.contains(value.toLowerCase(Locale.ROOT)));
-        }
-        return values.stream().anyMatch(value -> current.equals(value.toLowerCase(Locale.ROOT)));
-    }
-
-    private List<String> readValues(Object raw) {
-        List<String> values = new ArrayList<>();
-        if (raw instanceof List) {
-            for (Object item : (List<?>) raw) {
-                if (item != null && !String.valueOf(item).isBlank()) {
-                    values.add(String.valueOf(item).trim());
+        Object id = data.get("id");
+        for (Map<String, Object> item : taskList) {
+            if (Objects.equals(String.valueOf(item.get("id")), String.valueOf(id))) {
+                for (Map.Entry<?, ?> entry : data.entrySet()) {
+                    if (entry.getKey() != null && !"id".equals(entry.getKey().toString())) {
+                        item.put(entry.getKey().toString(), entry.getValue());
+                    }
                 }
+                return true;
             }
         }
-        return values;
+        return false;
     }
 
-    private Long parseTime(String value) {
-        if (value == null || value.isBlank()) {
-            return null;
+    @DeleteMapping("/delete")
+    public ApiResponse<Boolean> deleteEmployee(
+            @RequestParam(value = "id", required = false) String id
+    ) {
+        if (id != null && !id.isEmpty()) {
+            taskList.removeIf(item -> Objects.equals(String.valueOf(item.get("id")), id));
         }
-        String text = value.trim().replace('/', '-');
-        try {
-            return LocalDateTime.parse(text, DATE_TIME_FORMATTER)
-                    .atZone(java.time.ZoneId.systemDefault())
-                    .toInstant()
-                    .toEpochMilli();
-        } catch (DateTimeParseException ex) {
-            return null;
-        }
+        return ApiResponse.successSimple(true);
     }
 
-    private Map<String, Object> buildFilters() {
-        Map<String, Set<String>> grouped = new LinkedHashMap<>();
-        for (String field : FILTER_FIELDS) {
-            grouped.put(field, new TreeSet<>());
-        }
-        String min = null;
-        String max = null;
-        for (Map<String, Object> row : taskList) {
-            for (String field : FILTER_FIELDS) {
-                Object value = row.get(field);
-                if (value != null) {
-                    grouped.get(field).add(String.valueOf(value));
-                }
-            }
-            String createTime = String.valueOf(row.get("createTime"));
-            if (min == null || createTime.compareTo(min) < 0) {
-                min = createTime;
-            }
-            if (max == null || createTime.compareTo(max) > 0) {
-                max = createTime;
-            }
-        }
-        Map<String, Object> filters = new LinkedHashMap<>();
-        for (String field : FILTER_FIELDS) {
-            filters.put(field, new ArrayList<>(grouped.get(field)));
-        }
-        Map<String, String> createTime = new HashMap<>();
-        createTime.put("min", min == null ? "" : min);
-        createTime.put("max", max == null ? "" : max);
-        filters.put("createTime", createTime);
-        return filters;
+  private Map<String, Object> readSearchInfo(Map<String, Object> params) {
+    if (params == null) {
+      return Collections.emptyMap();
     }
+    Object source = params.get("body") instanceof Map ? params.get("body") : params;
+    if (!(source instanceof Map)) {
+      return Collections.emptyMap();
+    }
+    Object searchInfo = ((Map<String, Object>) source).get("searchInfo");
+    if (searchInfo instanceof Map) {
+      return (Map<String, Object>) searchInfo;
+    }
+    return Collections.emptyMap();
+  }
+
+  @SuppressWarnings("unchecked")
+  private List<Map<String, Object>> filterTasks(Map<String, Object> searchInfo) {
+    String keyword = searchInfo.get("keyword") instanceof String
+      ? ((String) searchInfo.get("keyword")).trim()
+      : "";
+    List<Map<String, Object>> filters = new ArrayList<>();
+    Object rawFilters = searchInfo.get("filters");
+    if (rawFilters instanceof List) {
+      for (Object item : (List<?>) rawFilters) {
+        if (item instanceof Map) {
+          filters.add((Map<String, Object>) item);
+        }
+      }
+    }
+    return taskList.stream()
+      .filter(row -> matchKeyword(row, keyword) && filters.stream().allMatch(filter -> matchFilter(row, filter)))
+      .collect(Collectors.toList());
+  }
+
+  private boolean matchKeyword(Map<String, Object> row, String keyword) {
+    if (keyword.isBlank()) {
+      return true;
+    }
+    String haystack = buildHaystack(row);
+    for (String token : keyword.split("\\s+")) {
+      if (!haystack.contains(token.toLowerCase(Locale.ROOT))) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private String buildHaystack(Map<String, Object> row) {
+    List<String> parts = new ArrayList<>();
+    for (String field : List.of(
+      "name", "employeeNo", "department", "departmentLevel", "workbenchName",
+      "project", "type", "address", "roles", "lastUpdateUser", "createTime", "status"
+    )) {
+      Object value = row.get(field);
+      if (value != null) {
+        parts.add(String.valueOf(value));
+      }
+    }
+    List<String> statusText = STATUS_KEYWORDS.get(String.valueOf(row.get("status")));
+    if (statusText != null) {
+      parts.addAll(statusText);
+    }
+    return String.join("\n", parts).toLowerCase(Locale.ROOT);
+  }
+
+  private boolean matchFilter(Map<String, Object> row, Map<String, Object> filter) {
+    Object fieldValue = filter.get("field");
+    if (!(fieldValue instanceof String) || !row.containsKey(fieldValue)) {
+      return true;
+    }
+    String field = (String) fieldValue;
+    String start = filter.get("start") instanceof String ? (String) filter.get("start") : null;
+    String end = filter.get("end") instanceof String ? (String) filter.get("end") : null;
+    if ((start != null && !start.isBlank()) || (end != null && !end.isBlank())) {
+      Long current = parseTime(String.valueOf(row.get(field)));
+      if (current == null) {
+        return false;
+      }
+      Long startTime = parseTime(start);
+      Long endTime = parseTime(end);
+      if (startTime != null && current < startTime) {
+        return false;
+      }
+      return endTime == null || current <= endTime;
+    }
+    List<String> values = readValues(filter.get("values"));
+    if (values.isEmpty()) {
+      return true;
+    }
+    String current = String.valueOf(row.get(field)).trim().toLowerCase(Locale.ROOT);
+    if (FUZZY_FIELDS.contains(field)) {
+      return values.stream().anyMatch(value -> current.contains(value.toLowerCase(Locale.ROOT)));
+    }
+    return values.stream().anyMatch(value -> current.equals(value.toLowerCase(Locale.ROOT)));
+  }
+
+  private List<String> readValues(Object raw) {
+    List<String> values = new ArrayList<>();
+    if (raw instanceof List) {
+      for (Object item : (List<?>) raw) {
+        if (item != null && !String.valueOf(item).isBlank()) {
+          values.add(String.valueOf(item).trim());
+        }
+      }
+    }
+    return values;
+  }
+
+  private Long parseTime(String value) {
+    if (value == null || value.isBlank()) {
+      return null;
+    }
+    String text = value.trim().replace('/', '-');
+    try {
+      return LocalDateTime.parse(text, DATE_TIME_FORMATTER)
+        .atZone(java.time.ZoneId.systemDefault())
+        .toInstant()
+        .toEpochMilli();
+    } catch (DateTimeParseException ex) {
+      return null;
+    }
+  }
+
+  private Map<String, Object> buildFilters() {
+    Map<String, Set<String>> grouped = new LinkedHashMap<>();
+    for (String field : FILTER_FIELDS) {
+      grouped.put(field, new TreeSet<>());
+    }
+    String min = null;
+    String max = null;
+    for (Map<String, Object> row : taskList) {
+      for (String field : FILTER_FIELDS) {
+        Object value = row.get(field);
+        if (value != null) {
+          grouped.get(field).add(String.valueOf(value));
+        }
+      }
+      String createTime = String.valueOf(row.get("createTime"));
+      if (min == null || createTime.compareTo(min) < 0) {
+        min = createTime;
+      }
+      if (max == null || createTime.compareTo(max) > 0) {
+        max = createTime;
+      }
+    }
+    Map<String, Object> filters = new LinkedHashMap<>();
+    for (String field : FILTER_FIELDS) {
+      filters.put(field, new ArrayList<>(grouped.get(field)));
+    }
+    Map<String, String> createTime = new HashMap<>();
+    createTime.put("min", min == null ? "" : min);
+    createTime.put("max", max == null ? "" : max);
+    filters.put("createTime", createTime);
+    return filters;
+  }
 }

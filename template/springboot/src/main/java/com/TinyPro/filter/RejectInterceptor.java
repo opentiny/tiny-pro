@@ -1,13 +1,11 @@
 package com.TinyPro.filter;
 
 import com.TinyPro.annotation.Reject;
+import com.TinyPro.config.TinyProProperties;
 import com.TinyPro.exception.BusinessException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
@@ -16,8 +14,16 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @Component
 public class RejectInterceptor implements HandlerInterceptor {
 
-    @Value("${reject.start}")
-    private Boolean rejectStart;
+    private final boolean rejectStart;
+
+    public RejectInterceptor() {
+        this.rejectStart = false;
+    }
+
+    @Autowired
+    public RejectInterceptor(TinyProProperties properties) {
+        this.rejectStart = properties.getReject().getStart();
+    }
 
     @Override
     public boolean preHandle(HttpServletRequest request,
