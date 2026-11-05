@@ -4,14 +4,12 @@ import com.TinyPro.annotation.PermissionAnnotation;
 import com.TinyPro.entity.contants.Contants;
 import com.TinyPro.entity.po.Permission;
 import com.TinyPro.entity.po.User;
+import com.TinyPro.entity.vo.AuthenticatedPrincipal;
 import com.TinyPro.exception.BusinessException;
-import com.TinyPro.redis.RedisUtil;
 import com.TinyPro.service.IPermissionService;
 import com.TinyPro.service.IUserService;
 import com.TinyPro.service.PermissionCheckService;
-import com.TinyPro.utils.JwtUtil;
-import com.alibaba.fastjson.JSON;
-import io.jsonwebtoken.Claims;
+import com.TinyPro.service.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,13 +23,11 @@ import java.util.stream.Collectors;
 public class PermissionCheckServiceImpl implements PermissionCheckService {
 
     @Autowired
-    private JwtUtil jwtUtil;
-    @Autowired
-    private RedisUtil redisUtil;
-    @Autowired
     private IUserService iUserService;
     @Autowired
     private IPermissionService iPermissionService;
+    @Autowired
+    private TokenService tokenService;
 
     @Override
     public void checkPermission(
@@ -53,20 +49,23 @@ public class PermissionCheckServiceImpl implements PermissionCheckService {
         String authHeader = request.getHeader("Authorization");
         String token = extractToken(authHeader);
         if (token == null) {
-            throw new BusinessException("exception.common.unauthorized", HttpStatus.UNAUTHORIZED, "Missing or invalid token");
+            throw new BusinessException("exception.common.unauth", HttpStatus.UNAUTHORIZED, "Missing or invalid token");
         }
 
-        // 4. 解析 JWT，获取用户 email
-        Claims claims = jwtUtil.parseJwt(token);
-        String email = claims.get("email", String.class);
-
-        // 5. 从 Redis 获取用户信息
-        String key = Contants.UserJwtTop + email + Contants.UserJwtbt;
-        String value = redisUtil.getValue(key);
-        if (value == null) {
-            throw new BusinessException("exception.common.unauthorized", HttpStatus.UNAUTHORIZED, "User not found in session");
+        // The interceptor normally stores the validated identity. The fallback
+        // keeps this service safe when invoked outside the MVC interceptor chain.
+        AuthenticatedPrincipal principal = (AuthenticatedPrincipal) request.getAttribute(
+                AuthenticatedPrincipal.REQUEST_ATTRIBUTE
+        );
+        if (principal == null) {
+            principal = tokenService.authenticate(token);
         }
-        User user = JSON.parseObject(value, User.class);
+
+        String email = principal.getEmail();
+        User user = iUserService.getUserInfo(email).getBody();
+        if (user == null) {
+            throw new BusinessException("exception.common.unauth", HttpStatus.UNAUTHORIZED, "User not found");
+        }
 
         // 6. 获取用户权限列表
         List<Permission> permissions = iUserService.getRoleByUserId(user);

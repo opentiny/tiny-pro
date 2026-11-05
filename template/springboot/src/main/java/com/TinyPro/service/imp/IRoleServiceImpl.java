@@ -57,7 +57,7 @@ public class IRoleServiceImpl implements IRoleService {
     @Transactional
     public ResponseEntity<Role> createRole(CreateRoleDto createRoleDto, boolean isInit) {
         // 检查角色是否已存在
-        Optional<Role> existingRole = iRoleRepository.findByName(createRoleDto.getName());
+        Optional<Role> existingRole = iRoleRepository.findFirstByNameOrderByIdAsc(createRoleDto.getName());
 
         if (isInit && existingRole.isPresent()) {
             return ResponseEntity.ok(existingRole.get());
