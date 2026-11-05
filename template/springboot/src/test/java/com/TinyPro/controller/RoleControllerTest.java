@@ -33,6 +33,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.*;
@@ -45,6 +46,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 public class RoleControllerTest {
 
     @Autowired
@@ -144,7 +146,7 @@ public class RoleControllerTest {
         when(roleService.createRole(any(), eq(false)))
                 .thenReturn(ResponseEntity.ok(mockRole));
 
-        MvcResult result = mockMvc.perform(post("/role")
+        MvcResult result = mockMvc.perform(post("/api/role")
                         .contentType("application/json")
                         .header("Authorization", "Bearer " + Contants.TOKEN)
                         .content("""
@@ -165,7 +167,7 @@ public class RoleControllerTest {
         when(roleService.findAllRole())
                 .thenReturn(ResponseEntity.ok(mockRoleSimpleVoList));
 
-        MvcResult result = mockMvc.perform(get("/role")
+        MvcResult result = mockMvc.perform(get("/api/role")
                         .header("Authorization", "Bearer " + Contants.TOKEN)
                 )
                 .andExpect(status().isOk())
@@ -222,7 +224,7 @@ public class RoleControllerTest {
                 .thenReturn(ResponseEntity.ok(mockRolePMVo));
 
         // 模拟请求 & 断言
-        mockMvc.perform(get("/role/detail")
+        mockMvc.perform(get("/api/role/detail")
                         .param("page", "1")
                         .param("limit", "10")
                         .param("name", "Admin")
@@ -244,7 +246,7 @@ public class RoleControllerTest {
                 .thenReturn(ResponseEntity.ok(mockRole));
         ObjectMapper objectMapper = new ObjectMapper();
         String requestBodyJson = objectMapper.writeValueAsString(updateRoleDto);
-        mockMvc.perform(patch("/role")
+        mockMvc.perform(patch("/api/role")
                         .contentType("application/json")
                         .header("Authorization", "Bearer "+Contants.TOKEN)
                         .content(requestBodyJson))
@@ -262,7 +264,7 @@ public class RoleControllerTest {
                 .thenReturn(ResponseEntity.ok(mockDeleteResult));
 
 
-        mockMvc.perform(delete("/role/1")
+        mockMvc.perform(delete("/api/role/1")
                         .header("Authorization", "Bearer "+Contants.TOKEN)
                 )
                 .andExpect(status().isOk())

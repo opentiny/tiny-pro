@@ -31,6 +31,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDate;
@@ -45,6 +46,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 class UserControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -134,6 +136,8 @@ class UserControllerTest {
         User user = new User();
         user.setEmail("admin@no-reply.com");
         user.setName("Info User");
+        user.setPassword("should-not-be-returned");
+        user.setSalt("should-not-be-returned");
 
         when(userService.getUserInfo("admin@no-reply.com"))
                 .thenReturn(new ResponseEntity<>(user, HttpStatus.OK));
@@ -142,7 +146,9 @@ class UserControllerTest {
                         .header("Authorization", "Bearer "+Contants.TOKEN))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value("admin@no-reply.com"))
-                .andExpect(jsonPath("$.name").value("Info User"));
+                .andExpect(jsonPath("$.name").value("Info User"))
+                .andExpect(jsonPath("$.password").doesNotExist())
+                .andExpect(jsonPath("$.salt").doesNotExist());
     }
 
     // ==================== DELETE /user/{email} 【删除用户】====================
