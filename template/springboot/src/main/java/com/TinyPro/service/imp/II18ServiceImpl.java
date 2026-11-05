@@ -93,17 +93,17 @@ public class II18ServiceImpl implements II18Service {
     public ResponseEntity<PageWrapper<I18Vo>> findAll(
             Integer page,
             Integer limit,
-            Boolean allBool,
+            Boolean allRequested,
             List<Integer> lang,
             String key,
             String content
     ) {
-        // 构造分页/不分页
+        // 与 NestJS 保持一致：有效的 page + limit 优先于 all。
         Pageable pageable;
-        if (Boolean.FALSE.equals(allBool)) {
-            pageable = Pageable.unpaged();
-        } else if (page != null && limit != null && page > 0 && limit > 0) {
+        if (page != null && limit != null && page > 0 && limit > 0) {
             pageable = PageRequest.of(page - 1, limit);
+        } else if (Boolean.TRUE.equals(allRequested)) {
+            pageable = Pageable.unpaged();
         } else {
             pageable = PageRequest.of(0, 10);
         }

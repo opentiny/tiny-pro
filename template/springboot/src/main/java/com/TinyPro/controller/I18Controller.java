@@ -46,8 +46,8 @@ public class I18Controller {
                                                       @RequestParam (required = false)List<Integer> lang,
                                                       @RequestParam(required = false) String key,
                                                       @RequestParam(required = false) String content) {
-        boolean allBool = !(all != null && all != 0);
-        return i18Service.findAll(page, limit, allBool, lang, key, content);
+        boolean allRequested = all != null && all != 0;
+        return i18Service.findAll(page, limit, allRequested, lang, key, content);
     }
 
     @PermissionAnnotation("i18n::query")
