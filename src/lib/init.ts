@@ -660,7 +660,6 @@ const createProjectSync = (answers: ProjectInfo) => {
       updatedEnvContent,
       'VITE_LOWCODE_DESIGNER_ENABLED',
       lowcodeEnabled
-
     );
 
     // 根据用户多选结果设置各可选功能的环境变量
