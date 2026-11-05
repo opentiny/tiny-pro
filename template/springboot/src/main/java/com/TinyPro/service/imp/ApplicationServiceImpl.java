@@ -29,108 +29,108 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ApplicationServiceImpl implements ApplicationService {
 
-  private final ApplicationRepository applicationRepository;
-  private final ObjectMapper objectMapper;
+    private final ApplicationRepository applicationRepository;
+    private final ObjectMapper objectMapper;
 
-  // 分页查询
-  public ApplicationVo findAllApplication(ApplicationPaginationQueryDto searchInfo) {
-    int page = searchInfo.getPage();
-    int limit = searchInfo.getLimit();
-    String keywords = searchInfo.getKeywords();
-    String classify = searchInfo.getClassify();
-    Pageable pageable = PageRequest.of(page - 1, limit, Sort.by("id"));
+    // 分页查询
+    public ApplicationVo findAllApplication(ApplicationPaginationQueryDto searchInfo) {
+        int page = searchInfo.getPage();
+        int limit = searchInfo.getLimit();
+        String keywords = searchInfo.getKeywords();
+        String classify = searchInfo.getClassify();
+        Pageable pageable = PageRequest.of(page - 1, limit, Sort.by("id"));
 
-    Specification<Application> spec = (root, query, cb) -> {
-      List<Predicate> predicates = new ArrayList<>();
+        Specification<Application> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
 
-      if (keywords != null && !keywords.isEmpty()) {
-        String pattern = "%" + keywords + "%";
-        Predicate namePred = cb.like(root.get("name"), pattern);
-        Predicate descPred = cb.like(root.get("description"), pattern);
-        Predicate tagPred = cb.like(root.get("tag"), pattern);
-        predicates.add(cb.or(namePred, descPred, tagPred));
-      }
+            if (keywords != null && !keywords.isEmpty()) {
+                String pattern = "%" + keywords + "%";
+                Predicate namePred = cb.like(root.get("name"), pattern);
+                Predicate descPred = cb.like(root.get("description"), pattern);
+                Predicate tagPred = cb.like(root.get("tag"), pattern);
+                predicates.add(cb.or(namePred, descPred, tagPred));
+            }
 
-      if (classify != null && !classify.isBlank() && !"all".equalsIgnoreCase(classify)) {
-        predicates.add(cb.equal(root.get("classify"), classify));
-      }
+            if (classify != null && !classify.isBlank() && !"all".equalsIgnoreCase(classify)) {
+                predicates.add(cb.equal(root.get("classify"), classify));
+            }
 
-      return cb.and(predicates.toArray(new Predicate[0]));
-    };
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
 
-    Page<Application> pageResult = applicationRepository.findAll(spec, pageable);
+        Page<Application> pageResult = applicationRepository.findAll(spec, pageable);
 
-    List<ApplicationVo.ApplicationItem> items = pageResult.getContent().stream()
-      .map(app -> new ApplicationVo.ApplicationItem(
-        app.getId(),
-        app.getName(),
-        app.getDescription(),
-        app.parseTagSafely(),
-        app.getIcon(),
-        app.getClassify()
-      ))
-      .toList();
+        List<ApplicationVo.ApplicationItem> items = pageResult.getContent().stream()
+            .map(app -> new ApplicationVo.ApplicationItem(
+                app.getId(),
+                app.getName(),
+                app.getDescription(),
+                app.parseTagSafely(),
+                app.getIcon(),
+                app.getClassify()
+            ))
+            .toList();
 
-    return new ApplicationVo(items, pageResult.getTotalElements());
-  }
-
-  // 创建应用
-  @Transactional
-  public Application createApplication(@Valid CreateApplicationDto dto) {
-    String name = dto.getName();
-    Application existing = applicationRepository.findByName(name);
-
-    if (existing != null) {
-      throw new BusinessException("applicationInfo.exists", HttpStatus.BAD_REQUEST, name);
+        return new ApplicationVo(items, pageResult.getTotalElements());
     }
 
-    Application newApp = new Application(
-      dto.getName(),
-      dto.getDescription(),
-      serializeTag(dto.getTag()),
-      dto.getIcon(),
-      dto.getClassify()
-    );
-    return applicationRepository.save(newApp);
-  }
+    // 创建应用
+    @Transactional
+    public Application createApplication(@Valid CreateApplicationDto dto) {
+        String name = dto.getName();
+        Application existing = applicationRepository.findByName(name);
 
-  private String serializeTag(JsonNode tag) {
-    if (tag == null || tag.isNull()) {
-      return null;
+        if (existing != null) {
+            throw new BusinessException("applicationInfo.exists", HttpStatus.BAD_REQUEST, name);
+        }
+
+        Application newApp = new Application(
+            dto.getName(),
+            dto.getDescription(),
+            serializeTag(dto.getTag()),
+            dto.getIcon(),
+            dto.getClassify()
+        );
+        return applicationRepository.save(newApp);
     }
 
-    JsonNode normalizedTag = tag;
-    if (tag.isTextual()) {
-      try {
-        normalizedTag = objectMapper.readTree(tag.textValue());
-      } catch (JsonProcessingException ex) {
-        throw invalidTag();
-      }
+    private String serializeTag(JsonNode tag) {
+        if (tag == null || tag.isNull()) {
+            return null;
+        }
+
+        JsonNode normalizedTag = tag;
+        if (tag.isTextual()) {
+            try {
+                normalizedTag = objectMapper.readTree(tag.textValue());
+            } catch (JsonProcessingException ex) {
+                throw invalidTag();
+            }
+        }
+
+        validateTagArray(normalizedTag);
+        try {
+            return objectMapper.writeValueAsString(normalizedTag);
+        } catch (JsonProcessingException ex) {
+            throw invalidTag();
+        }
     }
 
-    validateTagArray(normalizedTag);
-    try {
-      return objectMapper.writeValueAsString(normalizedTag);
-    } catch (JsonProcessingException ex) {
-      throw invalidTag();
-    }
-  }
+    private void validateTagArray(JsonNode tag) {
+        if (tag == null || !tag.isArray()) {
+            throw invalidTag();
+        }
 
-  private void validateTagArray(JsonNode tag) {
-    if (tag == null || !tag.isArray()) {
-      throw invalidTag();
+        for (JsonNode item : tag) {
+            if (item == null || !item.isObject()
+                    || !item.has("type") || !item.get("type").isTextual()
+                    || !item.has("value") || !item.get("value").isTextual()) {
+                throw invalidTag();
+            }
+        }
     }
 
-    for (JsonNode item : tag) {
-      if (item == null || !item.isObject()
-          || !item.has("type") || !item.get("type").isTextual()
-          || !item.has("value") || !item.get("value").isTextual()) {
-        throw invalidTag();
-      }
+    private BusinessException invalidTag() {
+        return new BusinessException("applicationInfo.invalidTag", HttpStatus.BAD_REQUEST, null);
     }
-  }
-
-  private BusinessException invalidTag() {
-    return new BusinessException("applicationInfo.invalidTag", HttpStatus.BAD_REQUEST, null);
-  }
 }
