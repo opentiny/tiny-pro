@@ -94,6 +94,8 @@ public class DataInitializer implements CommandLineRunner {
       return;
     }
 
+    boolean freshDatabase = isFreshDatabase();
+
     if (redisUtil.exists(Contants.INSTALL_FLAG)) {
       logger.warn("[APP]: Installation flag exists but required seed data is incomplete; re-running initialization");
     }
@@ -105,26 +107,44 @@ public class DataInitializer implements CommandLineRunner {
     initPermissions();
     initMenus();
     Role role = initRole();
-    initUser(role);
+    if (freshDatabase) {
+      initUser(role);
+    } else {
+      logger.info("[APP]: Existing database detected; skip default admin bootstrap");
+    }
     redisUtil.setPersistentValue(Contants.INSTALL_FLAG, "1");
     logger.info("[APP]: installation flag persisted: {}", Contants.INSTALL_FLAG);
   }
 
   /**
    * Redis and MySQL can be restored independently. Do not trust the Redis
-   * installation marker unless the database still contains the seed data
-   * required by the application. The check intentionally verifies that the
-   * user table has data instead of requiring a specific default account;
-   * deleting the default admin must not recreate it on the next restart.
+   * installation marker unless the database still contains the static seed
+   * data required by the application. The check intentionally does not require
+   * the default account; deleting the default admin must not recreate it on the
+   * next restart.
    */
   private boolean requiredSeedDataExists() {
     return permissionRepository.existsByName(Contants.ADMIN_SUPE_POWER)
       && roleRepository.findFirstByNameOrderByIdAsc(Contants.ADMIN).isPresent()
-      && userRepository.count() > 0
       && menuRepository.count() > 0
       && langRepository.count() > 0
       && i18Repository.count() > 0
       && applicationRepository.count() > 0;
+  }
+
+  /**
+   * The default account is a first-install bootstrap only. A database that
+   * already contains any application data may have intentionally removed the
+   * default account, so it must never be treated as a fresh installation.
+   */
+  private boolean isFreshDatabase() {
+    return userRepository.count() == 0
+      && roleRepository.count() == 0
+      && permissionRepository.count() == 0
+      && menuRepository.count() == 0
+      && langRepository.count() == 0
+      && i18Repository.count() == 0
+      && applicationRepository.count() == 0;
   }
 
   private void initI18n() throws IOException {
