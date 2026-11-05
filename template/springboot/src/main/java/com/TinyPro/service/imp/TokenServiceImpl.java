@@ -138,7 +138,12 @@ public class TokenServiceImpl implements TokenService {
     }
 
     private AuthenticatedPrincipal authenticateLegacy(String email) {
-        String cached = redisUtil.getValue(TokenRedisKeys.legacyToken(email));
+        String cached;
+        try {
+            cached = redisUtil.getValue(TokenRedisKeys.legacyToken(email));
+        } catch (RuntimeException ex) {
+            throw redisUnavailable("legacy", ex);
+        }
         if (StringUtils.isBlank(cached)) {
             throw tokenError();
         }

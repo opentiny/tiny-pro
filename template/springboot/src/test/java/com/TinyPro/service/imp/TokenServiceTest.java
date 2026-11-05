@@ -351,6 +351,20 @@ class TokenServiceTest {
     }
 
     @Test
+    void authenticateReturnsServiceUnavailableWhenRedisFailsForLegacyToken() {
+        String legacyToken = jwtUtil.generateJwt("user@example.com", 3600);
+        when(redisUtil.getValue("user:user@example.com:token"))
+                .thenThrow(new IllegalStateException("redis unavailable"));
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> tokenService.authenticate(legacyToken)
+        );
+
+        assertEquals(503, exception.getStatusCode().value());
+    }
+
+    @Test
     void authenticateRejectsLegacyTokenWhenCachedUserDoesNotMatch() {
         String legacyToken = jwtUtil.generateJwt("user@example.com", 3600);
         when(redisUtil.getValue("user:user@example.com:token"))
