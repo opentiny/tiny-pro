@@ -1,4 +1,5 @@
 import { parse, stringify } from 'yaml';
+import { randomBytes } from 'crypto';
 import * as path from 'path';
 import { copySync } from 'fs-extra';
 import chalk from 'chalk';
@@ -45,6 +46,10 @@ const createTemplateCopyFilter = (from: string) => {
   };
 };
 
+// Keep the generated value compatible with the legacy 8-character Base64
+// secret format, e.g. `0Zi4SA==`.
+const generateJwtSecret = (): string => randomBytes(32).toString('base64');
+
 /**
  * 询问创建项目的描述，使用的技术栈
  *
@@ -77,7 +82,8 @@ const getProjectInfo = (): Promise<ProjectInfo> => {
     {
       type: 'list',
       name: 'serverFramework',
-      message: '请选择是否集成服务端（Nest.js / SpringBoot），默认仅生成前端项目：',
+      message:
+        '请选择是否集成服务端（Nest.js / SpringBoot），默认仅生成前端项目：',
       choices: [
         // { name: 'Egg.js', value: ServerFrameworks.EggJs },
         { name: '仅生成前端项目', value: ServerFrameworks.Skip },
@@ -236,13 +242,8 @@ const createLowcodeDesignerSync = (answers: ProjectInfo) => {
  * name/package.json、name/pnpm-workspace.yaml、name/.gitignore
  */
 const createMonorepoRootSync = (answers: ProjectInfo) => {
-  const {
-    name,
-    description,
-    serverFramework,
-    serverConfirm,
-    lowcodeEngine,
-  } = answers;
+  const { name, description, serverFramework, serverConfirm, lowcodeEngine } =
+    answers;
   const rootPath = utils.getDistPath(name);
 
   // 参与 workspace 的 Node 子包（springboot 为 Java 工程，不参与）
@@ -281,7 +282,7 @@ const createMonorepoRootSync = (answers: ProjectInfo) => {
     pnpm: {
       overrides: {
         // tiny-robot-chat 依赖 ^1.30.0；低版本 SDK 的 exports 不支持子路径
-        // 目录导入会导致 vite 预构建失败
+        // 目录导入会导致 vite 预构建失败，锁定已知可用版本保证全新安装可运行
         '@modelcontextprotocol/sdk': '1.32.1',
       },
     },
@@ -295,7 +296,9 @@ const createMonorepoRootSync = (answers: ProjectInfo) => {
     path.join(rootPath, '.gitignore'),
     ['node_modules', 'dist', '*.log', '.env', ''].join('\n')
   );
-  log.success('monorepo 根目录配置（package.json / pnpm-workspace.yaml）创建成功');
+  log.success(
+    'monorepo 根目录配置（package.json / pnpm-workspace.yaml）创建成功'
+  );
 };
 
 /**
@@ -334,16 +337,29 @@ const createServerSync = (answers: ProjectInfo) => {
       SERVER_PORT: 3000, // 可以改为 answers.serverPort || 3000，如果将来要支持动态端口
     };
 
-    // ===== 2. 拷贝模板后，设置 Spring Boot 配置文件路径 =====
-    const propertiesFilePath = path.join(
+    // ===== 2. 拷贝模板后，设置 Spring Boot 本地配置文件路径 =====
+    const basePropertiesFilePath = path.join(
       serverTo,
       'src/main/resources/application.properties'
     );
+    const propertiesFilePath = path.join(
+      serverTo,
+      'src/main/resources/application-local.properties'
+    );
 
-    if (!existsSync(propertiesFilePath)) {
-      log.error(`❌ 未找到 Spring Boot 配置文件：${propertiesFilePath}`);
-      return;
+    if (
+      !existsSync(basePropertiesFilePath) ||
+      !existsSync(propertiesFilePath)
+    ) {
+      throw new Error(`❌ 未找到 Spring Boot 配置文件：${propertiesFilePath}`);
     }
+
+    // CLI-generated projects use local settings by default.
+    const baseEditor = createEditor(basePropertiesFilePath);
+    baseEditor.set('spring.profiles.default', 'local');
+    baseEditor.save(basePropertiesFilePath);
+
+    // ✅ 使用 createEditor 读取本地 properties 文件
 
     // ✅ 1. 使用 createEditor 读取 properties 文件
     const editor = createEditor(propertiesFilePath);
@@ -369,7 +385,7 @@ const createServerSync = (answers: ProjectInfo) => {
     editor.set('spring.datasource.hikari.maximum-pool-size', '10');
     editor.set('spring.datasource.hikari.auto-commit', 'true');
     editor.set('spring.datasource.hikari.max-lifetime', '180000');
-    editor.set('spring.datasource.hikari.connection-timeout', '30000');
+    editor.set('spring.datasource.hikari.connection-timeout', '5000');
 
     // MyBatis-Plus
     editor.set('mybatis-plus.mapper-locations', 'classpath:mappers/*.xml');
@@ -384,7 +400,8 @@ const createServerSync = (answers: ProjectInfo) => {
     );
 
     // JPA (如同时使用)
-    editor.set('spring.jpa.hibernate.ddl-auto', 'update');
+    // Hibernate only validates the Flyway-managed schema; it must never alter it.
+    editor.set('spring.jpa.hibernate.ddl-auto', 'validate');
     editor.set(
       'spring.jpa.database-platform',
       'org.hibernate.dialect.MySQL8Dialect'
@@ -399,7 +416,7 @@ const createServerSync = (answers: ProjectInfo) => {
     );
     editor.set(
       'spring.jpa.properties.hibernate.globally_quoted_identifiers',
-      'true'
+      'false'
     );
     editor.set(
       'spring.jpa.hibernate.naming.physical-strategy',
@@ -407,11 +424,21 @@ const createServerSync = (answers: ProjectInfo) => {
     );
 
     // JWT
-    editor.set('jwt.secret', '0Zi4SA==');
+    // Generate a project-specific fallback once. Deployments can override it
+    // with JWT_SECRET without changing the generated project files.
+    editor.set('jwt.secret', `\${JWT_SECRET:${generateJwtSecret()}}`);
 
     // Redis
     editor.set('spring.data.redis.host', config.REDIS_HOST);
     editor.set('spring.data.redis.port', config.REDIS_PORT.toString());
+    editor.set('spring.data.redis.timeout', '2s');
+    editor.set('spring.data.redis.connect-timeout', '2s');
+
+    // Actuator readiness checks the application dependencies used by probes.
+    editor.set(
+      'management.endpoint.health.group.readiness.include',
+      'readinessState,db,redis'
+    );
 
     // ✅ 4. 保存修改后的内容到原 .properties 文件
     editor.save(propertiesFilePath);
@@ -437,7 +464,8 @@ const createServerSync = (answers: ProjectInfo) => {
       LLM_API_KEY: '',
       LLM_MODEL: 'qwen-plus',
       // 默认开启联网搜索，否则模型无法回答实时性问题
-      LLM_EXTRA_BODY: '{"enable_search":true,"search_options":{"forced_search":true}}',
+      LLM_EXTRA_BODY:
+        '{"enable_search":true,"search_options":{"forced_search":true}}',
     };
     const envStr = objToEnv(config);
     const overwriteDockerComposeConfig = {
@@ -640,7 +668,11 @@ const createProjectSync = (answers: ProjectInfo) => {
     const selectedFeatures = features ?? [];
     FEATURE_OPTIONS.forEach((feature) => {
       const enabled = selectedFeatures.includes(feature.value);
-      updatedEnvContent = setEnvFlag(updatedEnvContent, feature.envKey, enabled);
+      updatedEnvContent = setEnvFlag(
+        updatedEnvContent,
+        feature.envKey,
+        enabled
+      );
     });
 
     // 仅前端项目开启模拟登录：登录不请求后端接口，直接模拟登录成功
@@ -685,7 +717,11 @@ const printNextSteps = (answers: ProjectInfo, prefix: string) => {
 
   console.log(
     chalk.green(
-      `${chalk.yellow(`$ cd ${name} && pnpm i 或者 npm install`)}         # 安装全部依赖（monorepo 一次安装 web${serverConfirm ? ' + server' : ''}）`
+      `${chalk.yellow(
+        `$ cd ${name} && pnpm i 或者 npm install`
+      )}         # 安装全部依赖（monorepo 一次安装 web${
+        serverConfirm ? ' + server' : ''
+      }）`
     )
   );
   console.log(
@@ -694,7 +730,9 @@ const printNextSteps = (answers: ProjectInfo, prefix: string) => {
         serverConfirm
           ? `$ cd ${name} && pnpm dev 或者 npm run dev`
           : `$ cd ${name} && pnpm start:mock 或者 npm run start:mock`
-      )}     # 开启web开发环境，${serverConfirm ? '使用前后端模式' : '使用mock模式'}`
+      )}     # 开启web开发环境，${
+        serverConfirm ? '使用前后端模式' : '使用mock模式'
+      }`
     )
   );
 
@@ -705,7 +743,11 @@ const printNextSteps = (answers: ProjectInfo, prefix: string) => {
           serverFramework === ServerFrameworks.SpringBoot
             ? `$ cd ${name}/springboot  # Java工程，参考目录内 Dockerfile / docker-compose.yml / pom.xml 启动`
             : `$ cd ${name} && pnpm dev:backend`
-        )}    # 开启server开发环境，${serverFramework === ServerFrameworks.SpringBoot ? '请确保已安装Java环境' : '请确保已安装Node.js环境'}，同时需安装且启用MySQL和Redis环境。`
+        )}    # 开启server开发环境，${
+          serverFramework === ServerFrameworks.SpringBoot
+            ? '请确保已安装Java环境'
+            : '请确保已安装Node.js环境'
+        }，同时需安装且启用MySQL和Redis环境。`
       )
     );
   }

@@ -15,6 +15,10 @@ import java.io.Serializable;
 
 @Data
 @Entity
+@Table(
+        name = "i18",
+        uniqueConstraints = @UniqueConstraint(name = "uk_i18_lang_key", columnNames = {"lang_id", "key"})
+)
 @TableName("i18")
 @DynamicUpdate
 public class I18 implements Serializable {

@@ -1,6 +1,6 @@
 package com.TinyPro.entity.po;
 
-import com.baomidou.mybatisplus.annotation.TableField;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.DynamicUpdate;
@@ -8,12 +8,9 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import jakarta.persistence.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
 @Data
 @Entity
@@ -25,9 +22,10 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
     private String name;
+    @Column(nullable = false, unique = true)
     private String email;
+    @JsonIgnore
     private String password;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -51,20 +49,15 @@ public class User {
     private Integer status;
 
     @CreatedDate
-    @Column(name = "createTime", updatable = false)
-    private LocalDate createTime;
-    @CreatedDate
     @Column(name = "create_time", updatable = false)
     private LocalDate create_time;
-    @LastModifiedDate
-    @Column(name = "updateTime")
-    private LocalDate updateTime;
     @LastModifiedDate
     @Column(name = "update_time")
     private LocalDate update_time;
 
     /* 密码盐 */
     @Column(name = "salt", length = 64)
+    @JsonIgnore
     private String salt;
 
     /* 加密钩子 */

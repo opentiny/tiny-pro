@@ -1,0 +1,11 @@
+# Flyway CLI configuration for the Spring Boot template.
+# Run Flyway commands from the template/springboot directory.
+
+[flyway]
+locations = ["filesystem:src/main/resources/db/migration"]
+baselineVersion = "1"
+baselineDescription = "Existing TinyPro schema"
+baselineOnMigrate = false
+validateOnMigrate = true
+cleanDisabled = true
+validateMigrationNaming = true

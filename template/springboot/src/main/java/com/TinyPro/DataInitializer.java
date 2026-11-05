@@ -1,14 +1,25 @@
 package com.TinyPro;
 
-
 import com.TinyPro.entity.contants.Contants;
 import com.TinyPro.entity.dto.InitMenuDto;
-import com.TinyPro.entity.po.*;
-
-import com.TinyPro.jpa.*;
+import com.TinyPro.entity.po.Application;
+import com.TinyPro.entity.po.I18;
+import com.TinyPro.entity.po.Lang;
+import com.TinyPro.entity.po.Menu;
+import com.TinyPro.entity.po.Permission;
+import com.TinyPro.entity.po.Role;
+import com.TinyPro.entity.po.User;
+import com.TinyPro.jpa.ApplicationRepository;
+import com.TinyPro.jpa.I18Repository;
+import com.TinyPro.jpa.IMenuRepository;
+import com.TinyPro.jpa.IPermissionRepository;
+import com.TinyPro.jpa.IRoleRepository;
+import com.TinyPro.jpa.IUserRepository;
+import com.TinyPro.jpa.LangRepository;
+import com.TinyPro.redis.RedisLockService;
+import com.TinyPro.redis.RedisUtil;
 import com.TinyPro.utils.Sha256Utils;
 import com.alibaba.fastjson.JSON;
-import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -19,258 +30,139 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Profile;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 @Component
+@Profile("!test")
 public class DataInitializer implements CommandLineRunner {
-    private static final Logger logger = LoggerFactory.getLogger(DataInitializer.class);
+  private static final Logger logger = LoggerFactory.getLogger(DataInitializer.class);
 
-    @Autowired
-    private DataSource dataSource; // 用于测试 MySQL
+  @Autowired
+  private DataSource dataSource;
 
-    @Autowired
-    private RedisConnectionFactory redisConnectionFactory;
-    @Autowired
-    private IUserRepository userRepository;
-    @Autowired
-    private IRoleRepository roleRepository;
-    @Autowired
-    private IPermissionRepository permissionRepository;
-    @Autowired
-    private IMenuRepository menuRepository;
-    @Autowired          // 或构造器注入
-    private LangRepository langRepository;
-    @Autowired
-    private I18Repository i18Repository;
+  @Autowired
+  private RedisConnectionFactory redisConnectionFactory;
+  @Autowired
+  private IUserRepository userRepository;
+  @Autowired
+  private IRoleRepository roleRepository;
+  @Autowired
+  private IPermissionRepository permissionRepository;
+  @Autowired
+  private IMenuRepository menuRepository;
+  @Autowired
+  private LangRepository langRepository;
+  @Autowired
+  private I18Repository i18Repository;
+  @Autowired
+  private ApplicationRepository applicationRepository;
 
-    @Autowired
-    private ApplicationRepository applicationRepository;
+  @Autowired
+  private RedisLockService redisLockService;
+  @Autowired
+  private RedisUtil redisUtil;
 
-    @Override
-    public void run(String... args) throws Exception {
-        // 1. 测试 MySQL
-        testMysqlConnection();
+  @Override
+  @Transactional
+  public void run(String... args) throws Exception {
+    redisLockService.execute("install", 60_000L, 300_000L, () -> {
+      try {
+        initializeDefaultData();
+        return null;
+      } catch (Exception exception) {
+        throw new IllegalStateException("Failed to initialize default data", exception);
+      }
+    });
+  }
 
-        // 2. 测试 Redis
-        testRedisConnection();
-        File lockFile = new File("data/lock");
-        if (lockFile.exists()) {
-            logger.warn("Lock file exists, if you want init again, please remove data/lock");
-            return;
-        }
-        // 初始化应用数据
-        initApplications();
-
-        // 初始化国际化信息
-        initI18n();
-
-        // 初始化权限
-        initPermissions();
-
-        // 初始化菜单
-        initMenus();
-
-        // 初始化角色
-        Role role = initRole();
-
-        // 初始化用户
-        initUser(role);
-
-
-
-
-      // 创建锁文件
-        lockFile.getParentFile().mkdirs();
-        Files.createFile(lockFile.toPath());
+  private void initializeDefaultData() throws IOException {
+    if (redisUtil.exists(Contants.INSTALL_FLAG) && requiredSeedDataExists()) {
+      logger.info("[APP]: Already installed; skip default data initialization");
+      return;
     }
 
-    private void initI18n() throws IOException {
-        ClassPathResource pathResource = new ClassPathResource("locales.json");
-        try (InputStream is = pathResource.getInputStream()) {
-            String json = new String(is.readAllBytes(), StandardCharsets.UTF_8);
-            Map<String, Map<String, String>> i18nData = JSON.parseObject(json, Map.class);
-            // 遍历外层 Map
-            for (Map.Entry<String, Map<String, String>> outerEntry : i18nData.entrySet()) {
-                String langName = outerEntry.getKey(); // 外层键作为 Lang 的 name
-                Lang lang = new Lang();
-                lang.setName(langName);
-                List<I18> i18List = new ArrayList<>();
-                // 遍历内层 Map
-                for (Map.Entry<String, String> innerEntry : outerEntry.getValue().entrySet()) {
-                    String key = innerEntry.getKey(); // 内层键
-                    String content = innerEntry.getValue(); // 内层值
-                    // 创建 I18 对象
-                    I18 i18 = new I18();
-                    i18.setKey(key);
-                    i18.setContent(content);
-                    i18List.add(i18);
-                }
-                // 将 I18 对象列表设置到 Lang 对象中
-                lang.setI18ns(i18List);
-                // 先保存 Lang 对象，生成 id
-                langRepository.save(lang);
-                i18List.forEach(i18 -> {
-                    i18.setLang(lang);
-                });
-                // 保存 I18 对象
-                i18Repository.saveAll(i18List);
-                // 清空 I18 列表，为下一个 Lang 准备
-                i18List.clear();
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    if (redisUtil.exists(Contants.INSTALL_FLAG)) {
+      logger.warn("[APP]: Installation flag exists but required seed data is incomplete; re-running initialization");
     }
 
-    private void initPermissions() {
-        Map<String, String[]> permissions = new HashMap<>();
-        permissions.put("user", new String[]{"add", "remove", "update", "query", "password::force-update","batch-remove"});
-        permissions.put("permission", new String[]{"add", "remove", "update", "get"});
-        permissions.put("role", new String[]{"add", "remove", "update", "query"});
-        permissions.put("menu", new String[]{"add", "remove", "update", "query"});
-        permissions.put("i18n", new String[]{"add", "remove", "update", "query","batch-remove"});
-        permissions.put("lang", new String[]{"add", "remove", "update", "query"});
-        permissions.put("application", new String[]{"add"});
+    testMysqlConnection();
+    testRedisConnection();
+    initI18n();
+    initApplications();
+    initPermissions();
+    initMenus();
+    Role role = initRole();
+    initUser(role);
+    redisUtil.setPersistentValue(Contants.INSTALL_FLAG, "1");
+    logger.info("[APP]: installation flag persisted: {}", Contants.INSTALL_FLAG);
+  }
 
-        Permission superPermission = new Permission();
-        superPermission.setName("*");
-        superPermission.setDesc("super permission");
-        try {
-            permissionRepository.save(superPermission);
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            logger.error("Please clear the database and try again");
-            System.exit(-1);
-        }
+  /**
+   * Redis and MySQL can be restored independently. Do not trust the Redis
+   * installation marker unless the database still contains the seed data
+   * required by the application. The check intentionally verifies that the
+   * user table has data instead of requiring a specific default account;
+   * deleting the default admin must not recreate it on the next restart.
+   */
+  private boolean requiredSeedDataExists() {
+    return permissionRepository.existsByName(Contants.ADMIN_SUPE_POWER)
+      && roleRepository.findFirstByNameOrderByIdAsc(Contants.ADMIN).isPresent()
+      && userRepository.count() > 0
+      && menuRepository.count() > 0
+      && langRepository.count() > 0
+      && i18Repository.count() > 0
+      && applicationRepository.count() > 0;
+  }
 
-        for (Map.Entry<String, String[]> entry : permissions.entrySet()) {
-            String module = entry.getKey();
-            String[] actions = entry.getValue();
-            for (String action : actions) {
-                Permission permission = new Permission();
-                permission.setName(module + "::" + action);
-                permission.setDesc("");
-                try {
-                    permissionRepository.save(permission);
-                } catch (Exception e) {
-                    logger.error(e.getMessage());
-                    logger.error("Please clear the database and try again");
-                    System.exit(-1);
-                }
-            }
+  private void initI18n() throws IOException {
+    ClassPathResource pathResource = new ClassPathResource("locales.json");
+    try (InputStream is = pathResource.getInputStream()) {
+      String json = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+      Map<String, Map<String, String>> i18nData = JSON.parseObject(json, Map.class);
+      for (Map.Entry<String, Map<String, String>> outerEntry : i18nData.entrySet()) {
+        String langName = outerEntry.getKey();
+        Lang lang = findOrInsert(
+          () -> langRepository.findFirstByNameOrderByIdAsc(langName).orElse(null),
+          () -> {
+            Lang newLang = new Lang();
+            newLang.setName(langName);
+            return langRepository.saveAndFlush(newLang);
+          }
+        );
+
+        for (Map.Entry<String, String> innerEntry : outerEntry.getValue().entrySet()) {
+          saveI18(lang, innerEntry.getKey(), innerEntry.getValue());
         }
+      }
     }
+  }
 
-    private void initMenus() throws IOException {
-        List<InitMenuDto> menuData = getMenuData();
-        try {
-            // 1. 查询数据库中已存在的菜单名称
-            List<String> existingMenuNames = menuRepository.findAll()
-                    .stream()
-                    .map(Menu::getName)
-                    .collect(Collectors.toList());
-            // 2. 过滤出数据库中不存在的菜单（基于名称比对）
-            List<InitMenuDto> newMenus = menuData.stream()
-                    .filter(menu -> !existingMenuNames.contains(menu.getName()))
-                    .collect(Collectors.toList());
-            //3.dfs储存数据
-            newMenus.forEach(item -> {
-                dfs(item, null);
-            });
+  private I18 saveI18(Lang lang, String key, String content) {
+    return findOrInsert(
+      () -> i18Repository.findFirstByKeyAndLang_IdOrderByIdAsc(key, Long.valueOf(lang.getId())).orElse(null),
+      () -> {
+        I18 i18 = new I18();
+        i18.setLang(lang);
+        i18.setKey(key);
+        i18.setContent(content);
+        return i18Repository.saveAndFlush(i18);
+      }
+    );
+  }
 
-            // 4. 批量导入新增菜单
-            if (!newMenus.isEmpty()) {
-                try {
-                    logger.info("成功导入 " + newMenus.size() + " 个新菜单");
-                } catch (Exception e) {
-                    logger.error("导入失败");
-                    throw new RuntimeException(e);
-                }
-            } else {
-                logger.info("没有新菜单需要导入，数据库已存在所有菜单");
-            }
-
-        } catch (Exception e) {
-            logger.error("菜单导入异常: " + e.getMessage());
-            logger.error("Please clear the database and try again");
-            System.exit(-1);
-        }
-    }
-
-    private void dfs(InitMenuDto item, Integer value) {
-        Menu menu = new Menu();
-        if (ObjectUtils.isNotEmpty(item)) {
-            BeanUtils.copyProperties(item, menu);
-            menu.setParentId(value);
-            menu = menuRepository.save(menu);
-        }
-        if (ObjectUtils.isEmpty(item.getChildren())) {
-            return;
-        }
-        for (InitMenuDto menuDto : item.getChildren()) {
-            dfs(menuDto, menu.getId());
-        }
-    }
-
-    private List<InitMenuDto> getMenuData() throws IOException {
-        ClassPathResource pathResource = new ClassPathResource("MenuData.json");
-        try (InputStream is = pathResource.getInputStream()) {
-            String json = new String(is.readAllBytes(), StandardCharsets.UTF_8);
-            List<InitMenuDto> menuData = JSON.parseArray(json, InitMenuDto.class);
-            return menuData;
-        }
-    }
-
-    private Role initRole() {
-        Role role = new Role();
-        role.setName("admin");
-
-        Set<Permission> permissions = permissionRepository.findByDesc("super permission")
-                .stream()
-                .collect(Collectors.toSet());  // Java 17+ 不可变列表
-
-        role.setPermission(permissions);
-
-        Set<Menu> all = menuRepository.findAll().stream().collect(Collectors.toSet());
-        role.setMenus(all);
-        roleRepository.save(role);
-        return role;
-    }
-
-    private void initUser(Role role) {
-        User user = new User();
-        user.setEmail("admin@no-reply.com");
-        String password;
-        try {
-            password = Sha256Utils.encry(Contants.ADMIN, Contants.PUBLICK_SALT);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        user.setPassword(password);
-        user.setName(Contants.ADMIN);
-        user.setSalt(Contants.PUBLICK_SALT);
-        user.setStatus(Contants.USER_STATUS_YES);
-        Optional<Role> optionalRole = roleRepository.findByName(Contants.ADMIN);
-        Role adminRole = optionalRole.get();
-        List<Role> roleList = List.of(adminRole);
-        user.setRole(roleList);
-        user = userRepository.save(user);
-        logger.info("[APP]: create admin user success");
-        logger.info("[APP]: email: {}", user.getEmail());
-        logger.info("[APP]: password: 'admin'");
-        logger.info("Enjoy!");
-    }
   private void initApplications() {
     List<Application> applicationData = List.of(
       new Application(
@@ -366,27 +258,138 @@ public class DataInitializer implements CommandLineRunner {
       );
     }
   }
-    private String capitalizeFirst(String str) {
-        if (str == null || str.isEmpty()) {
-            return str;
-        }
-        return str.substring(0, 1).toUpperCase() + str.substring(1);
+
+  private void initPermissions() {
+    Map<String, String[]> permissions = new HashMap<>();
+    permissions.put("user", new String[]{"add", "remove", "update", "query", "password::force-update", "batch-remove"});
+    permissions.put("permission", new String[]{"add", "remove", "update", "get"});
+    permissions.put("role", new String[]{"add", "remove", "update", "query"});
+    permissions.put("menu", new String[]{"add", "remove", "update", "query"});
+    permissions.put("i18n", new String[]{"add", "remove", "update", "query", "batch-remove"});
+    permissions.put("lang", new String[]{"add", "remove", "update", "query"});
+    permissions.put("application", new String[]{"add"});
+
+    createPermissionIfAbsent("*", "super permission");
+
+    for (Map.Entry<String, String[]> entry : permissions.entrySet()) {
+      String module = entry.getKey();
+      String[] actions = entry.getValue();
+      for (String action : actions) {
+        createPermissionIfAbsent(module + "::" + action, "");
+      }
     }
-    private void testMysqlConnection() {
-        try (Connection connection = dataSource.getConnection()) {
-            logger.info("[✅ TEST] MySQL 数据库连接成功！数据库状态正常。");
-        } catch (SQLException e) {
-            logger.error("[❌ ERROR] MySQL 数据库连接失败！", e);
-        }
+  }
+
+  private Permission createPermissionIfAbsent(String name, String desc) {
+    return findOrInsert(
+      () -> permissionRepository.findFirstByNameOrderByIdAsc(name).orElse(null),
+      () -> {
+        Permission permission = new Permission();
+        permission.setName(name);
+        permission.setDesc(desc);
+        return permissionRepository.saveAndFlush(permission);
+      }
+    );
+  }
+
+  private void initMenus() throws IOException {
+    List<InitMenuDto> menuData = getMenuData();
+    for (InitMenuDto item : menuData) {
+      saveMenuTree(item, null);
+    }
+  }
+
+  private Menu saveMenuTree(InitMenuDto item, Integer parentId) {
+    if (item == null) {
+      return null;
     }
 
-    private void testRedisConnection() {
-        try (RedisConnection redisConnection = redisConnectionFactory.getConnection()) {
-            logger.info("[✅ TEST] Redis 连接成功！缓存服务状态正常。");
-        } catch (Exception e) {
-            logger.error("[❌ ERROR] Redis 连接失败！", e);
-        }
+    Menu menu = new Menu();
+    BeanUtils.copyProperties(item, menu);
+    menu.setId(null);
+    menu.setParentId(parentId);
+
+    Menu persisted = findOrInsert(
+      () -> menuRepository.findByMenuIdentity(
+        menu.getName(),
+        menu.getOrder(),
+        menu.getMenuType(),
+        menu.getParentId(),
+        menu.getPath(),
+        menu.getIcon(),
+        menu.getComponent(),
+        menu.getLocale()
+      ).stream().findFirst().orElse(null),
+      () -> menuRepository.saveAndFlush(menu)
+    );
+
+    if (item.getChildren() != null) {
+      for (InitMenuDto child : item.getChildren()) {
+        saveMenuTree(child, persisted.getId());
+      }
     }
+
+    return persisted;
+  }
+
+  private List<InitMenuDto> getMenuData() throws IOException {
+    ClassPathResource pathResource = new ClassPathResource("MenuData.json");
+    try (InputStream is = pathResource.getInputStream()) {
+      String json = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+      return JSON.parseArray(json, InitMenuDto.class);
+    }
+  }
+
+  private Role initRole() {
+    Permission superPermission = permissionRepository.findFirstByNameOrderByIdAsc("*")
+      .orElseThrow(() -> new IllegalStateException("super permission not initialized"));
+
+    Role persisted = roleRepository.findFirstByNameOrderByIdAsc(Contants.ADMIN).orElse(null);
+    if (persisted != null) {
+      return persisted;
+    }
+
+    Role role = new Role();
+    role.setName(Contants.ADMIN);
+    role.setPermission(new HashSet<>(List.of(superPermission)));
+    role.setMenus(new HashSet<>(menuRepository.findAll()));
+    return roleRepository.saveAndFlush(role);
+  }
+
+  private void initUser(Role role) {
+    User user = new User();
+    user.setEmail("admin@no-reply.com");
+    String password;
+    try {
+      password = Sha256Utils.encry(Contants.ADMIN, Contants.PUBLICK_SALT);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+    user.setPassword(password);
+    user.setName(Contants.ADMIN);
+    user.setSalt(Contants.PUBLICK_SALT);
+    user.setStatus(Contants.USER_STATUS_YES);
+    user.setRole(List.of(role));
+
+    if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+      logger.info("[APP]: admin user exists, skip create");
+      return;
+    }
+
+    try {
+      userRepository.saveAndFlush(user);
+      logger.info("[APP]: create admin user success");
+      logger.info("[APP]: default admin credentials created; password omitted from logs");
+      logger.info("Enjoy!");
+    } catch (DataIntegrityViolationException ex) {
+      if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+        logger.info("[APP]: admin user was created concurrently, skip create");
+        return;
+      }
+      throw ex;
+    }
+  }
+
   private <T> T findOrInsert(Supplier<T> lookupAction, Supplier<T> insertAction) {
     T existing = lookupAction.get();
     if (existing != null) {
@@ -401,6 +404,22 @@ public class DataInitializer implements CommandLineRunner {
         return concurrent;
       }
       throw ex;
+    }
+  }
+
+  private void testMysqlConnection() {
+    try (Connection connection = dataSource.getConnection()) {
+      logger.info("[TEST] MySQL connection ok");
+    } catch (SQLException e) {
+      logger.error("[ERROR] MySQL connection failed", e);
+    }
+  }
+
+  private void testRedisConnection() {
+    try (RedisConnection redisConnection = redisConnectionFactory.getConnection()) {
+      logger.info("[TEST] Redis connection ok");
+    } catch (Exception e) {
+      logger.error("[ERROR] Redis connection failed", e);
     }
   }
 }

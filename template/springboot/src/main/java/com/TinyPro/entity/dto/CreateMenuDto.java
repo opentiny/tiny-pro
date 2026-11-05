@@ -21,7 +21,6 @@ public class CreateMenuDto {
     @NotBlank(message = "{validation.NOT_EMPTY}")
     private String component;
     
-    @NotBlank(message = "{validation.NOT_EMPTY}")
     private String icon;
     
     @NotBlank(message = "{validation.NOT_EMPTY}")
