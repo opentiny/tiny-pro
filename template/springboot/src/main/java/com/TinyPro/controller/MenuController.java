@@ -7,6 +7,7 @@ import com.TinyPro.entity.dto.UpdateMenuDto;
 import com.TinyPro.entity.po.Menu;
 import com.TinyPro.entity.vo.MenuVo;
 import com.TinyPro.service.IMenuService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +35,7 @@ public class MenuController {
     @Reject
     @PermissionAnnotation("menu::add")
     @PostMapping
-    public ResponseEntity<Menu> createMenu(@RequestBody CreateMenuDto createMenuDto) {
+    public ResponseEntity<Menu> createMenu(@Valid @RequestBody CreateMenuDto createMenuDto) {
         boolean b = false;
         return iMenuService.createMenu(createMenuDto, b);
     }
