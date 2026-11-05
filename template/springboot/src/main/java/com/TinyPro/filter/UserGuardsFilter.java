@@ -1,29 +1,23 @@
 package com.TinyPro.filter;
 
 import com.TinyPro.annotation.IsPublic;
-import com.TinyPro.entity.contants.Contants;
-import com.TinyPro.entity.po.User;
+import com.TinyPro.entity.vo.AuthenticatedPrincipal;
 import com.TinyPro.exception.BusinessException;
-import com.TinyPro.redis.RedisUtil;
-import com.TinyPro.utils.JwtUtil;
-import com.alibaba.fastjson.JSON;
-import io.jsonwebtoken.Claims;
+import com.TinyPro.service.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 @Component
 public class UserGuardsFilter implements HandlerInterceptor {
 
     @Autowired
-    private RedisUtil redisUtil;
-    @Autowired
-    private JwtUtil jwtUtil;
+    private TokenService tokenService;
 
     @Override
     public boolean preHandle(HttpServletRequest request,
@@ -48,19 +42,18 @@ public class UserGuardsFilter implements HandlerInterceptor {
             // 3. 校验 token
             String token = extractTokenFromHeader(request);
             if (token == null) {
-                throw new BusinessException("exception.common.tokenExpire", HttpStatus.NOT_FOUND, null);
-            }
-
-            Claims claims = jwtUtil.parseJwt(token);
-            String email = claims.get("email", String.class);
-            String key = Contants.UserJwtTop + email + Contants.UserJwtbt;
-            String cached = redisUtil.getValue(key);
-            User user = JSON.parseObject(cached, User.class);
-
-            if (StringUtils.isBlank(cached) || !user.getEmail().equals(email)) {
                 throw new BusinessException("exception.common.tokenError", HttpStatus.UNAUTHORIZED, null);
             }
+
+            AuthenticatedPrincipal principal = tokenService.authenticate(token);
+            request.setAttribute(AuthenticatedPrincipal.REQUEST_ATTRIBUTE, principal);
             return true;
+        } catch (BusinessException businessException) {
+            // Preserve the specific token error and HTTP status for the client.
+            throw businessException;
+        } catch (ResponseStatusException statusException) {
+            // Preserve infrastructure failures such as Redis 503 responses.
+            throw statusException;
         } catch (Exception e) {
             throw new BusinessException("exception.common.tokenError", HttpStatus.UNAUTHORIZED, null);
         }

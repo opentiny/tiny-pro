@@ -12,11 +12,9 @@ import com.TinyPro.exception.BusinessException;
 import com.TinyPro.service.II18Service;
 import com.TinyPro.jpa.I18Repository;
 import com.TinyPro.jpa.LangRepository;
-import com.alibaba.fastjson.JSON;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -31,7 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -46,10 +44,10 @@ public class II18ServiceImpl implements II18Service {
 
     @Override
     @Transactional
-    public ResponseEntity<String> create(CreateI18Dto createI18Dto) {
+    public ResponseEntity<I18Vo> create(CreateI18Dto createI18Dto) {
         Lang lang = langRepository.findById(Long.valueOf(createI18Dto.getLang())).orElseThrow(() -> new BusinessException("exception.lang.notExists", HttpStatus.NOT_FOUND, null));
         // 校验 key + lang 是否已存在
-        if (i18Repository.findByKeyAndLang_Id(createI18Dto.getKey(), Long.valueOf(lang.getId())).isPresent()) {
+        if (i18Repository.findFirstByKeyAndLang_IdOrderByIdAsc(createI18Dto.getKey(), Long.valueOf(lang.getId())).isPresent()) {
             throw new BusinessException("exception.i18.exists", HttpStatus.BAD_REQUEST, null);
         }
         lang.setI18ns(null);
@@ -59,40 +57,53 @@ public class II18ServiceImpl implements II18Service {
         i18.setContent(createI18Dto.getContent());
         I18 save = i18Repository.save(i18);
 
-        return new ResponseEntity<>(JSON.toJSONString(save), HttpStatus.OK);
+        I18Vo result = new I18Vo(
+                save.getId(),
+                save.getKey(),
+                save.getContent(),
+                new LangVo(lang.getId(), lang.getName())
+        );
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @Override
-    public Map<String, Map<String, String>> getFormat( HttpServletRequest request) {
-        String lang = request.getHeader("x-lang");
-        Map<String, Map<String, String>> result = new HashMap<>();
-        Lang langData = langRepository.findByName(lang).orElseThrow(() -> new BusinessException("exception.lang.notExists", HttpStatus.NOT_FOUND, null));
+    @Transactional(readOnly = true)
+    public Map<String, Map<String, String>> getFormat(String lang) {
+        Map<String, Map<String, String>> result = new LinkedHashMap<>();
+        if (StringUtils.isBlank(lang)) {
+            langRepository.findAllWithI18ns().forEach(language ->
+                    result.put(language.getName(), formatI18ns(language.getI18ns())));
+            return result;
+        }
 
-        List<I18> i18List = i18Repository.findByLang_Id(Long.valueOf(langData.getId()));
-        Map<String, String> i18map = new HashMap<>();
-        i18List.forEach(item -> {
-            i18map.put(item.getKey(), item.getContent());
-        });
-
-        result.put(lang, i18map);
+        langRepository.findByNameWithI18ns(lang)
+                .ifPresent(language -> result.put(language.getName(), formatI18ns(language.getI18ns())));
         return result;
+    }
+
+    private Map<String, String> formatI18ns(List<I18> i18ns) {
+        Map<String, String> i18map = new LinkedHashMap<>();
+        if (i18ns != null) {
+            i18ns.forEach(item -> i18map.put(item.getKey(), item.getContent()));
+        }
+        return i18map;
     }
 
     @Override
     public ResponseEntity<PageWrapper<I18Vo>> findAll(
             Integer page,
             Integer limit,
-            Boolean allBool,
+            Boolean allRequested,
             List<Integer> lang,
             String key,
             String content
     ) {
-        // 构造分页/不分页
+        // 与 NestJS 保持一致：有效的 page + limit 优先于 all。
         Pageable pageable;
-        if (Boolean.FALSE.equals(allBool)) {
-            pageable = Pageable.unpaged();
-        } else if (page != null && limit != null && page > 0 && limit > 0) {
+        if (page != null && limit != null && page > 0 && limit > 0) {
             pageable = PageRequest.of(page - 1, limit);
+        } else if (Boolean.TRUE.equals(allRequested)) {
+            pageable = Pageable.unpaged();
         } else {
             pageable = PageRequest.of(0, 10);
         }

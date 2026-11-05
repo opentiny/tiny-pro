@@ -14,6 +14,7 @@ import com.TinyPro.jpa.IMenuRepository;
 import com.TinyPro.jpa.IRoleRepository;
 import com.TinyPro.jpa.IUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -89,10 +90,9 @@ import java.util.stream.Collectors;
         String locale = createMenuDto.getLocale();
 
         // 检查菜单是否已存在
-        Optional<Menu> existingMenu = menuRepository.findByNameAndOrderAndMenuTypeAndParentIdAndPathAndIconAndComponentAndLocale(
+        Optional<Menu> existingMenu = menuRepository.findByMenuIdentity(
                 name, order, menuType, parentId, path, icon, component, locale
-        );
-
+        ).stream().findFirst();
         if (isInit && existingMenu.isPresent()) {
             return ResponseEntity.ok(existingMenu.get());
         }
@@ -112,13 +112,41 @@ import java.util.stream.Collectors;
         newMenu.setOrder(order);
         newMenu.setLocale(locale);
 
-        return ResponseEntity.ok(menuRepository.save(newMenu));
+        try {
+            return ResponseEntity.ok(menuRepository.saveAndFlush(newMenu));
+        } catch (DataIntegrityViolationException ex) {
+            Optional<Menu> reloadedMenu = menuRepository.findByMenuIdentity(
+                    name, order, menuType, parentId, path, icon, component, locale
+            ).stream().findFirst();
+            if (reloadedMenu.isPresent()) {
+                if (isInit) {
+                    return ResponseEntity.ok(reloadedMenu.get());
+                }
+                throw new BusinessException("exception.menu.exists", HttpStatus.BAD_REQUEST, null);
+            }
+            throw ex;
+        }
     }
 
     @Override
     public ResponseEntity<Boolean> updateMenu(UpdateMenuDto updateMenuDto) {
         Menu menu = menuRepository.findById(Long.valueOf(updateMenuDto.getId()))
                 .orElseThrow(() -> new BusinessException("exception.menu.notExists",HttpStatus.NOT_FOUND,null));
+
+        boolean conflictsWithAnotherMenu = menuRepository.findByMenuIdentity(
+                        updateMenuDto.getName(),
+                        updateMenuDto.getOrder(),
+                        updateMenuDto.getMenuType(),
+                        updateMenuDto.getParentId(),
+                        updateMenuDto.getPath(),
+                        updateMenuDto.getIcon(),
+                        updateMenuDto.getComponent(),
+                        updateMenuDto.getLocale())
+                .stream()
+                .anyMatch(candidate -> !Objects.equals(candidate.getId(), menu.getId()));
+        if (conflictsWithAnotherMenu) {
+            throw new BusinessException("exception.menu.exists", HttpStatus.BAD_REQUEST, null);
+        }
 
         menu.setName(updateMenuDto.getName());
         menu.setPath(updateMenuDto.getPath());
@@ -128,7 +156,11 @@ import java.util.stream.Collectors;
         menu.setIcon(updateMenuDto.getIcon());
         menu.setOrder(updateMenuDto.getOrder());
         menu.setLocale(updateMenuDto.getLocale());
-        menuRepository.save(menu);
+        try {
+            menuRepository.saveAndFlush(menu);
+        } catch (DataIntegrityViolationException ex) {
+            throw new BusinessException("exception.menu.exists", HttpStatus.BAD_REQUEST, null);
+        }
         return ResponseEntity.ok(true);
     }
 
