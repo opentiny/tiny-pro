@@ -418,7 +418,11 @@ async function handleDelete(row: ProjectInfo) {
               <TinyOption
                 v-for="option in projectStatusOptions" :key="option.value" :value="option.value"
                 :label="$t(option.label)"
-              />
+              >
+                <TinyTag :type="projectStatusTagType[option.value]">
+                  {{ $t(option.label) }}
+                </TinyTag>
+              </TinyOption>
             </TinySelect>
           </TinyFormItem>
           <TinyFormItem :label="$t('advancedList.search.taskStatus')">
@@ -426,7 +430,11 @@ async function handleDelete(row: ProjectInfo) {
               <TinyOption
                 v-for="option in taskStatusOptions" :key="option.value" :value="option.value"
                 :label="$t(option.label)"
-              />
+              >
+                <TinyTag :type="option.value === '2' ? 'danger' : option.value === '1' ? 'warning' : 'success'">
+                  {{ $t(option.label) }}
+                </TinyTag>
+              </TinyOption>
             </TinySelect>
           </TinyFormItem>
           <TinyFormItem :label="$t('advancedList.search.department')">
@@ -437,7 +445,11 @@ async function handleDelete(row: ProjectInfo) {
               <TinyOption
                 v-for="option in priorityOptions" :key="option.value" :value="option.value"
                 :label="$t(option.label)"
-              />
+              >
+                <TinyTag :type="priorityTagType[option.value]">
+                  {{ $t(option.label) }}
+                </TinyTag>
+              </TinyOption>
             </TinySelect>
           </TinyFormItem>
           <TinyFormItem :label="$t('advancedList.search.owner')">

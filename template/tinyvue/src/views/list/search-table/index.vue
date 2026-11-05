@@ -267,9 +267,6 @@ function toCsvEvent() {
 
     <div class="search-table-container">
       <div class="button-group flex-wrap gap-4 max-sm:gap-[3%]">
-        <TinyButton class="max-sm:w-[30%]">
-          {{ $t('userInfo.table.operations.delete') }}
-        </TinyButton>
         <TinyFileUpload class="max-sm:w-[30%]" action="#" accept=".xls,.xlsx" @change="importExcel">
           <TinyButton class="max-sm:w-full">
             {{ $t('userInfo.table.import') }}
@@ -327,7 +324,7 @@ function toCsvEvent() {
             <TinyGridColumn field="roles" :title="$t('searchTable.columns.roles')" />
             <TinyGridColumn field="lastUpdateUser" :title="$t('searchTable.columns.lastUpdateUser')" />
             <TinyGridColumn field="createTime" :title="$t('searchTable.columns.createTime')" />
-            <TinyGridColumn :title="$t('searchTable.columns.operations')">
+            <TinyGridColumn :title="$t('searchTable.columns.operations')" width="160">
               <template #default="data">
                 <a class="operation" @click="handleUpdated(data.row.id)">
                   <IconEditor class="operation-icon" />{{ $t('userInfo.table.operations.update') }}
