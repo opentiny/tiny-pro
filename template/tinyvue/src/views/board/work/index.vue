@@ -64,7 +64,7 @@ const Home = [
 .container-work {
   width: 100%;
   height: 100%;
-  padding: 24px;
+  padding: 0 24px;
   overflow: auto;
   background: #f6f8f9;
   color: #191919;

@@ -11,7 +11,7 @@ export function getUserPractic() {
 }
 
 export function getUserTrain() {
-  return axios.get(`${import.meta.env.VITE_MOCK_SERVER_HOST}/api/user/getrtrain`)
+  return axios.get(`${import.meta.env.VITE_BASE_API}/user/getrtrain`)
 }
 
 // 切换数据源
