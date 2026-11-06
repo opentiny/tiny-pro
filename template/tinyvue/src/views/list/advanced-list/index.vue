@@ -428,7 +428,10 @@ async function handleToolbarButtonClick({ code, $grid }: { code: string, $grid: 
     }
     saving.value = true
     try {
-      await Promise.all(pending.map(row => saveRow(row)))
+      // 等待全部保存请求结束再放开按钮，避免部分请求仍进行时重复提交
+      const results = await Promise.allSettled(pending.map(row => saveRow(row)))
+      if (results.some(result => result.status === 'rejected'))
+        throw new Error('save failed')
       Modal.message({ message: t('advancedList.message.saveSuccess'), status: 'success' })
     }
     catch {

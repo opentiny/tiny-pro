@@ -135,7 +135,7 @@ const versionStatusByProjectStatus: Record<string, string[]> = {
 }
 
 const versionList = computed(() => {
-  const allowed = versionStatusByProjectStatus[project.value?.projectStatus ?? '1']
+  const allowed = versionStatusByProjectStatus[project.value?.projectStatus ?? '1'] ?? versionStatusByProjectStatus[1]
   return versionData.filter(item => allowed.includes(item.status))
 })
 
