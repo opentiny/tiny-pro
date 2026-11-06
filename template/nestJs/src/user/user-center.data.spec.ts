@@ -24,4 +24,13 @@ describe('queryUserCenterData', () => {
     expect('list' in week && week.list.every(item => item.bid === 'A' && item.pid === 'C')).toBe(true);
     expect(next.tableData).toHaveLength(10);
   });
+
+  it('includes rows on the selected start and end dates', () => {
+    const filtered = queryUserCenterData({
+      startTime: '2021-12-18',
+      endTime: '2021-12-18',
+    });
+
+    expect(filtered.tableData.map(item => item.id)).toEqual(['1']);
+  });
 });

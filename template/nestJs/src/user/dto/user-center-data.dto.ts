@@ -1,5 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsArray, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsDateString, IsNumber, IsOptional, IsString, ValidateIf } from 'class-validator';
 
 export class UserCenterDataDto {
   @ApiPropertyOptional({ description: '排序：2、4 为倒序' })
@@ -10,11 +10,15 @@ export class UserCenterDataDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
+  @ValidateIf((_, value) => value !== '')
+  @IsDateString()
   startTime?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
+  @ValidateIf((_, value) => value !== '')
+  @IsDateString()
   endTime?: string;
 
   @ApiPropertyOptional({ type: [String] })

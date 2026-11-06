@@ -41,8 +41,8 @@ export interface UserData {
   sort?: number | undefined
   startTime?: string
   endTime?: string
-  filterStatus?: []
-  filterType?: []
+  filterStatus?: string[]
+  filterType?: string[]
 }
 export interface RefreshToken {
   token: string
@@ -100,8 +100,23 @@ export function updateUserInfo(data: any) {
   return axios.patch(`${import.meta.env.VITE_BASE_API}/user/update`, data)
 }
 
-export function getUserData(data?: UserData) {
-  return axios.post<UserRes>(`${import.meta.env.VITE_BASE_API}/user/data`, data)
+function readUserCenterPayload(result: unknown): UserRes {
+  const body = (result as { data?: unknown })?.data ?? result
+  if (body && typeof body === 'object' && 'chartData' in body) {
+    return body as UserRes
+  }
+  if (body && typeof body === 'object' && 'data' in body) {
+    const nested = (body as { data?: UserRes }).data
+    if (nested && typeof nested === 'object' && 'chartData' in nested) {
+      return nested
+    }
+  }
+  return { chartData: [], tableData: [] }
+}
+
+export async function getUserData(data?: UserData) {
+  const result = await axios.post(`${import.meta.env.VITE_BASE_API}/user/data`, data)
+  return { data: readUserCenterPayload(result) }
 }
 
 export function registerUser(data: any) {

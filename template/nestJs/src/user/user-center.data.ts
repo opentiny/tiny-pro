@@ -59,10 +59,10 @@ function matchesCode(selected: string[] | undefined, value: string) {
 
 function matchesTime(time: string, startTime?: string, endTime?: string) {
   const itemTime = new Date(time).getTime()
-  if (startTime && itemTime - new Date(startTime).getTime() <= 0) {
+  if (startTime && itemTime < new Date(startTime).getTime()) {
     return false
   }
-  if (endTime && itemTime - new Date(endTime).getTime() >= 0) {
+  if (endTime && itemTime > new Date(endTime).getTime()) {
     return false
   }
   return true
