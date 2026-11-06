@@ -35,7 +35,7 @@ const initData1 = mock({
   ],
 });
 
-const initData2 = mock({
+export const initData2 = mock({
   options: [
     {
       value: 'work.mock.collectValue1',

@@ -27,6 +27,7 @@ import { I18nTranslations } from '../.generate/i18n.generated';
 import { Reject } from '../public/reject.decorator';
 import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiProperty } from '@nestjs/swagger';
 import { User } from '@app/models';
+import { initData2 } from '../mock/data/board';
 
 @Controller('user')
 export class UserController {
@@ -121,6 +122,12 @@ export class UserController {
   @Permission('user::update')
   async updatePwdUser(@Body() body: UpdatePwdUserDto) {
     return this.userService.updatePwdUser(body);
+  }
+
+  @ApiOperation({ summary: '工作台收藏卡片' })
+  @Get('getrtrain')
+  getWorkTrain() {
+    return initData2;
   }
 
   @ApiOperation({ summary: '用户中心看板' })
