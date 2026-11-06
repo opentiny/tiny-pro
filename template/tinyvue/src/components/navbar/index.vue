@@ -319,7 +319,7 @@ async function handlePwdUpdateSubmit() {
   justify-content: space-between;
   height: 100%;
   background-color: #fff;
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid #dbdbdb;
 }
 
 #navbar-search {

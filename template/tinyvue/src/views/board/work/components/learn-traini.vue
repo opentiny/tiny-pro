@@ -26,8 +26,9 @@ async function fetchData() {
     target: document.getElementById('container'),
   })
   try {
-    const { data } = await getUserTrain()
-    state.options = data.options
+    const result = await getUserTrain()
+    const body = result?.data ?? result
+    state.options = body?.options ?? body?.data?.options ?? []
   }
   finally {
     state.loading.close()

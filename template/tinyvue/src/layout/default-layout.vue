@@ -304,26 +304,25 @@ watch(appStore.$state, (newValue) => {
 <template>
   <div class="layout">
     <div>
-      <div class="relative z-[999] shadow-[0_4px_6px_#0003]">
+      <div class="relative z-[999]">
         <NavBar v-if="layoutMode[myPattern].navbar" />
       </div>
       <div class="flex">
         <Suspense>
           <Menu
             v-if="reloadKey !== 'menu' && layoutMode[myPattern].menu"
-            class="z-[100] shadow-[0_4px_12px_#0000001a]"
+            class="z-[100]"
           />
         </Suspense>
         <div
           class="h-[calc(100vh-60px)] flex-1 bg-[#f5f6f7] text-[#ccc]"
-          :style="{ width: isMenuCollapsed ? '100%' : 'calc(100% - 220px)', padding: '0 10px' }"
+          :style="{ width: isMenuCollapsed ? '100%' : 'calc(100% - 220px)' }"
         >
           <Tabs
             :key="tabsRefreshKey"
             v-model="currentTabName"
             with-close
-            size="small"
-            class="!pt-4"
+            class="px-4"
             @click="onClick"
             @close="onClose"
           >
@@ -354,7 +353,7 @@ watch(appStore.$state, (newValue) => {
               </template>
             </TabItem>
           </Tabs>
-          <PageLayout class="pl-4 pr-4 !h-[calc(100%-100px)]" />
+          <PageLayout class="!h-[calc(100%-100px)]" />
           <Footer v-if="layoutMode[myPattern].footer" class="h-[60px]" />
         </div>
       </div>
@@ -392,7 +391,8 @@ watch(appStore.$state, (newValue) => {
 }
 
 :deep(.tiny-tabs--top) {
-  padding: 0 16px;
+  padding: 0 22px;
+  background-color: #fff;
 }
 
 .tab-action-dropdown {
@@ -405,5 +405,6 @@ watch(appStore.$state, (newValue) => {
 :deep(.tiny-tree-menu .tiny-tree) {
   height: 100%;
   overflow: auto;
+  border-right: 1px solid #dbdbdb;
 }
 </style>

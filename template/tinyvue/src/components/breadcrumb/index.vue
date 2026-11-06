@@ -17,6 +17,6 @@ const { items = [] } = defineProps<{ items?: string[] }>()
 
 <style scoped lang="less">
 .container-breadcrumb {
-  margin: 16px 0px;
+  margin: 20px 0 16px 0px;
 }
 </style>

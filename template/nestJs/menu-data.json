@@ -196,25 +196,6 @@
     "locale": "menu.user"
   },
   {
-    "label": "MenuPage",
-    "children": [
-      {
-        "label": "SecondMenu",
-        "children": [],
-        "url": "secondMenu",
-        "component": "menu/demo/index",
-        "icon": "add-cube",
-        "menuType": "normal",
-        "locale": "menu.menuPage.second"
-      }
-    ],
-    "url": "menuPage",
-    "component": "menu/index",
-    "icon": "IconApp",
-    "menuType": "normal",
-    "locale": "menu.menuPage"
-  },
-  {
     "label": "SystemManager",
     "children": [
       {
