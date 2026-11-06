@@ -3,6 +3,7 @@ import froms from '../views/form/step/mock'
 import application from './application'
 import { createBackendMocks } from './backend'
 import board from './board'
+import { createEditorMocks } from './editor'
 import list from './list'
 import profile from './profile'
 import robot from './robot'
@@ -18,5 +19,6 @@ export function createMockHandlers(): MockMethod[] {
     ...user,
     ...application,
     ...robot,
+    ...createEditorMocks(),
   ]
 }

@@ -1,13 +1,26 @@
 <script lang="ts" setup>
+import type { CollaborationDocument } from '@/mock/editor'
 import { Modal, Grid as TinyGrid, GridColumn as TinyGridColumn } from '@opentiny/vue'
 import { iconDel, iconEdit } from '@opentiny/vue-icon'
+import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { collaborationDocuments, removeCollaborationDocument } from '../mock'
+import { deleteCollaborationDocument, getCollaborationDocuments } from '@/api/editor'
+import { clearCollabRoomData } from '../mock'
 
 const IconEdit = iconEdit()
 const IconDel = iconDel()
 
 const router = useRouter()
+
+const documents = ref<CollaborationDocument[]>([])
+
+async function loadDocuments() {
+  documents.value = await getCollaborationDocuments()
+}
+
+onMounted(() => {
+  loadDocuments()
+})
 
 function handleCellClick({ row }: any, event: MouseEvent) {
   // 点击“删除”操作列时不触发行跳转
@@ -27,7 +40,12 @@ function handleDelete(row: any) {
     message: `确定要删除协同文档「${row.name}」吗？删除后不可恢复。`,
   }).then(async (res: string) => {
     if (res === 'confirm') {
-      const removed = await removeCollaborationDocument(row.id)
+      // 先清理本地 IndexedDB 中的房间数据，清理失败不删除服务端记录，避免同 id 重建文档时复活旧内容
+      const cleared = await clearCollabRoomData(row.id)
+      const removed = cleared ? await deleteCollaborationDocument(row.id) : false
+      if (removed) {
+        documents.value = documents.value.filter(doc => doc.id !== row.id)
+      }
       Modal.message({
         message: removed ? '删除成功' : '删除失败：本地协同数据清理未完成，请重试',
         status: removed ? 'success' : 'error',
@@ -44,7 +62,7 @@ function handleDelete(row: any) {
         多人协同文档列表
       </h3>
     </div>
-    <TinyGrid :data="collaborationDocuments" :show-header="false" :border="false" size="medium" @cell-click="handleCellClick">
+    <TinyGrid :data="documents" :show-header="false" :border="false" size="medium" @cell-click="handleCellClick">
       <TinyGridColumn field="name" title="文档标题" />
       <TinyGridColumn field="members" title="成员">
         <template #default="{ row }">

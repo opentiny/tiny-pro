@@ -1,22 +1,23 @@
 <script lang="ts" setup>
+import type { CollaborationDocument, RichTextDocument } from '@/mock/editor'
 import TinyEditor from '@opentiny/fluent-editor'
 import { Modal, Dropdown as TinyDropdown, Input as TinyInput } from '@opentiny/vue'
 import { iconAdd, iconChevronLeft, iconDel, iconEdit, iconEllipsis, iconError, iconFullscreenRight, iconGroup, IconLoadingShadow, iconMinscreenRight, iconSuccess, iconUser } from '@opentiny/vue-icon'
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { onBeforeRouteLeave, onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router'
+import {
+  createCollaborationDocument,
+  createEditorDocument,
+  deleteCollaborationDocument,
+  deleteEditorDocument,
+  getCollaborationDocuments,
+  getEditorDocuments,
+  updateCollaborationDocument,
+  updateEditorDocument,
+} from '@/api/editor'
 import { useUserStore } from '@/store'
 import { getToken } from '@/utils/auth'
-import {
-  addCollaborationDocument,
-  addDocument,
-  collaborationDocuments,
-  removeCollaborationDocument,
-  removeDocument,
-  richTextDocuments,
-  updateCollaborationDocument,
-  updateDocument,
-  waitCollabRoomDataSettled,
-} from '../mock'
+import { clearCollabRoomData, waitCollabRoomDataSettled } from '../mock'
 import '@opentiny/fluent-editor/style.css'
 
 const IconAdd = iconAdd()
@@ -29,9 +30,20 @@ const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
 
-// 协同编辑使用的自建 y-websocket 服务地址：未配置时不建立任何网络连接（协同不可用，仅本地编辑）。
-// 禁止回退到 Yjs 公共演示服务（wss://demos.yjs.dev/ws），否则文档内容会同步到第三方服务器，且房间名可预测，存在内容泄露风险
-const collabWebsocketUrl = import.meta.env.VITE_COLLAB_WEBSOCKET_URL
+// 协同编辑 WebSocket 服务地址（y-websocket），配置步骤：
+// 1. 默认（未配置 VITE_COLLAB_WEBSOCKET_URL）：回退到 Yjs 公共演示服务 wss://demos.yjs.dev/ws，
+//    仅供功能体验与测试——文档内容会同步到第三方服务器，且房间名可预测，存在内容泄露风险，切勿用于真实文档；
+// 2. 自建服务（推荐）：将 VITE_COLLAB_WEBSOCKET_URL 指向自部署的 y-websocket 服务地址，
+//    开发环境写入 template/tinyvue/.env.development（或 .env），生产构建经 CI 环境变量或 .env.production 注入，
+//    配置后优先使用自建服务，不再连接公共演示服务
+const PUBLIC_DEMO_WEBSOCKET_URL = 'wss://demos.yjs.dev/ws'
+const customCollabWebsocketUrl = import.meta.env.VITE_COLLAB_WEBSOCKET_URL
+// 用户未配置自建服务时，当前实际使用的是公共演示服务（状态栏据此追加提示）
+const isPublicDemoServer = !customCollabWebsocketUrl
+if (isPublicDemoServer) {
+  console.warn('[tiny-pro] 协同编辑当前使用 Yjs 公共演示服务，仅供测试；请配置 VITE_COLLAB_WEBSOCKET_URL 为自部署服务后再用于真实文档。')
+}
+const collabWebsocketUrl = customCollabWebsocketUrl || PUBLIC_DEMO_WEBSOCKET_URL
 
 const editorRef = ref<HTMLElement>()
 const title = ref('')
@@ -78,14 +90,15 @@ const IconSync = computed(() => {
   return IconLoadingShadow()
 })
 const syncStatusText = computed(() => {
+  const demoNote = '（公共演示服务，仅供测试使用。若用于生产环境，请自行配置部署的服务地址）'
   if (collabSyncStatus.value === 'connected') {
-    return '同步成功'
+    return `同步成功${demoNote}`
   }
   if (collabSyncStatus.value === 'disconnected') {
-    return '同步失败'
+    return `同步失败${demoNote}`
   }
   if (collabSyncStatus.value === 'syncing') {
-    return '正在同步中'
+    return `正在同步中${demoNote}`
   }
   return '同步中…'
 })
@@ -105,12 +118,23 @@ const isCreateMode = computed(() => route.query.id === undefined)
 
 // 从多人协同列表进入时（from=collaboration）展示协同文档，否则展示开始创作文档
 const isCollaborationMode = computed(() => route.query.from === 'collaboration')
-const docList = computed(() => (isCollaborationMode.value ? collaborationDocuments : richTextDocuments))
+// 左侧文档目录：由 mock 接口（src/api/editor.ts）加载，模式切换时重新请求对应列表
+const documents = ref<(RichTextDocument | CollaborationDocument)[]>([])
+let loadedListMode: 'documents' | 'collaboration' | null = null
+
+async function ensureDocuments() {
+  const mode = isCollaborationMode.value ? 'collaboration' : 'documents'
+  if (loadedListMode === mode) {
+    return
+  }
+  documents.value = mode === 'collaboration' ? await getCollaborationDocuments() : await getEditorDocuments()
+  loadedListMode = mode
+}
 // 新建模式下首次自动保存创建的文档 id（刻意不改 URL，避免 fullPath 变化导致整页重挂载）
 const pendingDocId = ref<number | null>(null)
 const activeDocument = computed(() => {
   const id = route.query.id !== undefined ? Number(route.query.id) : pendingDocId.value
-  return docList.value.find(doc => doc.id === id)
+  return documents.value.find(doc => doc.id === id)
 })
 
 // 已加载到编辑器的文档 id，初始为 null，避免新建模式（无 id）下被误判为“已加载”而跳过初始化
@@ -270,7 +294,7 @@ async function initCollabEditor(content: string) {
   TinyEditor.register('modules/cursors', QuillCursors, true)
   const room = currentCollabRoom()
   const ydoc = new Y.Doc()
-  // 未配置协同服务地址时不创建网络连接：仅本地 IndexedDB 编辑，状态直接标记为断连
+  // collabWebsocketUrl 始终有值（未配置时回退公共演示服务），直接建立网络连接
   const provider = collabWebsocketUrl ? new WebsocketProvider(collabWebsocketUrl, room, ydoc) : null
   const persistence = new IndexeddbPersistence(room, ydoc)
   collabDoc = ydoc
@@ -328,10 +352,16 @@ async function initCollabEditor(content: string) {
     if (!_editor || docId == null || !Number.isInteger(docId)) {
       return
     }
-    updateCollaborationDocument(docId, {
+    const patch = {
       time: new Date().toLocaleString('zh-CN', { hour12: false }).replaceAll('/', '-'),
       content: _editor.getSemanticHTML(),
-    })
+    }
+    // 本地列表立即反映远端内容，服务端记录异步落盘
+    const localDoc = documents.value.find(doc => doc.id === docId)
+    if (localDoc) {
+      Object.assign(localDoc, patch)
+    }
+    void updateCollaborationDocument(docId, patch)
   })
   // 协同身份使用当前登录用户的账号名，未取到时退化为随机名
   const localUser = {
@@ -416,9 +446,14 @@ async function initCollabEditor(content: string) {
   }
 }
 
-function syncForm() {
+async function syncForm() {
+  await ensureDocuments()
+  // 等待接口期间用户可能已离开页面，编辑器容器已卸载
+  if (!editorRef.value) {
+    return
+  }
   const id = route.query.id === undefined ? undefined : Number(route.query.id)
-  if (id !== undefined && !docList.value.some(doc => doc.id === id)) {
+  if (id !== undefined && !documents.value.some(doc => doc.id === id)) {
     // 文档不存在（已删除或非法链接）：提示并返回列表，不为未知 id 打开协同房间
     Modal.message({ message: '文档不存在或已被删除', status: 'warning' })
     router.replace({ name: 'Editor', query: isCollaborationMode.value ? { view: 'collaboration' } : {} })
@@ -470,7 +505,8 @@ function goBack() {
   }
   // 有标题时先把未触发的自动保存落盘，再返回
   if (title.value.trim()) {
-    doSave()
+    void doSave().finally(() => pushBack())
+    return
   }
   pushBack()
 }
@@ -521,7 +557,7 @@ function scheduleAutoSave() {
   }
   saveTimer = setTimeout(() => {
     saveTimer = null
-    doSave()
+    void doSave()
   }, 800)
 }
 
@@ -531,7 +567,7 @@ function flushPendingSave() {
   if (saveTimer) {
     clearTimeout(saveTimer)
     saveTimer = null
-    doSave()
+    void doSave()
   }
 }
 
@@ -547,7 +583,7 @@ watch(title, (value) => {
   scheduleAutoSave()
 })
 
-function doSave(): boolean {
+async function doSave(): Promise<boolean> {
   const name = title.value.trim()
   if (!name) {
     return false
@@ -562,35 +598,58 @@ function doSave(): boolean {
     // 新建文档时的「我」占位替换为真实协同用户名
     return [...new Set([...members.filter(member => member !== '我'), userName])]
   }
-  const pendingId = pendingDocId.value
-  const id = route.query.id !== undefined ? Number(route.query.id) : pendingId
+  const id = route.query.id !== undefined ? Number(route.query.id) : pendingDocId.value
   if (id == null) {
-    // 新建模式首次保存：只写入数据，不改 URL，防止布局重挂载页面
-    let doc
+    // 新建模式首次保存：只写入数据，不改 URL，防止布局重挂载页面；id 由服务端生成后回填
+    let doc: RichTextDocument | CollaborationDocument | null
     if (isCollaborationMode.value) {
-      doc = addCollaborationDocument({ name, content })
-      updateCollaborationDocument(doc.id, { members: mergeMembers(doc.members) })
+      doc = await createCollaborationDocument({ name, content, members: mergeMembers(['我']) })
+      if (!doc) {
+        return false
+      }
       // 首次保存拿到正式 id 后重绑到正式房间，后续协同编辑对列表用户可见
       rebindCollabRoom(doc.id)
     }
     else {
-      doc = addDocument({ name, content, department: '未分类' })
+      doc = await createEditorDocument({ name, content, department: '未分类' })
+      if (!doc) {
+        return false
+      }
     }
+    documents.value.unshift(doc)
     pendingDocId.value = doc.id
     loadedDocId = doc.id
     hasUnsavedEdits = false
     return true
   }
   const now = new Date().toLocaleString('zh-CN', { hour12: false }).replaceAll('/', '-')
+  const localDoc = documents.value.find(item => item.id === id)
+  // 本地列表与服务端记录同步更新：列表立即反映最新标题 / 时间，服务端由接口落盘
   if (isCollaborationMode.value) {
-    const doc = collaborationDocuments.find(item => item.id === id)
-    updateCollaborationDocument(id, { name, content, time: now, members: mergeMembers(doc?.members ?? []) })
+    const patch = {
+      name,
+      content,
+      time: now,
+      members: mergeMembers(localDoc && 'members' in localDoc ? localDoc.members : []),
+    }
+    const updated = await updateCollaborationDocument(id, patch)
+    if (!updated) {
+      return false
+    }
+    if (localDoc) {
+      Object.assign(localDoc, patch)
+    }
     hasUnsavedEdits = false
   }
   else {
-    // 文档可能已被删除（如 id 不存在），保存失败时不再向上报成功
-    if (!updateDocument(id, { name, content, time: now })) {
+    const patch = { name, content, time: now }
+    const updated = await updateEditorDocument(id, patch)
+    if (!updated) {
+      // 文档可能已被删除（如 id 不存在），保存失败时不再向上报成功
       return false
+    }
+    if (localDoc) {
+      Object.assign(localDoc, patch)
     }
     hasUnsavedEdits = false
   }
@@ -632,12 +691,12 @@ function handleDelete() {
       flushPendingSave()
       // 当前打开的协同房间还持有 IndexedDB 连接，先销毁编辑器释放连接，避免数据清理被阻塞
       destroyEditor()
-      // 首次清理可能因删除被其他连接阻塞而超时，但超时的 deleteDatabase 仍可能在后台继续执行：
-      // 等 pending 的删除落定后再重试/恢复编辑器，避免新连接排在删除之后、房间数据在编辑器使用过程中被清掉
-      let removed = await removeCollaborationDocument(id)
+      // 先清理本地 IndexedDB 房间数据再删服务端记录，避免同 id 重建文档时复活旧内容；
+      // 首次清理可能被其他连接阻塞超时，等 pending 删除落定后重试
+      let removed = await removeCollabDocument(id)
       if (!removed) {
         await waitCollabRoomDataSettled(`tiny-pro-collab-${id}`)
-        removed = await removeCollaborationDocument(id)
+        removed = await removeCollabDocument(id)
       }
       if (!removed) {
         // 仍有其他页面持有该房间连接导致清理无法完成：恢复编辑器并重建房间连接（优先使用房间实时内容，快照仅在房间为空时兜底），避免页面空白不可用
@@ -647,25 +706,38 @@ function handleDelete() {
       }
     }
     else {
-      removeDocument(id)
+      const removed = await deleteEditorDocument(id)
+      if (!removed) {
+        Modal.message({ message: '删除失败：文档不存在或已被删除', status: 'error' })
+        return
+      }
     }
+    documents.value = documents.value.filter(doc => doc.id !== id)
     Modal.message({ message: '删除成功', status: 'success' })
     resetPage()
   })
+}
+
+// 删除协同文档：先清本地 IndexedDB 房间数据（失败则不动服务端记录），再调接口删除
+async function removeCollabDocument(id: number): Promise<boolean> {
+  if (!await clearCollabRoomData(id)) {
+    return false
+  }
+  return deleteCollaborationDocument(id)
 }
 
 function toggleFullscreen() {
   isFullscreen.value = !isFullscreen.value
 }
 
-function handleKeydown(event: KeyboardEvent) {
+async function handleKeydown(event: KeyboardEvent) {
   if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
     event.preventDefault()
     if (!title.value.trim()) {
       Modal.message({ message: '请输入文档标题', status: 'warning' })
       return
     }
-    const saved = doSave()
+    const saved = await doSave()
     Modal.message({
       message: saved ? '文档已自动保存，无需手动保存' : '保存失败，文档不存在或已被删除',
       status: saved ? 'success' : 'error',
@@ -705,7 +777,7 @@ function handleKeydown(event: KeyboardEvent) {
             文档列表
           </div>
           <div
-            v-for="doc in docList"
+            v-for="doc in documents"
             :key="doc.id"
             class="editor-create-item"
             :class="{ 'editor-create-item--active': doc.id === activeDocument?.id }"
@@ -1062,7 +1134,9 @@ function handleKeydown(event: KeyboardEvent) {
 .editor-create-sync {
   display: inline-flex;
   align-items: center;
+  flex-shrink: 0;
   gap: 4px;
+  white-space: nowrap;
 
   .editor-create-sync-text {
     color: #595959;
