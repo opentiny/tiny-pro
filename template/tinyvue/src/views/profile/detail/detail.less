@@ -72,3 +72,16 @@
     color: #191919;
   }
 }
+
+// 窄屏下减少列数，避免标签和取值被截断
+@media (max-width: 768px) {
+  .detail-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .detail-form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

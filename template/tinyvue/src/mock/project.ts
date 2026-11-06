@@ -1,4 +1,5 @@
 import { successResponseWrap } from '../utils/setup-mock'
+import { mockHttpResponse } from './dispatch'
 
 export interface ProjectRecord {
   id: string
@@ -74,7 +75,7 @@ function pick<T>(list: T[], index: number): T {
 function createProjectList(count: number): ProjectRecord[] {
   const list: ProjectRecord[] = []
   for (let i = 0; i < count; i += 1) {
-    const startTime = randomDate(2023, 2025)
+    const [startTime, endTime] = [randomDate(2023, 2025), randomDate(2025, 2027)].sort()
     list.push({
       id: String(i + 1),
       projectName: pick(projectNames, i),
@@ -83,7 +84,7 @@ function createProjectList(count: number): ProjectRecord[] {
       taskStatus: pick(taskStatuses, i * 2 + 1),
       department: pick(departments, i * 3 + 2),
       startTime,
-      endTime: randomDate(2025, 2027),
+      endTime,
       priority: pick(priorities, i * 5 + 1),
       owner: pick(owners, i * 7 + 3),
     })
@@ -100,14 +101,31 @@ export default [
     url: '/api/project/getProjectList',
     method: 'post',
     response: () => {
-      return successResponseWrap(projects)
+      return successResponseWrap(structuredClone(projects))
     },
   },
   {
     url: '/api/project/create',
     method: 'post',
     response: ({ body }: { body?: { data?: Partial<ProjectRecord> } }) => {
-      const record: ProjectRecord = { ...(body?.data as ProjectRecord), id: String(nextProjectId++) }
+      const data = body?.data ?? {}
+      const requiredFields: (keyof ProjectRecord)[] = ['projectName', 'projectCode', 'owner']
+      const missing = requiredFields.filter(field => !String(data[field] ?? '').trim())
+      if (missing.length)
+        return mockHttpResponse(400, { message: `Missing required fields: ${missing.join(', ')}` })
+      const record: ProjectRecord = {
+        projectName: '',
+        projectCode: '',
+        projectStatus: '',
+        taskStatus: '',
+        department: '',
+        startTime: '',
+        endTime: '',
+        priority: '',
+        owner: '',
+        ...data,
+        id: String(nextProjectId++),
+      }
       const index = projects.findIndex(item => item.id === String(body?.data?.id ?? ''))
       if (index > -1)
         projects[index] = record
@@ -121,8 +139,9 @@ export default [
     method: 'post',
     response: ({ body }: { body?: { data?: Partial<ProjectRecord> } }) => {
       const index = projects.findIndex(item => item.id === String(body?.data?.id ?? ''))
-      if (index > -1)
-        projects[index] = { ...projects[index], ...body?.data } as ProjectRecord
+      if (index === -1)
+        return mockHttpResponse(404, { message: 'Project not found' })
+      projects[index] = { ...projects[index], ...body?.data } as ProjectRecord
       return successResponseWrap(true)
     },
   },

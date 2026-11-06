@@ -92,13 +92,18 @@ function validateRows(rows: ProjectInfo[]): string[] {
       .map(({ label }) => t(label))
     if (!missing.length)
       return []
-    const seq = gridData.value.indexOf(row) + 1
+    const seq = tableData.value.indexOf(row) + 1
     return [`#${seq}（${row.projectName || row.projectCode || '-'}）: ${missing.join('、')}${t('advancedList.message.requiredEmpty')}`]
   })
 }
 
 // 存在未保存修改时，离开页面前弹确认；关闭/刷新浏览器时提示
-const hasPendingChanges = computed(() => dirtyKeys.value.size > 0 || newKeys.value.size > 0)
+const hasPendingChanges = computed(() => {
+  if (dirtyKeys.value.size > 0 || newKeys.value.size > 0)
+    return true
+  // 编辑器仍打开时 handleEditClosed 尚未触发，直接对比当前行数据
+  return tableData.value.some(row => !newKeys.value.has(row.id) && isRowChanged(row))
+})
 
 onBeforeRouteLeave((to, from, next) => {
   if (!hasPendingChanges.value) {
@@ -111,8 +116,11 @@ onBeforeRouteLeave((to, from, next) => {
 })
 
 function handleBeforeUnload(event: BeforeUnloadEvent) {
-  if (hasPendingChanges.value)
+  if (hasPendingChanges.value) {
     event.preventDefault()
+    // 旧版浏览器只有 returnValue 非空时才弹出提示
+    event.returnValue = t('advancedList.message.leaveConfirm')
+  }
 }
 
 onMounted(() => {
@@ -248,8 +256,10 @@ function isRowChanged(row: ProjectInfo) {
 
 async function fetchData() {
   const { data } = await queryProjectList()
-  tableData.value = data
-  gridData.value = [...data]
+  // 保留已插入但未保存的新行，避免被初始列表覆盖
+  const drafts = tableData.value.filter(row => newKeys.value.has(row.id))
+  tableData.value = [...drafts, ...data]
+  gridData.value = [...tableData.value]
   originalSnapshots.clear()
   data.forEach((row) => {
     originalSnapshots.set(row.id, snapshotRow(row))
@@ -257,7 +267,9 @@ async function fetchData() {
 }
 
 onMounted(() => {
-  fetchData()
+  fetchData().catch(() => {
+    Modal.message({ message: t('advancedList.message.operationFailed'), status: 'error' })
+  })
 })
 
 function handleSearch() {
@@ -299,18 +311,40 @@ function createEmptyRow(): ProjectInfo {
   }
 }
 
+// 进行中的新增请求，按临时 id 跟踪，删除前需等待其完成以拿到服务端 id
+const pendingCreates = new Map<string, Promise<void>>()
+
+async function waitForPendingCreate(row: ProjectInfo) {
+  await pendingCreates.get(row.id)?.catch(() => {})
+}
+
 // 保存单行，返回是否为新增行
 async function saveRow(row: ProjectInfo) {
+  const submitted = { ...row }
   if (newKeys.value.has(row.id)) {
-    const { data } = await createProject(row)
-    newKeys.value.delete(row.id)
-    row.id = data.id
+    const tempId = row.id
+    const create = createProject(submitted).then(({ data }) => {
+      newKeys.value.delete(tempId)
+      row.id = data.id
+      submitted.id = data.id
+    })
+    pendingCreates.set(tempId, create)
+    try {
+      await create
+    }
+    finally {
+      pendingCreates.delete(tempId)
+    }
   }
   else {
-    await updateProject(row)
-    dirtyKeys.value.delete(row.id)
+    await updateProject(submitted)
   }
-  originalSnapshots.set(row.id, snapshotRow(row))
+  originalSnapshots.set(row.id, snapshotRow(submitted))
+  // 请求期间又发生的修改需要保留脏标记，否则会被漏保存
+  if (snapshotRow(row) === snapshotRow(submitted))
+    dirtyKeys.value.delete(row.id)
+  else
+    dirtyKeys.value.add(row.id)
   return false
 }
 
@@ -323,7 +357,7 @@ async function handleToolbarButtonClick({ code, $grid }: { code: string, $grid: 
     newKeys.value.add(row.id)
     pagerConfig.currentPage = 1
     gridRef.value?.setActiveCell?.(row, 'projectName')
-    Modal.message({ message: t('advancedList.message.addSuccess'), status: 'success' })
+    Modal.message({ message: t('advancedList.message.addSuccess'), status: 'info' })
   }
 
   if (code === 'delete') {
@@ -336,8 +370,10 @@ async function handleToolbarButtonClick({ code, $grid }: { code: string, $grid: 
       if (res !== 'confirm')
         return
       try {
-        await Promise.all(rows.map(row => deleteProject(row.id)))
-        const ids = new Set(rows.map(row => row.id))
+        // 等待进行中的新增请求完成，确保用服务端 id 删除
+        await Promise.all(rows.map(row => waitForPendingCreate(row)))
+        const results = await Promise.allSettled(rows.map(row => deleteProject(row.id)))
+        const ids = new Set(rows.filter((_, index) => results[index].status === 'fulfilled').map(row => row.id))
         tableData.value = tableData.value.filter(item => !ids.has(item.id))
         gridData.value = gridData.value.filter(item => !ids.has(item.id))
         selectedKeys.value.clear()
@@ -346,6 +382,10 @@ async function handleToolbarButtonClick({ code, $grid }: { code: string, $grid: 
           newKeys.value.delete(id)
           dirtyKeys.value.delete(id)
         })
+        if (ids.size < rows.length) {
+          Modal.message({ message: t('advancedList.message.operationFailed'), status: 'error' })
+          return
+        }
         Modal.message({ message: t('advancedList.message.deleteSuccess'), status: 'success' })
       }
       catch {
@@ -355,7 +395,7 @@ async function handleToolbarButtonClick({ code, $grid }: { code: string, $grid: 
   }
 
   if (code === 'save') {
-    const pending: ProjectInfo[] = gridData.value.filter(
+    const pending: ProjectInfo[] = tableData.value.filter(
       row => newKeys.value.has(row.id) || dirtyKeys.value.has(row.id),
     )
     if (!pending.length) {
@@ -386,6 +426,8 @@ async function handleToolbarButtonClick({ code, $grid }: { code: string, $grid: 
 
 async function handleDelete(row: ProjectInfo) {
   try {
+    // 新增请求未完成时先等待，确保用服务端 id 删除
+    await waitForPendingCreate(row)
     await deleteProject(row.id)
     tableData.value = tableData.value.filter(item => item.id !== row.id)
     gridData.value = gridData.value.filter(item => item.id !== row.id)
@@ -496,6 +538,26 @@ async function handleDelete(row: ProjectInfo) {
               <TinyInput v-model="row.projectCode" />
             </template>
           </TinyGridColumn>
+          <TinyGridColumn field="priority" :title="$t('advancedList.columns.priority')" :editor="{ component: 'select' }">
+            <template #default="{ row }">
+              <TinyTag :type="priorityTagType[row.priority]">
+                {{ $t(priorityLabel[row.priority]) }}
+              </TinyTag>
+            </template>
+            <template #edit="{ row }">
+              <TinySelect v-model="row.priority">
+                <TinyOption
+                  v-for="option in priorityOptions" :key="option.value" :value="option.value"
+                  :label="$t(option.label)"
+                />
+              </TinySelect>
+            </template>
+          </TinyGridColumn>
+          <TinyGridColumn field="owner" :title="$t('advancedList.columns.owner')" :editor="{ component: 'input' }">
+            <template #edit="{ row }">
+              <TinyInput v-model="row.owner" />
+            </template>
+          </TinyGridColumn>
           <TinyGridColumn field="projectStatus" :title="$t('advancedList.columns.projectStatus')" :editor="{ component: 'select' }">
             <template #default="{ row }">
               <TinyTag :type="projectStatusTagType[row.projectStatus]">
@@ -541,26 +603,6 @@ async function handleDelete(row: ProjectInfo) {
               <TinyDatePicker v-model="row.endTime" type="date" value-format="yyyy-MM-dd" />
             </template>
           </TinyGridColumn>
-          <TinyGridColumn field="priority" :title="$t('advancedList.columns.priority')" :editor="{ component: 'select' }">
-            <template #default="{ row }">
-              <TinyTag :type="priorityTagType[row.priority]">
-                {{ $t(priorityLabel[row.priority]) }}
-              </TinyTag>
-            </template>
-            <template #edit="{ row }">
-              <TinySelect v-model="row.priority">
-                <TinyOption
-                  v-for="option in priorityOptions" :key="option.value" :value="option.value"
-                  :label="$t(option.label)"
-                />
-              </TinySelect>
-            </template>
-          </TinyGridColumn>
-          <TinyGridColumn field="owner" :title="$t('advancedList.columns.owner')" :editor="{ component: 'input' }">
-            <template #edit="{ row }">
-              <TinyInput v-model="row.owner" />
-            </template>
-          </TinyGridColumn>
           <TinyGridColumn :title="$t('advancedList.columns.operations')" width="90" fixed="right">
             <template #default="{ row }">
               <TinyPopconfirm
@@ -568,9 +610,9 @@ async function handleDelete(row: ProjectInfo) {
                 @confirm="handleDelete(row)"
               >
                 <template #reference>
-                  <a class="operation">
+                  <button type="button" class="operation">
                     {{ $t('advancedList.operations.delete') }}
-                  </a>
+                  </button>
                 </template>
               </TinyPopconfirm>
             </template>

@@ -13,15 +13,15 @@ import {
   Steps as TinySteps,
   Tag as TinyTag,
 } from '@opentiny/vue'
+import { t } from '@opentiny/vue-locale'
 import { computed, onMounted, ref } from 'vue'
 import { queryProjectList } from '@/api/project'
 
 // 项目基本信息，取自项目管理 mock 数据中的第一条
 const project = ref<ProjectInfo | null>(null)
 
-// 展示用的补充信息（mock 数据之外即兴补充）
+// 展示用的补充信息（mock 数据）
 const extraInfo = ref({
-  progress: 65,
   manHours: 320,
   budget: 180,
   teamSize: 12,
@@ -33,23 +33,46 @@ const extraInfo = ref({
   remark: '项目整体进度符合预期，需重点关注第三方接口联调的排期风险。',
 })
 
+// 当前进度随项目状态推导，保证与所选项目一致
+const progressByStatus: Record<string, number> = {
+  0: 5,
+  1: 65,
+  2: 100,
+  3: 40,
+}
+
+const progress = computed(() => {
+  return progressByStatus[project.value?.projectStatus ?? '1'] ?? 65
+})
+
 const projectStatusOptions = [
-  { value: '0', label: '未开始' },
-  { value: '1', label: '进行中' },
-  { value: '2', label: '已完成' },
-  { value: '3', label: '已暂停' },
+  { value: '0', label: 'advancedList.status.notStarted' },
+  { value: '1', label: 'advancedList.status.inProgress' },
+  { value: '2', label: 'advancedList.status.completed' },
+  { value: '3', label: 'advancedList.status.paused' },
 ]
 
 const priorityOptions = [
-  { value: '0', label: '高' },
-  { value: '1', label: '中' },
-  { value: '2', label: '低' },
+  { value: '0', label: 'advancedList.priority.high' },
+  { value: '1', label: 'advancedList.priority.medium' },
+  { value: '2', label: 'advancedList.priority.low' },
 ]
 
-const riskOptions = ['高', '中', '低'].map(value => ({ value, label: value }))
+const riskOptions = [
+  { value: '高', label: 'advancedList.priority.high' },
+  { value: '中', label: 'advancedList.priority.medium' },
+  { value: '低', label: 'advancedList.priority.low' },
+]
 
 // 第一模块：项目进度（横向步骤条）
-const stepNodes = ['立项申请', '需求评审', '开发实施', '联调测试', '上线发布', '验收归档']
+const stepNodeKeys = [
+  'profileDetail.steps.initiation',
+  'profileDetail.steps.review',
+  'profileDetail.steps.development',
+  'profileDetail.steps.testing',
+  'profileDetail.steps.release',
+  'profileDetail.steps.acceptance',
+]
 
 const statusDoneCount: Record<string, number> = {
   0: 0,
@@ -61,7 +84,8 @@ const statusDoneCount: Record<string, number> = {
 const stepsData = computed(() => {
   const doneCount = statusDoneCount[project.value?.projectStatus ?? '1'] ?? 2
   const paused = project.value?.projectStatus === '3'
-  return stepNodes.map((name, index) => {
+  return stepNodeKeys.map((key, index) => {
+    const name = t(key)
     if (index < doneCount)
       return { name, status: 'done' }
     if (index === doneCount)
@@ -72,12 +96,10 @@ const stepsData = computed(() => {
 
 const activeStep = computed(() => {
   const doneCount = statusDoneCount[project.value?.projectStatus ?? '1'] ?? 2
-  return Math.min(doneCount, stepNodes.length - 1)
+  return Math.min(doneCount, stepNodeKeys.length - 1)
 })
 
 // 第五模块：版本发布记录（模拟数据）
-const versionList = ref<ProjectVersion[]>([])
-
 interface ProjectVersion {
   id: string
   version: string
@@ -96,10 +118,23 @@ const versionData: ProjectVersion[] = [
   { id: '6', version: 'V1.5.0', date: '-', content: '多项目组合管理与资源负荷视图（规划中）', status: '2', owner: '杨柳' },
 ]
 
+// 各项目状态下可见的版本记录，保证与所选项目阶段一致
+const versionStatusByProjectStatus: Record<string, string[]> = {
+  0: ['2'],
+  1: ['0', '1', '2'],
+  2: ['0'],
+  3: ['0', '2'],
+}
+
+const versionList = computed(() => {
+  const allowed = versionStatusByProjectStatus[project.value?.projectStatus ?? '1']
+  return versionData.filter(item => allowed.includes(item.status))
+})
+
 const versionStatusLabel: Record<string, string> = {
-  0: '已发布',
-  1: '预发布',
-  2: '规划中',
+  0: 'profileDetail.versions.published',
+  1: 'profileDetail.versions.prerelease',
+  2: 'profileDetail.versions.planned',
 }
 
 const versionStatusTagType: Record<string, string> = {
@@ -111,7 +146,6 @@ const versionStatusTagType: Record<string, string> = {
 async function fetchData() {
   const { data } = await queryProjectList()
   project.value = data[0] ?? null
-  versionList.value = [...versionData]
 }
 
 onMounted(() => {
@@ -127,9 +161,9 @@ onMounted(() => {
       <!-- 模块一：项目进度 -->
       <div v-if="project" class="detail-card">
         <div class="card-header">
-          <span class="card-title">项目进度</span>
+          <span class="card-title">{{ $t('profileDetail.card.progress') }}</span>
           <TinyTag :type="{ 0: '', 1: 'success', 2: 'primary', 3: 'warning' }[project.projectStatus]">
-            {{ projectStatusOptions.find(item => item.value === project.projectStatus)?.label }}
+            {{ $t(projectStatusOptions.find(item => item.value === project.projectStatus)?.label ?? '') }}
           </TinyTag>
         </div>
         <div class="card-desc">
@@ -141,35 +175,35 @@ onMounted(() => {
       <!-- 模块二：基本信息 -->
       <div v-if="project" class="detail-card">
         <div class="card-header">
-          <span class="card-title">基本信息</span>
+          <span class="card-title">{{ $t('profileDetail.card.basicInfo') }}</span>
         </div>
         <TinyForm class="detail-form" display-only label-position="top">
-          <TinyFormItem label="项目名称">
+          <TinyFormItem :label="$t('profileDetail.form.projectName')">
             <TinyInput v-model="project.projectName" />
           </TinyFormItem>
-          <TinyFormItem label="项目编号">
+          <TinyFormItem :label="$t('profileDetail.form.projectCode')">
             <TinyInput v-model="project.projectCode" />
           </TinyFormItem>
-          <TinyFormItem label="项目状态">
+          <TinyFormItem :label="$t('profileDetail.form.projectStatus')">
             <TinySelect v-model="project.projectStatus">
               <TinyOption
                 v-for="option in projectStatusOptions" :key="option.value" :value="option.value"
-                :label="option.label"
+                :label="$t(option.label)"
               />
             </TinySelect>
           </TinyFormItem>
-          <TinyFormItem label="项目优先级">
+          <TinyFormItem :label="$t('profileDetail.form.priority')">
             <TinySelect v-model="project.priority">
               <TinyOption
                 v-for="option in priorityOptions" :key="option.value" :value="option.value"
-                :label="option.label"
+                :label="$t(option.label)"
               />
             </TinySelect>
           </TinyFormItem>
-          <TinyFormItem label="项目负责人">
+          <TinyFormItem :label="$t('profileDetail.form.owner')">
             <TinyInput v-model="project.owner" />
           </TinyFormItem>
-          <TinyFormItem label="项目发起部门">
+          <TinyFormItem :label="$t('profileDetail.form.department')">
             <TinyInput v-model="project.department" />
           </TinyFormItem>
         </TinyForm>
@@ -178,25 +212,25 @@ onMounted(() => {
       <!-- 模块三：周期与资源 -->
       <div v-if="project" class="detail-card">
         <div class="card-header">
-          <span class="card-title">周期与资源</span>
+          <span class="card-title">{{ $t('profileDetail.card.schedule') }}</span>
         </div>
         <TinyForm class="detail-form" display-only label-position="top">
-          <TinyFormItem label="项目开始时间">
+          <TinyFormItem :label="$t('profileDetail.form.startTime')">
             <TinyDatePicker v-model="project.startTime" type="date" value-format="yyyy-MM-dd" />
           </TinyFormItem>
-          <TinyFormItem label="项目结束时间">
+          <TinyFormItem :label="$t('profileDetail.form.endTime')">
             <TinyDatePicker v-model="project.endTime" type="date" value-format="yyyy-MM-dd" />
           </TinyFormItem>
-          <TinyFormItem label="当前进度">
-            <TinyNumeric v-model="extraInfo.progress" unit="%" />
+          <TinyFormItem :label="$t('profileDetail.form.progress')">
+            <TinyNumeric :model-value="progress" unit="%" />
           </TinyFormItem>
-          <TinyFormItem label="已投入工时">
+          <TinyFormItem :label="$t('profileDetail.form.manHours')">
             <TinyNumeric v-model="extraInfo.manHours" unit="人日" />
           </TinyFormItem>
-          <TinyFormItem label="项目预算">
+          <TinyFormItem :label="$t('profileDetail.form.budget')">
             <TinyNumeric v-model="extraInfo.budget" unit="万元" />
           </TinyFormItem>
-          <TinyFormItem label="团队规模">
+          <TinyFormItem :label="$t('profileDetail.form.teamSize')">
             <TinyNumeric v-model="extraInfo.teamSize" unit="人" />
           </TinyFormItem>
         </TinyForm>
@@ -205,30 +239,30 @@ onMounted(() => {
       <!-- 模块四：目标与风险 -->
       <div v-if="project" class="detail-card">
         <div class="card-header">
-          <span class="card-title">目标与风险</span>
+          <span class="card-title">{{ $t('profileDetail.card.goalRisk') }}</span>
         </div>
         <TinyForm class="detail-form" display-only label-position="top">
-          <TinyFormItem label="项目目标">
+          <TinyFormItem :label="$t('profileDetail.form.goal')">
             <TinyInput v-model="extraInfo.goal" />
           </TinyFormItem>
-          <TinyFormItem label="核心技术">
+          <TinyFormItem :label="$t('profileDetail.form.technology')">
             <TinyInput v-model="extraInfo.technology" />
           </TinyFormItem>
-          <TinyFormItem label="协作部门">
+          <TinyFormItem :label="$t('profileDetail.form.partner')">
             <TinyInput v-model="extraInfo.partner" />
           </TinyFormItem>
-          <TinyFormItem label="风险等级">
+          <TinyFormItem :label="$t('profileDetail.form.riskLevel')">
             <TinySelect v-model="extraInfo.riskLevel">
               <TinyOption
                 v-for="option in riskOptions" :key="option.value" :value="option.value"
-                :label="option.label"
+                :label="$t(option.label)"
               />
             </TinySelect>
           </TinyFormItem>
-          <TinyFormItem label="质量要求">
+          <TinyFormItem :label="$t('profileDetail.form.quality')">
             <TinyInput v-model="extraInfo.quality" />
           </TinyFormItem>
-          <TinyFormItem label="备注说明">
+          <TinyFormItem :label="$t('profileDetail.form.remark')">
             <TinyInput v-model="extraInfo.remark" type="textarea" />
           </TinyFormItem>
         </TinyForm>
@@ -237,20 +271,20 @@ onMounted(() => {
       <!-- 模块五：版本发布记录 -->
       <div class="detail-card">
         <div class="card-header">
-          <span class="card-title">版本发布记录</span>
+          <span class="card-title">{{ $t('profileDetail.card.versions') }}</span>
         </div>
         <TinyGrid :data="versionList" row-id="id" align="center">
-          <TinyGridColumn field="version" title="版本号" width="120" />
-          <TinyGridColumn field="date" title="发布时间" width="120" />
-          <TinyGridColumn field="content" title="更新内容" show-overflow />
-          <TinyGridColumn field="status" title="状态" width="100">
+          <TinyGridColumn field="version" :title="$t('profileDetail.versions.version')" width="120" />
+          <TinyGridColumn field="date" :title="$t('profileDetail.versions.date')" width="120" />
+          <TinyGridColumn field="content" :title="$t('profileDetail.versions.content')" show-overflow />
+          <TinyGridColumn field="status" :title="$t('profileDetail.versions.status')" width="100">
             <template #default="{ row }">
               <TinyTag :type="versionStatusTagType[row.status]">
-                {{ versionStatusLabel[row.status] }}
+                {{ $t(versionStatusLabel[row.status]) }}
               </TinyTag>
             </template>
           </TinyGridColumn>
-          <TinyGridColumn field="owner" title="发布负责人" width="110" />
+          <TinyGridColumn field="owner" :title="$t('profileDetail.versions.owner')" width="110" />
         </TinyGrid>
       </div>
     </div>
