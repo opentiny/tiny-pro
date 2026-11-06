@@ -54,6 +54,9 @@ function handleSizeChange(size: number) {
 const dirtyKeys = ref(new Set<string>())
 const newKeys = ref(new Set<string>())
 
+// 保存请求进行中，防止重复点击造成重复创建
+const saving = ref(false)
+
 // 跨页选中的行 id 集合（分页切换时保留选中状态）
 const selectedKeys = ref(new Set<string>())
 
@@ -185,7 +188,7 @@ const projectStatusTagType: Record<string, string> = {
 const toolbarButtons = computed(() => [
   { code: 'insert', name: t('advancedList.operations.addRow'), type: 'primary' },
   { code: 'delete', name: t('advancedList.operations.batchDelete') },
-  { code: 'save', name: t('advancedList.operations.save') },
+  { code: 'save', name: t('advancedList.operations.save'), disabled: saving.value },
 ])
 
 function createEmptySearch() {
@@ -327,6 +330,11 @@ async function saveRow(row: ProjectInfo) {
       newKeys.value.delete(tempId)
       row.id = data.id
       submitted.id = data.id
+      // 选中态以临时 id 记录，替换为服务端 id 后同步迁移，避免批量删除时漏删
+      if (selectedKeys.value.has(tempId)) {
+        selectedKeys.value.delete(tempId)
+        selectedKeys.value.add(data.id)
+      }
     })
     pendingCreates.set(tempId, create)
     try {
@@ -395,6 +403,10 @@ async function handleToolbarButtonClick({ code, $grid }: { code: string, $grid: 
   }
 
   if (code === 'save') {
+    if (saving.value) {
+      Modal.message({ message: t('advancedList.message.saveInProgress'), status: 'info' })
+      return
+    }
     const pending: ProjectInfo[] = tableData.value.filter(
       row => newKeys.value.has(row.id) || dirtyKeys.value.has(row.id),
     )
@@ -414,12 +426,16 @@ async function handleToolbarButtonClick({ code, $grid }: { code: string, $grid: 
       Modal.alert(`${t('advancedList.message.requiredTip')}\n${errors.join('\n')}`)
       return
     }
+    saving.value = true
     try {
       await Promise.all(pending.map(row => saveRow(row)))
       Modal.message({ message: t('advancedList.message.saveSuccess'), status: 'success' })
     }
     catch {
       Modal.message({ message: t('advancedList.message.operationFailed'), status: 'error' })
+    }
+    finally {
+      saving.value = false
     }
   }
 }
@@ -500,8 +516,8 @@ async function handleDelete(row: ProjectInfo) {
           <TinyFormItem :label="$t('advancedList.search.startTime')">
             <TinyDatePicker
               v-model="searchForm.startTimeRange" type="daterange" clearable value-format="yyyy-MM-dd"
-              range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"
-              :placeholder="$t('advancedList.search.startTime')"
+              range-separator="-" :start-placeholder="$t('advancedList.search.startDate')"
+              :end-placeholder="$t('advancedList.search.endDate')" :placeholder="$t('advancedList.search.startTime')"
             />
           </TinyFormItem>
         </TinyForm>

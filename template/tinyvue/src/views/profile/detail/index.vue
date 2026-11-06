@@ -20,17 +20,25 @@ import { queryProjectList } from '@/api/project'
 // 项目基本信息，取自项目管理 mock 数据中的第一条
 const project = ref<ProjectInfo | null>(null)
 
-// 展示用的补充信息（mock 数据）
+// 展示用的文本补充信息
 const extraInfo = ref({
-  manHours: 320,
-  budget: 180,
-  teamSize: 12,
   goal: '打造统一的项目管理平台，实现项目全生命周期的数字化管控，提升跨部门协作效率。',
   technology: 'Vue3 + TypeScript + TinyVue / NestJS / PostgreSQL',
   partner: '质量管理部、运维中心、用户体验部',
-  riskLevel: '中',
   quality: '核心接口自动化测试覆盖率不低于 80%，生产缺陷密度低于 0.5 个/功能点',
   remark: '项目整体进度符合预期，需重点关注第三方接口联调的排期风险。',
+})
+
+// 周期与资源类指标随项目状态推导，保证与所选项目阶段一致
+const scheduleByStatus: Record<string, { manHours: number, budget: number, teamSize: number, riskLevel: string }> = {
+  0: { manHours: 40, budget: 20, teamSize: 5, riskLevel: '低' },
+  1: { manHours: 320, budget: 180, teamSize: 12, riskLevel: '中' },
+  2: { manHours: 560, budget: 260, teamSize: 12, riskLevel: '低' },
+  3: { manHours: 210, budget: 120, teamSize: 8, riskLevel: '高' },
+}
+
+const schedule = computed(() => {
+  return scheduleByStatus[project.value?.projectStatus ?? '1'] ?? scheduleByStatus[1]
 })
 
 // 当前进度随项目状态推导，保证与所选项目一致
@@ -225,13 +233,13 @@ onMounted(() => {
             <TinyNumeric :model-value="progress" unit="%" />
           </TinyFormItem>
           <TinyFormItem :label="$t('profileDetail.form.manHours')">
-            <TinyNumeric v-model="extraInfo.manHours" unit="人日" />
+            <TinyNumeric :model-value="schedule.manHours" unit="人日" />
           </TinyFormItem>
           <TinyFormItem :label="$t('profileDetail.form.budget')">
-            <TinyNumeric v-model="extraInfo.budget" unit="万元" />
+            <TinyNumeric :model-value="schedule.budget" unit="万元" />
           </TinyFormItem>
           <TinyFormItem :label="$t('profileDetail.form.teamSize')">
-            <TinyNumeric v-model="extraInfo.teamSize" unit="人" />
+            <TinyNumeric :model-value="schedule.teamSize" unit="人" />
           </TinyFormItem>
         </TinyForm>
       </div>
@@ -252,7 +260,7 @@ onMounted(() => {
             <TinyInput v-model="extraInfo.partner" />
           </TinyFormItem>
           <TinyFormItem :label="$t('profileDetail.form.riskLevel')">
-            <TinySelect v-model="extraInfo.riskLevel">
+            <TinySelect :model-value="schedule.riskLevel">
               <TinyOption
                 v-for="option in riskOptions" :key="option.value" :value="option.value"
                 :label="$t(option.label)"
