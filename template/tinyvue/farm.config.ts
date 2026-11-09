@@ -40,16 +40,6 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/mock': {
-        pathFilter(pathname, req) {
-          return Boolean(pathname.match('^/mock'));
-        },
-        pathRewrite: {
-          '^/mock': '/mock',
-        },
-        target: 'http://localhost:3000',
-        logger: console,
-      },
       '/api': {
         pathRewrite: {
           '^/api': '',

@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { UserModule } from './user/user.module';
 import { DbModule } from '@app/db';
+import { EmployeesModule } from './employees/employees.module';
 import { PermissionModule } from './permission/permission.module';
 import { AuthModule } from './auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
@@ -50,6 +51,7 @@ const MAX_RETRY = 20;
   imports: [
     DbModule,
     UserModule,
+    EmployeesModule,
     PermissionModule,
     AuthModule,
     RoleModule,

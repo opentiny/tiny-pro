@@ -50,14 +50,6 @@ const config = {
           '^/api': '',
         },
       },
-      {
-        context: ['/mock'],
-        target: process.env.VITE_SERVER_HOST,
-        changeOrigin: true,
-        pathRewrite: {
-          '^/mock': '/mock',
-        },
-      },
     ],
     client: {
       overlay: false,
