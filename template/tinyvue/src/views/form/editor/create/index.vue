@@ -17,7 +17,7 @@ import {
 } from '@/api/editor'
 import { useUserStore } from '@/store'
 import { getToken } from '@/utils/auth'
-import { clearCollabRoomData, waitCollabRoomDataSettled } from '../mock'
+import { clearCollabRoomData, waitCollabRoomDataSettled } from '../util'
 import '@opentiny/fluent-editor/style.css'
 
 const IconAdd = iconAdd()

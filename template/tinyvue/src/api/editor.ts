@@ -1,11 +1,7 @@
 import type { CollaborationDocument, RichTextDocument } from '@/mock/editor'
 import axios from 'axios'
 
-// 富文本栏目（开始创作 / 多人协同）文档接口，纯演示数据始终由 tinyvue 的 mock 提供，不依赖 nestJs。
-// 请求不带 /mock 前缀：/api/editor/... 在本地由 dev 代理固定转发到 8848 mock 服务，
-// 静态部署由浏览器内 axios adapter 直接派发到 src/mock/editor.ts 的 handler。
-// 响应为裸业务数据（res.data 即列表 / 文档 / 布尔值）；
-// 请求失败（如 8848 未启动）时列表降级为空、写操作返回 false / null，由调用方提示。
+// 富文本栏目（开始创作 / 多人协同）文档接口，纯演示数据始终由 tinyvue 的 mock 提供。
 
 function editorBaseUrl(): string {
   return `${import.meta.env.VITE_BASE_API}/editor`

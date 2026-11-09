@@ -29,16 +29,7 @@ const IconSave = iconSave()
 const IconEdit = iconEdit()
 
 const gridTable = ref({
-  data: [
-    {
-      name: '黄芊义',
-      number: 'a00101227',
-      department: '1',
-      status: 'running',
-      runningStatus: 'finished',
-      createTime: new Date(),
-    },
-  ],
+  data: [],
 })
 
 const defaultRender = (h, { row, column }) => row[column.property] ?? '--'

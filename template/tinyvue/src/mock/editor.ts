@@ -1,14 +1,8 @@
 import type { MockMethod } from './dispatch'
 import { mockHttpResponse } from './dispatch'
 
-// 富文本栏目（开始创作 / 多人协同）文档数据，原 views/form/editor/mock.ts 中的本地数据迁移至此。
-// 请求不带 /mock 前缀（/api/editor/...）：本地 dev 代理把 /api/editor 固定转发到本服务
-// （见 config/dev-proxy.ts，handler 注册在 /api/editor 下，转发时保留 /api 前缀）；
-// 静态部署由浏览器内 axios adapter 直接派发到本文件的 handler。不依赖 nestJs 实现这些路由。
 // 响应为裸业务数据；未找到文档返回 404，由 api 层（src/api/editor.ts）归一为 false / null。
 // 浏览器内 mock（axios adapter 模式）下数据写入 localStorage 持久化，刷新不丢；
-// 独立 mock 服务（tsx 启动）下数据保存在服务进程内存中，重启后回到种子数据。
-
 export interface RichTextDocument {
   id: number
   name: string

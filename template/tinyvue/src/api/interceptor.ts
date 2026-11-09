@@ -11,6 +11,12 @@ export interface HttpResponse<T = unknown> {
   data: T
 }
 
+interface MockRequestConfig extends AxiosRequestConfig {
+  isMockApi?: boolean
+}
+
+const MOCK_API_PREFIX = '/mock/api'
+
 const { VITE_API_BASE_URL, VITE_BASE_API, VITE_MOCK_IGNORE } = import.meta
   .env || { VITE_BASE_API: '', VITE_MOCK_IGNORE: '' }
 
@@ -20,10 +26,17 @@ if (VITE_API_BASE_URL) {
 
 const ignoreMockApiList = VITE_MOCK_IGNORE?.split(',') || []
 axios.interceptors.request.use(
-  (config: AxiosRequestConfig): any => {
+  (config: MockRequestConfig): any => {
     const isProxy = ignoreMockApiList.includes(config.url)
     if (isProxy) {
       config.url = config.url?.replace(VITE_BASE_API, '/api/v1')
+    }
+
+    // 统一将 /mock/api 前缀改写为 /api 发出，mock 路由由后端或 dev proxy 按 /api 提供；
+    // 同时打上标记，供响应拦截器识别 mock 响应，不再依赖 URL 中的 /mock
+    if (config.url?.includes(MOCK_API_PREFIX)) {
+      config.url = config.url.replace(MOCK_API_PREFIX, '/api')
+      config.isMockApi = true
     }
 
     const token = getToken()
@@ -48,7 +61,8 @@ axios.interceptors.request.use(
 axios.interceptors.response.use(
   (response: AxiosResponse<HttpResponse>) => {
     const res = response
-    if (res.request.responseURL.includes('mock')) {
+    const requestConfig = res.config as MockRequestConfig | undefined
+    if (requestConfig?.isMockApi || res.request.responseURL.includes('mock')) {
       return res.data
     }
     return res

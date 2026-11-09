@@ -5,7 +5,7 @@ import { iconDel, iconEdit } from '@opentiny/vue-icon'
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { deleteCollaborationDocument, getCollaborationDocuments } from '@/api/editor'
-import { clearCollabRoomData } from '../mock'
+import { clearCollabRoomData } from '../util'
 
 const IconEdit = iconEdit()
 const IconDel = iconDel()

@@ -1,6 +1,4 @@
-// 富文本栏目（开始创作 / 多人协同）文档数据已迁移为 mock 请求：
-// 接口定义在 src/api/editor.ts，mock 服务实现在 src/mock/editor.ts。
-// 本文件仅保留协同房间本地缓存（IndexedDB）的清理工具：
+// 同房间本地缓存（IndexedDB）的清理工具：
 // 删除协同文档必须先清掉本地房间数据（否则同 id 重建文档会复活旧内容），
 // 清理完成后再调用 deleteCollaborationDocument 删除服务端记录。
 
