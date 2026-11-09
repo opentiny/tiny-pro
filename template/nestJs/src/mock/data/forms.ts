@@ -1,7 +1,7 @@
 import { mock } from 'mockjs';
 import { successResponseWrap } from '../utils';
 
-const initBase = mock({
+export const initBase = mock({
   position: [
     {
       value: '1',

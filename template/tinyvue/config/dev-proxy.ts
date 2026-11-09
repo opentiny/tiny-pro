@@ -1,6 +1,5 @@
 export interface DevProxyEnv {
   VITE_BASE_API: string
-  VITE_MOCK_SERVER_HOST: string
   VITE_SERVER_HOST: string
   VITE_MOCK_HOST: string
 }
@@ -27,15 +26,6 @@ export function createDevProxyConfig(
         path.replace(
           new RegExp(`^${env.VITE_BASE_API}`),
           useMock ? env.VITE_BASE_API : '',
-        ),
-    },
-    [env.VITE_MOCK_SERVER_HOST]: {
-      target: apiTarget,
-      changeOrigin: true,
-      rewrite: (path: string) =>
-        path.replace(
-          new RegExp(`^${env.VITE_MOCK_SERVER_HOST}`),
-          useMock ? '' : env.VITE_MOCK_SERVER_HOST,
         ),
     },
   }
