@@ -14,7 +14,12 @@ const router = useRouter()
 const documents = ref<RichTextDocument[]>([])
 
 async function loadDocuments() {
-  documents.value = await getEditorDocuments()
+  try {
+    documents.value = await getEditorDocuments()
+  }
+  catch {
+    Modal.message({ message: '文档列表加载失败，请刷新页面重试', status: 'error' })
+  }
 }
 
 onMounted(() => {

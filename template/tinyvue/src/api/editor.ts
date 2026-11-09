@@ -7,15 +7,10 @@ function editorBaseUrl(): string {
   return `${import.meta.env.VITE_BASE_API}/editor`
 }
 
-// 开始创作文档列表
+// 开始创作文档列表（加载失败时抛出，由调用方提示并允许重试）
 export async function getEditorDocuments(): Promise<RichTextDocument[]> {
-  try {
-    const res = await axios.get<RichTextDocument[]>(`${editorBaseUrl()}/documents`)
-    return res.data ?? []
-  }
-  catch {
-    return []
-  }
+  const res = await axios.get<RichTextDocument[]>(`${editorBaseUrl()}/documents`)
+  return res.data ?? []
 }
 
 // 新建开始创作文档
@@ -51,15 +46,10 @@ export async function deleteEditorDocument(id: number): Promise<boolean> {
   }
 }
 
-// 多人协同文档列表
+// 多人协同文档列表（加载失败时抛出，由调用方提示并允许重试）
 export async function getCollaborationDocuments(): Promise<CollaborationDocument[]> {
-  try {
-    const res = await axios.get<CollaborationDocument[]>(`${editorBaseUrl()}/collaboration-documents`)
-    return res.data ?? []
-  }
-  catch {
-    return []
-  }
+  const res = await axios.get<CollaborationDocument[]>(`${editorBaseUrl()}/collaboration-documents`)
+  return res.data ?? []
 }
 
 // 新建多人协同文档

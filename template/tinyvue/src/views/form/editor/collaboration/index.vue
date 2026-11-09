@@ -15,7 +15,12 @@ const router = useRouter()
 const documents = ref<CollaborationDocument[]>([])
 
 async function loadDocuments() {
-  documents.value = await getCollaborationDocuments()
+  try {
+    documents.value = await getCollaborationDocuments()
+  }
+  catch {
+    Modal.message({ message: '协同文档列表加载失败，请刷新页面重试', status: 'error' })
+  }
 }
 
 onMounted(() => {

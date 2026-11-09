@@ -1,8 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
-import { EmployeeQueryBody, EmployeeSearchInfo } from './dto/employee-query.dto';
+import type { EmployeeQueryBody, EmployeeSearchInfo } from './dto/employee-query.dto';
 import { Employee } from './entities/employee.entity';
+
+// 分页上限：前端页大小选项最大 50，这里留有余量，防止一次拉取拖垮数据库
+const MAX_PAGE_SIZE = 100;
 
 // 关键字按空格分词，在所有文本字段中模糊匹配（AND 关系）；
 // 过滤器支持 values 精确匹配（name/employeeNo 模糊）以及 start/end 时间范围
@@ -18,6 +21,9 @@ const TEXT_FIELDS: Array<keyof Employee> = [
   'roles',
   'lastUpdateUser',
   'createTime',
+  'status',
+  'rank',
+  'description',
 ];
 
 const FILTER_FIELDS: Array<keyof Employee> = [
@@ -34,6 +40,12 @@ const FILTER_FIELDS: Array<keyof Employee> = [
   'lastUpdateUser',
 ];
 
+// createTime 不作为枚举筛选字段，但支持 start/end 时间范围筛选
+const RANGE_FIELDS = new Set<string>([
+  ...FILTER_FIELDS,
+  'createTime',
+]);
+
 const FUZZY_FIELDS = new Set<string>(['name', 'employeeNo']);
 
 @Injectable()
@@ -44,14 +56,18 @@ export class EmployeesService {
   ) {}
 
   async queryPage(body: EmployeeQueryBody = {}) {
-    const pageIndex = Math.max(1, Number(body.pageIndex) || 1);
-    const pageSize = Math.max(1, Number(body.pageSize) || 10);
+    const pageIndex = normalizePageValue(body.pageIndex, 1);
+    const pageSize = Math.min(normalizePageValue(body.pageSize, 10), MAX_PAGE_SIZE);
+    const offset = (pageIndex - 1) * pageSize;
+    if (!Number.isSafeInteger(offset)) {
+      return { total: 0, data: [], filters: await this.buildFilterOptions() };
+    }
     const qb = this.applySearch(
       this.employeeRepository.createQueryBuilder('employee'),
       body.searchInfo
     );
     const [data, total] = await qb
-      .skip((pageIndex - 1) * pageSize)
+      .skip(offset)
       .take(pageSize)
       .getManyAndCount();
     return {
@@ -92,7 +108,8 @@ export class EmployeesService {
     qb: SelectQueryBuilder<Employee>,
     searchInfo?: EmployeeSearchInfo
   ) {
-    const tokens = (searchInfo?.keyword ?? '').trim().split(/\s+/).filter(Boolean);
+    const keyword = typeof searchInfo?.keyword === 'string' ? searchInfo.keyword : '';
+    const tokens = keyword.trim().split(/\s+/).filter(Boolean);
     tokens.forEach((token, index) => {
       const param = `keyword${index}`;
       qb.andWhere(
@@ -111,7 +128,7 @@ export class EmployeesService {
     (searchInfo?.filters ?? []).forEach((filter, index) => {
       const field = filter.field;
       // field 先经白名单校验，避免拼接 SQL 时被注入
-      if (!field || !FILTER_FIELDS.includes(field as keyof Employee)) {
+      if (!field || !RANGE_FIELDS.has(field)) {
         return;
       }
       if (filter.start || filter.end) {
@@ -184,4 +201,13 @@ export class EmployeesService {
       createTime: { min: range?.min ?? '', max: range?.max ?? '' },
     };
   }
+}
+
+// 分页参数归一化：非有限数或非整数回退默认值，整数向下取整并钳制下界
+function normalizePageValue(value: unknown, fallback: number): number {
+  const num = Number(value);
+  if (!Number.isFinite(num)) {
+    return fallback;
+  }
+  return Math.max(1, Math.floor(num));
 }

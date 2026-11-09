@@ -15,10 +15,13 @@ interface MockRequestConfig extends AxiosRequestConfig {
   isMockApi?: boolean
 }
 
-const MOCK_API_PREFIX = '/mock/api'
-
-const { VITE_API_BASE_URL, VITE_BASE_API, VITE_MOCK_IGNORE } = import.meta
+const { VITE_API_BASE_URL, VITE_BASE_API, VITE_MOCK_IGNORE, VITE_MOCK_SERVER_HOST } = import.meta
   .env || { VITE_BASE_API: '', VITE_MOCK_IGNORE: '' }
+
+// 演示接口的标记前缀取自 VITE_MOCK_SERVER_HOST（默认 /mock），而非硬编码 /mock：
+// 配置成其他前缀（如 /demo-mock）时这里会同步识别
+const mockServerHost = (VITE_MOCK_SERVER_HOST || '/mock').replace(/\/$/, '')
+const MOCK_API_PREFIX = `${mockServerHost}/api`
 
 if (VITE_API_BASE_URL) {
   axios.defaults.baseURL = VITE_API_BASE_URL
@@ -32,7 +35,8 @@ axios.interceptors.request.use(
       config.url = config.url?.replace(VITE_BASE_API, '/api/v1')
     }
 
-    // 统一将 /mock/api 前缀改写为 /api 发出，mock 路由由后端或 dev proxy 按 /api 提供；
+    // 统一将演示接口前缀（${VITE_MOCK_SERVER_HOST}/api）改写为 /api 发出，
+    // mock 路由由后端或 dev proxy 按 /api 提供；
     // 同时打上标记，供响应拦截器识别 mock 响应，不再依赖 URL 中的 /mock
     if (config.url?.includes(MOCK_API_PREFIX)) {
       config.url = config.url.replace(MOCK_API_PREFIX, '/api')
@@ -62,7 +66,10 @@ axios.interceptors.response.use(
   (response: AxiosResponse<HttpResponse>) => {
     const res = response
     const requestConfig = res.config as MockRequestConfig | undefined
-    if (requestConfig?.isMockApi || res.request.responseURL.includes('mock')) {
+    // editor 接口需要完整的 Axios 响应信封（api/editor.ts 按 res.data 取值），
+    // 即便响应 URL 里带有 mock 字样（如经 mock 服务转发）也不做解包
+    const isEditorRequest = typeof res.config?.url === 'string' && res.config.url.includes('/editor/')
+    if (!isEditorRequest && (requestConfig?.isMockApi || res.request.responseURL.includes('mock'))) {
       return res.data
     }
     return res

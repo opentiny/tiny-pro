@@ -249,7 +249,8 @@ export function createEditorMocks(storage = createDefaultEditorStorage()): MockM
       url: '/api/editor/documents',
       method: 'get',
       response: () => {
-        return state.documents
+        // 返回副本，防止调用方改动/插入影响 mock 存储的数组
+        return [...state.documents]
       },
     },
     // 新建文档：id 由 mock 服务端生成
@@ -303,7 +304,8 @@ export function createEditorMocks(storage = createDefaultEditorStorage()): MockM
       url: '/api/editor/collaboration-documents',
       method: 'get',
       response: () => {
-        return state.collaborationDocuments
+        // 返回副本，防止调用方改动/插入影响 mock 存储的数组
+        return [...state.collaborationDocuments]
       },
     },
     // 新建协同文档：id 由 mock 服务端按持久化计数器分配，避免复用旧 id 串了远端协同房间
