@@ -1,13 +1,30 @@
 <script lang="ts" setup>
+import type { RichTextDocument } from '@/mock/editor'
 import { Modal, Grid as TinyGrid, GridColumn as TinyGridColumn } from '@opentiny/vue'
 import { iconDel, iconEdit } from '@opentiny/vue-icon'
+import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { removeDocument, richTextDocuments } from '../mock'
+import { deleteEditorDocument, getEditorDocuments } from '@/api/editor'
 
 const IconEdit = iconEdit()
 const IconDel = iconDel()
 
 const router = useRouter()
+
+const documents = ref<RichTextDocument[]>([])
+
+async function loadDocuments() {
+  try {
+    documents.value = await getEditorDocuments()
+  }
+  catch {
+    console.warn(`请补充后端接口`)
+  }
+}
+
+onMounted(() => {
+  loadDocuments()
+})
 
 function handleCellClick({ row }: any, event: MouseEvent) {
   // 点击“编辑 / 删除”操作列时不触发行跳转
@@ -25,10 +42,16 @@ function handleDelete(row: any) {
   Modal.confirm({
     title: '删除确认',
     message: `确定要删除文档「${row.name}」吗？删除后不可恢复。`,
-  }).then((res: string) => {
+  }).then(async (res: string) => {
     if (res === 'confirm') {
-      removeDocument(row.id)
-      Modal.message({ message: '删除成功', status: 'success' })
+      const removed = await deleteEditorDocument(row.id)
+      if (removed) {
+        documents.value = documents.value.filter(doc => doc.id !== row.id)
+      }
+      Modal.message({
+        message: removed ? '删除成功' : '删除失败：文档不存在或已被删除',
+        status: removed ? 'success' : 'error',
+      })
     }
   })
 }
@@ -41,7 +64,7 @@ function handleDelete(row: any) {
         文档列表
       </h3>
     </div>
-    <TinyGrid :data="richTextDocuments" :show-header="false" :border="false" size="medium" @cell-click="handleCellClick">
+    <TinyGrid :data="documents" :show-header="false" :border="false" size="medium" @cell-click="handleCellClick">
       <TinyGridColumn field="name" title="文档标题" />
       <TinyGridColumn field="time" title="最后更新时间" width="220" />
       <TinyGridColumn title="操作" width="120" align="center">
