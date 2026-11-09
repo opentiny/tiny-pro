@@ -353,7 +353,7 @@ watch(appStore.$state, (newValue) => {
               </template>
             </TabItem>
           </Tabs>
-          <PageLayout class="!h-[calc(100%-100px)]" />
+          <PageLayout class="!h-[calc(100%-100px)]" style="padding: 0 24px;" />
           <Footer v-if="layoutMode[myPattern].footer" class="h-[60px]" />
         </div>
       </div>
