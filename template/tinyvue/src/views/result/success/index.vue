@@ -88,7 +88,6 @@ function handleFormReset() {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  width: 98%;
   height: inherit;
   margin: 0 auto;
   overflow: hidden;
