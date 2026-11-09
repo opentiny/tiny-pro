@@ -37,5 +37,17 @@ export default {
         roles: [RoleType.admin, RoleType.user],
       },
     },
+    {
+      path: 'advanced-list',
+      name: 'AdvancedList',
+      id: 'AdvancedList',
+      label: 'AdvancedList',
+      component: () => import('@/views/list/advanced-list/index.vue'),
+      meta: {
+        locale: 'menu.list.advancedList',
+        requiresAuth: true,
+        roles: [RoleType.admin, RoleType.user],
+      },
+    },
   ],
 }
