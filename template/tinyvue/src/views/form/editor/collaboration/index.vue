@@ -19,7 +19,7 @@ async function loadDocuments() {
     documents.value = await getCollaborationDocuments()
   }
   catch {
-    Modal.message({ message: '协同文档列表加载失败，请刷新页面重试', status: 'error' })
+    console.warn(`请补充后端接口`)
   }
 }
 

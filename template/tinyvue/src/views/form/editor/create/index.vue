@@ -135,7 +135,7 @@ async function ensureDocuments() {
     // 加载失败不缓存结果，下次切换/重试可重新请求
     documents.value = []
     loadedListMode = null
-    Modal.message({ message: '文档列表加载失败，请稍后重试', status: 'error' })
+    console.warn(`请补充后端接口`)
   }
 }
 // 新建模式下首次自动保存创建的文档 id（刻意不改 URL，避免 fullPath 变化导致整页重挂载）
