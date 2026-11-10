@@ -84,6 +84,15 @@
         "component": "form/step/index",
         "path": "step",
         "locale": "menu.form.step"
+      },
+      {
+        "name": "Editor",
+        "order": 3,
+        "menuType": "normal",
+        "icon": "",
+        "component": "form/editor/index",
+        "path": "editor",
+        "locale": "menu.form.editor"
       }
     ]
   },
@@ -191,35 +200,6 @@
         "component": "user/info/index",
         "path": "info",
         "locale": "menu.user.info"
-      }
-    ]
-  },
-  {
-    "name": "Cloud",
-    "order": 8,
-    "menuType": "normal",
-    "icon": "IconDownloadCloud",
-    "component": "cloud/index",
-    "path": "cloud",
-    "locale": "menu.cloud",
-    "children": [
-      {
-        "name": "Hello",
-        "order": 1,
-        "menuType": "normal",
-        "icon": "",
-        "component": "cloud/hello/index",
-        "path": "hello",
-        "locale": "menu.cloud.hello"
-      },
-      {
-        "name": "Contracts",
-        "order": 2,
-        "menuType": "normal",
-        "icon": "",
-        "component": "cloud/contracts/index",
-        "path": "contracts",
-        "locale": "menu.cloud.contracts"
       }
     ]
   },
