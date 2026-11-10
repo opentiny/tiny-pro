@@ -23,7 +23,7 @@ public class MockListController {
             "1", List.of("已上线", "Online"),
             "2", List.of("进行中", "Ongoing")
     );
-    private static final List<Map<String, Object>> taskList = generateMockTaskList(60);
+    private final List<Map<String, Object>> taskList = generateMockTaskList(60);
     private static List<Map<String, Object>> generateMockTaskList(int count) {
         List<Map<String, Object>> mockList = new ArrayList<>();
         String[] names = {"xiaoming", "xiaohong", "xiaoli", "xiaowang", "xiaozhang", "xiaochen"};
