@@ -47,6 +47,12 @@ public class EmployeesController {
     }
 
     @IsPublic
+    @RequestMapping(value = "/updateEmployeeInfo", method = {RequestMethod.GET, RequestMethod.POST})
+    public boolean updateEmployeeInfo(@RequestBody(required = false) Map<String, Object> params) {
+        return mockListController.updateEmployeeInfo(params);
+    }
+
+    @IsPublic
     @DeleteMapping("/delete")
     public ApiResponse<Boolean> deleteEmployee(@RequestParam(value = "id", required = false) String id) {
         return mockListController.deleteEmployee(id);
