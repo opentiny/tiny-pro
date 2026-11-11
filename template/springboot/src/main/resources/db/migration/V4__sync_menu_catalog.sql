@@ -77,8 +77,12 @@ WHERE @form_menu_id IS NOT NULL
       FROM `menu`
       WHERE `parentId` = @form_menu_id
         AND `name` = 'Editor'
-        AND `path` = 'editor'
+        AND `order` = 3
+        AND `menuType` = 'normal'
+        AND `icon` = ''
         AND `component` = 'form/editor/index'
+        AND `path` = 'editor'
+        AND `locale` = 'menu.form.editor'
   );
 
 SET @editor_menu_id = (
@@ -87,55 +91,97 @@ SET @editor_menu_id = (
     WHERE @form_menu_id IS NOT NULL
       AND `parentId` = @form_menu_id
       AND `name` = 'Editor'
-      AND `path` = 'editor'
+      AND `order` = 3
+      AND `menuType` = 'normal'
+      AND `icon` = ''
       AND `component` = 'form/editor/index'
+      AND `path` = 'editor'
+      AND `locale` = 'menu.form.editor'
     ORDER BY `id`
     LIMIT 1
 );
 
--- Preserve role permissions before removing duplicate Editor records.
-INSERT INTO `role_menu` (`role_id`, `menu_id`)
-SELECT DISTINCT old_rm.`role_id`, @editor_menu_id
-FROM `role_menu` old_rm
-JOIN `menu` old_editor ON old_editor.`id` = old_rm.`menu_id`
-WHERE @editor_menu_id IS NOT NULL
-  AND old_editor.`parentId` = @form_menu_id
-  AND old_editor.`id` <> @editor_menu_id
-  AND old_editor.`name` = 'Editor'
-  AND old_editor.`path` = 'editor'
-  AND NOT EXISTS (
-      SELECT 1
-      FROM `role_menu` existing_rm
-      WHERE existing_rm.`role_id` = old_rm.`role_id`
-        AND existing_rm.`menu_id` = @editor_menu_id
-  );
+-- Build an old-node -> retained-node map before changing parentId. This is
+-- required because parentId participates in uk_menu_identity: two otherwise
+-- identical children can coexist before the merge but collide after reparenting.
+CREATE TEMPORARY TABLE `tmp_editor_roots` (
+    `old_id` INT NOT NULL PRIMARY KEY
+);
 
--- Reparent children before removing duplicate Editor records.
-UPDATE `menu` child
-JOIN `menu` old_editor ON old_editor.`id` = child.`parentId`
-SET child.`parentId` = @editor_menu_id
-WHERE @editor_menu_id IS NOT NULL
-  AND old_editor.`parentId` = @form_menu_id
-  AND old_editor.`id` <> @editor_menu_id
-  AND old_editor.`name` = 'Editor'
-  AND old_editor.`path` = 'editor';
-
--- Remove only duplicate Editor records under Form, preserving unrelated menus.
-DELETE rm
-FROM `role_menu` rm
-JOIN `menu` m ON m.`id` = rm.`menu_id`
-WHERE @form_menu_id IS NOT NULL
-  AND m.`parentId` = @form_menu_id
-  AND m.`id` <> @editor_menu_id
-  AND m.`name` = 'Editor'
-  AND m.`path` = 'editor';
-
-DELETE FROM `menu`
+INSERT INTO `tmp_editor_roots` (`old_id`)
+SELECT `id`
+FROM `menu`
 WHERE @form_menu_id IS NOT NULL
   AND `parentId` = @form_menu_id
   AND `id` <> @editor_menu_id
   AND `name` = 'Editor'
   AND `path` = 'editor';
+
+CREATE TEMPORARY TABLE `tmp_editor_menu_map` (
+    `old_id` INT NOT NULL PRIMARY KEY,
+    `target_id` INT NOT NULL,
+    `target_parent_id` INT NULL
+);
+
+INSERT INTO `tmp_editor_menu_map` (`old_id`, `target_id`, `target_parent_id`)
+WITH RECURSIVE `menu_map` AS (
+    SELECT r.`old_id`, @editor_menu_id AS `target_id`, @form_menu_id AS `target_parent_id`
+    FROM `tmp_editor_roots` r
+    UNION ALL
+    SELECT child.`id`,
+           COALESCE(canonical.`id`, child.`id`) AS `target_id`,
+           parent_map.`target_id` AS `target_parent_id`
+    FROM `menu_map` parent_map
+    JOIN `menu` child ON child.`parentId` = parent_map.`old_id`
+    LEFT JOIN `menu` canonical
+      ON canonical.`parentId` = parent_map.`target_id`
+     AND canonical.`name` = child.`name`
+     AND canonical.`order` <=> child.`order`
+     AND canonical.`menuType` <=> child.`menuType`
+     AND canonical.`icon` <=> child.`icon`
+     AND canonical.`component` <=> child.`component`
+     AND canonical.`path` <=> child.`path`
+     AND canonical.`locale` <=> child.`locale`
+)
+SELECT `old_id`, `target_id`, `target_parent_id`
+FROM `menu_map`;
+
+-- Transfer every role assignment from a duplicate node to its retained node.
+INSERT INTO `role_menu` (`role_id`, `menu_id`)
+SELECT DISTINCT rm.`role_id`, map.`target_id`
+FROM `role_menu` rm
+JOIN `tmp_editor_menu_map` map ON map.`old_id` = rm.`menu_id`
+WHERE map.`old_id` <> map.`target_id`
+  AND NOT EXISTS (
+      SELECT 1
+      FROM `role_menu` existing_rm
+      WHERE existing_rm.`role_id` = rm.`role_id`
+        AND existing_rm.`menu_id` = map.`target_id`
+  );
+
+-- Reparent only nodes that do not have a canonical duplicate. Conflicting
+-- nodes are deleted below after their assignments and descendants are merged.
+UPDATE `menu` m
+JOIN `tmp_editor_menu_map` map ON map.`old_id` = m.`id`
+SET m.`parentId` = map.`target_parent_id`
+WHERE map.`old_id` = map.`target_id`
+  AND map.`target_parent_id` IS NOT NULL
+  AND NOT (m.`parentId` <=> map.`target_parent_id`);
+
+-- Remove role links and menu rows for nodes that were merged into a retained
+-- canonical node. Non-conflicting descendants have already been reparented.
+DELETE rm
+FROM `role_menu` rm
+JOIN `tmp_editor_menu_map` map ON map.`old_id` = rm.`menu_id`
+WHERE map.`old_id` <> map.`target_id`;
+
+DELETE m
+FROM `menu` m
+JOIN `tmp_editor_menu_map` map ON map.`old_id` = m.`id`
+WHERE map.`old_id` <> map.`target_id`;
+
+DROP TEMPORARY TABLE `tmp_editor_menu_map`;
+DROP TEMPORARY TABLE `tmp_editor_roots`;
 
 -- Existing roles do not receive newly inserted menus automatically.
 INSERT INTO `role_menu` (`role_id`, `menu_id`)
