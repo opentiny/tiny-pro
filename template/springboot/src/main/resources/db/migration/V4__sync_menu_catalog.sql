@@ -28,13 +28,13 @@ SET @editor_menu_id = (
     FROM `menu`
     WHERE @form_menu_id IS NOT NULL
       AND `parentId` = @form_menu_id
-      AND `name` = 'Editor'
+      AND BINARY `name` = 'Editor'
       AND `order` = 3
-      AND `menuType` = 'normal'
-      AND `icon` = ''
-      AND `component` = 'form/editor/index'
-      AND `path` = 'editor'
-      AND `locale` = 'menu.form.editor'
+      AND BINARY `menuType` = 'normal'
+      AND BINARY `icon` = ''
+      AND BINARY `component` = 'form/editor/index'
+      AND BINARY `path` = 'editor'
+      AND BINARY `locale` = 'menu.form.editor'
     ORDER BY `id`
     LIMIT 1
 );
@@ -45,8 +45,8 @@ SET @legacy_editor_id = (
     WHERE @form_menu_id IS NOT NULL
       AND `parentId` = @form_menu_id
       AND (
-          `component` = 'orm/editor/index'
-          OR (`name` = 'Editor' AND `path` = 'editor')
+          BINARY `component` = 'orm/editor/index'
+          OR (BINARY `name` = 'Editor' AND BINARY `path` = 'editor')
       )
     ORDER BY `id`
     LIMIT 1
@@ -76,13 +76,13 @@ WHERE @form_menu_id IS NOT NULL
       SELECT 1
       FROM `menu`
       WHERE `parentId` = @form_menu_id
-        AND `name` = 'Editor'
+        AND BINARY `name` = 'Editor'
         AND `order` = 3
-        AND `menuType` = 'normal'
-        AND `icon` = ''
-        AND `component` = 'form/editor/index'
-        AND `path` = 'editor'
-        AND `locale` = 'menu.form.editor'
+        AND BINARY `menuType` = 'normal'
+        AND BINARY `icon` = ''
+        AND BINARY `component` = 'form/editor/index'
+        AND BINARY `path` = 'editor'
+        AND BINARY `locale` = 'menu.form.editor'
   );
 
 SET @editor_menu_id = (
@@ -90,13 +90,13 @@ SET @editor_menu_id = (
     FROM `menu`
     WHERE @form_menu_id IS NOT NULL
       AND `parentId` = @form_menu_id
-      AND `name` = 'Editor'
+      AND BINARY `name` = 'Editor'
       AND `order` = 3
-      AND `menuType` = 'normal'
-      AND `icon` = ''
-      AND `component` = 'form/editor/index'
-      AND `path` = 'editor'
-      AND `locale` = 'menu.form.editor'
+      AND BINARY `menuType` = 'normal'
+      AND BINARY `icon` = ''
+      AND BINARY `component` = 'form/editor/index'
+      AND BINARY `path` = 'editor'
+      AND BINARY `locale` = 'menu.form.editor'
     ORDER BY `id`
     LIMIT 1
 );
@@ -114,8 +114,10 @@ FROM `menu`
 WHERE @form_menu_id IS NOT NULL
   AND `parentId` = @form_menu_id
   AND `id` <> @editor_menu_id
-  AND `name` = 'Editor'
-  AND `path` = 'editor';
+  AND (
+      (BINARY `name` = 'Editor' AND BINARY `path` = 'editor')
+      OR BINARY `component` = 'orm/editor/index'
+  );
 
 -- Merge direct children before recursive reparenting. If the retained Editor
 -- has no child, identical children from multiple legacy Editors must first be
@@ -133,30 +135,33 @@ SELECT child.`id`,
                SELECT MIN(canonical.`id`)
                FROM `menu` canonical
                WHERE canonical.`parentId` = @editor_menu_id
-                 AND canonical.`name` = child.`name`
+                 AND BINARY canonical.`name` <=> BINARY child.`name`
                  AND canonical.`order` <=> child.`order`
-                 AND canonical.`menuType` <=> child.`menuType`
-                 AND canonical.`icon` <=> child.`icon`
-                 AND canonical.`component` <=> child.`component`
-                 AND canonical.`path` <=> child.`path`
-                 AND canonical.`locale` <=> child.`locale`
+                 AND BINARY canonical.`menuType` <=> BINARY child.`menuType`
+                 AND BINARY canonical.`icon` <=> BINARY child.`icon`
+                 AND BINARY canonical.`component` <=> BINARY child.`component`
+                 AND BINARY canonical.`path` <=> BINARY child.`path`
+                 AND BINARY canonical.`locale` <=> BINARY child.`locale`
            ),
            (
                SELECT MIN(candidate.`id`)
                FROM `menu` candidate
                JOIN `menu` candidate_root
                  ON candidate_root.`id` = candidate.`parentId`
-               WHERE candidate.`name` = child.`name`
+               WHERE BINARY candidate.`name` <=> BINARY child.`name`
                  AND candidate.`order` <=> child.`order`
-                 AND candidate.`menuType` <=> child.`menuType`
-                 AND candidate.`icon` <=> child.`icon`
-                 AND candidate.`component` <=> child.`component`
-                 AND candidate.`path` <=> child.`path`
-                 AND candidate.`locale` <=> child.`locale`
+                 AND BINARY candidate.`menuType` <=> BINARY child.`menuType`
+                 AND BINARY candidate.`icon` <=> BINARY child.`icon`
+                 AND BINARY candidate.`component` <=> BINARY child.`component`
+                 AND BINARY candidate.`path` <=> BINARY child.`path`
+                 AND BINARY candidate.`locale` <=> BINARY child.`locale`
                  AND candidate_root.`parentId` = @form_menu_id
                  AND candidate_root.`id` <> @editor_menu_id
-                 AND candidate_root.`name` = 'Editor'
-                 AND candidate_root.`path` = 'editor'
+                 AND (
+                     (BINARY candidate_root.`name` = 'Editor'
+                      AND BINARY candidate_root.`path` = 'editor')
+                     OR BINARY candidate_root.`component` = 'orm/editor/index'
+                 )
            )
        ) AS `target_id`
 FROM `menu` child
@@ -189,13 +194,13 @@ WITH RECURSIVE `menu_map` AS (
     JOIN `menu` child ON child.`parentId` = parent_map.`old_id`
     LEFT JOIN `menu` canonical
       ON canonical.`parentId` = parent_map.`target_id`
-     AND canonical.`name` = child.`name`
+     AND BINARY canonical.`name` <=> BINARY child.`name`
      AND canonical.`order` <=> child.`order`
-     AND canonical.`menuType` <=> child.`menuType`
-     AND canonical.`icon` <=> child.`icon`
-     AND canonical.`component` <=> child.`component`
-     AND canonical.`path` <=> child.`path`
-     AND canonical.`locale` <=> child.`locale`
+     AND BINARY canonical.`menuType` <=> BINARY child.`menuType`
+     AND BINARY canonical.`icon` <=> BINARY child.`icon`
+     AND BINARY canonical.`component` <=> BINARY child.`component`
+     AND BINARY canonical.`path` <=> BINARY child.`path`
+     AND BINARY canonical.`locale` <=> BINARY child.`locale`
 )
 SELECT `old_id`, `target_id`, `target_parent_id`
 FROM `menu_map`;
