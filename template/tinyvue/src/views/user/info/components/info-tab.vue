@@ -24,10 +24,12 @@ const state = reactive<{
   loading: any
   chartData: any
   tableData: any
+  taskSummary: { status: string, value: number }[]
 }>({
   loading: null,
   chartData: [] as any,
   tableData: [] as any,
+  taskSummary: [],
 })
 
 // 变量设置
@@ -54,6 +56,7 @@ async function fetchData() {
     const { data } = await getUserData(userStore.$state as any)
     state.chartData = data.chartData
     state.tableData = data.tableData
+    state.taskSummary = data.taskSummary ?? []
   }
   finally {
     state.loading.close()
@@ -108,7 +111,7 @@ watch(activeName, () => {
   <div id="contain">
     <TinyTabs v-model="activeName">
       <TinyTabItem :title="$t('userInfo.tab.one')" name="1">
-        <InfoCard />
+        <InfoCard :tasks="state.taskSummary" />
         <div v-if="md" class="contentFilter">
           <transition-slide-group>
             <div class="left" @click="changeSort">
@@ -137,7 +140,7 @@ watch(activeName, () => {
         <InfoTable :table-data="state.tableData" />
       </TinyTabItem>
       <TinyTabItem :title="$t('userInfo.tab.two')" name="2">
-        <InfoTasksTip />
+        <InfoTasksTip :tasks="state.taskSummary" />
         <div class="chartLength">
           <InfoChart :chart-data="state.chartData" />
         </div>

@@ -1,35 +1,27 @@
 <script lang="ts" setup>
+import { computed } from 'vue'
 import info1 from '@/assets/images/info1.png'
 import info2 from '@/assets/images/info2.png'
 import info3 from '@/assets/images/info3.png'
 import info4 from '@/assets/images/info4.png'
 
-const InfoNum = [
-  {
-    value: 1,
-    class: 'plan-pass',
-    text: 'userInfo.status.optionA',
-    img: info1,
-  },
-  {
-    value: 1,
-    class: 'plan-overdue',
-    text: 'userInfo.status.optionB',
-    img: info2,
-  },
-  {
-    value: 4,
-    class: 'plan-limit',
-    text: 'userInfo.status.optionC',
-    img: info3,
-  },
-  {
-    value: 4,
-    class: 'plan-fail',
-    text: 'userInfo.status.optionD',
-    img: info4,
-  },
-]
+const props = defineProps<{ tasks: { status: string, value: number }[] }>()
+
+const statusMeta: Record<string, { class: string, text: string, img: string }> = {
+  A: { class: 'plan-pass', text: 'userInfo.status.optionA', img: info1 },
+  B: { class: 'plan-overdue', text: 'userInfo.status.optionB', img: info2 },
+  C: { class: 'plan-limit', text: 'userInfo.status.optionC', img: info3 },
+  D: { class: 'plan-fail', text: 'userInfo.status.optionD', img: info4 },
+}
+
+const InfoNum = computed(() =>
+  ['A', 'B', 'C', 'D'].map(status => ({
+    value: props.tasks.find(item => item.status === status)?.value ?? 0,
+    class: statusMeta[status].class,
+    text: statusMeta[status].text,
+    img: statusMeta[status].img,
+  })),
+)
 </script>
 
 <template>

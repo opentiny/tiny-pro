@@ -11,12 +11,21 @@ const { currentLocale } = useLocale()
 const ringRef = ref()
 const legendLeft = ref('60%')
 
-const resolvedData = computed(() => [
-  { value: 300, name: '5G' },
-  { value: 1048, name: '4G' },
-  { value: 735, name: t('home.round.unknow') },
-  { value: 580, name: '3G' },
-])
+// 环图与站点数据来自 nestJS mock（GET /api/board/home 的 round）
+const props = defineProps<{
+  round?: {
+    ring: { value: number, name: string }[]
+    stations: { key: string, percentage: number, color: string }[]
+  }
+}>()
+
+const resolvedData = computed(() =>
+  (props.round?.ring ?? []).map(item => ({
+    ...item,
+    // name 为 home.* 时按国际化 key 处理（如 home.round.unknow）
+    name: item.name.startsWith('home.') ? t(item.name) : item.name,
+  })),
+)
 
 const totalValue = computed(() =>
   resolvedData.value.reduce((sum, item) => sum + item.value, 0),
@@ -26,12 +35,7 @@ const options = computed(() => ({
   data: resolvedData.value.map(item => ({ value: item.value, name: item.name })),
 }))
 
-const stations = [
-  { labelKey: 'home.round.station1', percentage: 70, color: '#5cb87a' },
-  { labelKey: 'home.round.station2', percentage: 45, color: '#1989fa' },
-  { labelKey: 'home.round.station3', percentage: 85, color: '#e6a23c' },
-  { labelKey: 'home.round.station4', percentage: 60, color: '#f56c6c' },
-]
+const stations = computed(() => props.round?.stations ?? [])
 
 const chartExtend = computed(() => {
   const total = totalValue.value
@@ -221,8 +225,8 @@ watch(currentLocale, () => {
         </div>
 
         <div class="stations">
-          <div v-for="station in stations" :key="station.labelKey" class="station-item">
-            <span class="station-name">{{ $t(station.labelKey) }}</span>
+          <div v-for="station in stations" :key="station.key" class="station-item">
+            <span class="station-name">{{ $t(station.key) }}</span>
             <TinyProgress
               class="station-progress"
               :percentage="station.percentage"

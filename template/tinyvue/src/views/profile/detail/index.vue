@@ -167,33 +167,34 @@ onMounted(() => {
 
     <div class="detail-wrapper">
       <!-- 模块一：项目进度 -->
-      <div v-if="project" class="detail-card">
+      <div class="detail-card">
         <div class="card-header">
           <span class="card-title">{{ $t('profileDetail.card.progress') }}</span>
-          <TinyTag :type="{ 0: '', 1: 'success', 2: 'primary', 3: 'warning' }[project.projectStatus]">
-            {{ $t(projectStatusOptions.find(item => item.value === project.projectStatus)?.label ?? '') }}
+          <TinyTag v-if="project" :type="{ 0: '', 1: 'success', 2: 'primary', 3: 'warning' }[project.projectStatus]">
+            {{ $t(projectStatusOptions.find(item => item.value === project?.projectStatus)?.label ?? '') }}
           </TinyTag>
+          <span v-else>-</span>
         </div>
         <div class="card-desc">
-          {{ project.projectName }}（{{ project.projectCode }}）
+          {{ project ? `${project.projectName}（${project.projectCode}）` : '-' }}
         </div>
         <TinySteps line :data="stepsData" :active="activeStep" :visible-num="6" class="project-steps" />
       </div>
 
       <!-- 模块二：基本信息 -->
-      <div v-if="project" class="detail-card">
+      <div class="detail-card">
         <div class="card-header">
           <span class="card-title">{{ $t('profileDetail.card.basicInfo') }}</span>
         </div>
         <TinyForm class="detail-form" display-only label-position="top">
           <TinyFormItem :label="$t('profileDetail.form.projectName')">
-            <TinyInput v-model="project.projectName" />
+            <TinyInput :model-value="project?.projectName ?? '-'" />
           </TinyFormItem>
           <TinyFormItem :label="$t('profileDetail.form.projectCode')">
-            <TinyInput v-model="project.projectCode" />
+            <TinyInput :model-value="project?.projectCode ?? '-'" />
           </TinyFormItem>
           <TinyFormItem :label="$t('profileDetail.form.projectStatus')">
-            <TinySelect v-model="project.projectStatus">
+            <TinySelect :model-value="project ? project.projectStatus : '-'">
               <TinyOption
                 v-for="option in projectStatusOptions" :key="option.value" :value="option.value"
                 :label="$t(option.label)"
@@ -201,7 +202,7 @@ onMounted(() => {
             </TinySelect>
           </TinyFormItem>
           <TinyFormItem :label="$t('profileDetail.form.priority')">
-            <TinySelect v-model="project.priority">
+            <TinySelect :model-value="project ? project.priority : '-'">
               <TinyOption
                 v-for="option in priorityOptions" :key="option.value" :value="option.value"
                 :label="$t(option.label)"
@@ -209,25 +210,25 @@ onMounted(() => {
             </TinySelect>
           </TinyFormItem>
           <TinyFormItem :label="$t('profileDetail.form.owner')">
-            <TinyInput v-model="project.owner" />
+            <TinyInput :model-value="project?.owner ?? '-'" />
           </TinyFormItem>
           <TinyFormItem :label="$t('profileDetail.form.department')">
-            <TinyInput v-model="project.department" />
+            <TinyInput :model-value="project?.department ?? '-'" />
           </TinyFormItem>
         </TinyForm>
       </div>
 
       <!-- 模块三：周期与资源 -->
-      <div v-if="project" class="detail-card">
+      <div class="detail-card">
         <div class="card-header">
           <span class="card-title">{{ $t('profileDetail.card.schedule') }}</span>
         </div>
         <TinyForm class="detail-form" display-only label-position="top">
           <TinyFormItem :label="$t('profileDetail.form.startTime')">
-            <TinyDatePicker v-model="project.startTime" type="date" value-format="yyyy-MM-dd" />
+            <TinyDatePicker :model-value="project?.startTime ?? '-'" type="date" value-format="yyyy-MM-dd" />
           </TinyFormItem>
           <TinyFormItem :label="$t('profileDetail.form.endTime')">
-            <TinyDatePicker v-model="project.endTime" type="date" value-format="yyyy-MM-dd" />
+            <TinyDatePicker :model-value="project?.endTime ?? '-'" type="date" value-format="yyyy-MM-dd" />
           </TinyFormItem>
           <TinyFormItem :label="$t('profileDetail.form.progress')">
             <TinyNumeric :model-value="progress" unit="%" />
@@ -245,7 +246,7 @@ onMounted(() => {
       </div>
 
       <!-- 模块四：目标与风险 -->
-      <div v-if="project" class="detail-card">
+      <div class="detail-card">
         <div class="card-header">
           <span class="card-title">{{ $t('profileDetail.card.goalRisk') }}</span>
         </div>

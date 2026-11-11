@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { TinyHuichartsLine as TinyChartLine } from '@opentiny/vue-huicharts'
-import { onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import useLocale from '@/hooks/locale'
 import { debounce } from '@/hooks/responsive'
@@ -49,28 +49,31 @@ function getAreaStyle(startColor: string) {
 }
 
 const timeData = Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2, '0')}:00`)
-const pvData = [18, 20, 22, 25, 24, 22, 19, 17, 18, 20, 23, 26, 28, 27, 24, 21, 19, 18, 20, 22, 24, 23, 21, 19]
-const playData = [25, 24, 26, 28, 30, 29, 27, 25, 24, 26, 28, 30, 31, 30, 28, 26, 25, 24, 25, 27, 29, 28, 26, 25]
-const pageData = [30, 32, 31, 29, 27, 26, 28, 30, 32, 33, 31, 29, 27, 26, 28, 30, 32, 33, 32, 30, 28, 27, 29, 31]
+
+// 曲线数据来自 nestJS mock（GET /api/board/home 的 curve）
+const props = defineProps<{ curve?: { pv: number[], play: number[], page: number[] } }>()
 
 function buildRows() {
-  return pvData.map((_, index) => ({
+  const { pv = [], play = [], page = [] } = props.curve ?? {}
+  return pv.map((_, index) => ({
     time: timeData[index],
-    [t('home.main.down')]: pvData[index],
-    [t('home.curve.play')]: playData[index],
-    [t('home.curve.page')]: pageData[index],
+    [t('home.main.down')]: pv[index],
+    [t('home.curve.play')]: play[index],
+    [t('home.curve.page')]: page[index],
   }))
 }
 
 const chartRef = ref()
-const options = ref({
+// options 用 computed 整体重建：props 数据或语言变化时图表自动更新
+// （huicharts 对初始化后的嵌套 mutation 不敏感，必须整体替换 options）
+const options = computed(() => ({
   data: buildRows(),
   xAxis: [
     {
       keyName: 'time',
     },
   ],
-})
+}))
 const chartExtend = ref({
   grid: {
     left: '8%',
@@ -145,8 +148,8 @@ onMounted(() => {
 
 watch(currentLocale, () => {
   chartExtend.value.legend = getLegendConfig()
-  options.value.data = buildRows()
   chartRef.value?.resize()
+  chartRef.value?.integrateChart?.echartsIns?.setOption({ legend: chartExtend.value.legend })
 })
 </script>
 
