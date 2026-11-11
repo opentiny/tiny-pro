@@ -117,6 +117,56 @@ WHERE @form_menu_id IS NOT NULL
   AND `name` = 'Editor'
   AND `path` = 'editor';
 
+-- Merge direct children before recursive reparenting. If the retained Editor
+-- has no child, identical children from multiple legacy Editors must first be
+-- reduced to one representative; otherwise changing both parentId values to
+-- the retained Editor creates the same uk_menu_identity.
+CREATE TEMPORARY TABLE `tmp_editor_direct_children` (
+    `old_id` INT NOT NULL PRIMARY KEY,
+    `target_id` INT NOT NULL
+);
+
+INSERT INTO `tmp_editor_direct_children` (`old_id`, `target_id`)
+SELECT child.`id`,
+       COALESCE(
+           (
+               SELECT MIN(canonical.`id`)
+               FROM `menu` canonical
+               WHERE canonical.`parentId` = @editor_menu_id
+                 AND canonical.`name` = child.`name`
+                 AND canonical.`order` <=> child.`order`
+                 AND canonical.`menuType` <=> child.`menuType`
+                 AND canonical.`icon` <=> child.`icon`
+                 AND canonical.`component` <=> child.`component`
+                 AND canonical.`path` <=> child.`path`
+                 AND canonical.`locale` <=> child.`locale`
+           ),
+           (
+               SELECT MIN(candidate.`id`)
+               FROM `menu` candidate
+               JOIN `tmp_editor_roots` candidate_root
+                 ON candidate_root.`old_id` = candidate.`parentId`
+               WHERE candidate.`name` = child.`name`
+                 AND candidate.`order` <=> child.`order`
+                 AND candidate.`menuType` <=> child.`menuType`
+                 AND candidate.`icon` <=> child.`icon`
+                 AND candidate.`component` <=> child.`component`
+                 AND candidate.`path` <=> child.`path`
+                 AND candidate.`locale` <=> child.`locale`
+           )
+       ) AS `target_id`
+FROM `menu` child
+JOIN `tmp_editor_roots` root ON root.`old_id` = child.`parentId`;
+
+UPDATE `menu` child
+JOIN `tmp_editor_direct_children` child_map
+  ON child_map.`old_id` = child.`id`
+SET child.`parentId` = @editor_menu_id
+WHERE child_map.`old_id` = child_map.`target_id`
+  AND NOT (child.`parentId` <=> @editor_menu_id);
+
+DROP TEMPORARY TABLE `tmp_editor_direct_children`;
+
 CREATE TEMPORARY TABLE `tmp_editor_menu_map` (
     `old_id` INT NOT NULL PRIMARY KEY,
     `target_id` INT NOT NULL,
