@@ -93,6 +93,33 @@ SET @editor_menu_id = (
     LIMIT 1
 );
 
+-- Preserve role permissions before removing duplicate Editor records.
+INSERT INTO `role_menu` (`role_id`, `menu_id`)
+SELECT DISTINCT old_rm.`role_id`, @editor_menu_id
+FROM `role_menu` old_rm
+JOIN `menu` old_editor ON old_editor.`id` = old_rm.`menu_id`
+WHERE @editor_menu_id IS NOT NULL
+  AND old_editor.`parentId` = @form_menu_id
+  AND old_editor.`id` <> @editor_menu_id
+  AND old_editor.`name` = 'Editor'
+  AND old_editor.`path` = 'editor'
+  AND NOT EXISTS (
+      SELECT 1
+      FROM `role_menu` existing_rm
+      WHERE existing_rm.`role_id` = old_rm.`role_id`
+        AND existing_rm.`menu_id` = @editor_menu_id
+  );
+
+-- Reparent children before removing duplicate Editor records.
+UPDATE `menu` child
+JOIN `menu` old_editor ON old_editor.`id` = child.`parentId`
+SET child.`parentId` = @editor_menu_id
+WHERE @editor_menu_id IS NOT NULL
+  AND old_editor.`parentId` = @form_menu_id
+  AND old_editor.`id` <> @editor_menu_id
+  AND old_editor.`name` = 'Editor'
+  AND old_editor.`path` = 'editor';
+
 -- Remove only duplicate Editor records under Form, preserving unrelated menus.
 DELETE rm
 FROM `role_menu` rm
