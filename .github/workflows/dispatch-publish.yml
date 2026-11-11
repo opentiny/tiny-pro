@@ -73,10 +73,14 @@ jobs:
           echo "value=$VERSION" >> $GITHUB_OUTPUT
       - name: Bump version
         run: |
-          # pnpm 自带 npm 版本管理
-          pnpm version ${{ steps.ver.outputs.value }} --no-git-tag-version
-          # 显示确认
-          cat package.json | jq .version
+          CURRENT="$(node -p "require('./package.json').version")"
+          TARGET="${{ steps.ver.outputs.value }}"
+          if [ "$CURRENT" = "$TARGET" ]; then
+            echo "Version already ${CURRENT}, skip bump"
+          else
+            pnpm version "$TARGET" --no-git-tag-version
+          fi
+          jq -r .version package.json
       - name: Build
         run: pnpm build
       - name: Clean node_modules
