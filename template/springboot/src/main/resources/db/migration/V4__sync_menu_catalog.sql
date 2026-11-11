@@ -144,8 +144,8 @@ SELECT child.`id`,
            (
                SELECT MIN(candidate.`id`)
                FROM `menu` candidate
-               JOIN `tmp_editor_roots` candidate_root
-                 ON candidate_root.`old_id` = candidate.`parentId`
+               JOIN `menu` candidate_root
+                 ON candidate_root.`id` = candidate.`parentId`
                WHERE candidate.`name` = child.`name`
                  AND candidate.`order` <=> child.`order`
                  AND candidate.`menuType` <=> child.`menuType`
@@ -153,6 +153,10 @@ SELECT child.`id`,
                  AND candidate.`component` <=> child.`component`
                  AND candidate.`path` <=> child.`path`
                  AND candidate.`locale` <=> child.`locale`
+                 AND candidate_root.`parentId` = @form_menu_id
+                 AND candidate_root.`id` <> @editor_menu_id
+                 AND candidate_root.`name` = 'Editor'
+                 AND candidate_root.`path` = 'editor'
            )
        ) AS `target_id`
 FROM `menu` child
