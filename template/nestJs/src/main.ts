@@ -7,6 +7,7 @@ import { generateMigration } from './generateMigration';
 
 import * as winston from 'winston';
 import { createLogger } from 'winston';
+import { createServer } from 'node:net';
 import { utilities, WinstonModule } from 'nest-winston';
 import 'winston-daily-rotate-file'; // 用于存储日志到文件
 import { INestApplication, RequestMethod } from '@nestjs/common';
@@ -95,8 +96,43 @@ async function bootstrap() {
   if (cfg.get('ENABLE_SWAGGER')) {
     prepareSwagger(cfg, app);
   }
+  // dev-watch 模式（scripts/dev-watch.mjs）下，重建重启时旧进程可能尚未
+  // 释放端口，先等待端口可用再 listen，避免 EADDRINUSE 报错
+  if (process.env.TINY_PRO_DEV_WATCH === 'true') {
+    await waitForPortFree(3000);
+  }
   await app.listen(3000);
   console.log(`Application is running on: ${await app.getUrl()}`);
+}
+
+function isPortFree(port: number) {
+  return new Promise<boolean>((resolve) => {
+    const tester = createServer();
+    tester.once('error', () => resolve(false));
+    tester.once('listening', () => {
+      tester.close(() => resolve(true));
+    });
+    tester.listen(port);
+  });
+}
+
+async function waitForPortFree(port: number, timeoutMs = 60000) {
+  const start = Date.now();
+  let logged = false;
+  while (!(await isPortFree(port))) {
+    if (!logged) {
+      console.log(`Port ${port} is occupied, waiting for the previous instance to exit...`);
+      logged = true;
+    }
+    if (Date.now() - start > timeoutMs) {
+      throw new Error(
+        `Port ${port} is still occupied after ${timeoutMs / 1000}s: another nestJS instance is likely running. ` +
+        `Kill it (e.g. Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -match 'nestJs' } | Stop-Process -Force), ` +
+        `then save any source file to retry.`
+      );
+    }
+    await new Promise((resolve) => setTimeout(resolve, 500));
+  }
 }
 bootstrap();
 

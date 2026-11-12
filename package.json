@@ -49,6 +49,7 @@
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
+    "nest:mock": "pnpm -F tinyui-nestjs-server start:mock",
     "dev:backend": "pnpm -F tinyui-nestjs-server start",
     "describe": "npm-scripts-info",
     "build": "run-s build:*",

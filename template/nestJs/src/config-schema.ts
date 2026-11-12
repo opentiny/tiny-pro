@@ -61,6 +61,12 @@ export type Configure = {
   // mock接口glob表达式
   MOCK_REGEX:string;
   /**
+   * 是否启用mock数据联调模式（pnpm start:mock 设置）。
+   * 为true时演示接口（/api/user/getdata 等）由内存mock数据接管，
+   * 否则演示接口走真实业务路由（数据库）
+   */
+  MOCK_MODE:string;
+  /**
    * 刷新令牌过期时间
    */
   REFRESH_TOKEN_TTL:number;
@@ -121,6 +127,7 @@ export const CONFIG_SCHEMA = Joi.object<Configure>({
   PAGINATION_LIMIT: Joi.number(),
   GLOBAL_PREFIX: Joi.string().default('/'),
   MOCK_REGEX: Joi.string(),
+  MOCK_MODE: Joi.string().default('false'),
   REFRESH_TOKEN_TTL: Joi.number().default(604800000),
   DEVICE_LIMIT: Joi.number().default(3),
   PREVIEW_MODE: Joi.bool().default(true),
