@@ -28,6 +28,6 @@ class FlywayMigrationTest {
                 Integer.class
         );
 
-        assertEquals(3, migrationCount);
+        assertEquals(4, migrationCount);
     }
 }
