@@ -9,9 +9,8 @@
  *   cross-env MOCK_MODE=true node scripts/dev-watch.mjs
  */
 import { spawn } from 'node:child_process';
-import { existsSync, statSync } from 'node:fs';
-
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+import { existsSync } from 'node:fs';
+import { stripVTControlCharacters } from 'node:util';
 
 function terminateProcessTree(child) {
   if (!child?.pid || child.exitCode !== null || child.signalCode !== null) {
@@ -42,51 +41,33 @@ function terminateProcessTree(child) {
   });
 }
 
-// 只接受本次 watch 编译新写入的产物，避免旧 dist/main.js 被误判为编译成功。
-async function waitForBuildOutput(entry, initialMtime, timeoutMs = 180000) {
-  const start = Date.now();
-  let lastMtime = initialMtime;
-  let hasNewOutput = false;
-  let stableCount = 0;
-
-  while (Date.now() - start < timeoutMs) {
-    await sleep(500);
-    if (!existsSync(entry)) {
-      stableCount = 0;
-      continue;
-    }
-
-    const mtime = statSync(entry).mtimeMs;
-    if (!hasNewOutput) {
-      if (mtime === initialMtime) {
-        continue;
-      }
-      hasNewOutput = true;
-      lastMtime = mtime;
-      continue;
-    }
-
-    if (mtime === lastMtime) {
-      stableCount += 1;
-      if (stableCount >= 4) {
-        return;
-      }
-    } else {
-      stableCount = 0;
-      lastMtime = mtime;
-    }
-  }
-
-  throw new Error(`等待首次编译产物超时：${entry}`);
-}
-
 const entry = 'dist/main.js';
-const initialMtime = existsSync(entry) ? statSync(entry).mtimeMs : 0;
 const build = spawn('nest', ['build', '--watch'], {
-  stdio: 'inherit',
+  stdio: ['inherit', 'pipe', 'pipe'],
   shell: true,
   detached: process.platform !== 'win32',
 });
+let resolveBuildSuccess;
+const buildSuccess = new Promise((resolve) => {
+  resolveBuildSuccess = resolve;
+});
+let initialBuildPending = true;
+let initialBuildOutput = '';
+
+function forwardBuildOutput(chunk, output) {
+  output.write(chunk);
+  if (!initialBuildPending) {
+    return;
+  }
+  initialBuildOutput += stripVTControlCharacters(chunk.toString());
+  if (initialBuildOutput.includes('compiled successfully')) {
+    initialBuildPending = false;
+    resolveBuildSuccess();
+  }
+}
+
+build.stdout.on('data', (chunk) => forwardBuildOutput(chunk, process.stdout));
+build.stderr.on('data', (chunk) => forwardBuildOutput(chunk, process.stderr));
 let server;
 let shuttingDown = false;
 
@@ -123,7 +104,10 @@ build.once('error', (error) => handleBuildFailure(1, error.message));
 build.once('exit', handleBuildFailure);
 
 try {
-  await Promise.race([waitForBuildOutput(entry, initialMtime), buildFailure]);
+  await Promise.race([buildSuccess, buildFailure]);
+  if (!existsSync(entry)) {
+    throw new Error(`首次编译成功但未找到产物：${entry}`);
+  }
 
   server = spawn(process.execPath, ['--watch', entry], {
     stdio: 'inherit',
