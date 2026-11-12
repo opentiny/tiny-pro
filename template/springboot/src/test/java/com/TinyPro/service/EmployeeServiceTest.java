@@ -95,6 +95,33 @@ class EmployeeServiceTest {
     }
 
     @Test
+    void treatsLikeWildcardsAsLiteralSearchText() {
+        Employee literal = employee("100%员工", "技术部", "1", "2024-03-01 08:00:00");
+        literal.setEmployeeNo("00_000001");
+        employeeRepository.saveAndFlush(literal);
+
+        EmployeeQueryDto keywordQuery = new EmployeeQueryDto();
+        EmployeeSearchInfoDto keywordInfo = new EmployeeSearchInfoDto();
+        keywordInfo.setKeyword("%");
+        keywordQuery.setSearchInfo(keywordInfo);
+
+        EmployeePageVo keywordResult = employeeService.queryPage(keywordQuery);
+
+        assertEquals(1, keywordResult.getTotal());
+        assertEquals("100%员工", keywordResult.getData().get(0).getName());
+
+        EmployeeQueryDto filterQuery = new EmployeeQueryDto();
+        EmployeeSearchInfoDto filterInfo = new EmployeeSearchInfoDto();
+        EmployeeSearchFilterDto nameFilter = new EmployeeSearchFilterDto();
+        nameFilter.setField("name");
+        nameFilter.setValues(List.of("%"));
+        filterInfo.setFilters(List.of(nameFilter));
+        filterQuery.setSearchInfo(filterInfo);
+
+        assertEquals(1, employeeService.queryPage(filterQuery).getTotal());
+    }
+
+    @Test
     void updateAndRemoveUseTheDatabase() {
         Employee employee = employeeRepository.findAll().get(0);
 

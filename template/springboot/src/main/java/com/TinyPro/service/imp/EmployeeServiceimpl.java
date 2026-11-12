@@ -19,9 +19,12 @@ import jakarta.persistence.criteria.Root;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -46,6 +49,7 @@ public class EmployeeServiceimpl implements IEmployeeService {
     private static final int DEFAULT_PAGE_INDEX = 1;
     private static final int DEFAULT_PAGE_SIZE = 10;
     private static final int MAX_PAGE_SIZE = 100;
+    private static final char LIKE_ESCAPE_CHARACTER = '\\';
 
     private static final Set<String> TEXT_FIELDS = Set.of(
             "name", "employeeNo", "department", "departmentLevel", "workbenchName",
@@ -95,7 +99,11 @@ public class EmployeeServiceimpl implements IEmployeeService {
                 normalizePageValue(query == null ? null : query.getPageSize(), DEFAULT_PAGE_SIZE),
                 MAX_PAGE_SIZE
         );
-        Pageable pageable = PageRequest.of(pageIndex - 1, pageSize);
+        Pageable pageable = PageRequest.of(
+          pageIndex - 1,
+          pageSize,
+          Sort.by(Sort.Direction.ASC, "id")
+        );
         EmployeeSearchInfoDto searchInfo = query == null ? null : query.getSearchInfo();
         Page<Employee> page = iEmployeRepository.findAll(buildSpecification(searchInfo), pageable);
         List<EmployeeVo> data = page.getContent().stream()
@@ -147,6 +155,26 @@ public class EmployeeServiceimpl implements IEmployeeService {
         Employee employee = getById(String.valueOf(data.getOrDefault("id", "")));
         if (employee == null) {
             return false;
+        }
+        if (data.containsKey("createTime")) {
+          Object value = data.get("createTime");
+
+          if (!(value instanceof String) || !hasText((String) value)) {
+            throw new ResponseStatusException(
+              HttpStatus.BAD_REQUEST,
+              "createTime 格式无效"
+            );
+          }
+
+          LocalDateTime parsed = parseDateTime((String) value);
+          if (parsed == null) {
+            throw new ResponseStatusException(
+              HttpStatus.BAD_REQUEST,
+              "createTime 格式无效"
+            );
+          }
+
+          employee.setCreateTime(parsed);
         }
         updateStringField(data, "name", employee::setName);
         updateStringField(data, "employeeNo", employee::setEmployeeNo);
@@ -205,10 +233,12 @@ public class EmployeeServiceimpl implements IEmployeeService {
             return;
         }
         for (String token : keyword.split("\\s+")) {
-            String pattern = "%" + token.toLowerCase(Locale.ROOT) + "%";
+            String pattern = "%" + escapeLikePattern(token.toLowerCase(Locale.ROOT)) + "%";
             Predicate[] matches = TEXT_FIELDS.stream()
                     .map(field -> criteriaBuilder.like(
-                            criteriaBuilder.lower(root.get(field).as(String.class)), pattern))
+                            criteriaBuilder.lower(root.get(field).as(String.class)),
+                            pattern,
+                            LIKE_ESCAPE_CHARACTER))
                     .toArray(Predicate[]::new);
             predicates.add(criteriaBuilder.or(matches));
         }
@@ -239,7 +269,8 @@ public class EmployeeServiceimpl implements IEmployeeService {
                 Predicate[] fuzzyMatches = values.stream()
                         .map(value -> criteriaBuilder.like(
                                 criteriaBuilder.lower(root.get(field).as(String.class)),
-                                "%" + value.toLowerCase(Locale.ROOT) + "%"))
+                                "%" + escapeLikePattern(value.toLowerCase(Locale.ROOT)) + "%",
+                                LIKE_ESCAPE_CHARACTER))
                         .toArray(Predicate[]::new);
                 predicates.add(criteriaBuilder.or(fuzzyMatches));
             } else {
@@ -370,6 +401,13 @@ public class EmployeeServiceimpl implements IEmployeeService {
 
     private boolean hasText(String value) {
         return value != null && !value.isBlank();
+    }
+
+    private String escapeLikePattern(String value) {
+        return value
+                .replace("\\", "\\\\")
+                .replace("%", "\\%")
+                .replace("_", "\\_");
     }
 
     private String formatTime(LocalDateTime value) {
