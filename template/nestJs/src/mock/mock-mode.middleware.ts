@@ -16,10 +16,7 @@ function matchUrl(
   const patternSegments = pattern.split('/').filter(Boolean);
   const pathSegments = pathname.split('/').filter(Boolean);
   let minSegments = patternSegments.length;
-  while (
-    minSegments > 0 &&
-    patternSegments[minSegments - 1].endsWith('?')
-  ) {
+  while (minSegments > 0 && patternSegments[minSegments - 1].endsWith('?')) {
     minSegments -= 1;
   }
   if (
@@ -48,7 +45,10 @@ export class MockModeMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
     // 注意：全局前缀会导致 NestJS 改写 req.url，匹配时必须用 req.originalUrl
     const [originalPath] = (req.originalUrl || req.url).split('?');
-    const path = `/api${originalPath}`;
+    const path =
+      originalPath === '/api' || originalPath.startsWith('/api/')
+        ? originalPath
+        : `/api${originalPath}`;
     const method = req.method.toLowerCase();
     for (const item of data) {
       if (item.method !== method) {

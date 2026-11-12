@@ -172,7 +172,15 @@ $ redis-cli
 PONG
 ```
 
-3. 安装依赖并启动前后端
+3. 配置后端环境变量
+
+```shell
+cp template/nestJs/.env.example template/nestJs/.env
+```
+
+编辑 `template/nestJs/.env`，根据本机 MySQL 配置填写 `DATABASE_HOST`、`DATABASE_PORT`、`DATABASE_USERNAME`、`DATABASE_PASSWORD` 和 `DATABASE_NAME`。
+
+4. 安装依赖并启动前后端
 
 ```shell
 # 安装依赖

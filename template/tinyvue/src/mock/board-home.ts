@@ -100,17 +100,19 @@ const homeRegionTable = [
   { id: '7', space: '四川', pv: '32(1.77%)', play: '0.65s', page: '2.92s' },
 ]
 
+export const boardHomeData = {
+  cards: homeCards,
+  curve: homeCurve,
+  falls: homeFalls,
+  round: homeRound,
+  region: homeRegion,
+  regionTable: homeRegionTable,
+}
+
 export default [
   {
     url: '/api/board/home',
     method: 'get',
-    response: () => ({
-      cards: homeCards,
-      curve: homeCurve,
-      falls: homeFalls,
-      round: homeRound,
-      region: homeRegion,
-      regionTable: homeRegionTable,
-    }),
+    response: () => boardHomeData,
   },
 ] as MockMethod[]

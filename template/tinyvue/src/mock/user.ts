@@ -3,6 +3,15 @@ import { initData, successResponseWrap } from '../utils/setup-mock'
 const positive = JSON.parse(JSON.stringify(initData.tableData))
 const negative = JSON.parse(JSON.stringify(initData.tableData.reverse()))
 const initlist = JSON.parse(JSON.stringify(initData.chartData[0].list))
+
+function userDataResponse() {
+  const taskSummary = ['A', 'B', 'C', 'D'].map(status => ({
+    status,
+    value: initData.tableData.filter((item: any) => item.pid === status).length,
+  }))
+  return successResponseWrap({ ...initData, taskSummary })
+}
+
 export default [
   // 用户中心数据
   {
@@ -17,12 +26,12 @@ export default [
       if (sort === 1 || sort === 3) {
         initData.chartData[0].list.reverse()
         initData.tableData = positive
-        return successResponseWrap(initData)
+        return userDataResponse()
       }
       if (sort === 2 || sort === 4) {
         initData.chartData[0].list.reverse()
         initData.tableData = negative
-        return successResponseWrap(initData)
+        return userDataResponse()
       }
       if (
         startTime !== ''
@@ -50,9 +59,9 @@ export default [
         })
         initData.tableData = table
         initData.chartData[0].list = chart
-        return successResponseWrap(initData)
+        return userDataResponse()
       }
-      return successResponseWrap(initData)
+      return userDataResponse()
     },
   },
 ] as any

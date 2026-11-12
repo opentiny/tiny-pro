@@ -8,61 +8,132 @@
  * 用法（由 package.json 的 start:mock / start:dev 脚本调用）：
  *   cross-env MOCK_MODE=true node scripts/dev-watch.mjs
  */
-import { spawn } from 'node:child_process'
-import { existsSync, statSync } from 'node:fs'
+import { spawn } from 'node:child_process';
+import { existsSync, statSync } from 'node:fs';
 
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// 等待 nest build --watch 的首次编译完成：
-// 观察 dist/main.js 的 mtime，连续一段时间（2s）不再变化即认为编译结束。
-// 必须等首次编译完成再启动 node --watch，否则 watcher 初始编译重写产物
-// 会触发一次"自发重启"，与刚启动的实例争抢端口。
-async function waitForBuildOutput(entry, timeoutMs = 180000) {
-  const start = Date.now()
-  let lastMtime = 0
-  let stableCount = 0
-  while (Date.now() - start < timeoutMs) {
-    await sleep(500)
-    if (!existsSync(entry)) {
-      continue
-    }
-    const mtime = statSync(entry).mtimeMs
-    if (mtime === lastMtime) {
-      stableCount += 1
-      if (stableCount >= 4) {
-        return
-      }
-    }
-    else {
-      stableCount = 0
-      lastMtime = mtime
-    }
+function terminateProcessTree(child) {
+  if (!child?.pid || child.exitCode !== null || child.signalCode !== null) {
+    return Promise.resolve();
   }
+
+  return new Promise((resolve) => {
+    const done = () => resolve();
+    child.once('exit', done);
+
+    if (process.platform === 'win32') {
+      const killer = spawn(
+        'taskkill',
+        ['/pid', String(child.pid), '/T', '/F'],
+        {
+          stdio: 'ignore',
+        }
+      );
+      killer.once('error', () => child.kill());
+      return;
+    }
+
+    try {
+      process.kill(-child.pid, 'SIGTERM');
+    } catch {
+      child.kill();
+    }
+  });
 }
 
+// 只接受本次 watch 编译新写入的产物，避免旧 dist/main.js 被误判为编译成功。
+async function waitForBuildOutput(entry, initialMtime, timeoutMs = 180000) {
+  const start = Date.now();
+  let lastMtime = initialMtime;
+  let hasNewOutput = false;
+  let stableCount = 0;
+
+  while (Date.now() - start < timeoutMs) {
+    await sleep(500);
+    if (!existsSync(entry)) {
+      stableCount = 0;
+      continue;
+    }
+
+    const mtime = statSync(entry).mtimeMs;
+    if (!hasNewOutput) {
+      if (mtime === initialMtime) {
+        continue;
+      }
+      hasNewOutput = true;
+      lastMtime = mtime;
+      continue;
+    }
+
+    if (mtime === lastMtime) {
+      stableCount += 1;
+      if (stableCount >= 4) {
+        return;
+      }
+    } else {
+      stableCount = 0;
+      lastMtime = mtime;
+    }
+  }
+
+  throw new Error(`等待首次编译产物超时：${entry}`);
+}
+
+const entry = 'dist/main.js';
+const initialMtime = existsSync(entry) ? statSync(entry).mtimeMs : 0;
 const build = spawn('nest', ['build', '--watch'], {
   stdio: 'inherit',
   shell: true,
-})
-await waitForBuildOutput('dist/main.js')
+  detached: process.platform !== 'win32',
+});
+let server;
+let shuttingDown = false;
 
-const server = spawn(process.execPath, ['--watch', 'dist/main.js'], {
-  stdio: 'inherit',
-  env: { ...process.env, TINY_PRO_DEV_WATCH: 'true' },
-})
-
-function shutdown() {
-  build.kill()
-  server.kill()
-  process.exit(0)
+async function shutdown(code = 0) {
+  if (shuttingDown) {
+    return;
+  }
+  shuttingDown = true;
+  await Promise.all([
+    terminateProcessTree(build),
+    terminateProcessTree(server),
+  ]);
+  process.exit(code);
 }
-process.on('SIGINT', shutdown)
-process.on('SIGTERM', shutdown)
-build.on('exit', (code) => {
-  server.kill()
-  process.exit(code ?? 0)
-})
-server.on('exit', (code) => {
-  build.kill()
-  process.exit(code ?? 0)
-})
+
+process.on('SIGINT', () => void shutdown());
+process.on('SIGTERM', () => void shutdown());
+
+let rejectBuildFailure;
+const buildFailure = new Promise((_, reject) => {
+  rejectBuildFailure = reject;
+});
+
+function handleBuildFailure(code, signal) {
+  const reason = signal ? `信号 ${signal}` : `退出码 ${code ?? 0}`;
+  rejectBuildFailure(new Error(`构建进程已退出（${reason}）`));
+  if (server) {
+    void shutdown(code ?? 1);
+  }
+}
+
+// 必须在等待产物前注册，首次编译立即失败时不能继续启动服务。
+build.once('error', (error) => handleBuildFailure(1, error.message));
+build.once('exit', handleBuildFailure);
+
+try {
+  await Promise.race([waitForBuildOutput(entry, initialMtime), buildFailure]);
+
+  server = spawn(process.execPath, ['--watch', entry], {
+    stdio: 'inherit',
+    env: { ...process.env, TINY_PRO_DEV_WATCH: 'true' },
+    detached: process.platform !== 'win32',
+  });
+  server.once('error', () => void shutdown(1));
+  server.once('exit', (code) => void shutdown(code ?? 0));
+} catch (error) {
+  console.error(error instanceof Error ? error.message : error);
+  await terminateProcessTree(build);
+  process.exitCode = 1;
+}

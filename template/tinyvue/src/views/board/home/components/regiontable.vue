@@ -4,10 +4,15 @@ import {
   Grid as TinyGrid,
   GridColumn as TinyGridColumn,
 } from '@opentiny/vue'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useResponsiveSize } from '@/hooks/responsive'
 
+const props = withDefaults(defineProps<{ tableData?: { id: string, space: string, pv: string, play: string, page: string }[] }>(), {
+  tableData: () => [],
+})
+
 const { gridSize } = useResponsiveSize()
+const grid = ref()
 
 const pagerConfig = ref({
   component: Pager,
@@ -25,10 +30,10 @@ const fetchData = ref({
   api: getData,
 })
 
-// 表格数据来自 nestJS mock / 纯前端 mock（GET /api/board/home 的 regionTable），无数据时为空表格
-const props = withDefaults(defineProps<{ tableData?: { id: string, space: string, pv: string, play: string, page: string }[] }>(), {
-  tableData: () => [],
-})
+watch(() => props.tableData, () => {
+  pagerConfig.value.attrs.currentPage = 1
+  grid.value?.handleFetch?.('reload')
+}, { deep: true })
 
 // 各排序字段的取值解析：pv/play/page 是带单位的字符串，需取数值部分比较
 const sortParsers: Record<string, (v: string) => number> = {
@@ -64,7 +69,7 @@ function getData({ page, sort }: any) {
 <template>
   <div class="container">
     <TinyGrid
-      :fetch-data="fetchData" :pager="pagerConfig"
+      ref="grid" :fetch-data="fetchData" :pager="pagerConfig"
       :size="gridSize" :auto-resize="true" align="center"
     >
       <TinyGridColumn field="id" :title="$t('home.roundtable.index')" width="16%" sortable />

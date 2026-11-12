@@ -89,9 +89,8 @@ const languages = [
 const menuTree: MockMenuNode[] = buildMenuTree(
   readSeedFile<any[]>('menu-data.json')
 );
-const localeTable = readSeedFile<Record<string, Record<string, string>>>(
-  'locales.json'
-);
+const localeTable =
+  readSeedFile<Record<string, Record<string, string>>>('locales.json');
 
 const permissions: MockPermission[] = [
   { id: 1, name: '*', desc: '全部权限' },
@@ -117,6 +116,7 @@ const adminUser = {
   id: '1',
   name: 'admin',
   email: ADMIN_EMAIL,
+  password: ADMIN_PASSWORD,
   department: 'Tiny-Vue-Pro',
   employeeType: 'social recruitment',
   probationStart: '2021-04-19',
@@ -168,21 +168,75 @@ const userCenterChartData = [
     title: 'userInfo.tab.two',
     value: 1,
     list: [
-      { sort: 1, type: 'userInfo.type.optionA', status: 'userInfo.status.optionA', len: 1, pid: 'A' },
-      { sort: 2, type: 'userInfo.type.optionB', status: 'userInfo.status.optionB', len: 2, pid: 'B' },
-      { sort: 3, type: 'userInfo.type.optionC', status: 'userInfo.status.optionC', len: 1, pid: 'C' },
-      { sort: 4, type: 'userInfo.type.optionA', status: 'userInfo.status.optionD', len: 2, pid: 'D' },
+      {
+        sort: 1,
+        type: 'userInfo.type.optionA',
+        status: 'userInfo.status.optionA',
+        len: 1,
+        pid: 'A',
+      },
+      {
+        sort: 2,
+        type: 'userInfo.type.optionB',
+        status: 'userInfo.status.optionB',
+        len: 2,
+        pid: 'B',
+      },
+      {
+        sort: 3,
+        type: 'userInfo.type.optionC',
+        status: 'userInfo.status.optionC',
+        len: 1,
+        pid: 'C',
+      },
+      {
+        sort: 4,
+        type: 'userInfo.type.optionA',
+        status: 'userInfo.status.optionD',
+        len: 2,
+        pid: 'D',
+      },
     ],
   },
   {
     title: 'userInfo.tab.one',
     value: 2,
     list: [
-      { sort: 1, type: 'userInfo.type.optionB', status: 'userInfo.status.optionA', len: 1, pid: 'B' },
-      { sort: 2, type: 'userInfo.type.optionC', status: 'userInfo.status.optionB', len: 2, pid: 'C' },
-      { sort: 3, type: 'userInfo.type.optionA', status: 'userInfo.status.optionC', len: 1, pid: 'A' },
-      { sort: 4, type: 'userInfo.type.optionB', status: 'userInfo.status.optionD', len: 2, pid: 'B' },
-      { sort: 5, type: 'userInfo.type.optionC', status: 'userInfo.status.optionA', len: 1, pid: 'C' },
+      {
+        sort: 1,
+        type: 'userInfo.type.optionB',
+        status: 'userInfo.status.optionA',
+        len: 1,
+        pid: 'B',
+      },
+      {
+        sort: 2,
+        type: 'userInfo.type.optionC',
+        status: 'userInfo.status.optionB',
+        len: 2,
+        pid: 'C',
+      },
+      {
+        sort: 3,
+        type: 'userInfo.type.optionA',
+        status: 'userInfo.status.optionC',
+        len: 1,
+        pid: 'A',
+      },
+      {
+        sort: 4,
+        type: 'userInfo.type.optionB',
+        status: 'userInfo.status.optionD',
+        len: 2,
+        pid: 'B',
+      },
+      {
+        sort: 5,
+        type: 'userInfo.type.optionC',
+        status: 'userInfo.status.optionA',
+        len: 1,
+        pid: 'C',
+      },
     ],
   },
 ];
@@ -210,6 +264,12 @@ function issueTokenPair(email: string) {
     refreshToken: `mock-refresh-token:${email}`,
     refreshTokenTTL: REFRESH_TOKEN_TTL,
   };
+}
+
+function serializeUser(user: any) {
+  const serialized = { ...user };
+  delete serialized.password;
+  return serialized;
 }
 
 // 与前端 IPaginationMeta 一致的分页结构
@@ -294,10 +354,7 @@ function snapshotRoleMenuIds() {
 
 function syncRoleMenus(roleMenuIds: Map<number, Set<number>>) {
   roles.forEach((role) => {
-    role.menus = selectMenus(
-      menuTree,
-      roleMenuIds.get(role.id) ?? new Set()
-    );
+    role.menus = selectMenus(menuTree, roleMenuIds.get(role.id) ?? new Set());
   });
 }
 
@@ -318,10 +375,13 @@ export default [
     method: 'post',
     response: (params: { body: any }) => {
       const { email, password } = params.body ?? {};
-      if (email !== ADMIN_EMAIL || password !== ADMIN_PASSWORD) {
+      const user = users.find(
+        (item) => item.email === email && item.password === password
+      );
+      if (!user) {
         throw new HttpException('邮箱或密码错误', HttpStatus.UNAUTHORIZED);
       }
-      return issueTokenPair(email);
+      return issueTokenPair(user.email);
     },
   },
   {
@@ -343,12 +403,11 @@ export default [
     method: 'get',
     response: (params: { params: Record<string, string> }) => {
       const email = params.params?.email || ADMIN_EMAIL;
-      return (
-        users.find((item) => item.email === email) ??
-        (() => {
-          throw new HttpException('用户不存在', HttpStatus.NOT_FOUND);
-        })()
-      );
+      const user = users.find((item) => item.email === email);
+      if (!user) {
+        throw new HttpException('用户不存在', HttpStatus.NOT_FOUND);
+      }
+      return serializeUser(user);
     },
   },
   {
@@ -357,7 +416,10 @@ export default [
     response: (params: { body: any }) => {
       const { email, name, password, roleIds } = params.body ?? {};
       if (!email || !name || !password) {
-        throw new HttpException('邮箱、姓名、密码为必填项', HttpStatus.BAD_REQUEST);
+        throw new HttpException(
+          '邮箱、姓名、密码为必填项',
+          HttpStatus.BAD_REQUEST
+        );
       }
       if (users.some((item) => item.email === email)) {
         throw new HttpException('用户已存在', HttpStatus.CONFLICT);
@@ -379,7 +441,7 @@ export default [
         role: roles.filter((item) => (roleIds ?? []).includes(item.id)),
       };
       users.push(user);
-      return user;
+      return serializeUser(user);
     },
   },
   {
@@ -416,7 +478,7 @@ export default [
       if (body.roleIds) {
         user.role = roles.filter((item) => body.roleIds.includes(item.id));
       }
-      return user;
+      return serializeUser(user);
     },
   },
   {
@@ -430,7 +492,7 @@ export default [
       emails.forEach((email: string) => {
         const index = users.findIndex((item) => item.email === email);
         if (index > -1 && users[index] !== adminUser) {
-          removed.push(users.splice(index, 1)[0]);
+          removed.push(serializeUser(users.splice(index, 1)[0]));
         }
       });
       return removed;
@@ -441,22 +503,19 @@ export default [
     method: 'delete',
     response: (params: { params: Record<string, string> }) => {
       const index = users.findIndex(
-        (item) =>
-          item.email === params.params?.email && item !== adminUser
+        (item) => item.email === params.params?.email && item !== adminUser
       );
       if (index === -1) {
         throw new HttpException('用户不存在', HttpStatus.NOT_FOUND);
       }
-      return users.splice(index, 1)[0];
+      return serializeUser(users.splice(index, 1)[0]);
     },
   },
   {
     url: '/api/user/admin/updatePwd',
     method: 'patch',
     response: (params: { body: any }) => {
-      const user = users.find(
-        (item) => item.email === params.body?.email
-      );
+      const user = users.find((item) => item.email === params.body?.email);
       if (!user) {
         throw new HttpException('用户不存在', HttpStatus.NOT_FOUND);
       }
@@ -492,14 +551,14 @@ export default [
     response: (params: { body: any }) => {
       // 个人中心页数据：表格列表 + 任务图，支持排序与筛选（类型/状态/起止时间）
       const body = params.body ?? {};
-      let rows = userCenterTableData.map(item => ({ ...item }));
+      let rows = userCenterTableData.map((item) => ({ ...item }));
       if (Array.isArray(body.filterType) && body.filterType.length) {
-        rows = rows.filter(item =>
+        rows = rows.filter((item) =>
           body.filterType.includes(optionLetter(item.type))
         );
       }
       if (Array.isArray(body.filterStatus) && body.filterStatus.length) {
-        rows = rows.filter(item =>
+        rows = rows.filter((item) =>
           body.filterStatus.includes(optionLetter(item.status))
         );
       }
@@ -521,7 +580,8 @@ export default [
       // 顶部状态统计卡（InfoTasksTip），随筛选联动
       const taskSummary = ['A', 'B', 'C', 'D'].map((status) => ({
         status,
-        value: rows.filter((item) => optionLetter(item.status) === status).length,
+        value: rows.filter((item) => optionLetter(item.status) === status)
+          .length,
       }));
       return { chartData: userCenterChartData, tableData: rows, taskSummary };
     },
@@ -530,11 +590,13 @@ export default [
     url: '/api/user',
     method: 'get',
     response: (params: { query: any }) => {
-      const filtered = users.filter(
-        (item) =>
-          includesName(item.name, params.query?.name) &&
-          includesName(item.email, params.query?.email)
-      );
+      const filtered = users
+        .filter(
+          (item) =>
+            includesName(item.name, params.query?.name) &&
+            includesName(item.email, params.query?.email)
+        )
+        .map(serializeUser);
       return paginate(filtered, params.query);
     },
   },
@@ -593,15 +655,10 @@ export default [
       }
       if (
         roles.some((role) =>
-          role.permission.some(
-            (item) => item.id === Number(params.params?.id)
-          )
+          role.permission.some((item) => item.id === Number(params.params?.id))
         )
       ) {
-        throw new HttpException(
-          '权限仍被角色引用',
-          HttpStatus.CONFLICT
-        );
+        throw new HttpException('权限仍被角色引用', HttpStatus.CONFLICT);
       }
       return permissions.splice(index, 1)[0];
     },
@@ -615,9 +672,7 @@ export default [
     url: '/api/role/info/:id',
     method: 'get',
     response: (params: { params: Record<string, string> }) => {
-      const role = roles.find(
-        (item) => item.id === Number(params.params?.id)
-      );
+      const role = roles.find((item) => item.id === Number(params.params?.id));
       if (!role) {
         throw new HttpException('角色不存在', HttpStatus.NOT_FOUND);
       }
@@ -628,9 +683,7 @@ export default [
     url: '/api/menu/role/:email',
     method: 'get',
     response: (params: { params: Record<string, string> }) => {
-      const user = users.find(
-        (item) => item.email === params.params?.email
-      );
+      const user = users.find((item) => item.email === params.params?.email);
       if (!user) {
         throw new HttpException('用户不存在', HttpStatus.NOT_FOUND);
       }
@@ -682,9 +735,7 @@ export default [
     url: '/api/role',
     method: 'patch',
     response: (params: { body: any }) => {
-      const role = roles.find(
-        (item) => item.id === Number(params.body?.id)
-      );
+      const role = roles.find((item) => item.id === Number(params.body?.id));
       if (!role) {
         throw new HttpException('角色不存在', HttpStatus.NOT_FOUND);
       }
@@ -714,7 +765,7 @@ export default [
       if (index < 0) {
         throw new HttpException('角色不存在', HttpStatus.NOT_FOUND);
       }
-      if ([adminUser].some((user) => user.role.some((r) => r.id === id))) {
+      if (users.some((user) => user.role.some((r) => r.id === id))) {
         throw new HttpException('角色仍被用户引用', HttpStatus.CONFLICT);
       }
       return roles.splice(index, 1)[0];
@@ -759,14 +810,31 @@ export default [
     url: '/api/menu',
     method: 'patch',
     response: (params: { body: any }) => {
-      const roleMenuIds = snapshotRoleMenuIds();
-      const location = findMenuLocation(
-        menuTree,
-        Number(params.body?.id)
-      );
+      const location = findMenuLocation(menuTree, Number(params.body?.id));
       if (!location) {
         throw new HttpException('菜单不存在', HttpStatus.NOT_FOUND);
       }
+      const parentId =
+        params.body?.parentId === undefined
+          ? location.node.parentId
+          : params.body.parentId;
+      const parent =
+        parentId === null ? null : findMenuLocation(menuTree, Number(parentId));
+      if (parentId !== null && !parent) {
+        throw new HttpException('父菜单不存在', HttpStatus.NOT_FOUND);
+      }
+      if (
+        parent &&
+        (parent.node.id === location.node.id ||
+          findMenuLocation(location.node.children, parent.node.id))
+      ) {
+        throw new HttpException(
+          '不能将菜单移动到自身或其子菜单下',
+          HttpStatus.BAD_REQUEST
+        );
+      }
+
+      const roleMenuIds = snapshotRoleMenuIds();
       const index = location.siblings.indexOf(location.node);
       location.siblings.splice(index, 1);
       Object.assign(location.node, {
@@ -775,23 +843,11 @@ export default [
         component: params.body?.component ?? location.node.component,
         customIcon: params.body?.icon ?? location.node.customIcon,
         menuType: params.body?.menuType ?? location.node.menuType,
-        parentId: params.body?.parentId ?? null,
+        parentId,
         order: params.body?.order ?? location.node.order,
         locale: params.body?.locale ?? location.node.locale,
       });
-      if (location.node.parentId === null) {
-        menuTree.push(location.node);
-      } else {
-        const parent = findMenuLocation(
-          menuTree,
-          Number(location.node.parentId)
-        );
-        if (!parent) {
-          location.siblings.splice(index, 0, location.node);
-          throw new HttpException('父菜单不存在', HttpStatus.NOT_FOUND);
-        }
-        parent.node.children.push(location.node);
-      }
+      (parent?.node.children ?? menuTree).push(location.node);
       syncRoleMenus(roleMenuIds);
       return location.node;
     },
@@ -800,27 +856,44 @@ export default [
     url: '/api/menu',
     method: 'delete',
     response: (params: { query: any }) => {
-      const roleMenuIds = snapshotRoleMenuIds();
-      const location = findMenuLocation(
-        menuTree,
-        Number(params.query?.id)
-      );
+      const location = findMenuLocation(menuTree, Number(params.query?.id));
       if (!location) {
         throw new HttpException('菜单不存在', HttpStatus.NOT_FOUND);
       }
+      const rawParentId = params.query?.parentId;
+      if (rawParentId === undefined || rawParentId === '') {
+        throw new HttpException(
+          '请指定子菜单的新父菜单',
+          HttpStatus.BAD_REQUEST
+        );
+      }
+      const parentId = Number(rawParentId);
+      if (!Number.isInteger(parentId)) {
+        throw new HttpException('父菜单参数无效', HttpStatus.BAD_REQUEST);
+      }
+      const targetLocation =
+        parentId === -1 ? null : findMenuLocation(menuTree, parentId);
+      if (parentId !== -1 && !targetLocation) {
+        throw new HttpException('父菜单不存在', HttpStatus.NOT_FOUND);
+      }
+      if (
+        parentId === location.node.id ||
+        findMenuLocation(location.node.children, parentId)
+      ) {
+        throw new HttpException(
+          '不能将子菜单移动到自身或其子菜单下',
+          HttpStatus.BAD_REQUEST
+        );
+      }
+
+      const target = parentId === -1 ? menuTree : targetLocation!.node.children;
+      const roleMenuIds = snapshotRoleMenuIds();
       const index = location.siblings.indexOf(location.node);
       const removed = location.siblings.splice(index, 1)[0];
-      const parentId = Number(params.query?.parentId);
-      const target =
-        parentId === -1
-          ? menuTree
-          : findMenuLocation(menuTree, parentId)?.node.children;
-      if (target) {
-        removed.children.forEach((child) => {
-          child.parentId = parentId === -1 ? null : parentId;
-          target.push(child);
-        });
-      }
+      removed.children.forEach((child) => {
+        child.parentId = parentId === -1 ? null : parentId;
+        target.push(child);
+      });
       roleMenuIds.forEach((ids) => ids.delete(removed.id));
       syncRoleMenus(roleMenuIds);
       return removed;
@@ -842,11 +915,11 @@ export default [
           includesName(String(item.content), params.query?.content) &&
           (!languageIds.size || languageIds.has(item.lang.id))
       );
-      if (
-        params.query?.all !== undefined &&
-        String(params.query.all) !== '0'
-      ) {
-        return paginate(records, { page: 1, limit: Math.max(1, records.length) });
+      if (params.query?.all !== undefined && String(params.query.all) !== '0') {
+        return paginate(records, {
+          page: 1,
+          limit: Math.max(1, records.length),
+        });
       }
       return paginate(records, params.query);
     },
@@ -905,9 +978,7 @@ export default [
       const language =
         params.body?.lang === undefined
           ? record.lang
-          : languages.find(
-              (item) => item.id === Number(params.body.lang)
-            );
+          : languages.find((item) => item.id === Number(params.body.lang));
       if (!language) {
         throw new HttpException('语言不存在', HttpStatus.NOT_FOUND);
       }

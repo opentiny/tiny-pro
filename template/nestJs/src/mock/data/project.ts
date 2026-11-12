@@ -1,3 +1,4 @@
+import { HttpException, HttpStatus } from '@nestjs/common';
 import { failResponseWrap, successResponseWrap } from '../utils';
 
 export interface ProjectRecord {
@@ -62,7 +63,9 @@ function pad(num: number) {
 
 function formatDate(timestamp: number) {
   const date = new Date(timestamp);
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(
+    date.getDate()
+  )}`;
 }
 
 function pick<T>(list: T[], index: number): T {
@@ -118,9 +121,12 @@ export default [
         (field) => !String(data[field] ?? '').trim()
       );
       if (missing.length) {
-        return failResponseWrap(
-          null,
-          `Missing required fields: ${missing.join(', ')}`
+        throw new HttpException(
+          failResponseWrap(
+            null,
+            `Missing required fields: ${missing.join(', ')}`
+          ),
+          HttpStatus.BAD_REQUEST
         );
       }
       const record: ProjectRecord = {
@@ -155,7 +161,10 @@ export default [
         (item) => item.id === String(params.body?.data?.id ?? '')
       );
       if (index === -1) {
-        return successResponseWrap(false);
+        throw new HttpException(
+          successResponseWrap(false),
+          HttpStatus.NOT_FOUND
+        );
       }
       projects[index] = { ...projects[index], ...params.body.data };
       return successResponseWrap(true);
