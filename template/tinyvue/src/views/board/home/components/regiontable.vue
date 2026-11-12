@@ -4,62 +4,15 @@ import {
   Grid as TinyGrid,
   GridColumn as TinyGridColumn,
 } from '@opentiny/vue'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useResponsiveSize } from '@/hooks/responsive'
 
-const { gridSize } = useResponsiveSize()
+const props = withDefaults(defineProps<{ tableData?: { id: string, space: string, pv: string, play: string, page: string }[] }>(), {
+  tableData: () => [],
+})
 
-const tableData = [
-  {
-    id: '1',
-    space: '上海',
-    pv: '1767(97.77%)',
-    play: '0.44s',
-    page: '2.7s',
-  },
-  {
-    id: '2',
-    space: '香港',
-    pv: '22(1.77%)',
-    play: '0.43s',
-    page: '1.1s',
-  },
-  {
-    id: '3',
-    space: '北京',
-    pv: '32(1.77%)',
-    play: '0.44s',
-    page: '1.7s',
-  },
-  {
-    id: '4',
-    space: '广东',
-    pv: '32(1.77%)',
-    play: '0.44s',
-    page: '1.7s',
-  },
-  {
-    id: '5',
-    space: '江苏',
-    pv: '16(0.88%)',
-    play: '0.66s',
-    page: '3.12s',
-  },
-  {
-    id: '6',
-    space: '福建',
-    pv: '1765(97.35%)',
-    play: '0.44s',
-    page: '1.7s',
-  },
-  {
-    id: '7',
-    space: '四川',
-    pv: '32(1.77%)',
-    play: '0.65s',
-    page: '2.92s',
-  },
-]
+const { gridSize } = useResponsiveSize()
+const grid = ref()
 
 const pagerConfig = ref({
   component: Pager,
@@ -77,6 +30,11 @@ const fetchData = ref({
   api: getData,
 })
 
+watch(() => props.tableData, () => {
+  pagerConfig.value.attrs.currentPage = 1
+  grid.value?.handleFetch?.('reload')
+}, { deep: true })
+
 // 各排序字段的取值解析：pv/play/page 是带单位的字符串，需取数值部分比较
 const sortParsers: Record<string, (v: string) => number> = {
   id: v => Number.parseInt(v, 10),
@@ -89,7 +47,7 @@ function getData({ page, sort }: any) {
   const { currentPage, pageSize } = page
   const offset = (currentPage - 1) * pageSize
 
-  const result = tableData.slice()
+  const result = props.tableData.slice()
 
   // 排序：点击表头后 Grid 会把 { field, order } 传进来
   if (sort?.order) {
@@ -103,7 +61,7 @@ function getData({ page, sort }: any) {
 
   return Promise.resolve({
     result: result.slice(offset, offset + pageSize),
-    page: { total: tableData.length },
+    page: { total: props.tableData.length },
   })
 }
 </script>
@@ -111,7 +69,7 @@ function getData({ page, sort }: any) {
 <template>
   <div class="container">
     <TinyGrid
-      :fetch-data="fetchData" :pager="pagerConfig"
+      ref="grid" :fetch-data="fetchData" :pager="pagerConfig"
       :size="gridSize" :auto-resize="true" align="center"
     >
       <TinyGridColumn field="id" :title="$t('home.roundtable.index')" width="16%" sortable />
