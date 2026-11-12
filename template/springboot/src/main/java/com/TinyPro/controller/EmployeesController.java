@@ -24,13 +24,13 @@ public class EmployeesController {
         this.employeeService = employeeService;
     }
 
-    @RequestMapping(value = "/getEmployee", method = {RequestMethod.GET, RequestMethod.POST})
+    @PostMapping("/getEmployee")
     public ApiResponse<EmployeePageVo> getEmployee(
             @Valid @RequestBody(required = false) EmployeeQueryDto query) {
         return ApiResponse.success(employeeService.queryPage(query));
     }
 
-    @RequestMapping(value = "/getEmployeeInfo", method = {RequestMethod.GET, RequestMethod.POST})
+    @PostMapping("/getEmployeeInfo")
     public ApiResponse<EmployeeVo> getEmployeeInfo(@RequestBody(required = false) java.util.Map<String, Object> params) {
         Object id = params == null ? null : params.get("id");
         return ApiResponse.success(EmployeeVo.from(employeeService.getById(id == null ? "" : String.valueOf(id))));
