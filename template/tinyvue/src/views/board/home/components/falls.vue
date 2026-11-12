@@ -5,11 +5,9 @@ import { useI18n } from 'vue-i18n'
 import useLocale from '@/hooks/locale'
 import { debounce } from '@/hooks/responsive'
 
+const props = defineProps<{ falls?: { pv: number[], play: number[], page: number[] } }>()
 const { t } = useI18n()
 const { currentLocale } = useLocale()
-
-// 瀑布图数据来自 nestJS mock（GET /api/board/home 的 falls）
-const props = defineProps<{ falls?: { pv: number[], play: number[], page: number[] } }>()
 
 function getPhases() {
   return ['DNS', t('home.falls.tcp'), t('home.falls.ssl'), 'Dns', t('home.falls.tcp'), t('home.falls.ssl')]

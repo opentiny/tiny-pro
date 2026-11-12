@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n'
 import useLocale from '@/hooks/locale'
 import { debounce } from '@/hooks/responsive'
 
+const props = defineProps<{ curve?: { pv: number[], play: number[], page: number[] } }>()
 const { t } = useI18n()
 const { currentLocale } = useLocale()
 
@@ -49,9 +50,6 @@ function getAreaStyle(startColor: string) {
 }
 
 const timeData = Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2, '0')}:00`)
-
-// 曲线数据来自 nestJS mock（GET /api/board/home 的 curve）
-const props = defineProps<{ curve?: { pv: number[], play: number[], page: number[] } }>()
 
 function buildRows() {
   const { pv = [], play = [], page = [] } = props.curve ?? {}
