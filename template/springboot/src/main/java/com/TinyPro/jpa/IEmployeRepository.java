@@ -1,8 +1,8 @@
 package com.TinyPro.jpa;
 
 import com.TinyPro.entity.po.Employee;
-import com.TinyPro.entity.po.I18;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface IEmployeRepository extends JpaRepository<Employee, Long> {
+public interface IEmployeRepository extends JpaRepository<Employee, Long>, JpaSpecificationExecutor<Employee> {
 }

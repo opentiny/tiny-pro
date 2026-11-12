@@ -1,23 +1,15 @@
 package com.TinyPro.controller;
 
-import com.TinyPro.annotation.IsPublic;
-import com.TinyPro.entity.po.Employee;
+import com.TinyPro.annotation.Reject;
+import com.TinyPro.entity.dto.EmployeeQueryDto;
+import com.TinyPro.entity.dto.EmployeeUpdateRequest;
+import com.TinyPro.entity.vo.EmployeePageVo;
+import com.TinyPro.entity.vo.EmployeeVo;
 import com.TinyPro.mock.ApiResponse;
-import com.TinyPro.mock.MockListController;
 import com.TinyPro.service.IEmployeeService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Map;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 成员的操作类
@@ -25,41 +17,39 @@ import java.util.Map;
 @RequestMapping("/employee")
 @RestController
 public class EmployeesController {
-    @Autowired
-    private IEmployeeService employeeService;
-    private final MockListController mockListController;
+    private final IEmployeeService employeeService;
 
     @Autowired
-    public EmployeesController(MockListController mockListController) {
-        this.mockListController = mockListController;
+    public EmployeesController(IEmployeeService employeeService) {
+        this.employeeService = employeeService;
     }
 
-    @IsPublic
     @RequestMapping(value = "/getEmployee", method = {RequestMethod.GET, RequestMethod.POST})
-    public Map<String, Object> getEmployee(@RequestBody(required = false) Map<String, Object> params) {
-        return mockListController.getEmployee(params);
+    public ApiResponse<EmployeePageVo> getEmployee(
+            @Valid @RequestBody(required = false) EmployeeQueryDto query) {
+        return ApiResponse.success(employeeService.queryPage(query));
     }
 
-    @IsPublic
     @RequestMapping(value = "/getEmployeeInfo", method = {RequestMethod.GET, RequestMethod.POST})
-    public Map<String, Object> getEmployeeInfo(@RequestBody(required = false) Map<String, Object> params) {
-        return mockListController.getEmployeeInfo(params);
+    public ApiResponse<EmployeeVo> getEmployeeInfo(@RequestBody(required = false) java.util.Map<String, Object> params) {
+        Object id = params == null ? null : params.get("id");
+        return ApiResponse.success(EmployeeVo.from(employeeService.getById(id == null ? "" : String.valueOf(id))));
     }
 
-    @IsPublic
-    @RequestMapping(value = "/updateEmployeeInfo", method = {RequestMethod.GET, RequestMethod.POST})
-    public boolean updateEmployeeInfo(@RequestBody(required = false) Map<String, Object> params) {
-        return mockListController.updateEmployeeInfo(params);
+    @Reject
+    @PostMapping("/updateEmployeeInfo")
+    public ApiResponse<Boolean> updateEmployeeInfo(@RequestBody(required = false) EmployeeUpdateRequest request) {
+        return ApiResponse.success(employeeService.update(request == null ? null : request.getData()));
     }
 
-    @IsPublic
+    @Reject
     @DeleteMapping("/delete")
     public ApiResponse<Boolean> deleteEmployee(@RequestParam(value = "id", required = false) String id) {
-        return mockListController.deleteEmployee(id);
+        return ApiResponse.success(employeeService.remove(id));
     }
 
     @GetMapping("getEmployee/{id}")
-    public ResponseEntity<Employee> findOne(@PathVariable String id) {
-        return new ResponseEntity<>(employeeService.getById(id), HttpStatus.OK);
+    public ApiResponse<EmployeeVo> findOne(@PathVariable String id) {
+        return ApiResponse.success(EmployeeVo.from(employeeService.getById(id)));
     }
 }
