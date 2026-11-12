@@ -38,7 +38,7 @@ test('generated employees vary across filterable columns', () => {
   assert.ok(new Set(employees.map(item => item.department)).size > 1)
   assert.ok(new Set(employees.map(item => item.address)).size > 1)
   assert.ok(new Set(employees.map(item => item.employeeNo)).size === 60)
-  assert.ok(employees.every(item => /^00\d{6}$/.test(item.employeeNo)))
+  assert.ok(employees.every(item => /^101\d{6}$/.test(item.employeeNo)))
   assert.deepEqual([...new Set(employees.map(item => item.status))].sort(), ['0', '1', '2'])
 })
 
