@@ -118,7 +118,7 @@ function randomCreateTime() {
 function randomEmployeeNo(used: Set<string>) {
   let value = ''
   do {
-    value = `00${String(Math.floor(Math.random() * 1000000)).padStart(6, '0')}`
+    value = `20${String(Math.floor(Math.random() * 1000000)).padStart(6, '0')}`
   } while (used.has(value))
   used.add(value)
   return value

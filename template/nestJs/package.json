@@ -11,6 +11,7 @@
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"libs/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
+    "start:mock": "cross-env MOCK_MODE=true node scripts/dev-watch.mjs",
     "start:debug": "nest start --debug --watch",
     "start:prod": "pm2 start dist/main.js --name=\"TinyuiNestjsServer\"",
     "stop": "pm2 stop TinyuiNestjsServer",

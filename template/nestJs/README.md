@@ -47,6 +47,15 @@ npm install
 
 完成上述检查后, 您可以使用 `docker compose up -d` 来运行 docker 环境
 
+### 联调模式说明
+
+演示页面接口（看板 `/user/getdata`、表单 `/base/getdata`、员工 `/employee/*`、项目 `/project/*` 等）有两种联调方式:
+
+- `pnpm start:dev`（默认）: 需要 MySQL 与 Redis。演示接口走真实业务路由, 数据来自 MySQL（如员工列表查 `employee` 表）
+- `pnpm start:mock`: **不需要 MySQL 与 Redis**。启用 `MOCK_MODE=true`, 应用只加载 mock 能力：演示接口、登录、用户信息、角色权限、菜单、国际化全部由内存 mock 数据接管（数据定义在 `src/mock/data/`）, 前端可直接完成登录并调试演示页面
+
+两种方式下前端请求形式不变（均为 `/api/**`）, 由后端启动方式决定数据来源。注意: 未建表的演示接口（看板、表单选项、项目等）在非 mock 模式下没有真实路由, 无法访问。
+
 
 ## 二次开发指南
 
