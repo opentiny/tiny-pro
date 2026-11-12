@@ -51,14 +51,9 @@ class EmployeesControllerTest {
     }
 
     @Test
-    void getEmployeeSupportsOpeningTheUrl() throws Exception {
-        when(employeeService.queryPage(any()))
-                .thenReturn(new EmployeePageVo(0, List.of(), Map.of()));
-
+    void getEmployeeRejectsGetRequests() throws Exception {
         mockMvc.perform(get("/employee/getEmployee"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value("0"))
-                .andExpect(jsonPath("$.data.total").value(0));
+                .andExpect(status().isMethodNotAllowed());
     }
 
     @Test
@@ -77,6 +72,12 @@ class EmployeesControllerTest {
                 .andExpect(jsonPath("$.data.id").value("2"))
                 .andExpect(jsonPath("$.data.name").value("员工2"))
                 .andExpect(jsonPath("$.data.employeeNo").value("00000002"));
+    }
+
+    @Test
+    void getEmployeeInfoRejectsGetRequests() throws Exception {
+        mockMvc.perform(get("/employee/getEmployeeInfo").param("id", "2"))
+                .andExpect(status().isMethodNotAllowed());
     }
 
     @Test
