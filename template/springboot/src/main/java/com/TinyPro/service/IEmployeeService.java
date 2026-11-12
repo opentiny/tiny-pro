@@ -1,6 +1,7 @@
 package com.TinyPro.service;
 
 import com.TinyPro.entity.po.Employee;
+import com.TinyPro.entity.dto.EmployeeCreateRequest;
 import com.TinyPro.entity.dto.EmployeeQueryDto;
 import com.TinyPro.entity.vo.EmployeePageVo;
 
@@ -11,6 +12,8 @@ public interface IEmployeeService {
     List<Employee> list(List<Long> employeeQueryWrapper);
 
     EmployeePageVo queryPage(EmployeeQueryDto query);
+
+    Employee create(EmployeeCreateRequest request);
 
     Employee getById(String id);
 

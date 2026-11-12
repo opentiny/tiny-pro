@@ -1,6 +1,7 @@
 package com.TinyPro.service.imp;
 
 import com.TinyPro.entity.dto.EmployeeQueryDto;
+import com.TinyPro.entity.dto.EmployeeCreateRequest;
 import com.TinyPro.entity.dto.EmployeeSearchFilterDto;
 import com.TinyPro.entity.dto.EmployeeSearchInfoDto;
 import com.TinyPro.entity.po.Employee;
@@ -101,6 +102,30 @@ public class EmployeeServiceimpl implements IEmployeeService {
                 .map(EmployeeVo::from)
                 .toList();
         return new EmployeePageVo(page.getTotalElements(), data, buildFilterOptions());
+    }
+
+    @Override
+    @Transactional
+    public Employee create(EmployeeCreateRequest request) {
+        Employee employee = new Employee();
+        if (request != null) {
+            employee.setName(request.getName());
+            employee.setEmployeeNo(request.getEmployeeNo());
+            employee.setDepartment(request.getDepartment());
+            employee.setDepartmentLevel(request.getDepartmentLevel());
+            employee.setStatus(request.getStatus());
+            employee.setWorkbenchName(request.getWorkbenchName());
+            employee.setProject(request.getProject());
+            employee.setType(request.getType());
+            employee.setAddress(request.getAddress());
+            employee.setRoles(request.getRoles());
+            employee.setLastUpdateUser(request.getLastUpdateUser());
+            employee.setCreateTime(parseDateTime(request.getCreateTime()));
+        }
+        if (employee.getCreateTime() == null) {
+            employee.setCreateTime(LocalDateTime.now());
+        }
+        return iEmployeRepository.saveAndFlush(employee);
     }
 
     @Override

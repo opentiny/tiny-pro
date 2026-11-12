@@ -75,6 +75,26 @@ class EmployeesControllerTest {
     }
 
     @Test
+    void createEmployeeReturnsTheCreatedEmployee() throws Exception {
+        Employee employee = new Employee();
+        employee.setId(61L);
+        employee.setName("新员工");
+        employee.setEmployeeNo("00000061");
+        when(employeeService.create(any())).thenReturn(employee);
+
+        mockMvc.perform(post("/employee/create")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"新员工\",\"employeeNo\":\"00000061\",\"status\":\"1\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("0"))
+                .andExpect(jsonPath("$.data.id").value("61"))
+                .andExpect(jsonPath("$.data.name").value("新员工"))
+                .andExpect(jsonPath("$.data.employeeNo").value("00000061"));
+
+        verify(employeeService).create(any());
+    }
+
+    @Test
     void getEmployeeInfoRejectsGetRequests() throws Exception {
         mockMvc.perform(get("/employee/getEmployeeInfo").param("id", "2"))
                 .andExpect(status().isMethodNotAllowed());

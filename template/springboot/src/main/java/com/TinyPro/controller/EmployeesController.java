@@ -1,6 +1,8 @@
 package com.TinyPro.controller;
 
+import com.TinyPro.annotation.PermissionAnnotation;
 import com.TinyPro.annotation.Reject;
+import com.TinyPro.entity.dto.EmployeeCreateRequest;
 import com.TinyPro.entity.dto.EmployeeQueryDto;
 import com.TinyPro.entity.dto.EmployeeUpdateRequest;
 import com.TinyPro.entity.vo.EmployeePageVo;
@@ -37,12 +39,21 @@ public class EmployeesController {
     }
 
     @Reject
+    @PermissionAnnotation("employee::add")
+    @PostMapping("/create")
+    public ApiResponse<EmployeeVo> createEmployee(@RequestBody(required = false) EmployeeCreateRequest request) {
+        return ApiResponse.success(EmployeeVo.from(employeeService.create(request)));
+    }
+
+    @Reject
+    @PermissionAnnotation("employee::update")
     @PostMapping("/updateEmployeeInfo")
     public ApiResponse<Boolean> updateEmployeeInfo(@RequestBody(required = false) EmployeeUpdateRequest request) {
         return ApiResponse.success(employeeService.update(request == null ? null : request.getData()));
     }
 
     @Reject
+    @PermissionAnnotation("employee::remove")
     @DeleteMapping("/delete")
     public ApiResponse<Boolean> deleteEmployee(@RequestParam(value = "id", required = false) String id) {
         return ApiResponse.success(employeeService.remove(id));

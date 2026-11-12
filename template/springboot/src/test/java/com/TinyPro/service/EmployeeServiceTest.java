@@ -1,6 +1,7 @@
 package com.TinyPro.service;
 
 import com.TinyPro.entity.dto.EmployeeQueryDto;
+import com.TinyPro.entity.dto.EmployeeCreateRequest;
 import com.TinyPro.entity.dto.EmployeeSearchFilterDto;
 import com.TinyPro.entity.dto.EmployeeSearchInfoDto;
 import com.TinyPro.entity.po.Employee;
@@ -107,6 +108,22 @@ class EmployeeServiceTest {
 
         assertTrue(employeeService.remove(String.valueOf(employee.getId())));
         assertTrue(employeeRepository.findById(employee.getId()).isEmpty());
+    }
+
+    @Test
+    void createPersistsAndReturnsAnEmployee() {
+        EmployeeCreateRequest request = new EmployeeCreateRequest();
+        request.setName("新员工");
+        request.setEmployeeNo("00000061");
+        request.setDepartment("技术部");
+        request.setStatus("1");
+
+        Employee created = employeeService.create(request);
+
+        assertTrue(created.getId() != null);
+        assertEquals("新员工", created.getName());
+        assertEquals("00000061", created.getEmployeeNo());
+        assertTrue(employeeRepository.findById(created.getId()).isPresent());
     }
 
     private Employee employee(String name, String department, String status, String createTime) {
