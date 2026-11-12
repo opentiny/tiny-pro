@@ -43,6 +43,9 @@ import { PermissionInit } from './permission/permission.initalizer';
 import { UserInit } from './user/user.initalizer';
 import { ApplicationInit } from './application/application.init';
 import { ChatModule } from './chat/chat.module';
+import { ProjectModule } from './project/project.module';
+import { EditorModule } from './editor/editor.module';
+import { DemoDataModule } from './demo/demo-data.module';
 
 const INSTALL_FLAG = 'FLAG:INSTALL';
 const MAX_RETRY = 20;
@@ -58,6 +61,9 @@ const MAX_RETRY = 20;
     MenuModule,
     ApplicationModule,
     ChatModule,
+    ProjectModule,
+    EditorModule,
+    DemoDataModule,
     ConfigModule.forRoot({
       isGlobal: true,
       expandVariables: true,

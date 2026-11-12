@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import learncoach from './components/learn-coach.vue'
-import salesChart from './components/sales-chart.vue'
 import learnplan from './components/learn-plan.vue'
 import learnprobation from './components/learn-probation.vue'
 import learntrain from './components/learn-traini.vue'
+import salesChart from './components/sales-chart.vue'
 
 const Home = [
   { label: 'work.index.Brave', value: 'work.index.Growth' },

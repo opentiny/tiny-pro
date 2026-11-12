@@ -24,7 +24,7 @@ export const successResponseWrap = (data: unknown) => {
   return {
     data,
     errMsg: '',
-    code: '0',
+    code: 200,
   };
 };
 

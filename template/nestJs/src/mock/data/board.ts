@@ -97,10 +97,11 @@ export default [
     url: '/api/user/getselect',
     method: 'post',
     response: (data: any) => {
+      const selected = data.body?.value ?? data.body;
       let result = null;
-      if (data.body === 1) {
+      if (selected === 1 || selected === '1') {
         result = successResponseWrap(changeDate.options1);
-      } else if (data.body === 2) {
+      } else if (selected === 2 || selected === '2') {
         result = successResponseWrap(changeDate.options2);
       } else {
         result = successResponseWrap(changeDate.options3);
