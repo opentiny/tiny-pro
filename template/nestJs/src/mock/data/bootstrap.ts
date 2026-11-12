@@ -375,9 +375,12 @@ export default [
     method: 'post',
     response: (params: { body: any }) => {
       const { email, password } = params.body ?? {};
-      const user = users.find(
-        (item) => item.email === email && item.password === password
-      );
+      const user =
+        typeof password === 'string' && password.trim()
+          ? users.find(
+              (item) => item.email === email && item.password === password
+            )
+          : undefined;
       if (!user) {
         throw new HttpException('邮箱或密码错误', HttpStatus.UNAUTHORIZED);
       }
@@ -519,7 +522,11 @@ export default [
       if (!user) {
         throw new HttpException('用户不存在', HttpStatus.NOT_FOUND);
       }
-      user.password = params.body?.newPassword ?? params.body?.password;
+      const newPassword = params.body?.newPassword ?? params.body?.password;
+      if (typeof newPassword !== 'string' || !newPassword.trim()) {
+        throw new HttpException('新密码不能为空', HttpStatus.BAD_REQUEST);
+      }
+      user.password = newPassword;
       return true;
     },
   },
@@ -532,8 +539,12 @@ export default [
       if (user?.password !== undefined && oldPassword !== user.password) {
         throw new HttpException('原密码错误', HttpStatus.BAD_REQUEST);
       }
+      const newPassword = params.body?.newPassword;
+      if (typeof newPassword !== 'string' || !newPassword.trim()) {
+        throw new HttpException('新密码不能为空', HttpStatus.BAD_REQUEST);
+      }
       if (user) {
-        user.password = params.body?.newPassword;
+        user.password = newPassword;
       }
       return true;
     },

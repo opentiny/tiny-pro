@@ -124,7 +124,8 @@ export default [
         throw new HttpException(
           failResponseWrap(
             null,
-            `Missing required fields: ${missing.join(', ')}`
+            `Missing required fields: ${missing.join(', ')}`,
+            String(HttpStatus.BAD_REQUEST)
           ),
           HttpStatus.BAD_REQUEST
         );
@@ -162,7 +163,7 @@ export default [
       );
       if (index === -1) {
         throw new HttpException(
-          successResponseWrap(false),
+          failResponseWrap(null, '项目不存在', String(HttpStatus.NOT_FOUND)),
           HttpStatus.NOT_FOUND
         );
       }
