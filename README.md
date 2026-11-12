@@ -20,10 +20,24 @@ TinyPro 是 TinyCLI 的一个套件，是一个开箱即用、前后端分离的
 
 官网：[https://opentiny.design/vue-pro](https://opentiny.design/vue-pro)
 
-## 一行命令初始化一个后台管理模板
+## TinyCLI一行命令————初始化一个后台管理模板
 
 请确保您安装了`Node.js`、`NPM`、`TinyCLI`。
 
+官方推荐用 npm 安装 TinyCLI：
+
+```bash
+npm install @opentiny/cli -g
+tiny -v
+```
+
+查看是否安装成功：
+
+```bash
+tiny -v
+```
+
+使用 tiny init 命令，创建pro项目：
 ```bash
 tiny init pro
 ```
@@ -40,7 +54,7 @@ tiny-pro
 
 后端服务支持 `Docker 启动` 与 `命令启动` 两种方式。
 
-### Docker 启动
+### Docker 启动（方式一）
 
 请确保您安装了 `Docker`。
 
@@ -50,7 +64,7 @@ tiny-pro
 docker compose up -d
 ```
 
-### 命令启动
+### 命令启动（方式二）
 
 请确保您安装了 `MySQL`、`Redis`。
 
@@ -61,51 +75,65 @@ docker compose up -d
 - MySQL 中存在 `.env` 文件中 `DATABASE_NAME` 字段定义的数据库，且该数据库为空
 - `.env` 文件中 `DATABASE_SYNCHRONIZE` 为 `true`
 
-完成上述检查后，您可以在 `tiny-pro/nestJs` 下执行以下命令，启动后端服务：
-
-```bash
-npm i && npm start
-```
-
-## 前端启动
-
-前端支持 **Mock 独立启动** 与 **连接真实后端** 两种方式。
-
-### Mock 独立启动（推荐快速体验）
-
-在 `tiny-pro/web` 下依次执行以下命令：
-
-- 安装依赖：`npm i`
-- 启动前端项目：`npm start`
-
-`npm start` 会同时拉起 Mock 服务和 Vite 开发服务，无需启动后端即可访问 [http://localhost:3031/](http://localhost:3031/)。
-
-### 连接真实后端
-
-请先按上文启动后端服务，然后在 `tiny-pro/web` 下执行：
-
-```bash
-npm run dev:full
-```
-
 更详细的文档请参考 TinyPro 官网：[https://opentiny.design/vue-pro](https://opentiny.design/vue-pro)
 
-## 本地启动
+## 本地项目启动运行
 
-如果你有意愿参与本项目的贡献，可以通过以下方式启动项目。
+如果你有意愿参与本项目的贡献，可以通过以下方式启动项目。共三种模式，按是否需要 MySQL / Redis 选择：
 
-### 仅启动前端（Mock）
+> 以下以 pnpm 为例；npm 用户请注意：根目录使用 pnpm workspace，npm 无法使用根目录脚本，请进入对应子项目目录执行（命令见各模式末尾的 npm 等价命令）。
 
-无需 MySQL / Redis / 后端，适合前端开发与调试：
+### 模式一：纯前端 Mock（无需 MySQL / Redis，推荐快速体验）
+Mock 服务和前端都由 tinyvue 提供，无需启动任何后端：
 
 ```shell
 pnpm i
 pnpm dev
 ```
 
-`pnpm dev` 会调用前端的 `start` 脚本，同时启动 Mock 与 Vite。启动成功之后，会自动打开浏览器，并访问：[http://localhost:3031/](http://localhost:3031/)。
+`pnpm dev` 会同时启动 Mock 服务（8848）与 Vite 开发服务。启动成功之后，会自动打开浏览器，并访问：[http://localhost:3031/](http://localhost:3031/)。
 
-### 启动前后端联调
+npm 等价命令：
+
+```shell
+cd template/tinyvue
+npm i
+npm run start:mock
+```
+
+### 模式二：NestJS Mock 联调（无需 MySQL / Redis）
+
+NestJS 以 `MOCK_MODE=true` 启动，只加载 mock 能力：演示接口、登录、用户信息、角色权限、菜单、国际化、系统管理页的增删改查全部由 NestJS 内存 mock 数据接管（数据定义在 `template/nestJs/src/mock/data/`），适合联调后端接口形态或调试前端页面。
+
+```shell
+pnpm i
+
+# 终端 1：启动 NestJS mock 服务
+pnpm nest:mock
+
+# 终端 2：启动前端
+pnpm dev:vite
+```
+
+访问 [http://localhost:3031/](http://localhost:3031/)，账号 `admin@no-reply.com` / `admin`。修改 `template/nestJs/src/mock/data/` 下的数据文件会热更新，重启服务后还原。
+
+npm 等价命令：
+
+```shell
+# 终端 1
+cd template/nestJs
+npm i
+npm run start:mock
+
+# 终端 2
+cd template/tinyvue
+npm i
+npm run dev
+```
+
+### 模式三：真实数据库联调（需要 MySQL / Redis）
+
+演示接口走真实业务路由，数据来自 MySQL。
 
 前提是 MySQL / Redis 服务已成功启动。
 
@@ -144,12 +172,13 @@ $ redis-cli
 PONG
 ```
 
-3. 复制 NestJS 环境变量
+3. 配置后端环境变量
 
 ```shell
-cd template/nestJs
-cp .env.example .env
+cp template/nestJs/.env.example template/nestJs/.env
 ```
+
+编辑 `template/nestJs/.env`，根据本机 MySQL 配置填写 `DATABASE_HOST`、`DATABASE_PORT`、`DATABASE_USERNAME`、`DATABASE_PASSWORD` 和 `DATABASE_NAME`。
 
 4. 安装依赖并启动前后端
 
@@ -160,11 +189,27 @@ pnpm i
 # 启动后端，执行该命令之后，会初始化 MySQL 数据库 demo_tiny_pro 的表结构，并填充表数据
 pnpm dev:backend
 
-# 启动前端（关闭 Mock，代理到真实后端）
-pnpm -F tiny-pro-vue dev:full
+# 启动前端
+pnpm dev:vite
 ```
 
 启动成功之后，会自动打开浏览器，并访问：[http://localhost:3031/](http://localhost:3031/)。
+
+npm 等价命令：
+
+```shell
+# 终端 1
+cd template/nestJs
+npm i
+npm start
+
+# 终端 2（dev.env 中 VITE_USE_MOCK 默认为 false，直接 dev 即代理到真实后端）
+cd template/tinyvue
+npm i
+npm run dev
+```
+
+> 说明：三种模式下前端请求形式不变（均为 `/api/**`）。模式二、三的区别在于 NestJS 的启动方式（`pnpm nest:mock` 或 `pnpm dev:backend`），由后端决定演示接口的数据来源（内存 mock 或 MySQL）。
 
 ## 维护者
 
