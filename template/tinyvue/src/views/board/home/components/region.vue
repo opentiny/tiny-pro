@@ -1,52 +1,29 @@
 <script lang="ts" setup>
 import { TinyHuichartsMap as TinyChartMap } from '@opentiny/vue-huicharts'
-import { onMounted, onUnmounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 import chinaData from '@/assets/china.json'
 import { debounce } from '@/hooks/responsive'
 import RegionTable from './regiontable.vue'
 
-const data = [
-  { name: '北京市', value: 350000 },
-  { name: '天津市', value: 120000 },
-  { name: '上海市', value: 300000 },
-  { name: '重庆市', value: 92000 },
-  { name: '河北省', value: 25000 },
-  { name: '河南省', value: 20000 },
-  { name: '云南省', value: 500 },
-  { name: '辽宁省', value: 3050 },
-  { name: '黑龙江省', value: 80000 },
-  { name: '湖南省', value: 2000 },
-  { name: '安徽省', value: 24580 },
-  { name: '山东省', value: 40629 },
-  { name: '新疆维吾尔自治区', value: 36981 },
-  { name: '江苏省', value: 13569 },
-  { name: '浙江省', value: 24956 },
-  { name: '江西省', value: 15194 },
-  { name: '湖北省', value: 41398 },
-  { name: '广西壮族自治区', value: 41150 },
-  { name: '甘肃省', value: 17630 },
-  { name: '山西省', value: 27370 },
-  { name: '内蒙古自治区', value: 27370 },
-  { name: '陕西省', value: 97208 },
-  { name: '吉林省', value: 88290 },
-  { name: '福建省', value: 19978 },
-  { name: '贵州省', value: 94485 },
-  { name: '广东省', value: 89426 },
-  { name: '青海省', value: 35484 },
-  { name: '西藏自治区', value: 97413 },
-  { name: '四川省', value: 54161 },
-  { name: '宁夏回族自治区', value: 56515 },
-  { name: '海南省', value: 54871 },
-  { name: '台湾省', value: 48544 },
-  { name: '香港省', value: 49474 },
-  { name: '澳门特别行政区', value: 34594 },
-]
+// 地图与地域表格数据来自 nestJS mock（GET /api/board/home 的 region / regionTable）
+const props = defineProps<{
+  region?: { name: string, value: number }[]
+  regionTable?: { id: string, space: string, pv: string, play: string, page: string }[]
+}>()
 
 const mapChartsRef = ref()
 const chartData = ref({
   columns: ['name', 'value'],
-  rows: data,
+  rows: [] as { name: string, value: number }[],
 })
+
+// mock 数据异步到达后填充地图
+watch(() => props.region, (region) => {
+  if (region) {
+    chartData.value.rows = region
+    mapChartsRef.value?.resize()
+  }
+}, { deep: true, immediate: true })
 const chartSettings = ref({
   position: 'china',
   mapOrigin: chinaData, // 用户自己的地图数据
@@ -133,7 +110,7 @@ onMounted(() => {
         />
       </div>
       <div class="region-table">
-        <RegionTable />
+        <RegionTable :table-data="regionTable ?? []" />
       </div>
     </div>
   </div>

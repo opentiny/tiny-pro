@@ -36,6 +36,7 @@ export interface LoginRes {
 export interface UserRes {
   chartData: []
   tableData: []
+  taskSummary?: { status: string, value: number }[]
 }
 export interface UserData {
   sort?: number | undefined

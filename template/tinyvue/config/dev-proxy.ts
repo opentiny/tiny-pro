@@ -25,6 +25,10 @@ export function createDevProxyConfig(
       rewrite: (path: string) =>
         path.replace(
           new RegExp(`^${env.VITE_BASE_API}`),
+          // 纯前端 mock 模式原样转发到 8848（handler 按 /api 匹配）；
+          // 联调模式剥掉 /api 前缀转发到后端，
+          // 演示接口走 NestJS 内存 mock 还是真实数据库由后端的
+          // MOCK_MODE 决定（nestJs: pnpm start:mock / pnpm start:dev）
           useMock ? env.VITE_BASE_API : '',
         ),
     },

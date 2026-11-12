@@ -22,28 +22,14 @@ interface CardData {
   percent: number
 }
 
-const rangeData: Record<RangeKey, CardData[]> = {
-  week: [
-    { value: '3.23', trend: 'up', change: '5.2%', type: 'success', percent: 76 },
-    { value: '1.56', trend: 'down', change: '2.1%', type: 'danger', percent: 48 },
-    { value: '3.69', trend: 'up', change: '0.88%', type: 'success', percent: 82 },
-    { value: '0.69', trend: 'down', change: '1.4%', type: 'danger', percent: 35 },
-  ],
-  day: [
-    { value: '2.87', trend: 'up', change: '3.6%', type: 'success', percent: 71 },
-    { value: '1.42', trend: 'up', change: '0.9%', type: 'success', percent: 54 },
-    { value: '3.15', trend: 'down', change: '1.8%', type: 'danger', percent: 68 },
-    { value: '0.74', trend: 'up', change: '2.4%', type: 'success', percent: 42 },
-  ],
-  hour: [
-    { value: '2.41', trend: 'down', change: '0.6%', type: 'danger', percent: 64 },
-    { value: '1.08', trend: 'down', change: '1.2%', type: 'danger', percent: 47 },
-    { value: '2.96', trend: 'up', change: '1.1%', type: 'success', percent: 79 },
-    { value: '0.52', trend: 'up', change: '4.3%', type: 'success', percent: 58 },
-  ],
-}
+// 卡片数据来自 nestJS mock（GET /api/board/home 的 cards）
+const props = defineProps<{ cards?: Record<RangeKey, CardData[]> }>()
 
-const cards = [
+const emptyCards: Record<RangeKey, CardData[]> = { week: [], day: [], hour: [] }
+
+const rangeData = computed(() => props.cards ?? emptyCards)
+
+const cardLabels = [
   { labelKey: 'home.main.one' },
   { label: 'DOM Ready' },
   { labelKey: 'home.main.up' },
@@ -51,7 +37,7 @@ const cards = [
 ]
 
 const currentRange = ref<RangeKey>('week')
-const currentData = computed(() => rangeData[currentRange.value])
+const currentData = computed(() => rangeData.value[currentRange.value])
 
 const trendIcons = {
   up: TrendUpIcon,
@@ -81,8 +67,8 @@ const trendIcons = {
         </div>
       </div>
     </div>
-    <div class="cards">
-      <div v-for="(card, index) in cards" :key="card.label || card.labelKey" class="card">
+    <div v-if="currentData.length" class="cards">
+      <div v-for="(card, index) in cardLabels" :key="card.label || card.labelKey" class="card">
         <div class="info">
           <div class="value">
             {{ currentData[index].value }}<span class="unit">/s</span>

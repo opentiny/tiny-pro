@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { TinyHuichartsBar as TinyChartBar } from '@opentiny/vue-huicharts'
-import { onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import useLocale from '@/hooks/locale'
 import { debounce } from '@/hooks/responsive'
@@ -8,9 +8,8 @@ import { debounce } from '@/hooks/responsive'
 const { t } = useI18n()
 const { currentLocale } = useLocale()
 
-const playData = [12, 22, 10, 18, 25, 14]
-const pageData = [20, 15, 26, 22, 18, 24]
-const pvData = [8, 18, 14, 26, 12, 20]
+// 瀑布图数据来自 nestJS mock（GET /api/board/home 的 falls）
+const props = defineProps<{ falls?: { pv: number[], play: number[], page: number[] } }>()
 
 function getPhases() {
   return ['DNS', t('home.falls.tcp'), t('home.falls.ssl'), 'Dns', t('home.falls.tcp'), t('home.falls.ssl')]
@@ -18,23 +17,26 @@ function getPhases() {
 
 function buildRows() {
   const phases = getPhases()
+  const { pv = [], play = [], page = [] } = props.falls ?? {}
   return phases.map((phase, index) => ({
     phase,
-    [t('home.curve.play')]: playData[index],
-    [t('home.curve.page')]: pageData[index],
-    [t('home.main.down')]: pvData[index],
+    [t('home.curve.play')]: play[index],
+    [t('home.curve.page')]: page[index],
+    [t('home.main.down')]: pv[index],
   }))
 }
 
 const barRef = ref()
-const options = ref({
+// options 用 computed 整体重建：props 数据或语言变化时图表自动更新
+// （huicharts 对初始化后的嵌套 mutation 不敏感，必须整体替换 options）
+const options = computed(() => ({
   data: buildRows(),
   xAxis: [
     {
       keyName: 'phase',
     },
   ],
-})
+}))
 const chartExtend = ref({
   grid: {
     left: '3%',
@@ -113,7 +115,6 @@ onMounted(() => {
 })
 
 watch(currentLocale, () => {
-  options.value.data = buildRows()
   chartExtend.value.legend.data = [t('home.curve.play'), t('home.curve.page'), t('home.main.down')]
   barRef.value?.resize()
 })
