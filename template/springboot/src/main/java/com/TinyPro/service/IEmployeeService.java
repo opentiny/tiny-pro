@@ -1,15 +1,23 @@
 package com.TinyPro.service;
 
 import com.TinyPro.entity.po.Employee;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.service.IService;
+import com.TinyPro.entity.dto.EmployeeCreateRequest;
+import com.TinyPro.entity.dto.EmployeeQueryDto;
+import com.TinyPro.entity.vo.EmployeePageVo;
 
 import java.util.List;
+import java.util.Map;
 
 public interface IEmployeeService {
     List<Employee> list(List<Long> employeeQueryWrapper);
 
+    EmployeePageVo queryPage(EmployeeQueryDto query);
+
+    Employee create(EmployeeCreateRequest request);
+
     Employee getById(String id);
 
-    void remove(String Id);
+    boolean update(Map<String, Object> data);
+
+    boolean remove(String id);
 }
