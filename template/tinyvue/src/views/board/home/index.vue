@@ -8,7 +8,8 @@ const Main = defineAsyncComponent(() => import('./components/main.vue'))
 const Round = defineAsyncComponent(() => import('./components/round.vue'))
 const Region = defineAsyncComponent(() => import('./components/region.vue'))
 
-// 整页数据来自 GET /api/board/home；请求失败时各模块照常展示空状态。
+// 整页数据来自 nestJS mock / 纯前端 mock（GET /api/board/home）。
+// 请求失败或无数据时 homeData 为 undefined，各模块照常渲染、展示空数据
 const homeData = ref()
 
 onMounted(async () => {

@@ -5,7 +5,9 @@ import {
   Module,
   NestModule,
   OnModuleInit,
+  Optional,
 } from '@nestjs/common';
+import 'dotenv/config';
 import { UserModule } from './user/user.module';
 import { DbModule } from '@app/db';
 import { EmployeesModule } from './employees/employees.module';
@@ -28,6 +30,7 @@ import {
   I18nModule,
 } from 'nestjs-i18n';
 import { MockModule } from './mock/mock.module';
+import { MockModeMiddleware } from './mock/mock-mode.middleware';
 import { RejectRequestGuard } from './public/reject.guard';
 import { HealthCheckController } from './health-check.controller';
 import { ApplicationModule } from './application/application.module';
@@ -50,26 +53,17 @@ import { DemoDataModule } from './demo/demo-data.module';
 const INSTALL_FLAG = 'FLAG:INSTALL';
 const MAX_RETRY = 20;
 
+// mock 数据联调模式（pnpm start:mock）：只启动 mock 能力，
+// 不连接 MySQL/Redis，登录与系统引导链路由内存 mock 数据接管
+const MOCK_MODE = process.env.MOCK_MODE === 'true';
+
 @Module({
   imports: [
-    DbModule,
-    UserModule,
-    EmployeesModule,
-    PermissionModule,
-    AuthModule,
-    RoleModule,
-    MenuModule,
-    ApplicationModule,
-    ChatModule,
-    ProjectModule,
-    EditorModule,
-    DemoDataModule,
     ConfigModule.forRoot({
       isGlobal: true,
       expandVariables: true,
       validationSchema: CONFIG_SCHEMA
     }),
-    I18Module,
     I18nModule.forRoot({
       fallbackLanguage: 'enUS',
       loaderOptions: {
@@ -80,42 +74,60 @@ const MAX_RETRY = 20;
       typesOutputPath: join(__dirname, '../src/.generate/i18n.generated.ts'),
     }),
     MockModule,
-    RedisModule,
-    LockerModule.register({
-      global: true
-    }),
+    ...(MOCK_MODE
+      ? []
+      : [
+          DbModule,
+          UserModule,
+          EmployeesModule,
+          PermissionModule,
+          AuthModule,
+          RoleModule,
+          MenuModule,
+          ApplicationModule,
+          ChatModule,
+          I18Module,
+          RedisModule,
+          LockerModule.register({
+            global: true
+          }),
+        ]),
   ],
   controllers: [HealthCheckController],
   providers: [
-    {
-      provide: APP_GUARD,
-      useClass: AuthGuard,
-    },
-    {
-      provide: APP_GUARD,
-      useClass: RejectRequestGuard,
-    },
-    {
-      provide: APP_GUARD,
-      useClass: PermissionGuard,
-    },
-    InstallLock,
-    LockerDiscover,
+    ...(MOCK_MODE
+      ? []
+      : [
+          {
+            provide: APP_GUARD,
+            useClass: AuthGuard,
+          },
+          {
+            provide: APP_GUARD,
+            useClass: RejectRequestGuard,
+          },
+          {
+            provide: APP_GUARD,
+            useClass: PermissionGuard,
+          },
+          InstallLock,
+          LockerDiscover,
+        ]),
   ],
-  exports: [LockerDiscover]
+  exports: MOCK_MODE ? [] : [LockerDiscover]
 })
 export class AppModule implements OnModuleInit,NestModule {
   constructor(
-    private lang: I18LangService,
-    private i18: I18Service,
-    private lock: InstallLock,
-    private redis: RedisService,
+    @Optional() private lang: I18LangService,
+    @Optional() private i18: I18Service,
+    @Optional() private lock: InstallLock,
+    @Optional() private redis: RedisService,
     private cfg: ConfigService<Configure>,
-    private menuInit: MenuInitializer,
-    private roleInit: RoleInit,
-    private permissionInit: PermissionInit,
-    private userInit: UserInit,
-    private applicationInit: ApplicationInit
+    @Optional() private menuInit: MenuInitializer,
+    @Optional() private roleInit: RoleInit,
+    @Optional() private permissionInit: PermissionInit,
+    @Optional() private userInit: UserInit,
+    @Optional() private applicationInit: ApplicationInit
   ) {}
   async isInstalled(redis: Redis) {
     return redis.exists(INSTALL_FLAG);
@@ -124,12 +136,22 @@ export class AppModule implements OnModuleInit,NestModule {
     return redis.set(INSTALL_FLAG, '1');
   }
   configure(consumer: MiddlewareConsumer) {
+    if (MOCK_MODE) {
+      Logger.log('[APP]: mock 数据联调模式已启用 (MOCK_MODE=true), 演示接口与登录由内存 mock 数据接管, 不连接 MySQL/Redis');
+      consumer
+        .apply(MockModeMiddleware)
+        .forRoutes('*');
+      return;
+    }
     consumer
       .apply(LockRequestContextMiddleware)
       .forRoutes('*');
   }
   async onModuleInit(
   ) {
+    if (MOCK_MODE) {
+      return;
+    }
     const IS_PREVIEW_MOD = this.cfg.get('PREVIEW_MODE');
     if (IS_PREVIEW_MOD) {
       Logger.warn('You are currently in demonstration mode. All additions, deletions, and modifications request will be rejected');
