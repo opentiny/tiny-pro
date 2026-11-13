@@ -31,6 +31,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -67,10 +68,15 @@ public class EmployeeServiceimpl implements IEmployeeService {
     private static final Set<String> FUZZY_FIELDS = Set.of("name", "employeeNo");
 
     private static final DateTimeFormatter[] DATE_TIME_FORMATTERS = {
-            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"),
-            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"),
-            DateTimeFormatter.ofPattern("yyyy-MM-dd")
+            DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss")
+                    .withResolverStyle(ResolverStyle.STRICT),
+            DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm")
+                    .withResolverStyle(ResolverStyle.STRICT)
     };
+
+    private static final DateTimeFormatter DATE_FORMATTER =
+            DateTimeFormatter.ofPattern("uuuu-MM-dd")
+                    .withResolverStyle(ResolverStyle.STRICT);
 
     private final IEmployeRepository iEmployeRepository;
 
@@ -99,6 +105,13 @@ public class EmployeeServiceimpl implements IEmployeeService {
                 normalizePageValue(query == null ? null : query.getPageSize(), DEFAULT_PAGE_SIZE),
                 MAX_PAGE_SIZE
         );
+        long offset = ((long) pageIndex - 1) * pageSize;
+        if (offset > Integer.MAX_VALUE) {
+          throw new ResponseStatusException(
+            HttpStatus.BAD_REQUEST,
+            "分页页码过大"
+          );
+        }
         Pageable pageable = PageRequest.of(
           pageIndex - 1,
           pageSize,
@@ -197,13 +210,6 @@ public class EmployeeServiceimpl implements IEmployeeService {
         updateStringField(data, "address", employee::setAddress);
         updateStringField(data, "roles", employee::setRoles);
         updateStringField(data, "lastUpdateUser", employee::setLastUpdateUser);
-        Object createTime = data.get("createTime");
-        if (createTime instanceof String value) {
-            LocalDateTime parsed = parseDateTime(value);
-            if (parsed != null) {
-                employee.setCreateTime(parsed);
-            }
-        }
         iEmployeRepository.save(employee);
         return true;
     }
@@ -396,13 +402,15 @@ public class EmployeeServiceimpl implements IEmployeeService {
         String normalized = value.trim().replace('/', '-');
         for (DateTimeFormatter formatter : DATE_TIME_FORMATTERS) {
             try {
-                return LocalDateTime.parse(normalized, formatter);
+            return LocalDateTime.parse(normalized, formatter);
             } catch (DateTimeParseException ignored) {
                 // Try the next supported input format.
+
             }
         }
         try {
-            return LocalDate.parse(normalized).atTime(endOfDay ? LocalTime.MAX : LocalTime.MIN);
+            return LocalDate.parse(normalized, DATE_FORMATTER)
+                    .atTime(endOfDay ? LocalTime.MAX : LocalTime.MIN);
         } catch (DateTimeParseException ignored) {
             // Ignore invalid range values, matching the permissive NestJS query behavior.
         }

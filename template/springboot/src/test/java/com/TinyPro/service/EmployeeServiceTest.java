@@ -20,7 +20,9 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.springframework.web.server.ResponseStatusException;
 
 @DataJpaTest
 @Import(EmployeeServiceimpl.class)
@@ -151,6 +153,31 @@ class EmployeeServiceTest {
         assertEquals("新员工", created.getName());
         assertEquals("00000061", created.getEmployeeNo());
         assertTrue(employeeRepository.findById(created.getId()).isPresent());
+    }
+
+    @Test
+    void rejectsInvalidCreateTimeWhenCreatingEmployee() {
+        EmployeeCreateRequest request = new EmployeeCreateRequest();
+        request.setName("非法日期员工");
+        request.setEmployeeNo("00000062");
+        request.setCreateTime("2025-02-30 09:00:00");
+
+        assertThrows(ResponseStatusException.class, () -> employeeService.create(request));
+        assertTrue(employeeRepository.findByEmployeeNo("00000062").isEmpty());
+    }
+
+    @Test
+    void rejectsInvalidCreateTimeWhenUpdatingEmployee() {
+        Employee employee = employeeRepository.findAll().get(0);
+        LocalDateTime originalCreateTime = employee.getCreateTime();
+
+        assertThrows(ResponseStatusException.class, () -> employeeService.update(Map.of(
+                "id", String.valueOf(employee.getId()),
+                "createTime", "2025-04-31 09:00:00"
+        )));
+
+        assertEquals(originalCreateTime,
+                employeeRepository.findById(employee.getId()).orElseThrow().getCreateTime());
     }
 
     private Employee employee(String name, String department, String status, String createTime) {
