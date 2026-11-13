@@ -1,5 +1,14 @@
 import axios from 'axios'
 
+export interface ProjectVersion {
+  id: string
+  version: string
+  date: string
+  content: string
+  status: string
+  owner: string
+}
+
 export interface ProjectInfo {
   id: string
   projectName: string
@@ -11,6 +20,17 @@ export interface ProjectInfo {
   endTime: string
   priority: string
   owner: string
+  progress: number
+  manHours: number
+  budget: number
+  teamSize: number
+  goal: string
+  technology: string
+  partner: string
+  riskLevel: string
+  quality: string
+  remark: string
+  versions: ProjectVersion[] | null
 }
 
 export function queryProjectList() {

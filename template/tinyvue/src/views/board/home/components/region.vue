@@ -5,7 +5,6 @@ import chinaData from '@/assets/china.json'
 import { debounce } from '@/hooks/responsive'
 import RegionTable from './regiontable.vue'
 
-// 地图与地域表格数据来自 nestJS mock（GET /api/board/home 的 region / regionTable）
 const props = defineProps<{
   region?: { name: string, value: number }[]
   regionTable?: { id: string, space: string, pv: string, play: string, page: string }[]

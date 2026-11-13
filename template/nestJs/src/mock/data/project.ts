@@ -1,6 +1,15 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { failResponseWrap, successResponseWrap } from '../utils';
 
+export interface ProjectVersion {
+  id: string;
+  version: string;
+  date: string;
+  content: string;
+  status: string;
+  owner: string;
+}
+
 export interface ProjectRecord {
   id: string;
   projectName: string;
@@ -12,6 +21,17 @@ export interface ProjectRecord {
   endTime: string;
   priority: string;
   owner: string;
+  progress: number;
+  manHours: number;
+  budget: number;
+  teamSize: number;
+  goal: string;
+  technology: string;
+  partner: string;
+  riskLevel: string;
+  quality: string;
+  remark: string;
+  versions: ProjectVersion[];
 }
 
 const projectNames = [
@@ -72,6 +92,47 @@ function pick<T>(list: T[], index: number): T {
   return list[index % list.length];
 }
 
+const technologies = [
+  'Vue3 + TypeScript + TinyVue / NestJS / MySQL',
+  'Vue3 + TinyVue / SpringBoot / MySQL',
+  'Vue3 + TypeScript + TinyVue / Vite / Redis',
+];
+
+function createVersions(
+  projectIndex: number,
+  projectStatus: string,
+  owner: string
+): ProjectVersion[] {
+  const id = String(projectIndex + 1);
+  const active = projectStatus === '1' || projectStatus === '3';
+  return [
+    {
+      id: `${id}-1`,
+      version: 'V1.0.0',
+      date: projectStatus === '0' ? '-' : formatDate(Date.UTC(2025, 6, 15)),
+      content: '项目基础能力、权限管理和工作台',
+      status: projectStatus === '0' ? '2' : '0',
+      owner,
+    },
+    {
+      id: `${id}-2`,
+      version: 'V1.1.0-beta',
+      date: active ? formatDate(Date.UTC(2026, 0, 10)) : '-',
+      content: '流程协同、消息提醒与移动端适配',
+      status: active ? '1' : '2',
+      owner,
+    },
+    {
+      id: `${id}-3`,
+      version: 'V2.0.0',
+      date: '-',
+      content: '多项目组合管理与资源负荷视图',
+      status: '2',
+      owner,
+    },
+  ];
+}
+
 // 与前端 tinyvue mock（template/tinyvue/src/mock/project.ts）字段保持一致的确定性数据
 function createProjectList(count: number): ProjectRecord[] {
   const list: ProjectRecord[] = [];
@@ -79,17 +140,31 @@ function createProjectList(count: number): ProjectRecord[] {
     const base = new Date(2023, 0, 1).getTime();
     const startTime = base + ((i * 97) % 700) * 86400000;
     const endTime = startTime + (((i * 53) % 300) + 30) * 86400000;
+    const projectName = pick(projectNames, i);
+    const projectStatus = pick(projectStatuses, i);
+    const owner = pick(owners, i * 7 + 3);
     list.push({
       id: String(i + 1),
-      projectName: pick(projectNames, i),
+      projectName,
       projectCode: `PRJ-${2024 + (i % 2)}-${pad((i % 60) + 1)}`,
-      projectStatus: pick(projectStatuses, i),
+      projectStatus,
       taskStatus: pick(taskStatuses, i * 2 + 1),
       department: pick(departments, i * 3 + 2),
       startTime: formatDate(startTime),
       endTime: formatDate(endTime),
       priority: pick(priorities, i * 5 + 1),
-      owner: pick(owners, i * 7 + 3),
+      owner,
+      progress: [10, 65, 100, 40][i % 4],
+      manHours: 80 + (i % 6) * 40,
+      budget: 50 + (i % 5) * 30,
+      teamSize: 5 + (i % 8),
+      goal: `完成${projectName}建设，形成可复用的企业级业务能力。`,
+      technology: pick(technologies, i),
+      partner: '质量管理部、运维中心、用户体验部',
+      riskLevel: pick(['低', '中', '高'], i),
+      quality: '核心接口自动化测试覆盖率不低于 80%，关键流程具备完整审计记录。',
+      remark: `${projectName}按当前计划推进，持续跟踪关键依赖和交付风险。`,
+      versions: createVersions(i, projectStatus, owner),
     });
   }
   return list;
@@ -140,6 +215,17 @@ export default [
         endTime: '',
         priority: '',
         owner: '',
+        progress: 0,
+        manHours: 0,
+        budget: 0,
+        teamSize: 0,
+        goal: '',
+        technology: '',
+        partner: '',
+        riskLevel: '',
+        quality: '',
+        remark: '',
+        versions: [],
         ...data,
         id: String(nextProjectId++),
       };

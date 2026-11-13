@@ -16,5 +16,5 @@ export function getUserTrain() {
 
 // 切换数据源
 export function getUserChange(data: string) {
-  return axios.post(`${import.meta.env.VITE_MOCK_SERVER_HOST}/api/user/getselect`, data as any)
+  return axios.post(`${import.meta.env.VITE_MOCK_SERVER_HOST}/api/user/getselect`, { value: data })
 }
