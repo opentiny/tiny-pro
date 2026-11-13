@@ -6,7 +6,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { Reject } from '../public/reject.decorator';
+import { Reject } from '../../public/reject.decorator';
 import { EditorService } from './editor.service';
 import {
   EditorCollaborationDocument,

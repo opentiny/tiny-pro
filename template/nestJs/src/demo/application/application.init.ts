@@ -1,4 +1,4 @@
-import { Initializer } from "../initalizer.interface";
+import { Initializer } from "../../initalizer.interface";
 import { applicationData } from './init/data';
 import { Repository } from "typeorm";
 import { Application } from "@app/models";

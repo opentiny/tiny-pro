@@ -10,7 +10,7 @@ import {
 import 'dotenv/config';
 import { UserModule } from './user/user.module';
 import { DbModule } from '@app/db';
-import { EmployeesModule } from './employees/employees.module';
+import { EmployeesModule } from './demo/employees/employees.module';
 import { PermissionModule } from './permission/permission.module';
 import { AuthModule } from './auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
@@ -33,7 +33,7 @@ import { MockModule } from './mock/mock.module';
 import { MockModeMiddleware } from './mock/mock-mode.middleware';
 import { RejectRequestGuard } from './public/reject.guard';
 import { HealthCheckController } from './health-check.controller';
-import { ApplicationModule } from './application/application.module';
+import { ApplicationModule } from './demo/application/application.module';
 import { CONFIG_SCHEMA, Configure } from './config-schema';
 import { InstallLock } from './install-lock';
 import { RedisService } from '../libs/redis/redis.service';
@@ -44,10 +44,10 @@ import { MenuInitializer } from './menu/menu.initializer';
 import { RoleInit } from './role/role.initializer';
 import { PermissionInit } from './permission/permission.initalizer';
 import { UserInit } from './user/user.initalizer';
-import { ApplicationInit } from './application/application.init';
+import { ApplicationInit } from './demo/application/application.init';
 import { ChatModule } from './chat/chat.module';
-import { ProjectModule } from './project/project.module';
-import { EditorModule } from './editor/editor.module';
+import { ProjectModule } from './demo/project/project.module';
+import { EditorModule } from './demo/editor/editor.module';
 import { DemoDataModule } from './demo/demo-data.module';
 
 const INSTALL_FLAG = 'FLAG:INSTALL';
@@ -86,6 +86,9 @@ const MOCK_MODE = process.env.MOCK_MODE === 'true';
           MenuModule,
           ApplicationModule,
           ChatModule,
+          ProjectModule,
+          EditorModule,
+          DemoDataModule,
           I18Module,
           RedisModule,
           LockerModule.register({

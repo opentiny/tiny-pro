@@ -1,10 +1,20 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { randomUUID } from 'crypto';
-import { Repository } from 'typeorm';
+import { DataSource, EntityTarget, Repository } from 'typeorm';
 import {
-  DemoData,
+  BoardHome,
+  BoardWorkPlan,
+  BoardWorkPractice,
+  BoardWorkPracticeChart,
+  BoardWorkTraining,
+  DemoJsonData,
+  FormAdvance,
+  FormBase,
+  FormStep,
   FormSubmission,
+  ProfileDetail,
+  UserInfo,
 } from './entities/demo-data.entity';
 
 interface UserCenterQuery {
@@ -22,28 +32,74 @@ interface UserCenterRow {
   [key: string]: unknown;
 }
 
+interface UserCenterData {
+  tableData: UserCenterRow[];
+  chartData: unknown[];
+}
+
+interface WorkSelectData {
+  options1: number[];
+  options2: number[];
+  options3: number[];
+}
+
 @Injectable()
 export class DemoDataService {
   constructor(
-    @InjectRepository(DemoData)
-    private readonly demoDataRepository: Repository<DemoData>,
+    private readonly dataSource: DataSource,
     @InjectRepository(FormSubmission)
     private readonly formSubmissionRepository: Repository<FormSubmission>
   ) {}
 
-  async get<T>(key: string): Promise<T> {
-    const record = await this.demoDataRepository.findOne({ where: { key } });
+  private async get<T>(entity: EntityTarget<DemoJsonData>): Promise<T> {
+    const repository = this.dataSource.getRepository(entity);
+    const record = await repository.findOne({ where: { id: 1 } });
     if (!record) {
-      throw new NotFoundException(`Demo data not found: ${key}`);
+      throw new NotFoundException(
+        `Demo data not found: ${repository.metadata.tableName}`
+      );
     }
     return record.data as T;
   }
 
+  getBoardHome() {
+    return this.get(BoardHome);
+  }
+
+  getWorkPlan() {
+    return this.get(BoardWorkPlan);
+  }
+
+  getWorkPractice() {
+    return this.get(BoardWorkPractice);
+  }
+
+  getWorkTraining() {
+    return this.get(BoardWorkTraining);
+  }
+
+  getWorkPracticeChart() {
+    return this.get<WorkSelectData>(BoardWorkPracticeChart);
+  }
+
+  getBaseForm() {
+    return this.get(FormBase);
+  }
+
+  getStepForm() {
+    return this.get(FormStep);
+  }
+
+  getAdvanceForm() {
+    return this.get(FormAdvance);
+  }
+
+  getProfileDetail() {
+    return this.get(ProfileDetail);
+  }
+
   async getUserCenterData(query: UserCenterQuery = {}) {
-    const data = await this.get<{
-      tableData: UserCenterRow[];
-      chartData: unknown[];
-    }>('user-center');
+    const data = await this.get<UserCenterData>(UserInfo);
     let tableData = data.tableData.map((item) => ({ ...item }));
     if (query.filterType?.length) {
       tableData = tableData.filter((item) =>
@@ -67,9 +123,7 @@ export class DemoDataService {
     }
     const descending = query.sort === 2 || query.sort === 4;
     tableData.sort((a, b) =>
-      descending
-        ? b.time.localeCompare(a.time)
-        : a.time.localeCompare(b.time)
+      descending ? b.time.localeCompare(a.time) : a.time.localeCompare(b.time)
     );
     return {
       chartData: data.chartData,

@@ -1,9 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { successResponseWrap } from '../mock/utils';
 import { Reject } from '../public/reject.decorator';
 import { DemoDataService } from './demo-data.service';
@@ -14,31 +9,27 @@ export class DemoDataController {
 
   @Get('board/home')
   getBoardHome() {
-    return this.demoDataService.get('board-home');
+    return this.demoDataService.getBoardHome();
   }
 
   @Get('user/getdata')
   async getUserData() {
-    return successResponseWrap(await this.demoDataService.get('work-data'));
+    return successResponseWrap(await this.demoDataService.getWorkPlan());
   }
 
   @Get('user/getrpractic')
   async getUserPractice() {
-    return successResponseWrap(await this.demoDataService.get('work-practice'));
+    return successResponseWrap(await this.demoDataService.getWorkPractice());
   }
 
   @Get('user/getrtrain')
   getUserTrain() {
-    return this.demoDataService.get('work-train');
+    return this.demoDataService.getWorkTraining();
   }
 
   @Post('user/getselect')
   async getUserSelect(@Body() body: unknown) {
-    const data = await this.demoDataService.get<{
-      options1: number[];
-      options2: number[];
-      options3: number[];
-    }>('work-select');
+    const data = await this.demoDataService.getWorkPracticeChart();
     const selected = String(
       typeof body === 'object' && body !== null && 'value' in body
         ? body.value
@@ -48,8 +39,8 @@ export class DemoDataController {
       selected === '1'
         ? data.options1
         : selected === '2'
-          ? data.options2
-          : data.options3;
+        ? data.options2
+        : data.options3;
     return successResponseWrap(result);
   }
 
@@ -60,17 +51,17 @@ export class DemoDataController {
 
   @Get('base/getdata')
   async getBaseData() {
-    return successResponseWrap(await this.demoDataService.get('form-options'));
+    return successResponseWrap(await this.demoDataService.getBaseForm());
   }
 
   @Get('step/getdata')
   async getStepData() {
-    return successResponseWrap(await this.demoDataService.get('form-options'));
+    return successResponseWrap(await this.demoDataService.getStepForm());
   }
 
   @Get('advance/getdata')
   async getAdvanceData() {
-    return successResponseWrap(await this.demoDataService.get('form-options'));
+    return successResponseWrap(await this.demoDataService.getAdvanceForm());
   }
 
   @Reject()
@@ -82,6 +73,6 @@ export class DemoDataController {
 
   @Get('detail/getdata')
   async getDetailData() {
-    return successResponseWrap(await this.demoDataService.get('profile-detail'));
+    return successResponseWrap(await this.demoDataService.getProfileDetail());
   }
 }

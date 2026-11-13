@@ -24,7 +24,7 @@ export const successResponseWrap = (data: unknown) => {
   return {
     data,
     errMsg: '',
-    code: 200,
+    code: process.env.MOCK_MODE === 'true' ? '0' : 200,
   };
 };
 

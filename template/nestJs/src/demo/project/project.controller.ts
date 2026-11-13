@@ -5,8 +5,8 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { successResponseWrap } from '../mock/utils';
-import { Reject } from '../public/reject.decorator';
+import { successResponseWrap } from '../../mock/utils';
+import { Reject } from '../../public/reject.decorator';
 import { Project } from './entities/project.entity';
 import { ProjectService } from './project.service';
 
