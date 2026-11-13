@@ -2,6 +2,7 @@ package com.TinyPro.controller;
 
 import com.TinyPro.entity.po.Employee;
 import com.TinyPro.entity.vo.EmployeePageVo;
+import com.TinyPro.exception.GlobalExceptionHandler;
 import com.TinyPro.service.IEmployeeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,6 +23,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 
 class EmployeesControllerTest {
 
@@ -31,7 +33,10 @@ class EmployeesControllerTest {
     @BeforeEach
     void setUp() {
         employeeService = mock(IEmployeeService.class);
-        mockMvc = MockMvcBuilders.standaloneSetup(new EmployeesController(employeeService)).build();
+        mockMvc = MockMvcBuilders
+                .standaloneSetup(new EmployeesController(employeeService))
+                .setControllerAdvice(new GlobalExceptionHandler())
+                .build();
     }
 
     @Test
@@ -53,7 +58,8 @@ class EmployeesControllerTest {
     @Test
     void getEmployeeRejectsGetRequests() throws Exception {
         mockMvc.perform(get("/employee/getEmployee"))
-                .andExpect(status().isMethodNotAllowed());
+                .andExpect(status().isMethodNotAllowed())
+                .andExpect(header().string("Allow", "POST"));
     }
 
     @Test
@@ -97,7 +103,8 @@ class EmployeesControllerTest {
     @Test
     void getEmployeeInfoRejectsGetRequests() throws Exception {
         mockMvc.perform(get("/employee/getEmployeeInfo").param("id", "2"))
-                .andExpect(status().isMethodNotAllowed());
+                .andExpect(status().isMethodNotAllowed())
+                .andExpect(header().string("Allow", "POST"));
     }
 
     @Test
