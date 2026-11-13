@@ -128,10 +128,20 @@ public class EmployeeServiceimpl implements IEmployeeService {
             employee.setAddress(request.getAddress());
             employee.setRoles(request.getRoles());
             employee.setLastUpdateUser(request.getLastUpdateUser());
-            employee.setCreateTime(parseDateTime(request.getCreateTime()));
         }
-        if (employee.getCreateTime() == null) {
-            employee.setCreateTime(LocalDateTime.now());
+        if (request != null && request.getCreateTime() != null) {
+          LocalDateTime parsed = parseDateTime(request.getCreateTime());
+
+          if (parsed == null) {
+            throw new ResponseStatusException(
+              HttpStatus.BAD_REQUEST,
+              "createTime 格式无效"
+            );
+          }
+
+          employee.setCreateTime(parsed);
+        } else {
+          employee.setCreateTime(LocalDateTime.now());
         }
         return iEmployeRepository.saveAndFlush(employee);
     }
