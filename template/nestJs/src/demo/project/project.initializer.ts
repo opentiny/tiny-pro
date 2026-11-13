@@ -247,13 +247,7 @@ export class ProjectInitializer implements OnModuleInit {
         detailFields
           .filter((field) => {
             const value = current[field];
-            return (
-              value === null ||
-              value === undefined ||
-              value === '' ||
-              value === 0 ||
-              (Array.isArray(value) && value.length === 0)
-            );
+            return value === null || value === undefined;
           })
           .map((field) => [field, seed[field]])
       );

@@ -40,13 +40,17 @@ export class EditorService {
   }
 
   async updateDocument(id: number, patch: Partial<EditorDocument>) {
-    const document = await this.documentRepository.findOne({ where: { id } });
-    if (!document) {
-      return false;
+    const fields: Partial<EditorDocument> = {};
+    for (const key of ['name', 'department', 'time', 'content'] as const) {
+      if (patch[key] !== undefined) {
+        fields[key] = patch[key];
+      }
     }
-    Object.assign(document, patch, { id: document.id });
-    await this.documentRepository.save(document);
-    return true;
+    if (!Object.keys(fields).length) {
+      return !!(await this.documentRepository.findOne({ where: { id } }));
+    }
+    const result = await this.documentRepository.update(id, fields);
+    return (result.affected ?? 0) > 0;
   }
 
   async removeDocument(id: number) {
@@ -76,15 +80,18 @@ export class EditorService {
     id: number,
     patch: Partial<EditorCollaborationDocument>
   ) {
-    const document = await this.collaborationRepository.findOne({
-      where: { id },
-    });
-    if (!document) {
-      return false;
+    const fields: Partial<EditorCollaborationDocument> = {};
+    for (const key of ['name', 'members', 'time', 'content'] as const) {
+      const value = patch[key];
+      if (value !== undefined) {
+        (fields as Record<string, unknown>)[key] = value;
+      }
     }
-    Object.assign(document, patch, { id: document.id });
-    await this.collaborationRepository.save(document);
-    return true;
+    if (!Object.keys(fields).length) {
+      return !!(await this.collaborationRepository.findOne({ where: { id } }));
+    }
+    const result = await this.collaborationRepository.update(id, fields);
+    return (result.affected ?? 0) > 0;
   }
 
   async removeCollaborationDocument(id: number) {

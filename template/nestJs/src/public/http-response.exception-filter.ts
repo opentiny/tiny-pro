@@ -26,14 +26,21 @@ export class HttpResponseExceptionFilter implements ExceptionFilter {
         ? (exceptionResponse as Record<string, unknown>)
         : {};
     const rawMessage =
-      body.message ??
-      (typeof exceptionResponse === 'string' ? exceptionResponse : undefined) ??
-      (exception instanceof Error ? exception.message : 'Internal server error');
+      exception instanceof HttpException
+        ? body.message ??
+          (typeof exceptionResponse === 'string'
+            ? exceptionResponse
+            : 'Internal server error')
+        : 'Internal server error';
     const errMsg = Array.isArray(rawMessage)
       ? rawMessage.join('; ')
       : String(rawMessage);
     if (status >= HttpStatus.INTERNAL_SERVER_ERROR) {
-      this.logger.error(errMsg, exception instanceof Error ? exception.stack : '');
+      const detail = exception instanceof Error ? exception.message : errMsg;
+      this.logger.error(
+        detail,
+        exception instanceof Error ? exception.stack : ''
+      );
     }
     response.status(status).json({
       ...body,

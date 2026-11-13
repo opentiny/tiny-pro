@@ -86,6 +86,7 @@ async function bootstrap() {
   app.useGlobalPipes(new I18nValidationPipe());
   app.useGlobalInterceptors(new HttpResponseInterceptor());
   app.useGlobalFilters(
+    new HttpResponseExceptionFilter(),
     new I18nValidationExceptionFilter({
       errorFormatter: (errors) => {
         const reason: string[] = [];
@@ -94,8 +95,7 @@ async function bootstrap() {
         }
         return reason;
       },
-    }),
-    new HttpResponseExceptionFilter()
+    })
   );
   if (cfg.get('ENABLE_SWAGGER')) {
     prepareSwagger(cfg, app);

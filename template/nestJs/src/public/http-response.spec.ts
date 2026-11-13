@@ -93,18 +93,24 @@ describe('HttpResponseExceptionFilter', () => {
     );
   });
 
-  it('maps unexpected errors to code 500', () => {
-    jest.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
+  it('maps unexpected errors to code 500 with a generic message', () => {
+    const loggerSpy = jest
+      .spyOn(Logger.prototype, 'error')
+      .mockImplementation(() => undefined);
     const { response, host } = createHost();
     new HttpResponseExceptionFilter().catch(new Error('Database failed'), host);
     expect(response.status).toHaveBeenCalledWith(500);
     expect(response.json).toHaveBeenCalledWith(
       expect.objectContaining({
         data: null,
-        errMsg: 'Database failed',
+        errMsg: 'Internal server error',
         code: 500,
         statusCode: 500,
       })
+    );
+    expect(loggerSpy).toHaveBeenCalledWith(
+      'Database failed',
+      expect.any(String)
     );
   });
 });

@@ -69,6 +69,19 @@ export class ProjectService {
       throw new NotFoundException('Project not found');
     }
     Object.assign(project, data, { id: project.id });
+    const requiredFields: Array<keyof Project> = [
+      'projectName',
+      'projectCode',
+      'owner',
+    ];
+    const missing = requiredFields.filter(
+      (field) => !String(project[field] ?? '').trim()
+    );
+    if (missing.length) {
+      throw new BadRequestException(
+        `Missing required fields: ${missing.join(', ')}`
+      );
+    }
     await this.projectRepository.save(project);
     return true;
   }

@@ -30,7 +30,7 @@ export interface ProjectInfo {
   riskLevel: string
   quality: string
   remark: string
-  versions: ProjectVersion[]
+  versions: ProjectVersion[] | null
 }
 
 export function queryProjectList() {
