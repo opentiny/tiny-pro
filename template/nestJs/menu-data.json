@@ -47,6 +47,15 @@
         "icon": "",
         "menuType": "normal",
         "locale": "menu.list.cardList"
+      },
+      {
+        "label": "AdvancedList",
+        "children": [],
+        "url": "advanced-list",
+        "component": "list/advanced-list/index",
+        "icon": "",
+        "menuType": "normal",
+        "locale": "menu.list.advancedList"
       }
     ],
     "url": "list",
