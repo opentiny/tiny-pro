@@ -69,6 +69,24 @@ axios.interceptors.response.use(
     // editor 接口需要完整的 Axios 响应信封（api/editor.ts 按 res.data 取值），
     // 即便响应 URL 里带有 mock 字样（如经 mock 服务转发）也不做解包
     const isEditorRequest = typeof res.config?.url === 'string' && res.config.url.includes('/editor/')
+    const responseBody = res.data as unknown as { code?: number, data?: unknown }
+    const isRealResponse = !requestConfig?.isMockApi && !res.request.responseURL.includes('mock')
+    if (isRealResponse && res.config?.url?.includes('/i18/format') && responseBody?.code === 200) {
+      res.data = Object.fromEntries(
+        Object.entries(responseBody).filter(([key]) => key !== 'code'),
+      ) as any
+    }
+    else if (
+      isRealResponse
+      && responseBody?.code === 200
+      && Array.isArray(responseBody.data)
+      && Object.keys(responseBody).every(key => ['data', 'errMsg', 'code'].includes(key))
+    ) {
+      res.data = responseBody.data as any
+    }
+    else if (isEditorRequest && responseBody?.code === 200 && 'data' in responseBody) {
+      res.data = responseBody.data as any
+    }
     if (!isEditorRequest && (requestConfig?.isMockApi || res.request.responseURL.includes('mock'))) {
       return res.data
     }

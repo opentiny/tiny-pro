@@ -6,18 +6,16 @@ import { useI18n } from 'vue-i18n'
 import useLocale from '@/hooks/locale'
 import { debounce } from '@/hooks/responsive'
 
-const { t } = useI18n()
-const { currentLocale } = useLocale()
-const ringRef = ref()
-const legendLeft = ref('60%')
-
-// 环图与站点数据来自 nestJS mock（GET /api/board/home 的 round）
 const props = defineProps<{
   round?: {
     ring: { value: number, name: string }[]
     stations: { key: string, percentage: number, color: string }[]
   }
 }>()
+const { t } = useI18n()
+const { currentLocale } = useLocale()
+const ringRef = ref()
+const legendLeft = ref('60%')
 
 const resolvedData = computed(() =>
   (props.round?.ring ?? []).map(item => ({
