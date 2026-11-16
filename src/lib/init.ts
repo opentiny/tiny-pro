@@ -279,6 +279,8 @@ const createMonorepoRootSync = (answers: ProjectInfo) => {
   }
   if (serverConfirm && serverFramework === ServerFrameworks.NestJs) {
     scripts['dev:backend'] = `pnpm -C ${ServerFrameworks.NestJs} run start:dev`;
+    // 后端 mock 调试：不连 MySQL/Redis，登录与系统引导由内存 mock 数据接管
+    scripts['nest:mock'] = `pnpm -C ${ServerFrameworks.NestJs} run start:mock`;
   }
   const tinyRobotEnabled = (features ?? []).includes(FeatureType.TinyRobot);
   const rootPackageJson = {
@@ -287,13 +289,19 @@ const createMonorepoRootSync = (answers: ProjectInfo) => {
     scripts,
     version: '1.0.0',
     private: true,
+    // npm 不识别 pnpm-workspace.yaml，补充 workspaces 字段使 npm install 同样可用
+    workspaces: packages,
     // tiny-robot-chat 依赖 ^1.30.0；低版本 SDK 的 exports 不支持子路径
     // 目录导入会导致 vite 预构建失败，仅集成 TinyRobot 时锁定已知可用版本
+    //（pnpm 读 pnpm.overrides，npm 读顶层 overrides）
     ...(tinyRobotEnabled && {
       pnpm: {
         overrides: {
           '@modelcontextprotocol/sdk': '1.32.1',
         },
+      },
+      overrides: {
+        '@modelcontextprotocol/sdk': '1.32.1',
       },
     }),
   };
@@ -304,10 +312,17 @@ const createMonorepoRootSync = (answers: ProjectInfo) => {
 
   if (tinyRobotEnabled) {
     // TinyRobot 各包新版本在 npmmirror 可能存在同步延迟，仅 @opentiny 作用域走官方源，
-    // 其余依赖仍用用户默认镜像，保证初始化后无需额外操作即可 pnpm i / npm install
+    // 其余依赖仍用用户默认镜像，保证初始化后无需额外操作即可 pnpm i / npm install；
+    // npm 默认会把 tarball 地址重写回默认源（replace-registry-host=npmjs），
+    // 镜像未同步时会 404，必须置为 never
     writeFileSync(
       path.join(rootPath, '.npmrc'),
-      '# TinyRobot 最新版本仅在 npm 官方源可稳定解析，镜像同步后可删除本文件\n@opentiny:registry=https://registry.npmjs.org\n'
+      [
+        '# TinyRobot 最新版本仅在 npm 官方源可稳定解析，镜像同步后可删除本文件',
+        '@opentiny:registry=https://registry.npmjs.org',
+        'replace-registry-host=never',
+        '',
+      ].join('\n')
     );
   }
 
@@ -684,6 +699,18 @@ const integrateTinyRobot = (answers: ProjectInfo) => {
     writeFileSync(viteConfigPath, viteConfigContent);
   }
 
+  // 将模型 API Key 占位写入 web/.env，用户填入即可联网回答（vite 全模式加载 .env）
+  const envPath = path.join(webPath, '.env');
+  if (existsSync(envPath)) {
+    const envContent = readFileSync(envPath, { encoding: 'utf8' });
+    if (!envContent.includes('VITE_ALIYUN_DASHSCOPE_KEY')) {
+      writeFileSync(
+        envPath,
+        `${envContent.trimEnd()}\n\n# TinyRobot 智能助手大模型 API Key，按需配置其一即可联网回答（参考 .env.example）\n# 阿里云百炼（Qwen），同时用于高德 MCP 示例的鉴权\nVITE_ALIYUN_DASHSCOPE_KEY=\n# DeepSeek\nVITE_DEEPSEEK_API_KEY=\n`
+      );
+    }
+  }
+
   log.success('TinyRobot 智能助手集成成功');
 };
 
@@ -807,7 +834,8 @@ const createProjectSync = (answers: ProjectInfo) => {
  * 打印初始化完成后的下一步操作提示
  */
 const printNextSteps = (answers: ProjectInfo, prefix: string) => {
-  const { name, serverFramework, serverConfirm, lowcodeEngine } = answers;
+  const { name, serverFramework, serverConfirm, lowcodeEngine, features } =
+    answers;
 
   /* prettier-ignore-start */
   console.log(
@@ -819,7 +847,7 @@ const printNextSteps = (answers: ProjectInfo, prefix: string) => {
   console.log(
     chalk.green(
       `${chalk.yellow(
-        `$ cd ${name} && pnpm i 或者 npm install`
+        `$ cd ${name} && pnpm i(推荐) 或者 npm install`
       )}         # 安装全部依赖（monorepo 一次安装 web${
         serverConfirm ? ' + server' : ''
       }）`
@@ -829,8 +857,8 @@ const printNextSteps = (answers: ProjectInfo, prefix: string) => {
     chalk.green(
       `${chalk.yellow(
         serverConfirm
-          ? `$ cd ${name} && pnpm dev 或者 npm run dev`
-          : `$ cd ${name} && pnpm start:mock 或者 npm run start:mock`
+          ? `$ cd ${name} && pnpm dev(推荐) 或者 npm run dev`
+          : `$ cd ${name} && pnpm start:mock(推荐) 或者 npm run start:mock`
       )}     # 开启web开发环境，${
         serverConfirm ? '使用前后端模式' : '使用mock模式'
       }`
@@ -843,12 +871,32 @@ const printNextSteps = (answers: ProjectInfo, prefix: string) => {
         `${chalk.yellow(
           serverFramework === ServerFrameworks.SpringBoot
             ? `$ cd ${name}/springboot  # Java工程，参考目录内 Dockerfile / docker-compose.yml / pom.xml 启动`
-            : `$ cd ${name} && pnpm dev:backend`
+            : `$ cd ${name} && pnpm dev:backend(推荐) 或者 npm run dev:backend`
         )}    # 开启server开发环境，${
           serverFramework === ServerFrameworks.SpringBoot
             ? '请确保已安装Java环境'
             : '请确保已安装Node.js环境'
         }，同时需安装且启用MySQL和Redis环境。`
+      )
+    );
+    if (serverFramework === ServerFrameworks.NestJs) {
+      console.log(
+        chalk.green(
+          `${chalk.yellow(
+            `$ cd ${name} && pnpm nest:mock(推荐) 或者 npm run nest:mock`
+          )} # 后端mock调试：无需MySQL/Redis，内存mock接管登录与引导数据，配合 pnpm dev 前端联调`
+        )
+      );
+    }
+  }
+
+  // TinyRobot 智能助手 API Key 配置提示
+  if ((features ?? []).includes(FeatureType.TinyRobot)) {
+    console.log(
+      chalk.green(
+        `${chalk.yellow(
+          `$ 配置 ${name}/web/.env 中的 VITE_ALIYUN_DASHSCOPE_KEY 或 VITE_DEEPSEEK_API_KEY`
+        )}  # TinyRobot 智能助手需配置大模型 API Key 后才能联网回答`
       )
     );
   }
