@@ -92,22 +92,6 @@ export type Configure = {
    * Swagger文档版本
    */
   SWAGGER_VERSION: string;
-  /**
-   * 大模型服务地址（OpenAI 兼容协议，默认 DeepSeek）
-   */
-  LLM_BASE_URL: string;
-  /**
-   * 大模型 API Key（仅服务端使用，勿提交到仓库）
-   */
-  LLM_API_KEY: string;
-  /**
-   * 大模型默认模型名
-   */
-  LLM_MODEL: string;
-  /**
-   * 大模型扩展请求参数（JSON 字符串，如 '{"enable_search":true,"search_options":{"forced_search":true}}'）
-   */
-  LLM_EXTRA_BODY: string;
 }
 
 export const CONFIG_SCHEMA = Joi.object<Configure>({
@@ -135,8 +119,4 @@ export const CONFIG_SCHEMA = Joi.object<Configure>({
   SWAGGER_TITLE: Joi.string().default('Tiny Pro'),
   SWAGGER_DESC: Joi.string().default('开箱即用的中后台模板'),
   SWAGGER_VERSION: Joi.string().default('1.0.0'),
-  LLM_BASE_URL: Joi.string().default('https://dashscope.aliyuncs.com/compatible-mode/v1'),
-  LLM_API_KEY: Joi.string().allow('').default(''),
-  LLM_MODEL: Joi.string().default('qwen-plus'),
-  LLM_EXTRA_BODY: Joi.string().allow('').default(''),
 })

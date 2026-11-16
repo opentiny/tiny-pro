@@ -2,7 +2,7 @@
 import { Dropdown, DropdownMenu, Modal, TabItem, Tabs } from '@opentiny/vue'
 import locale from '@opentiny/vue-locale'
 import TinyThemeTool from '@opentiny/vue-theme/theme-tool'
-import { computed, defineAsyncComponent, nextTick, provide, ref, watch } from 'vue'
+import { computed, nextTick, provide, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import Footer from '@/components/footer/index.vue'
@@ -11,6 +11,7 @@ import NavBar from '@/components/navbar/index.vue'
 import { useTheme } from '@/hooks/useTheme'
 import { useAppStore, useTabStore } from '@/store'
 import PageLayout from './page-layout.vue'
+// __TINY_ROBOT_CHAT_IMPORT__
 
 // 动态切换
 const router = useRouter()
@@ -265,15 +266,6 @@ const theme = new TinyThemeTool()
 useTheme(theme)
 provide('THEME', theme)
 
-// 检查是否启用 TinyRobot 智能助手
-const isTinyRobotEnabled = computed(() => {
-  return import.meta.env.VITE_TINY_ROBOT_ENABLED === 'true'
-})
-// 未启用时不加载智能助手组件对应的 chunk
-const TinyRobotChat = defineAsyncComponent(
-  () => import('@/tiny-robot-chat/TinyRobotChat.vue'),
-)
-
 watch(appStore.$state, (newValue) => {
   if (!newValue.navbar) {
     myPattern.value = 'simple'
@@ -359,7 +351,7 @@ watch(appStore.$state, (newValue) => {
       </div>
     </div>
     <img v-if="!appStore.navbar" src="@/assets/images/global.png" class="global-setting" @click="switchSet">
-    <TinyRobotChat v-if="isTinyRobotEnabled" />
+    <!-- __TINY_ROBOT_CHAT__ -->
   </div>
 </template>
 

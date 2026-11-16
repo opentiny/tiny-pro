@@ -45,20 +45,12 @@ describe('HttpResponseInterceptor', () => {
     expect(primitiveResult).toEqual({ data: true, errMsg: '', code: 200 });
   });
 
-  it('keeps health checks and robot streams unchanged', async () => {
+  it('keeps health checks unchanged', async () => {
     expect(
       await firstValueFrom(
         interceptor.intercept(httpContext('/healthCheck'), respond('success'))
       )
     ).toBe('success');
-    expect(
-      await firstValueFrom(
-        interceptor.intercept(
-          httpContext('/robot/chat/completions'),
-          respond('stream')
-        )
-      )
-    ).toBe('stream');
   });
 });
 

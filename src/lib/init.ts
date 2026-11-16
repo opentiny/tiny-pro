@@ -14,6 +14,7 @@ import {
   devCommand,
   devDependencies,
   FEATURE_OPTIONS,
+  FeatureType,
   LowcodeEngine,
   ProjectInfo,
   removedCommand,
@@ -242,8 +243,14 @@ const createLowcodeDesignerSync = (answers: ProjectInfo) => {
  * name/package.json、name/pnpm-workspace.yaml、name/.gitignore
  */
 const createMonorepoRootSync = (answers: ProjectInfo) => {
-  const { name, description, serverFramework, serverConfirm, lowcodeEngine } =
-    answers;
+  const {
+    name,
+    description,
+    serverFramework,
+    serverConfirm,
+    lowcodeEngine,
+    features,
+  } = answers;
   const rootPath = utils.getDistPath(name);
 
   // 参与 workspace 的 Node 子包（springboot 为 Java 工程，不参与）
@@ -273,19 +280,22 @@ const createMonorepoRootSync = (answers: ProjectInfo) => {
   if (serverConfirm && serverFramework === ServerFrameworks.NestJs) {
     scripts['dev:backend'] = `pnpm -C ${ServerFrameworks.NestJs} run start:dev`;
   }
+  const tinyRobotEnabled = (features ?? []).includes(FeatureType.TinyRobot);
   const rootPackageJson = {
     name,
     description,
     scripts,
     version: '1.0.0',
     private: true,
-    pnpm: {
-      overrides: {
-        // tiny-robot-chat 依赖 ^1.30.0；低版本 SDK 的 exports 不支持子路径
-        // 目录导入会导致 vite 预构建失败，锁定已知可用版本保证全新安装可运行
-        '@modelcontextprotocol/sdk': '1.32.1',
+    // tiny-robot-chat 依赖 ^1.30.0；低版本 SDK 的 exports 不支持子路径
+    // 目录导入会导致 vite 预构建失败，仅集成 TinyRobot 时锁定已知可用版本
+    ...(tinyRobotEnabled && {
+      pnpm: {
+        overrides: {
+          '@modelcontextprotocol/sdk': '1.32.1',
+        },
       },
-    },
+    }),
   };
   writeFileSync(
     path.join(rootPath, 'package.json'),
@@ -460,12 +470,6 @@ const createServerSync = (answers: ProjectInfo) => {
       EXPIRES_IN: '2h',
       PAGINATION_PAGE: 1,
       PAGINATION_LIMIT: 10,
-      LLM_BASE_URL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
-      LLM_API_KEY: '',
-      LLM_MODEL: 'qwen-plus',
-      // 默认开启联网搜索，否则模型无法回答实时性问题
-      LLM_EXTRA_BODY:
-        '{"enable_search":true,"search_options":{"forced_search":true}}',
     };
     const envStr = objToEnv(config);
     const overwriteDockerComposeConfig = {
@@ -592,6 +596,88 @@ const packageJsonProcess = (
   return remove;
 };
 
+// 模板中预置的 TinyRobot 注入标记：选中时替换为实际代码，未选中/集成失败时整行清除
+const TINY_ROBOT_MARKER_PATTERN = /__TINY_ROBOT_/;
+const TINY_ROBOT_LAYOUT_IMPORT_MARKER = '// __TINY_ROBOT_CHAT_IMPORT__';
+const TINY_ROBOT_LAYOUT_COMPONENT_MARKER = '<!-- __TINY_ROBOT_CHAT__ -->';
+const TINY_ROBOT_VITE_PROXY_MARKER = '// __TINY_ROBOT_MCP_PROXY__';
+
+const stripTinyRobotMarkers = (filePath: string) => {
+  if (!existsSync(filePath)) {
+    return;
+  }
+  const content = readFileSync(filePath, { encoding: 'utf8' });
+  const cleaned = content
+    .split('\n')
+    .filter((line) => !TINY_ROBOT_MARKER_PATTERN.test(line))
+    .join('\n');
+  writeFileSync(filePath, cleaned);
+};
+
+/**
+ * 按需集成 TinyRobot 智能助手（AI 对话）
+ * 选中时通过官方 CLI（npx @opentiny/tiny-robot-cli add chat）生成 src/tiny-robot-chat
+ * 并写入依赖，再把组件挂载到默认布局；未选中或集成失败时不保留任何相关代码
+ */
+const integrateTinyRobot = (answers: ProjectInfo) => {
+  const { name, features } = answers;
+  const webPath = utils.getDistPath(`${name}/web`);
+  const layoutPath = path.join(webPath, 'src/layout/default-layout.vue');
+  const viteConfigPath = path.join(webPath, 'config/vite.config.dev.ts');
+  const enabled = (features ?? []).includes(FeatureType.TinyRobot);
+
+  if (!enabled) {
+    stripTinyRobotMarkers(layoutPath);
+    stripTinyRobotMarkers(viteConfigPath);
+    return;
+  }
+
+  log.info(
+    '正在通过 @opentiny/tiny-robot-cli 集成 TinyRobot 智能助手，请耐心等待...'
+  );
+  const result = spawn.sync(
+    'npx',
+    ['-y', '@opentiny/tiny-robot-cli', 'add', 'chat', '--yes'],
+    { cwd: webPath, stdio: 'inherit' }
+  );
+  if (result.status !== 0) {
+    stripTinyRobotMarkers(layoutPath);
+    stripTinyRobotMarkers(viteConfigPath);
+    log.error('TinyRobot 智能助手集成失败，已跳过，不影响其余项目文件');
+    log.info(
+      '可稍后进入 web 目录手动执行：npx @opentiny/tiny-robot-cli add chat'
+    );
+    return;
+  }
+
+  // 挂载组件到默认布局（与官方文档推荐用法一致，无条件渲染）
+  const layoutContent = readFileSync(layoutPath, { encoding: 'utf8' })
+    .replace(
+      TINY_ROBOT_LAYOUT_IMPORT_MARKER,
+      "import TinyRobotChat from '@/tiny-robot-chat/TinyRobotChat.vue'"
+    )
+    .replace(TINY_ROBOT_LAYOUT_COMPONENT_MARKER, '<TinyRobotChat />');
+  writeFileSync(layoutPath, layoutContent);
+
+  // 生成的 MCP 示例走 /modelcontextprotocol-mcp 本地代理，仅 vite 开发配置需要注入
+  if (existsSync(viteConfigPath)) {
+    const proxyLines = [
+      '// TinyRobot MCP 示例服务代理（详见 https://sonyleo.github.io/tiny-robot/alpha/guide/cli-integration.html）',
+      `'/modelcontextprotocol-mcp': {`,
+      `  target: 'https://modelcontextprotocol.io/mcp',`,
+      `  changeOrigin: true,`,
+      `  rewrite: path => path.replace(/^\\/modelcontextprotocol-mcp/, ''),`,
+      `},`,
+    ].join('\n        ');
+    const viteConfigContent = readFileSync(viteConfigPath, {
+      encoding: 'utf8',
+    }).replace(TINY_ROBOT_VITE_PROXY_MARKER, proxyLines);
+    writeFileSync(viteConfigPath, viteConfigContent);
+  }
+
+  log.success('TinyRobot 智能助手集成成功');
+};
+
 /**
  * 同步创建客户端项目文件目录、文件
  * @answers 询问客户端问题的选择值
@@ -664,9 +750,12 @@ const createProjectSync = (answers: ProjectInfo) => {
       lowcodeEnabled
     );
 
-    // 根据用户多选结果设置各可选功能的环境变量
+    // 根据用户多选结果设置各可选功能的环境变量（仅处理声明了 envKey 的功能）
     const selectedFeatures = features ?? [];
     FEATURE_OPTIONS.forEach((feature) => {
+      if (!feature.envKey) {
+        return;
+      }
       const enabled = selectedFeatures.includes(feature.value);
       updatedEnvContent = setEnvFlag(
         updatedEnvContent,
@@ -689,6 +778,9 @@ const createProjectSync = (answers: ProjectInfo) => {
     log.error('配置环境变量失败');
     log.info('请手动配置env信息');
   }
+
+  // 按需集成 TinyRobot 智能助手（CLI 会改写 web/package.json，需在模板拷贝与包信息处理之后执行）
+  integrateTinyRobot(answers);
 
   if (serverConfirm) {
     // 如果对接服务端，执行文件复制及相关配置（ WIP: 后台接口暂未全量完成，部分接口还是使用mock ）

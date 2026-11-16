@@ -25,12 +25,7 @@ export default mergeConfig(
       },
       proxy: {
         ...proxyConfig,
-        // TinyRobot MCP 示例服务代理（详见 https://sonyleo.github.io/tiny-robot/alpha/guide/cli-integration.html）
-        '/modelcontextprotocol-mcp': {
-          target: 'https://modelcontextprotocol.io/mcp',
-          changeOrigin: true,
-          rewrite: path => path.replace(/^\/modelcontextprotocol-mcp/, ''),
-        },
+        // __TINY_ROBOT_MCP_PROXY__
       },
     },
     define: {
@@ -43,9 +38,6 @@ export default mergeConfig(
         process.env.VITE_LOWCODE_DESIGNER_URL || 'http://localhost:8090',
       ),
       // 确保可选功能开关被注入到客户端代码
-      'import.meta.env.VITE_TINY_ROBOT_ENABLED': JSON.stringify(
-        process.env.VITE_TINY_ROBOT_ENABLED || 'false',
-      ),
       'import.meta.env.VITE_TINY_EDITOR_ENABLED': JSON.stringify(
         process.env.VITE_TINY_EDITOR_ENABLED || 'false',
       ),
