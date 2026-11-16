@@ -303,11 +303,11 @@ const createMonorepoRootSync = (answers: ProjectInfo) => {
   );
 
   if (tinyRobotEnabled) {
-    // TinyRobot 各包新版本在 npmmirror 可能存在同步延迟，直接生成官方源配置，
-    // 保证用户初始化后无需额外操作即可 pnpm i / npm install
+    // TinyRobot 各包新版本在 npmmirror 可能存在同步延迟，仅 @opentiny 作用域走官方源，
+    // 其余依赖仍用用户默认镜像，保证初始化后无需额外操作即可 pnpm i / npm install
     writeFileSync(
       path.join(rootPath, '.npmrc'),
-      '# TinyRobot 最新版本仅在 npm 官方源可稳定解析，镜像同步后可删除本文件\nregistry=https://registry.npmjs.org\n'
+      '# TinyRobot 最新版本仅在 npm 官方源可稳定解析，镜像同步后可删除本文件\n@opentiny:registry=https://registry.npmjs.org\n'
     );
   }
 
