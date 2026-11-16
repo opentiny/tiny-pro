@@ -14,6 +14,8 @@ import { INestApplication, RequestMethod } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { Configure } from './config-schema';
+import { HttpResponseInterceptor } from './public/http-response.interceptor';
+import { HttpResponseExceptionFilter } from './public/http-response.exception-filter';
 
 dotenv.config({ path: '.env' });
 
@@ -82,7 +84,9 @@ async function bootstrap() {
     return;
   }
   app.useGlobalPipes(new I18nValidationPipe());
+  app.useGlobalInterceptors(new HttpResponseInterceptor());
   app.useGlobalFilters(
+    new HttpResponseExceptionFilter(),
     new I18nValidationExceptionFilter({
       errorFormatter: (errors) => {
         const reason: string[] = [];
