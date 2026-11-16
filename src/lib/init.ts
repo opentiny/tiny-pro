@@ -302,6 +302,15 @@ const createMonorepoRootSync = (answers: ProjectInfo) => {
     JSON.stringify(rootPackageJson, null, 2)
   );
 
+  if (tinyRobotEnabled) {
+    // TinyRobot 各包新版本在 npmmirror 可能存在同步延迟，直接生成官方源配置，
+    // 保证用户初始化后无需额外操作即可 pnpm i / npm install
+    writeFileSync(
+      path.join(rootPath, '.npmrc'),
+      '# TinyRobot 最新版本仅在 npm 官方源可稳定解析，镜像同步后可删除本文件\nregistry=https://registry.npmjs.org\n'
+    );
+  }
+
   writeFileSync(
     path.join(rootPath, '.gitignore'),
     ['node_modules', 'dist', '*.log', '.env', ''].join('\n')

@@ -52,8 +52,8 @@ export interface FeatureOption {
 export const FEATURE_OPTIONS: FeatureOption[] = [
   {
     // 选中后通过 npx @opentiny/tiny-robot-cli add chat 生成代码并挂载，无环境变量开关；
-    // 名称中附带镜像源提示：npmmirror 同步有延迟，最新版本仅在官方源可解析
-    name: 'TinyRobot 智能助手（AI 对话，推荐：安装最新依赖需 npm 官方源 registry.npmjs.org）',
+    // 名称中附带镜像源提示：npmmirror 同步有延迟，选中后自动配置官方源
+    name: 'TinyRobot 智能助手（AI 对话，推荐使用 npm 官方源安装最新依赖）',
     value: FeatureType.TinyRobot,
   },
   {
