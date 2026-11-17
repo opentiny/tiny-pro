@@ -1,9 +1,9 @@
 import process from 'node:process'
 import { mergeConfig } from 'vite'
-import { vueManualChunk } from './manual-chunks'
-import configCompressPlugin from './plugin/compress'
-import configVisualizerPlugin from './plugin/visualizer'
-import baseConig from './vite.config.preview.base'
+import { vueManualChunk } from './manual-chunks.ts'
+import configCompressPlugin from './plugin/compress.ts'
+import configVisualizerPlugin from './plugin/visualizer.ts'
+import baseConig from './vite.config.preview.base.ts'
 
 export default mergeConfig(
   {

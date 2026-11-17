@@ -1,3 +1,4 @@
+import '@/utils/passive-events'
 import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill'
 import TinySearchBox from '@opentiny/vue-search-box'
 import { createApp } from 'vue'

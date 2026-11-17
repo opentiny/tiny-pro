@@ -1,5 +1,4 @@
 import type { Router, RouteRecordRaw } from 'vue-router'
-import { nextTick } from 'vue'
 import { useMenuStore } from '@/store/modules/router'
 import NotFound from '@/views/not-found/404/index.vue'
 import constant from '../constant'
@@ -118,19 +117,9 @@ export function registerHiddenSubRoutes(router: Router) {
 }
 
 export function setupMenuGuard(router: Router) {
-  let has404 = false
   router.beforeEach(async (to) => {
     if (to.name?.toString().toLowerCase() === 'login')
       return
-    if (!has404) {
-      has404 = true
-      router.addRoute({
-        path: `${import.meta.env.VITE_CONTEXT}:pathMatch(.*)*`,
-        name: 'notFound',
-        component: () => import('@/views/not-found/index.vue'),
-      })
-    }
-    await nextTick()
     const menuStore = useMenuStore()
     if (menuStore.menuList.length)
       return

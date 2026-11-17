@@ -1,13 +1,11 @@
 <script lang="ts" setup>
 import { TinyHuichartsBar as TinyChartBar } from '@opentiny/vue-huicharts'
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import useLocale from '@/hooks/locale'
 import { debounce } from '@/hooks/responsive'
 
 const props = defineProps<{ falls?: { pv: number[], play: number[], page: number[] } }>()
 const { t } = useI18n()
-const { currentLocale } = useLocale()
 
 function getPhases() {
   return ['DNS', t('home.falls.tcp'), t('home.falls.ssl'), 'Dns', t('home.falls.tcp'), t('home.falls.ssl')]
@@ -35,7 +33,7 @@ const options = computed(() => ({
     },
   ],
 }))
-const chartExtend = ref({
+const chartExtend = {
   grid: {
     left: '3%',
     right: '4%',
@@ -44,7 +42,6 @@ const chartExtend = ref({
   },
   color: ['#4e85f4', '#5f45ff', '#ff9e03'],
   legend: {
-    data: [t('home.curve.play'), t('home.curve.page'), t('home.main.down')],
     top: '10',
     left: 'auto',
     right: '24',
@@ -89,7 +86,7 @@ const chartExtend = ref({
       },
     },
   ],
-})
+}
 
 onMounted(() => {
   const resizeHandler = debounce(() => barRef.value?.resize(), 200)
@@ -102,19 +99,10 @@ onMounted(() => {
     observer.observe(el)
   }
 
-  setTimeout(() => {
-    barRef.value?.resize()
-  }, 200)
-
   onUnmounted(() => {
     window.removeEventListener('resize', resizeHandler)
     observer?.disconnect()
   })
-})
-
-watch(currentLocale, () => {
-  chartExtend.value.legend.data = [t('home.curve.play'), t('home.curve.page'), t('home.main.down')]
-  barRef.value?.resize()
 })
 </script>
 
