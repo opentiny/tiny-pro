@@ -267,20 +267,23 @@ const createMonorepoRootSync = (answers: ProjectInfo) => {
   );
 
   // 根 package.json 提供一键启动脚本，子包通过目录引用，与包名无关
+  // 统一使用 npm 启动，保证未安装 pnpm 的用户也可执行各脚本
+  const npmRunWeb = 'npm run --prefix web';
   const scripts: Record<string, string> = {
-    build: 'pnpm -C web build',
+    build: `${npmRunWeb} build`,
   };
   if (serverConfirm) {
     // 已集成服务端：前端直连后端启动（不走 mock 服务）
-    scripts.dev = 'pnpm -C web run dev';
+    scripts.dev = `${npmRunWeb} dev`;
   } else {
     // 仅前端项目：vite + 8848 mock 服务并行启动，无需 mysql/redis
-    scripts['start:mock'] = 'pnpm -C web run start:mock';
+    scripts['start:mock'] = `${npmRunWeb} start:mock`;
   }
   if (serverConfirm && serverFramework === ServerFrameworks.NestJs) {
-    scripts['dev:backend'] = `pnpm -C ${ServerFrameworks.NestJs} run start:dev`;
+    const npmRunNest = `npm run --prefix ${ServerFrameworks.NestJs}`;
+    scripts['dev:backend'] = `${npmRunNest} start:dev`;
     // 后端 mock 调试：不连 MySQL/Redis，登录与系统引导由内存 mock 数据接管
-    scripts['nest:mock'] = `pnpm -C ${ServerFrameworks.NestJs} run start:mock`;
+    scripts['nest:mock'] = `${npmRunNest} start:mock`;
   }
   const tinyRobotEnabled = (features ?? []).includes(FeatureType.TinyRobot);
   const rootPackageJson = {
@@ -948,8 +951,15 @@ export const installDependencies = (answers: ProjectInfo) => {
   const { name } = answers;
 
   // monorepo 根目录一条命令安装全部 workspace 依赖（web / nestJs / lowcode-designer）
-  log.info('正在安装项目依赖，安装过程需要几十秒，请耐心等待...');
-  const installResult = spawn.sync('pnpm', ['install'], {
+  // 优先使用 pnpm（读 pnpm-workspace.yaml），未安装时回退 npm（读 workspaces 字段）
+  const pnpmCheck = spawn.sync('pnpm', ['--version'], {
+    stdio: 'ignore',
+  });
+  const packageManager = pnpmCheck.status === 0 ? 'pnpm' : 'npm';
+  log.info(
+    `正在使用 ${packageManager} 安装项目依赖，安装过程需要几十秒，请耐心等待...`
+  );
+  const installResult = spawn.sync(packageManager, ['install'], {
     cwd: name,
     stdio: 'inherit',
   });
