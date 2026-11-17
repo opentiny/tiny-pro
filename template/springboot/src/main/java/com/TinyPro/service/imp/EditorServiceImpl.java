@@ -179,6 +179,11 @@ public class EditorServiceImpl implements EditorService {
         editorRepository.save(editor);
 
         if (patch.getMembers() != null) {
+            if (usersByName.isEmpty()) {
+                editorMemberRepository.deleteAllByEditorId(editor.getId());
+                return true;
+            }
+
             List<EditorMember> members = usersByName.values().stream()
                     .filter(user -> !editorMemberRepository.existsByEditorIdAndUserId(
                             editor.getId(), user.getId()))

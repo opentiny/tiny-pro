@@ -10,5 +10,7 @@ public interface EditorMemberRepository extends JpaRepository<EditorMember, Long
 
     boolean existsByEditorIdAndUserId(Long editorId, Integer userId);
 
+    void deleteAllByEditorId(Long editorId);
+
     List<EditorMember> findAllByEditorIdInOrderByEditorIdAscIdAsc(Collection<Long> editorIds);
 }
