@@ -293,7 +293,7 @@ const createMonorepoRootSync = (answers: ProjectInfo) => {
     workspaces: packages,
     // tiny-robot-chat 依赖 ^1.30.0；低版本 SDK 的 exports 不支持子路径
     // 目录导入会导致 vite 预构建失败，仅集成 TinyRobot 时锁定已知可用版本
-    //（pnpm 读 pnpm.overrides，npm 读顶层 overrides）
+    // （pnpm 读 pnpm.overrides，npm 读顶层 overrides）
     ...(tinyRobotEnabled && {
       pnpm: {
         overrides: {
@@ -662,15 +662,26 @@ const integrateTinyRobot = (answers: ProjectInfo) => {
   const result = spawn.sync(
     'npx',
     ['-y', '@opentiny/tiny-robot-cli', 'add', 'chat', '--yes'],
-    { cwd: webPath, stdio: 'inherit' }
+    {
+      cwd: webPath,
+      stdio: 'inherit',
+      env: {
+        ...process.env,
+        // 官方源 .npmrc 在 createMonorepoRootSync 阶段才写入，npx 拉取时还不存在；
+        // 镜像可能尚未同步该 CLI，这里通过环境变量让 @opentiny 作用域直接走官方源
+        'npm_config_@opentiny:registry': 'https://registry.npmjs.org',
+        npm_config_replace_registry_host: 'never',
+      },
+    }
   );
   if (result.status !== 0) {
     stripTinyRobotMarkers(layoutPath);
     stripTinyRobotMarkers(viteConfigPath);
     log.error('TinyRobot 智能助手集成失败，已跳过，不影响其余项目文件');
-    log.info(
-      '可稍后进入 web 目录手动执行：npx @opentiny/tiny-robot-cli add chat'
-    );
+    log.info(`可稍后进入 web 目录手动集成，步骤：
+1. 执行 npx @opentiny/tiny-robot-cli add chat --yes 生成 src/tiny-robot-chat
+2. 在 src/layout/default-layout.vue 中引入并渲染组件：import TinyRobotChat from '@/tiny-robot-chat/TinyRobotChat.vue'，模板中添加 <TinyRobotChat />
+3. 如需 MCP 示例，在 config/vite.config.dev.ts 的 proxy 中增加 /modelcontextprotocol-mcp 代理（参考 https://sonyleo.github.io/tiny-robot/alpha/guide/cli-integration.html）`);
     return;
   }
 

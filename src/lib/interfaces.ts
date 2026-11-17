@@ -49,7 +49,7 @@ export interface FeatureOption {
 /**
  * 可选功能清单，后续新增功能时在此追加即可
  */
-export const FEATURE_OPTIONS: FeatureOption[] = [
+export const FEATURE_OPTIONS: Array<FeatureOption> = [
   {
     // 选中后通过 npx @opentiny/tiny-robot-cli add chat 生成代码并挂载，无环境变量开关；
     // 名称中附带镜像源提示：npmmirror 同步有延迟，选中后自动配置官方源
