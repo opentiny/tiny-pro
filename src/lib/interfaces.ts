@@ -133,6 +133,7 @@ export const devDependencies = {
     'vite',
     '@rspack/cli',
     '@rspack/core',
+    '@rspack/dev-server',
     /@farmfe\/.*/,
   ],
   farm: [
