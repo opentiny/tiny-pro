@@ -22,9 +22,9 @@ Create the configured MySQL database, then start the application.
 
 创建配置好的 MySQL 数据库，然后启动应用。
 
-Flyway runs `V1__init_schema.sql` through the latest migration (`V3__upgrade_legacy_schema.sql`) before `DataInitializer` inserts the default permissions, menus, roles, languages, applications, and admin user.
+Flyway runs `V1__init_schema.sql` through the latest migration (`V7__create_project_detail_tables.sql`) before `DataInitializer` inserts the default permissions, menus, roles, languages, applications, and admin user. The form option migration seeds the lookup data used by `/base/getdata` and `/step/getdata`, V6 creates the rich-text document and collaborative membership tables, and V7 creates project detail, version, and stage tables.
 
-Flyway 会先执行从 `V1__init_schema.sql` 到最新版本（当前为 `V3__upgrade_legacy_schema.sql`）的迁移，然后由 `DataInitializer` 插入默认权限、菜单、角色、语言、应用和管理员用户。
+Flyway 会先执行从 `V1__init_schema.sql` 到最新版本（当前为 `V7__create_project_detail_tables.sql`）的迁移，并初始化表单选项、富文本编辑器文档表、协同文档成员关系表以及项目详情相关表，然后由 `DataInitializer` 插入默认权限、菜单、角色、语言、应用和管理员用户。
 
 ## Existing database and baseline
 
@@ -73,7 +73,7 @@ flyway baseline \
   -baselineVersion=1 \
   -baselineDescription="Existing TinyPro schema"
 
-# Apply V2 and V3 / 执行 V2 和 V3
+# Apply migrations after the baseline / 执行 baseline 后的迁移
 flyway migrate \
   -url="$SPRING_DATASOURCE_URL" \
   -user="$SPRING_DATASOURCE_USERNAME" \

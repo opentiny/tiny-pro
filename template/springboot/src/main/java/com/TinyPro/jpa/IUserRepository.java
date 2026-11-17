@@ -8,9 +8,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Collection;
 
 public interface IUserRepository extends JpaRepository<User, Long> , JpaSpecificationExecutor<User> {
     Optional<User> findByEmail(String email);
+    List<User> findAllByNameIn(List<String> names);
+    List<User> findAllByIdIn(Collection<Integer> ids);
     List<User> findAllByEmail(String email);
     boolean existsByRoleId(Long roleId);
     @Modifying

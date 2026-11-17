@@ -3,6 +3,8 @@ package com.TinyPro;
 import com.TinyPro.entity.contants.Contants;
 import com.TinyPro.entity.dto.InitMenuDto;
 import com.TinyPro.entity.po.Application;
+import com.TinyPro.entity.po.Editor;
+import com.TinyPro.entity.po.EditorMember;
 import com.TinyPro.entity.po.I18;
 import com.TinyPro.entity.po.Lang;
 import com.TinyPro.entity.po.Menu;
@@ -10,6 +12,8 @@ import com.TinyPro.entity.po.Permission;
 import com.TinyPro.entity.po.Role;
 import com.TinyPro.entity.po.User;
 import com.TinyPro.jpa.ApplicationRepository;
+import com.TinyPro.jpa.EditorMemberRepository;
+import com.TinyPro.jpa.EditorRepository;
 import com.TinyPro.jpa.I18Repository;
 import com.TinyPro.jpa.IMenuRepository;
 import com.TinyPro.jpa.IPermissionRepository;
@@ -39,6 +43,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -57,6 +62,10 @@ public class DataInitializer implements CommandLineRunner {
   private RedisConnectionFactory redisConnectionFactory;
   @Autowired
   private IUserRepository userRepository;
+  @Autowired
+  private EditorRepository editorRepository;
+  @Autowired
+  private EditorMemberRepository editorMemberRepository;
   @Autowired
   private IRoleRepository roleRepository;
   @Autowired
@@ -112,6 +121,7 @@ public class DataInitializer implements CommandLineRunner {
     } else {
       logger.info("[APP]: Existing database detected; skip default admin bootstrap");
     }
+    initEditorDocuments();
     redisUtil.setPersistentValue(Contants.INSTALL_FLAG, "1");
     logger.info("[APP]: installation flag persisted: {}", Contants.INSTALL_FLAG);
   }
@@ -129,7 +139,9 @@ public class DataInitializer implements CommandLineRunner {
       && menuRepository.count() > 0
       && langRepository.count() > 0
       && i18Repository.count() > 0
-      && applicationRepository.count() > 0;
+      && applicationRepository.count() > 0
+      && editorRepository.count() > 0
+      && editorMemberRepository.count() > 0;
   }
 
   /**
@@ -144,7 +156,9 @@ public class DataInitializer implements CommandLineRunner {
       && menuRepository.count() == 0
       && langRepository.count() == 0
       && i18Repository.count() == 0
-      && applicationRepository.count() == 0;
+      && applicationRepository.count() == 0
+      && editorRepository.count() == 0
+      && editorMemberRepository.count() == 0;
   }
 
   private void initI18n() throws IOException {
@@ -409,6 +423,81 @@ public class DataInitializer implements CommandLineRunner {
       }
       throw ex;
     }
+  }
+
+  private void initEditorDocuments() {
+    List<Editor> normalDocuments = List.of(
+      editorSeed(
+        "云平台数据库联调记录",
+        "云平台部",
+        LocalDateTime.of(2026, 11, 3, 9, 40),
+        "<h2>云平台数据库联调记录</h2><p>本次联调完成了员工、项目和文档接口的数据库持久化验证。</p><ul><li>所有列表均读取 MySQL</li><li>新增与修改操作重启后保留</li></ul>"
+      ),
+      editorSeed(
+        "企业工作台验收清单",
+        "前端技术部",
+        LocalDateTime.of(2026, 11, 5, 15, 20),
+        "<h2>企业工作台验收清单</h2><ol><li>检查监控空数据状态</li><li>检查表格筛选与分页</li><li>检查编辑器自动保存</li></ol>"
+      ),
+      editorSeed(
+        "质量网关发布说明",
+        "质量保障部",
+        LocalDateTime.of(2026, 11, 8, 18, 0),
+        "<h2>质量网关 V1.6</h2><p>新增接口覆盖率看板与发布前自动巡检能力。</p>"
+      )
+    );
+
+    for (Editor document : normalDocuments) {
+      saveEditorIfAbsent(document);
+    }
+
+    List<Editor> collaborationDocuments = List.of(
+      editorSeed(
+        "云资源平台迭代周稿",
+        "云资源部",
+        LocalDateTime.of(2026, 11, 6, 10, 15),
+        "<h2>云资源平台迭代</h2><p>请各负责人每日更新接口联调和数据准备进度。</p>"
+      ),
+      editorSeed(
+        "设计资产中心评审纪要",
+        "设计中心",
+        LocalDateTime.of(2026, 11, 7, 14, 50),
+        "<h2>评审结论</h2><p>统一资产分类与检索字段，下一版本补充批量管理能力。</p>"
+      ),
+      editorSeed(
+        "质量门禁接入方案",
+        "质量保障部",
+        LocalDateTime.of(2026, 11, 9, 11, 30),
+        "<h2>接入方案</h2><p>先覆盖核心读写接口，再逐步接入全量页面巡检。</p>"
+      )
+    );
+
+    List<User> collaborationUsers = userRepository.findAll();
+    for (Editor document : collaborationDocuments) {
+      Editor savedDocument = saveEditorIfAbsent(document);
+      for (User user : collaborationUsers) {
+        if (!editorMemberRepository.existsByEditorIdAndUserId(savedDocument.getId(), user.getId())) {
+          EditorMember member = new EditorMember();
+          member.setEditorId(savedDocument.getId());
+          member.setUserId(user.getId());
+          editorMemberRepository.save(member);
+        }
+      }
+    }
+  }
+
+  private Editor editorSeed(String name, String department, LocalDateTime time, String content) {
+    Editor editor = new Editor();
+    editor.setName(name);
+    editor.setDepartment(department);
+    editor.setTime(time);
+    editor.setContent(content);
+    return editor;
+  }
+
+  private Editor saveEditorIfAbsent(Editor editor) {
+    return editorRepository.findFirstByNameOrderByIdAsc(editor.getName())
+      .orElseGet(() -> editorRepository.saveAndFlush(editor));
   }
 
   private <T> T findOrInsert(Supplier<T> lookupAction, Supplier<T> insertAction) {
