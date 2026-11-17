@@ -6,6 +6,7 @@ import com.TinyPro.entity.dto.EditorUpdateRequest;
 import com.TinyPro.entity.vo.EditorVo;
 import com.TinyPro.entity.vo.CollaborationEditorVo;
 import com.TinyPro.service.EditorService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,7 +33,7 @@ public class EditorController {
     }
 
     @PostMapping("/document")
-    public EditorVo postDocument(@RequestBody EditorDocumentDto documentDto) {
+    public EditorVo postDocument(@Valid @RequestBody EditorDocumentDto documentDto) {
         return editorService.postDocument(documentDto);
     }
 
