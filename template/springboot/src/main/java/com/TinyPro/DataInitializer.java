@@ -139,9 +139,7 @@ public class DataInitializer implements CommandLineRunner {
       && menuRepository.count() > 0
       && langRepository.count() > 0
       && i18Repository.count() > 0
-      && applicationRepository.count() > 0
-      && editorRepository.count() > 0
-      && editorMemberRepository.count() > 0;
+      && applicationRepository.count() > 0;
   }
 
   /**

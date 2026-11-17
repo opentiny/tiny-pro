@@ -3,8 +3,6 @@ package com.TinyPro;
 import com.TinyPro.entity.contants.Contants;
 import com.TinyPro.entity.po.Role;
 import com.TinyPro.jpa.ApplicationRepository;
-import com.TinyPro.jpa.EditorMemberRepository;
-import com.TinyPro.jpa.EditorRepository;
 import com.TinyPro.jpa.I18Repository;
 import com.TinyPro.jpa.IMenuRepository;
 import com.TinyPro.jpa.IPermissionRepository;
@@ -54,10 +52,6 @@ class DataInitializerRunnerTest {
     private I18Repository i18Repository;
     @Mock
     private ApplicationRepository applicationRepository;
-    @Mock
-    private EditorRepository editorRepository;
-    @Mock
-    private EditorMemberRepository editorMemberRepository;
 
     private DataInitializer initializer;
 
@@ -73,8 +67,6 @@ class DataInitializerRunnerTest {
         ReflectionTestUtils.setField(initializer, "langRepository", langRepository);
         ReflectionTestUtils.setField(initializer, "i18Repository", i18Repository);
         ReflectionTestUtils.setField(initializer, "applicationRepository", applicationRepository);
-        ReflectionTestUtils.setField(initializer, "editorRepository", editorRepository);
-        ReflectionTestUtils.setField(initializer, "editorMemberRepository", editorMemberRepository);
 
         doAnswer(invocation -> ((Supplier<?>) invocation.getArgument(3)).get())
                 .when(redisLockService)
@@ -88,8 +80,6 @@ class DataInitializerRunnerTest {
         when(langRepository.count()).thenReturn(1L);
         when(i18Repository.count()).thenReturn(1L);
         when(applicationRepository.count()).thenReturn(1L);
-        when(editorRepository.count()).thenReturn(1L);
-        when(editorMemberRepository.count()).thenReturn(1L);
     }
 
     // 已完成初始化且数据库中存在其他用户时，补种流程不能重新创建默认管理员。
