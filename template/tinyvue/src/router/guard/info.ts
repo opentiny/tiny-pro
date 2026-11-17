@@ -9,10 +9,9 @@ import { unauthorizedLoginLocation } from '@/utils/app-location'
 import { setToken } from '@/utils/auth'
 
 export default function setupInfoGuard(router: Router) {
-  router.beforeEach(async (to, from, next) => {
+  router.beforeEach(async (to) => {
     NProgress.start()
     if (to.name === 'login') {
-      next()
       NProgress.done()
       return
     }
@@ -20,10 +19,9 @@ export default function setupInfoGuard(router: Router) {
     const localesStore = useLocales()
     const { data } = (await getUserInfo()) ?? { data: null }
     if (!data) {
-      next(unauthorizedLoginLocation(to))
       setToken('')
       NProgress.done()
-      return
+      return unauthorizedLoginLocation(to)
     }
     if (localesStore.shouldFetch) {
       await localesStore.fetchLang()
@@ -51,7 +49,6 @@ export default function setupInfoGuard(router: Router) {
     userStore.rolePermission = (data.role as unknown as Role[])
       .flatMap(role => role.permission)
       .map(permission => permission.name)
-    next()
     NProgress.done()
   })
 }

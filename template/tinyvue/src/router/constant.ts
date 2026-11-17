@@ -36,4 +36,10 @@ export default [
     path: import.meta.env.VITE_CONTEXT + 'redirect',
     component: () => import('@/views/redirect.vue'),
   },
+  {
+    // 菜单路由在导航守卫里才挂上。先接住当前地址，避免启动时出现 No match。
+    path: `${import.meta.env.VITE_CONTEXT}:pathMatch(.*)*`,
+    name: 'notFound',
+    component: () => import('@/views/not-found/index.vue'),
+  },
 ] as RouteRecordRaw[]

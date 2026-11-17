@@ -1,6 +1,13 @@
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import { defineConfig, mergeConfig, loadEnv } from 'vite';
 import { useTinyEngineBaseConfig } from '@opentiny/tiny-engine-vite-config';
+
+const require = createRequire(import.meta.url);
+// Vite 8 会把这个包的 .cjs 入口当成含 import 的脚本解析失败，改用 ESM 入口。
+const baselineBrowserMapping = require
+  .resolve('baseline-browser-mapping')
+  .replace(/index\.cjs$/, 'index.js');
 
 export default defineConfig((configEnv) => {
   // 加载环境变量（从 env 目录加载）
@@ -22,6 +29,11 @@ export default defineConfig((configEnv) => {
   });
 
   const customConfig = {
+    resolve: {
+      alias: {
+        'baseline-browser-mapping': baselineBrowserMapping,
+      },
+    },
     base, // 配置静态资源前缀
     envDir: './env',
     publicDir: path.resolve(__dirname, './public'),

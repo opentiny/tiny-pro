@@ -136,10 +136,6 @@ onMounted(() => {
   }
 
   resizeHandler()
-  setTimeout(() => {
-    ringRef.value?.resize()
-    updateLegendPosition()
-  }, 200)
 
   onUnmounted(() => {
     window.removeEventListener('resize', resizeHandler)
