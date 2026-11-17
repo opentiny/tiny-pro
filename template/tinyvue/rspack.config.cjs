@@ -70,6 +70,7 @@ const config = {
       },
       {
         test: /\.css$/,
+        resourceQuery: { not: /raw/ },
         type: 'css/auto',
       },
       {
@@ -87,6 +88,7 @@ const config = {
       },
       {
         test: /\.less$/,
+        resourceQuery: { not: /raw/ },
         use: [
           {
             loader: 'less-loader',

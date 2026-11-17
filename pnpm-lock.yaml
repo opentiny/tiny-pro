@@ -436,8 +436,8 @@ importers:
         specifier: ^11.0.0
         version: 11.4.21(vue@3.5.45(typescript@5.9.3))
       vue-router:
-        specifier: ^5.5.1
-        version: 5.5.1(@farmfe/core@2.0.0(@types/node@22.20.5)(less@4.9.1)(lightningcss@1.33.0)(sugarss@2.0.0)(terser@5.51.2))(@rspack/core@2.3.2)(@vue/compiler-sfc@3.5.45)(esbuild@0.28.2)(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript@5.9.3)(vue@3.5.45(typescript@5.9.3)))(rolldown@1.2.19)(rollup@4.68.4)(vite@8.3.8(@types/node@22.20.5)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1)(sugarss@2.0.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))(vue@3.5.45(typescript@5.9.3))(webpack@5.112.2)
+        specifier: 5.5.0
+        version: 5.5.0(@farmfe/core@2.0.0(@types/node@22.20.5)(less@4.9.1)(lightningcss@1.33.0)(sugarss@2.0.0)(terser@5.51.2))(@rspack/core@2.3.2)(@vue/compiler-sfc@3.5.45)(esbuild@0.28.2)(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript@5.9.3)(vue@3.5.45(typescript@5.9.3)))(rolldown@1.2.19)(rollup@4.68.4)(vite@8.3.8(@types/node@22.20.5)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1)(sugarss@2.0.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))(vue@3.5.45(typescript@5.9.3))(webpack@5.112.2)
       xlsx:
         specifier: ^0.18.0
         version: 0.18.5
@@ -483,10 +483,13 @@ importers:
         version: 2.0.0(@farmfe/core@2.0.0(@types/node@22.20.5)(less@4.9.1)(lightningcss@1.33.0)(sugarss@2.0.0)(terser@5.51.2))(less@4.9.1)
       '@rspack/cli':
         specifier: ^2.3.2
-        version: 2.3.2(@rspack/core@2.3.2)
+        version: 2.3.2(@rspack/core@2.3.2)(@rspack/dev-server@2.2.2(@rspack/core@2.3.2)(selfsigned@5.5.0))
       '@rspack/core':
         specifier: ^2.3.2
         version: 2.3.2
+      '@rspack/dev-server':
+        specifier: ^2.2.2
+        version: 2.2.2(@rspack/core@2.3.2)(selfsigned@5.5.0)
       '@types/lodash':
         specifier: ^4.17.9
         version: 4.17.27
@@ -5004,6 +5007,25 @@ packages:
       '@swc/helpers':
         optional: true
 
+  '@rspack/dev-middleware@2.0.6':
+    resolution: {integrity: sha512-Rcx7dlDZQ9ddUJGuutFvnSeAKl+ZOc1fnC3htibs8yew3zMD9VgvSUe4MAwEn94Gb390l5heA+s/j5KhoSG5MQ==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    peerDependencies:
+      '@rspack/core': ^2.0.0
+    peerDependenciesMeta:
+      '@rspack/core':
+        optional: true
+
+  '@rspack/dev-server@2.2.2':
+    resolution: {integrity: sha512-pK4V9YJW8dkfjy6WYJ2T6DrPkcIn2yjA1HiaU146141j8UCxHok5lsplyqudLzerOhvwqMrNFmnsuXLnFbfn4Q==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    peerDependencies:
+      '@rspack/core': ^2.0.0
+      selfsigned: ^5.0.0
+    peerDependenciesMeta:
+      selfsigned:
+        optional: true
+
   '@scarf/scarf@1.4.0':
     resolution: {integrity: sha512-xxeapPiUXdZAE3che6f3xogoJPeZgig6omHEy1rIY5WVsB3H2BHNnZH+gHG6x91SCWyQCzWGsuL2Hh3ClO5/qQ==}
 
@@ -7014,10 +7036,6 @@ packages:
   chokidar@5.0.0:
     resolution: {integrity: sha512-TQMmc3w+5AxjpL8iIiwebF73dRDF4fBIieAqGn9RGCWaEVwQ6Fb2cGe31Yns0RRIzii5goJ1Y7xbMwo1TxMplw==}
     engines: {node: '>= 20.19.0'}
-
-  chokidar@6.0.0:
-    resolution: {integrity: sha512-Ec2Z7wpcKBiMpR7DxteoqS/sq5G5d2A4fpxzPv6+fD7xNNdrTghn7L11YwV5EN1B3i72Erc3XVT5FkWIDx90+A==}
-    engines: {node: '>= 22.22'}
 
   chownr@2.0.0:
     resolution: {integrity: sha512-bIomtDF5KGpdogkLd9VspvFzk9KfpyyGlS8YFVZl7TGPBHL5snIOnxeshwVgPteQ9b4Eydl+pVbIyE1DcvCWgQ==}
@@ -10745,10 +10763,6 @@ packages:
   local-pkg@1.2.1:
     resolution: {integrity: sha512-++gUqRDEvcnN6Zhqrr+y/CkVEHhlrR96vZn3nZZPYzMcBUyBtTKzB9NadClFIsIVSsu+3i9tfk/erqy9kAmt7Q==}
     engines: {node: '>=14'}
-
-  local-pkg@2.0.0:
-    resolution: {integrity: sha512-xvTNwM27EpU+fkLSpo33Pq/nm8m5zNf0aU/hF4W4ZM9RHQjVZa5KTmmXIzEzVsdI09NOUqj0djHhTv96sUowSQ==}
-    engines: {node: '>=20.19.0'}
 
   localforage@1.10.0:
     resolution: {integrity: sha512-14/H1aX7hzBBmmh7sGPd+AOMkkIrHM3Z1PAyGgZigA1H1p5O5ANnMyWzvpAETtG68/dC4pC0ncy3+PPGzXZHPg==}
@@ -15456,8 +15470,8 @@ packages:
     peerDependencies:
       vue: ^3.5.0
 
-  vue-router@5.5.1:
-    resolution: {integrity: sha512-lUENd/QIhKd2HWACnXID3us0GWBnuOi3BwkTUzce2+4nfM/b3seV5saNURM9+wt48/qUxviotpcm7yFxC0U4qA==}
+  vue-router@5.5.0:
+    resolution: {integrity: sha512-nYhG+YzLcrO5Z7KbH1H/xvBeBzhCWhQG0z5DYNLuaJULhavZBmEgoQ5xVHGxwe65c5hnJQHZpBxWdQhnOBzHmw==}
     peerDependencies:
       '@pinia/colada': '>=0.21.2'
       '@vue/compiler-sfc': ^3.5.34 || ^4.0.0
@@ -16224,7 +16238,7 @@ snapshots:
       '@babel/helper-compilation-targets': 7.29.13
       '@babel/helper-module-transforms': 7.29.14(@babel/core@7.18.13)
       '@babel/helpers': 7.29.14
-      '@babel/parser': 7.23.9
+      '@babel/parser': 7.29.14
       '@babel/template': 7.29.7
       '@babel/traverse': 7.23.9
       '@babel/types': 7.29.14
@@ -19973,7 +19987,7 @@ snapshots:
 
   '@opentiny/tiny-engine-vue-to-dsl@2.11.0(typescript@5.9.3)':
     dependencies:
-      '@babel/parser': 7.23.9
+      '@babel/parser': 7.29.14
       '@babel/traverse': 7.23.9
       '@babel/types': 7.29.14
       '@vue/compiler-dom': 3.5.45
@@ -22979,13 +22993,26 @@ snapshots:
       '@rspack/binding-win32-ia32-msvc': 2.3.2
       '@rspack/binding-win32-x64-msvc': 2.3.2
 
-  '@rspack/cli@2.3.2(@rspack/core@2.3.2)':
+  '@rspack/cli@2.3.2(@rspack/core@2.3.2)(@rspack/dev-server@2.2.2(@rspack/core@2.3.2)(selfsigned@5.5.0))':
     dependencies:
       '@rspack/core': 2.3.2
+    optionalDependencies:
+      '@rspack/dev-server': 2.2.2(@rspack/core@2.3.2)(selfsigned@5.5.0)
 
   '@rspack/core@2.3.2':
     dependencies:
       '@rspack/binding': 2.3.2
+
+  '@rspack/dev-middleware@2.0.6(@rspack/core@2.3.2)':
+    optionalDependencies:
+      '@rspack/core': 2.3.2
+
+  '@rspack/dev-server@2.2.2(@rspack/core@2.3.2)(selfsigned@5.5.0)':
+    dependencies:
+      '@rspack/core': 2.3.2
+      '@rspack/dev-middleware': 2.0.6(@rspack/core@2.3.2)
+    optionalDependencies:
+      selfsigned: 5.5.0
 
   '@scarf/scarf@1.4.0': {}
 
@@ -24286,7 +24313,7 @@ snapshots:
 
   '@vue/compiler-core@3.2.45':
     dependencies:
-      '@babel/parser': 7.23.9
+      '@babel/parser': 7.29.14
       '@vue/shared': 3.2.45
       estree-walker: 2.0.2
       source-map: 0.6.1
@@ -24311,7 +24338,7 @@ snapshots:
 
   '@vue/compiler-sfc@3.2.45':
     dependencies:
-      '@babel/parser': 7.23.9
+      '@babel/parser': 7.29.14
       '@vue/compiler-core': 3.2.45
       '@vue/compiler-dom': 3.2.45
       '@vue/compiler-ssr': 3.2.45
@@ -24389,7 +24416,7 @@ snapshots:
 
   '@vue/reactivity-transform@3.2.45':
     dependencies:
-      '@babel/parser': 7.23.9
+      '@babel/parser': 7.29.14
       '@vue/compiler-core': 3.2.45
       '@vue/shared': 3.2.45
       estree-walker: 2.0.2
@@ -25647,10 +25674,6 @@ snapshots:
       readdirp: 4.1.2
 
   chokidar@5.0.0:
-    dependencies:
-      readdirp: 5.1.1
-
-  chokidar@6.0.0:
     dependencies:
       readdirp: 5.1.1
 
@@ -30086,12 +30109,6 @@ snapshots:
       mlly: 1.8.2
       pkg-types: 2.4.0
       quansync: 0.2.11
-
-  local-pkg@2.0.0:
-    dependencies:
-      mlly: 1.8.2
-      pkg-types: 2.4.0
-      quansync: 1.0.0
 
   localforage@1.10.0:
     dependencies:
@@ -35725,14 +35742,14 @@ snapshots:
       '@vue/devtools-api': 6.6.4
       vue: 3.5.45(typescript@5.9.3)
 
-  vue-router@5.5.1(@farmfe/core@2.0.0(@types/node@22.20.5)(less@4.9.1)(lightningcss@1.33.0)(sugarss@2.0.0)(terser@5.51.2))(@rspack/core@2.3.2)(@vue/compiler-sfc@3.5.45)(esbuild@0.28.2)(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript@5.9.3)(vue@3.5.45(typescript@5.9.3)))(rolldown@1.2.19)(rollup@4.68.4)(vite@8.3.8(@types/node@22.20.5)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1)(sugarss@2.0.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))(vue@3.5.45(typescript@5.9.3))(webpack@5.112.2):
+  vue-router@5.5.0(@farmfe/core@2.0.0(@types/node@22.20.5)(less@4.9.1)(lightningcss@1.33.0)(sugarss@2.0.0)(terser@5.51.2))(@rspack/core@2.3.2)(@vue/compiler-sfc@3.5.45)(esbuild@0.28.2)(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript@5.9.3)(vue@3.5.45(typescript@5.9.3)))(rolldown@1.2.19)(rollup@4.68.4)(vite@8.3.8(@types/node@22.20.5)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1)(sugarss@2.0.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))(vue@3.5.45(typescript@5.9.3))(webpack@5.112.2):
     dependencies:
       '@vue-macros/common': 3.1.4(vue@3.5.45(typescript@5.9.3))
       '@vue/devtools-api': 8.2.1
       ast-walker-scope: 0.10.0
-      chokidar: 6.0.0
+      chokidar: 5.0.0
       confbox: 0.3.2
-      local-pkg: 2.0.0
+      local-pkg: 1.2.1
       magic-string: 1.4.5
       mlly: 1.8.2
       muggle-string: 0.4.1

@@ -1,4 +1,4 @@
-import { readdir, readFile } from 'node:fs/promises'
+import { readdir, readFile, stat } from 'node:fs/promises'
 import { extname, join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import type { JsPlugin } from '@farmfe/core'
@@ -23,17 +23,24 @@ async function collectSources(dir: string, files: string[]) {
   return files
 }
 
-async function loadUnoConfig(root: string) {
+async function loadUnoConfig(root: string, stamp: number) {
   // 不能静态 import uno.config.ts。Farm 编译配置时会把它交给 SWC，文件里的中文标点会直接 panic。
-  const mod = await tsImport(pathToFileURL(join(root, 'uno.config.ts')).href, import.meta.url)
+  // 查询参数用来绕开 tsx 的模块缓存，配置改过之后才会读到新内容。
+  const href = `${pathToFileURL(join(root, 'uno.config.ts')).href}?t=${stamp}`
+  const mod = await tsImport(href, import.meta.url)
   return mod.default as UserConfig
 }
 
 export function farmUnoCss(root: string): JsPlugin {
   let generatorPromise: Promise<UnoGenerator> | undefined
+  let configStamp = 0
 
-  function getGenerator() {
-    generatorPromise ??= loadUnoConfig(root).then(config => createGenerator(config))
+  async function getGenerator() {
+    const { mtimeMs } = await stat(join(root, 'uno.config.ts'))
+    if (generatorPromise && mtimeMs === configStamp)
+      return generatorPromise
+    configStamp = mtimeMs
+    generatorPromise = loadUnoConfig(root, mtimeMs).then(config => createGenerator(config))
     return generatorPromise
   }
 
