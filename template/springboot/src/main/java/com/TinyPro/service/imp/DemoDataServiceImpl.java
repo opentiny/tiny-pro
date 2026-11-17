@@ -126,6 +126,7 @@ public class DemoDataServiceImpl implements DemoDataService {
         Map<String, Object> params = query == null ? Map.of() : query;
         String startTime = stringValue(params.get("startTime"));
         String endTime = stringValue(params.get("endTime"));
+        String inclusiveEndTime = endTime.length() == 10 ? endTime + " 23:59:59" : endTime;
         List<String> filterStatus = stringList(params.get("filterStatus"));
         List<String> filterType = stringList(params.get("filterType"));
 
@@ -133,7 +134,7 @@ public class DemoDataServiceImpl implements DemoDataService {
                 .filter(row -> filterType.isEmpty() || filterType.contains(lastChar(row.get("type"))))
                 .filter(row -> filterStatus.isEmpty() || filterStatus.contains(lastChar(row.get("status"))))
                 .filter(row -> startTime.isBlank() || stringValue(row.get("time")).compareTo(startTime) >= 0)
-                .filter(row -> endTime.isBlank() || stringValue(row.get("time")).compareTo(endTime) <= 0)
+                .filter(row -> inclusiveEndTime.isBlank() || stringValue(row.get("time")).compareTo(inclusiveEndTime) <= 0)
                 .map(HashMap::new)
                 .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
 
