@@ -1,6 +1,7 @@
 const { resolve } = require('path');
 const { VueLoaderPlugin } = require('vue-loader');
 const rspack = require('@rspack/core');
+const { UnoCSSRspackPlugin } = require('@unocss/webpack/rspack');
 const { configDotenv } = require('dotenv');
 configDotenv({
   path: './.env',
@@ -17,10 +18,8 @@ const config = {
     filename: `js/[name]_[chunkhash:8].js`, // 设置打包后的 js 文件名，如果在文件名前增加文件路径，会将打包后的 js 文件放在指定的文件夹下
     publicPath: '/',
   },
-  experiments: {
-    css: false,
-  },
   plugins: [
+    UnoCSSRspackPlugin(),
     new VueLoaderPlugin(),
     new rspack.HtmlRspackPlugin({
       template: './index.html',
@@ -65,8 +64,13 @@ const config = {
         },
       },
       {
+        // import.meta.glob 的 ?raw 要当成源码字符串，不能按 Markdown 去解析。
+        resourceQuery: /raw/,
+        type: 'asset/source',
+      },
+      {
         test: /\.css$/,
-        use: ['style-loader', 'css-loader'],
+        type: 'css/auto',
       },
       {
         test: /\.(ts)$/,
@@ -84,15 +88,14 @@ const config = {
       {
         test: /\.less$/,
         use: [
-          'style-loader',
-          'css-loader',
           {
             loader: 'less-loader',
             options: {
-              additionalData: `@import "${resolve('./src/assets/style/breakpoint.less')}";`,
+              additionalData: `@import "${resolve(__dirname, 'src/assets/style/breakpoint.less')}";`,
             },
           },
         ],
+        type: 'css/auto',
       },
       {
         test: /\.svg$/,

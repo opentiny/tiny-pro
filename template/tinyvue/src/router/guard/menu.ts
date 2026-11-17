@@ -119,11 +119,9 @@ export function registerHiddenSubRoutes(router: Router) {
 
 export function setupMenuGuard(router: Router) {
   let has404 = false
-  router.beforeEach(async (to, from, next) => {
-    if (to.name?.toString().toLowerCase() === 'login') {
-      next()
+  router.beforeEach(async (to) => {
+    if (to.name?.toString().toLowerCase() === 'login')
       return
-    }
     if (!has404) {
       has404 = true
       router.addRoute({
@@ -134,10 +132,8 @@ export function setupMenuGuard(router: Router) {
     }
     await nextTick()
     const menuStore = useMenuStore()
-    if (menuStore.menuList.length) {
-      next()
+    if (menuStore.menuList.length)
       return
-    }
     const data = await menuStore.getMenuList()
     const routes = toRoutes(data)
     routes.forEach((route) => {
@@ -146,6 +142,6 @@ export function setupMenuGuard(router: Router) {
       }
     })
     registerHiddenSubRoutes(router)
-    next({ path: to.path, query: to.query, hash: to.hash, replace: true })
+    return { path: to.path, query: to.query, hash: to.hash, replace: true }
   })
 }
