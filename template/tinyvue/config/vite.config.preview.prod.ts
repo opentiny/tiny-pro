@@ -1,5 +1,6 @@
 import process from 'node:process'
 import { mergeConfig } from 'vite'
+import { vueManualChunk } from './manual-chunks'
 import configCompressPlugin from './plugin/compress'
 import configVisualizerPlugin from './plugin/visualizer'
 import baseConig from './vite.config.preview.base'
@@ -16,9 +17,7 @@ export default mergeConfig(
     build: {
       rollupOptions: {
         output: {
-          manualChunks: {
-            vue: ['vue', 'vue-router', 'pinia', '@vueuse/core', 'vue-i18n'],
-          },
+          manualChunks: vueManualChunk,
         },
       },
       chunkSizeWarningLimit: 2000,

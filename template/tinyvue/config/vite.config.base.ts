@@ -53,8 +53,10 @@ const config = {
     BUILD_TOOLS: '\'VITE\'',
   },
   optimizeDeps: {
-    esbuildOptions: {
-      resolveExtensions: ['.ts', '.js', '.css'],
+    rolldownOptions: {
+      resolve: {
+        extensions: ['.ts', '.js', '.css'],
+      },
     },
   },
   css: {
