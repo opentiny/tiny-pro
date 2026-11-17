@@ -42,7 +42,7 @@ export function resolvePostLoginLocation(
     fallbackPath?: string
     loginPath?: string
   } = {},
-): RouteLocationRaw {
+): Exclude<RouteLocationRaw, string> {
   if (typeof redirect !== 'string' || !redirect) {
     return { path: fallbackPath }
   }

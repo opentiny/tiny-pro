@@ -1,18 +1,15 @@
 <script lang="ts" setup>
 import { TinyHuichartsLine as TinyChartLine } from '@opentiny/vue-huicharts'
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import useLocale from '@/hooks/locale'
 import { debounce } from '@/hooks/responsive'
 
 const props = defineProps<{ curve?: { pv: number[], play: number[], page: number[] } }>()
 const { t } = useI18n()
-const { currentLocale } = useLocale()
 
-function getLegendConfig() {
-  const isMobile = window.innerWidth < 768
+function getLegendConfig(width = window.innerWidth) {
+  const isMobile = width < 768
   return {
-    data: [t('home.main.down'), t('home.curve.play'), t('home.curve.page')],
     top: '10',
     left: 'auto',
     right: '24',
@@ -62,6 +59,7 @@ function buildRows() {
 }
 
 const chartRef = ref()
+const viewportWidth = ref(window.innerWidth)
 // options 用 computed 整体重建：props 数据或语言变化时图表自动更新
 // （huicharts 对初始化后的嵌套 mutation 不敏感，必须整体替换 options）
 const options = computed(() => ({
@@ -72,59 +70,61 @@ const options = computed(() => ({
     },
   ],
 }))
-const chartExtend = ref({
-  grid: {
-    left: '8%',
-    right: '8%',
-  },
-  color: ['#fcc800', '#62b42e', '#bfb9fa'],
-  legend: getLegendConfig(),
-  yAxis: [
-    {
-      min: 0,
-      max: 40,
-      interval: 5,
-      axisLabel: {
-        formatter: '{value} s',
-      },
+const chartExtend = computed(() => {
+  const legend = getLegendConfig(viewportWidth.value)
+  return {
+    grid: {
+      left: '8%',
+      right: '8%',
     },
-  ],
-  tooltip: {
-    trigger: 'axis',
-  },
-  series: [
-    {
-      smooth: true,
-      showSymbol: false,
-      lineStyle: {
-        color: '#fcc800',
+    color: ['#fcc800', '#62b42e', '#bfb9fa'],
+    legend,
+    yAxis: [
+      {
+        min: 0,
+        max: 40,
+        interval: 5,
+        axisLabel: {
+          formatter: '{value} s',
+        },
       },
-      areaStyle: getAreaStyle('rgba(252,200,0,0.25)'),
+    ],
+    tooltip: {
+      trigger: 'axis',
     },
-    {
-      smooth: true,
-      showSymbol: false,
-      lineStyle: {
-        color: '#62b42e',
+    series: [
+      {
+        smooth: true,
+        showSymbol: false,
+        lineStyle: {
+          color: '#fcc800',
+        },
+        areaStyle: getAreaStyle('rgba(252,200,0,0.25)'),
       },
-      areaStyle: getAreaStyle('rgba(98,180,46,0.25)'),
-    },
-    {
-      smooth: true,
-      showSymbol: false,
-      lineStyle: {
-        color: '#bfb9fa',
+      {
+        smooth: true,
+        showSymbol: false,
+        lineStyle: {
+          color: '#62b42e',
+        },
+        areaStyle: getAreaStyle('rgba(98,180,46,0.25)'),
       },
-      areaStyle: getAreaStyle('rgba(191,185,250,0.25)'),
-    },
-  ],
+      {
+        smooth: true,
+        showSymbol: false,
+        lineStyle: {
+          color: '#bfb9fa',
+        },
+        areaStyle: getAreaStyle('rgba(191,185,250,0.25)'),
+      },
+    ],
+  }
 })
 
 onMounted(() => {
   const resizeHandler = debounce(() => {
-    chartExtend.value.legend = getLegendConfig()
+    viewportWidth.value = window.innerWidth
     chartRef.value?.resize()
-    chartRef.value?.integrateChart?.echartsIns?.setOption({ legend: chartExtend.value.legend })
   }, 200)
 
   window.addEventListener('resize', resizeHandler)
@@ -136,18 +136,10 @@ onMounted(() => {
     observer.observe(el)
   }
 
-  setTimeout(() => chartRef.value?.resize(), 200)
-
   onUnmounted(() => {
     window.removeEventListener('resize', resizeHandler)
     observer?.disconnect()
   })
-})
-
-watch(currentLocale, () => {
-  chartExtend.value.legend = getLegendConfig()
-  chartRef.value?.resize()
-  chartRef.value?.integrateChart?.echartsIns?.setOption({ legend: chartExtend.value.legend })
 })
 </script>
 

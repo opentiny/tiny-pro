@@ -3,15 +3,17 @@ import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import { defineConfig } from 'vite'
 import svgLoader from 'vite-svg-loader'
+import { quillMentionOptimizePlugin, quillMentionRegisterPlugin } from './plugin/quill-mention.ts'
 
 export default defineConfig({
   plugins: [
     vue(),
     vueJsx(),
     svgLoader({ svgoConfig: {} }),
+    quillMentionRegisterPlugin(),
   ],
   build: {
-    outDir: resolve(__dirname, '../dist/vue-pro/pages'),
+    outDir: resolve(import.meta.dirname, '../dist/vue-pro/pages'),
     commonjsOptions: {
       transformMixedEsModules: true,
     },
@@ -20,11 +22,11 @@ export default defineConfig({
     alias: [
       {
         find: '@',
-        replacement: resolve(__dirname, '../src'),
+        replacement: resolve(import.meta.dirname, '../src'),
       },
       {
         find: 'assets',
-        replacement: resolve(__dirname, '../src/assets'),
+        replacement: resolve(import.meta.dirname, '../src/assets'),
       },
       {
         find: 'vue-i18n',
@@ -39,6 +41,11 @@ export default defineConfig({
   },
   define: {
     'process.env': {},
+  },
+  optimizeDeps: {
+    rolldownOptions: {
+      plugins: [quillMentionOptimizePlugin()],
+    },
   },
   css: {
     preprocessorOptions: {

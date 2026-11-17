@@ -133,8 +133,6 @@ watch(currentLocale, async () => {
 })
 
 onMounted(() => {
-  setTimeout(resizeCharts, 200)
-
   const observer = new ResizeObserver(() => {
     resizeCharts()
   })

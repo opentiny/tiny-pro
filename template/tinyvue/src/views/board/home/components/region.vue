@@ -78,9 +78,6 @@ onMounted(() => {
   }
 
   resizeHandler()
-  setTimeout(() => {
-    mapChartsRef.value?.resize()
-  }, 200)
 
   onUnmounted(() => {
     window.removeEventListener('resize', resizeHandler)
