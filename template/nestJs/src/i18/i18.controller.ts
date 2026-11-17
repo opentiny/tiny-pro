@@ -56,7 +56,7 @@ export class I18Controller {
   findAll(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page?: number,
     @Query('limit', new DefaultValuePipe(0), ParseIntPipe) limit?: number,
-    @Query('all', ParseIntPipe) all?: number,
+    @Query('all', new DefaultValuePipe(0), ParseIntPipe) all?: number,
     @Query('lang', new DefaultValuePipe([]), ParseArrayPipe) lang?: number[],
     @Query('key') key?: string,
     @Query('content') content?: string

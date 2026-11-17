@@ -3,6 +3,7 @@ import { Progress as TinyProgress, Tag as TinyTag } from '@opentiny/vue'
 import { iconArrowDown, iconArrowUp } from '@opentiny/vue-icon'
 import { computed, ref } from 'vue'
 
+const props = defineProps<{ cards?: Record<RangeKey, CardData[]> }>()
 const TrendUpIcon = iconArrowUp()
 const TrendDownIcon = iconArrowDown()
 
@@ -21,9 +22,6 @@ interface CardData {
   type: 'success' | 'danger'
   percent: number
 }
-
-// 卡片数据来自 nestJS mock（GET /api/board/home 的 cards）
-const props = defineProps<{ cards?: Record<RangeKey, CardData[]> }>()
 
 const emptyCards: Record<RangeKey, CardData[]> = { week: [], day: [], hour: [] }
 
