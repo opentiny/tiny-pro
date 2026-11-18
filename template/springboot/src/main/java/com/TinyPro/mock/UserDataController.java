@@ -9,7 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @RestController
-@RequestMapping("/mock/api/user")
+@RequestMapping("/user")
 public class UserDataController {
 
     private final Map<String, Object> initData = initMockData();
