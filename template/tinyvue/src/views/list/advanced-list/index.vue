@@ -108,14 +108,10 @@ const hasPendingChanges = computed(() => {
   return tableData.value.some(row => !newKeys.value.has(row.id) && isRowChanged(row))
 })
 
-onBeforeRouteLeave((to, from, next) => {
-  if (!hasPendingChanges.value) {
-    next()
+onBeforeRouteLeave(() => {
+  if (!hasPendingChanges.value)
     return
-  }
-  Modal.confirm(t('advancedList.message.leaveConfirm')).then((res: string) => {
-    next(res === 'confirm')
-  })
+  return Modal.confirm(t('advancedList.message.leaveConfirm')).then((res: string) => res === 'confirm')
 })
 
 function handleBeforeUnload(event: BeforeUnloadEvent) {

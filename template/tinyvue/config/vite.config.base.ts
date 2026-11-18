@@ -6,6 +6,7 @@ import vueJsx from '@vitejs/plugin-vue-jsx'
 import UnoCSS from 'unocss/vite'
 import { defineConfig, loadEnv } from 'vite'
 import svgLoader from 'vite-svg-loader'
+import { quillMentionOptimizePlugin, quillMentionRegisterPlugin } from './plugin/quill-mention.ts'
 
 // npm workspaces 会把依赖提升到 monorepo 根目录，web/node_modules 下不一定存在，
 // 通过 node 解析定位包真实目录，兼容 npm / pnpm 两种安装方式
@@ -19,9 +20,10 @@ const config = {
     vueJsx(),
     svgLoader({ svgoConfig: {} }),
     UnoCSS(),
+    quillMentionRegisterPlugin(),
   ],
   build: {
-    outDir: resolve(__dirname, loadEnv('', process.cwd()).VITE_OUT_DIR || '../dist'),
+    outDir: resolve(import.meta.dirname, loadEnv('', process.cwd()).VITE_OUT_DIR || '../dist'),
     commonjsOptions: {
       transformMixedEsModules: true,
     },
@@ -30,11 +32,11 @@ const config = {
     alias: [
       {
         find: '@',
-        replacement: resolve(__dirname, '../src'),
+        replacement: resolve(import.meta.dirname, '../src'),
       },
       {
         find: 'assets',
-        replacement: resolve(__dirname, '../src/assets'),
+        replacement: resolve(import.meta.dirname, '../src/assets'),
       },
       {
         find: 'vue-i18n',
@@ -60,8 +62,11 @@ const config = {
     BUILD_TOOLS: '\'VITE\'',
   },
   optimizeDeps: {
-    esbuildOptions: {
-      resolveExtensions: ['.ts', '.js', '.css'],
+    rolldownOptions: {
+      resolve: {
+        extensions: ['.ts', '.js', '.css'],
+      },
+      plugins: [quillMentionOptimizePlugin()],
     },
   },
   css: {

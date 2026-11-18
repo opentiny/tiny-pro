@@ -2,12 +2,12 @@ import { resolve } from 'node:path'
 import process from 'node:process'
 import { configDotenv } from 'dotenv'
 import { loadEnv, mergeConfig } from 'vite'
-import { createDevProxyConfig } from './dev-proxy'
-import baseConfig from './vite.config.base'
+import { createDevProxyConfig } from './dev-proxy.ts'
+import baseConfig from './vite.config.base.ts'
 
 // 加载 dev.env 文件
 configDotenv({
-  path: resolve(__dirname, '../dev.env'),
+  path: resolve(import.meta.dirname, '../dev.env'),
 })
 
 // 加载环境变量（development 模式会读取 .env.development 和 .env）

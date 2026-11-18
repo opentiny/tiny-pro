@@ -7,11 +7,10 @@ import { unauthorizedLoginLocation } from '@/utils/app-location'
 import { isLogin } from '@/utils/auth'
 
 export default function setupPermissionGuard(router: Router) {
-  router.beforeEach(async (to, from, next) => {
+  router.beforeEach(async (to) => {
     NProgress.start()
     if (!isLogin()) {
       if (to.name === 'login') {
-        next()
         NProgress.done()
         return
       }
@@ -21,11 +20,9 @@ export default function setupPermissionGuard(router: Router) {
         status: 'error',
       })
       await nextTick()
-      next(unauthorizedLoginLocation(to))
       NProgress.done()
-      return
+      return unauthorizedLoginLocation(to)
     }
-    next()
     NProgress.done()
   })
 }

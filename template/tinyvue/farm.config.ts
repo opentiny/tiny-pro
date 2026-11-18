@@ -1,23 +1,28 @@
-import { defineConfig, loadEnv } from '@farmfe/core';
+import { fileURLToPath } from 'node:url';
+import { join, resolve } from 'node:path';
+import { defineConfig } from '@farmfe/core';
 import vue from '@vitejs/plugin-vue';
 import less from '@farmfe/js-plugin-less';
-import { join, resolve } from 'path';
 import { configDotenv } from 'dotenv';
+import { farmUnoCss } from './config/farm-unocss';
+
+const root = fileURLToPath(new URL('.', import.meta.url));
 
 configDotenv({
   path: './.env',
 });
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   vitePlugins: [vue()],
   plugins: [
+    farmUnoCss(root),
     less({
-      additionalData: `@import "${resolve(__dirname, 'src/assets/style/breakpoint.less')}";`,
+      additionalData: `@import "${resolve(root, 'src/assets/style/breakpoint.less')}";`,
     }),
   ],
   compilation: {
     define: {
-      'process.env': {},
+      'process.env.NODE_ENV': JSON.stringify(command === 'build' || command === 'preview' ? 'production' : 'development'),
       'BUILD_TOOLS': '"VITE"',
       'import.meta.env.VITE_CONTEXT': '"/vue-pro/"',
       'import.meta.env.VITE_BASE_API': '"/api"',
@@ -30,8 +35,8 @@ export default defineConfig({
     },
     resolve: {
       alias: {
-        '@': join(__dirname, 'src'),
-        'assets': join(__dirname, 'src/assets'),
+        '@': join(root, 'src'),
+        'assets': join(root, 'src/assets'),
         'vue-i18n': 'vue-i18n/dist/vue-i18n.esm-bundler.js',
         'vue': 'vue/dist/vue.esm-bundler.js',
       },
@@ -41,15 +46,9 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        pathRewrite: {
-          '^/api': '',
-        },
         target: 'http://localhost:3000',
-        pathFilter(pathname, req) {
-          return Boolean(pathname.match('^/api'));
-        },
-        logger: console,
+        rewrite: (requestPath: string) => requestPath.replace(/^\/api/, ''),
       },
     },
   },
-});
+}));
