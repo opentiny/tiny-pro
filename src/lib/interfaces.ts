@@ -38,13 +38,23 @@ export enum FeatureType {
 }
 
 /**
+ * 可选功能项；envKey 存在时由 init 按选择结果改写对应环境变量
+ */
+export interface FeatureOption {
+  name: string;
+  value: FeatureType;
+  envKey?: string;
+}
+
+/**
  * 可选功能清单，后续新增功能时在此追加即可
  */
-export const FEATURE_OPTIONS = [
+export const FEATURE_OPTIONS: Array<FeatureOption> = [
   {
-    name: 'TinyRobot 智能助手（AI 对话）',
+    // 选中后通过 npx @opentiny/tiny-robot-cli add chat 生成代码并挂载，无环境变量开关；
+    // 名称中附带镜像源提示：npmmirror 同步有延迟，选中后自动配置官方源
+    name: 'TinyRobot 智能助手（AI 对话，推荐使用 npm 官方源安装最新依赖）',
     value: FeatureType.TinyRobot,
-    envKey: 'VITE_TINY_ROBOT_ENABLED',
   },
   {
     name: 'TinyEditor 富文本编辑器',

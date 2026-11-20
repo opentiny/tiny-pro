@@ -10,7 +10,8 @@
         "include": "i18n/**/*",
         "watchAssets": true
       }
-    ]
+    ],
+    "webpackConfigPath": "webpack.config.js"
   },
   "projects": {
     "db": {

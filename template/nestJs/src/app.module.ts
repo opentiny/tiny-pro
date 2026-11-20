@@ -45,7 +45,6 @@ import { RoleInit } from './role/role.initializer';
 import { PermissionInit } from './permission/permission.initalizer';
 import { UserInit } from './user/user.initalizer';
 import { ApplicationInit } from './demo/application/application.init';
-import { ChatModule } from './chat/chat.module';
 import { ProjectModule } from './demo/project/project.module';
 import { EditorModule } from './demo/editor/editor.module';
 import { DemoDataModule } from './demo/demo-data.module';
@@ -85,7 +84,6 @@ const MOCK_MODE = process.env.MOCK_MODE === 'true';
           RoleModule,
           MenuModule,
           ApplicationModule,
-          ChatModule,
           ProjectModule,
           EditorModule,
           DemoDataModule,

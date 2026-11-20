@@ -11,10 +11,7 @@ export class HttpResponseInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const request = context.switchToHttp().getRequest();
     const path = String(request.originalUrl ?? request.url ?? '');
-    if (
-      path.includes('/robot/chat/completions') ||
-      path.endsWith('/healthCheck')
-    ) {
+    if (path.endsWith('/healthCheck')) {
       return next.handle();
     }
     return next.handle().pipe(

@@ -1,4 +1,5 @@
-import { resolve } from 'node:path'
+import { createRequire } from 'node:module'
+import { dirname, resolve } from 'node:path'
 import process from 'node:process'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
@@ -6,6 +7,12 @@ import UnoCSS from 'unocss/vite'
 import { defineConfig, loadEnv } from 'vite'
 import svgLoader from 'vite-svg-loader'
 import { quillMentionOptimizePlugin, quillMentionRegisterPlugin } from './plugin/quill-mention.ts'
+
+// npm workspaces 会把依赖提升到 monorepo 根目录，web/node_modules 下不一定存在，
+// 通过 node 解析定位包真实目录，兼容 npm / pnpm 两种安装方式
+const localRequire = createRequire(import.meta.url)
+const resolveLocalPackage = (name: string) =>
+  dirname(localRequire.resolve(`${name}/package.json`))
 
 const config = {
   plugins: [
@@ -41,11 +48,11 @@ const config = {
       },
       {
         find: '@opentiny/vue-icon',
-        replacement: resolve(import.meta.dirname, '../node_modules/@opentiny/vue-icon'), // compile template
+        replacement: resolveLocalPackage('@opentiny/vue-icon'), // compile template
       },
       {
         find: '@opentiny/vue-theme',
-        replacement: resolve(import.meta.dirname, '../node_modules/@opentiny/vue-theme'),
+        replacement: resolveLocalPackage('@opentiny/vue-theme'),
       },
     ],
     extensions: ['.ts', '.js', '.css'],

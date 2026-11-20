@@ -8,7 +8,7 @@
     "build:alpha": "cross-env NODE_OPTIONS=--max-old-space-size=10240 vite build --mode alpha",
     "build": "cross-env NODE_OPTIONS=--max-old-space-size=10240 vite build",
     "serve:frontend": "cross-env vite",
-    "serve:mock": "node node_modules/@opentiny/tiny-engine-mock/dist/app.js"
+    "serve:mock": "node -e \"require('@opentiny/tiny-engine-mock')\""
   },
   "dependencies": {
     "@opentiny/icons": "^0.1.4",
