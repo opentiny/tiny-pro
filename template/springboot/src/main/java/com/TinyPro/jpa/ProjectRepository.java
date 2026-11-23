@@ -11,4 +11,8 @@ import java.util.List;
 public interface ProjectRepository extends JpaRepository<Project, Long>, JpaSpecificationExecutor<Project> {
 
     List<Project> findAllByOrderByIdAsc();
+
+    boolean existsByProjectCode(String projectCode);
+
+    boolean existsByProjectCodeAndIdNot(String projectCode, Long id);
 }
