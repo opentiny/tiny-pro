@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
 @RestController
-@RequestMapping("/mock/api/user")
+@RequestMapping("/user")
 public class MockBoardController {
     private final List<Map<String, String>> mockGetData = List.of(
             Map.of("value", "1", "label", "work.mock.employees"),
