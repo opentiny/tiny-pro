@@ -5,12 +5,14 @@ import com.TinyPro.entity.po.Project;
 import com.TinyPro.entity.po.ProjectStage;
 import com.TinyPro.entity.po.ProjectVersion;
 import com.TinyPro.entity.vo.ProjectVo;
+import com.TinyPro.exception.BusinessException;
 import com.TinyPro.jpa.ProjectStageRepository;
 import com.TinyPro.jpa.ProjectRepository;
 import com.TinyPro.jpa.ProjectVersionRepository;
 import com.TinyPro.mock.ApiResponse;
 import com.TinyPro.service.ProjectService;
 import org.springframework.http.HttpStatus;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -98,13 +100,18 @@ public class ProjectServiceImpl implements ProjectService {
         String owner = text(data, "owner", "");
 
         if (projectRepository.existsByProjectCode(projectCode)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Project code already exists");
+            throw projectCodeConflict(projectCode, null);
         }
 
         Project project = new Project();
         applyProjectFields(project, data, true);
 
-        Project saved = projectRepository.saveAndFlush(project);
+        Project saved;
+        try {
+            saved = projectRepository.saveAndFlush(project);
+        } catch (DataIntegrityViolationException exception) {
+            throw projectCodeConflict(projectCode, exception);
+        }
         return ApiResponse.success(ProjectVo.from(saved, List.of(), List.of()));
     }
 
@@ -124,13 +131,25 @@ public class ProjectServiceImpl implements ProjectService {
 
         String projectCode = text(data, "projectCode", project.getProjectCode());
         if (projectRepository.existsByProjectCodeAndIdNot(projectCode, id)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Project code already exists");
+            throw projectCodeConflict(projectCode, null);
         }
 
         applyProjectFields(project, data, false);
         validateRequiredFields(project);
-        projectRepository.saveAndFlush(project);
+        try {
+            projectRepository.saveAndFlush(project);
+        } catch (DataIntegrityViolationException exception) {
+            throw projectCodeConflict(projectCode, exception);
+        }
         return ApiResponse.success(true);
+    }
+
+    private BusinessException projectCodeConflict(
+            String projectCode, DataIntegrityViolationException cause) {
+        BusinessException exception = new BusinessException(
+                "project.codeExists", HttpStatus.CONFLICT, projectCode);
+        exception.initCause(cause);
+        return exception;
     }
 
     @Override
