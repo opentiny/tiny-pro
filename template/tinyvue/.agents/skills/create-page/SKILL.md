@@ -35,7 +35,7 @@ import GeneralLayout from '@/layout/general-layout.vue'
 在后台「系统管理 > 国际化管理」新增词条（若运行时环境提供 `add-i18n-entry` WebMCP 工具则直接调用）：
 
 - Key 格式：`模块::页面::元素`，如 `$page_name::page::title`
-- zhCN（lang=2）与 enUS（lang=1）各建一条
+- 通过后台界面按语言名称分别创建 zhCN 与 enUS 词条；通过接口或 WebMCP 工具创建前，先查询语言列表并核对当前数据库中的语言 ID。`add-i18n-entry` 工具目前仅接受 `lang=1`（预期 enUS）或 `lang=2`（预期 zhCN），实际映射不符时不要使用该工具，改用后台界面按语言名称创建
 - 页面内所有文案都必须走 `$t()`，不允许写死中文
 
 ## 第三步：后台菜单管理登记
@@ -55,6 +55,8 @@ import GeneralLayout from '@/layout/general-layout.vue'
 原理：菜单下发后由 `src/router/guard/menu.ts` 把 `component` 字段映射到 `src/views/**`，组件路径写错会落到内置 404 组件。
 
 ## 第四步：角色绑定菜单
+
+> 前提：后端 `PREVIEW_MODE` 必须为 `false`。默认值 `true` 会拒绝角色更新请求；修改后需重启后端服务，再重试绑定。
 
 在后台「系统管理 > 查看角色」中为角色（如 admin）执行「绑定菜单」，勾选新菜单（或调用 `bind-menu-for-role` WebMCP 工具）。未绑定角色的菜单不会出现在左侧导航。
 

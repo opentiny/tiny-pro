@@ -18,7 +18,7 @@ pnpm migrate:gen      # 生成数据库迁移
 pnpm migrate:run      # 执行迁移（node migrate.js）
 ```
 
-Swagger 文档：`http://localhost:3000/api`（`GLOBAL_PREFIX` 默认 `/api`）。
+Swagger 文档：`http://localhost:3000/api`（默认不启用，需在 `.env` 中设置 `ENABLE_SWAGGER=true` 并重启服务后访问）。接口全局前缀由 `GLOBAL_PREFIX` 配置（未配置时回退为 `/api`，`.env.example` 默认值为 `/`）。
 
 ## 环境依赖
 
@@ -47,7 +47,7 @@ libs              # 共享库（@app/db、@app/models、@app/locker、redis 等�
 1. **鉴权与授权**：`AuthGuard` 与 `PermissionGuard` 通过 `APP_GUARD` 全局注册。
    - 接口要权限控制时加 `@Permission('模块::操作')`（`src/public/permission.decorator.ts`），与前端 `v-permission` 的值一一对应。
    - 需要跳过鉴权的公开接口用 `src/public/public.decorator.ts`；`@Reject` 用于拒绝特定请求。
-2. **初始化器**：各模块的 `*.initializer.ts`（如 `menu.initializer.ts`、`role.initializer.ts`）在启动时灌入种子数据（菜单、角色、权限、用户）。新增内置权限/菜单时优先改对应 initializer，而不是手动写 SQL。
+2. **初始化器**：各模块的 `*.initializer.ts`（如 `menu.initializer.ts`、`role.initializer.ts`）在首次安装时灌入种子数据（菜单、角色、权限、用户）。新增内置权限/菜单时优先改对应 initializer，而不是手动写 SQL；Redis 中存在 `FLAG:INSTALL` 时会跳过初始化，已有安装需另行提供数据迁移或通过后台管理同步，仅修改 initializer 不会更新已有数据库。
 3. **DTO 校验**：入参用 `dto/` 下的 class 加 `class-validator` 装饰器；全局 `I18nValidationPipe` 负责校验与报错翻译。
 4. **接口文档**：controller 方法补 `@ApiOperation`/`@ApiOkResponse` 等 Swagger 装饰器。
 5. **统一响应**：`src/public/http-response.interceptor.ts` 与 `http-response.exception-filter.ts` 已统一出参/异常结构，不要在 controller 里自行拼装响应码。
@@ -55,4 +55,4 @@ libs              # 共享库（@app/db、@app/models、@app/locker、redis 等�
 
 ## 与前端的联动
 
-本服务是 TinyPro Vue 前端（`template/tinyvue`）的数据源：菜单树、权限、角色、用户、国际化词条全部由这里持久化。改动这些域的接口时，检查前端 `src/api/`（menu.ts、permission.ts、role.ts、user.ts、lang.ts 等）是否需要同步；接口路径带全局前缀（默认 `/api`，前端按 `/api/v1` 代理/mock 前缀处理）。
+本服务是 TinyPro Vue 前端（`template/tinyvue`）的数据源：菜单树、权限、角色、用户、国际化词条全部由这里持久化。改动这些域的接口时，检查前端 `src/api/`（menu.ts、permission.ts、role.ts、user.ts、lang.ts 等）是否需要同步；接口全局前缀以 `GLOBAL_PREFIX` 配置为准，前端开发请求使用 `/api`，非 mock 模式下开发代理转发前会移除该前缀，mock 模式下保留。

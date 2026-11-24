@@ -10,7 +10,7 @@
 
 ```bash
 ├── src/lib          # toolkit 源码（init/build/start 等命令逻辑，TypeScript）
-├── dist             # tsc 构建产物（随仓库提交，发布前由 prepublishOnly 重新构建）
+├── dist             # tsc 本地构建产物（已被 .gitignore 忽略，不纳入版本控制）
 ├── template
 │   ├── tinyvue      # 前端模板（Vue3 + Vite + TinyVue），有自己的 AGENTS.md
 │   ├── nestJs       # NestJS 后端模板，有自己的 AGENTS.md
@@ -46,6 +46,6 @@ pnpm docs:dev         # 本地预览文档站
 ## 修改时的注意点
 
 1. **改 `template/` 下的文件会影响所有脚手架产物**，等于在改所有未来用户的项目，需按发布标准对待。
-2. `dist/` 是提交在仓库里的构建产物；改 `src/` 后应跑 `pnpm build:main` 保持同步（发布时 `prepublishOnly` 会自动重建）。
+2. `dist/` 是本地构建产物，已被 `.gitignore` 忽略，不纳入版本控制；改 `src/` 后无需提交 `dist/`，需要本地产物时运行 `pnpm build:main`（发布时 `prepublishOnly` 会自动重建）。
 3. 前端/后端的「菜单、权限、角色、用户、国际化」是前后端联动的功能：改 tinyvue 侧交互时，检查 nestJs 侧对应接口是否也要动（`template/nestJs/src/{menu,permission,role,user,i18}`）。
 4. 新增页面/菜单的标准流程以「后台管理系统动态下发」为准，见 `template/tinyvue/AGENTS.md`。
