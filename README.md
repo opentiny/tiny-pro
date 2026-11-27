@@ -243,3 +243,244 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
+
+## Spring Boot 后端启动
+
+Spring Boot 后端位于 `template/springboot`，启动类为
+`com.TinyPro.TinyProApplication`，默认监听 `3000` 端口。
+
+### 环境准备
+
+本地启动前请准备：
+
+- JDK 17
+- Maven 3.9+，并确保 `mvn` 已加入 PATH
+- MySQL 8.x，默认端口 `3306`
+- Redis 7.x，默认端口 `6379`
+- 可选的 LLM 服务 API Key（仅调用 AI 对话接口时需要）
+
+使用 Docker 启动时，只需要准备 Docker Engine 和 Docker Compose，不需要在本机单独安装 Java、Maven、MySQL 或 Redis。
+
+### 本地启动
+
+#### 1. 创建 MySQL 数据库
+
+创建一个空数据库：
+
+```sql
+CREATE DATABASE tinypro_db
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
+```
+
+数据库名称需要与 `template/springboot/src/main/resources/application-local.properties` 中的连接地址一致。
+
+#### 2. 启动 Redis
+
+```bash
+redis-cli ping
+```
+
+正常返回 `PONG`。
+
+#### 3. 配置环境变量
+
+`application-local.properties` 使用以下环境变量：
+
+| 环境变量 | 是否必需 | 说明 |
+| --- | --- | --- |
+| `MYSQL_USERNAME` | 是 | MySQL 用户名 |
+| `MYSQL_PASSWORD` | 是 | MySQL 密码 |
+| `REDIS_HOST` | 是 | Redis 地址，本机通常为 `localhost` |
+| `REDIS_PASSWORD` | 否 | Redis 密码，无密码时留空 |
+| `JWT_SECRET` | 是 | JWT 签名密钥，至少 8 个字符 |
+| `LLM_API_KEY` | 使用 AI 时必需 | 服务端调用大模型的 API Key |
+| `LLM_BASE_URL` | 否 | OpenAI 兼容接口地址，默认通义千问兼容地址 |
+| `LLM_MODEL` | 否 | 默认模型，默认值为 `qwen-plus` |
+| `LLM_EXTRA_BODY` | 否 | 发送给模型服务的额外 JSON 参数 |
+| `GLOBAL_PREFIX` | 否 | API 前缀，默认 `/`；可设置为 `/api` |
+| `ENABLE_SWAGGER` | 否 | 是否启用 Swagger，默认 `false` |
+| `FLYWAY_ENABLED` | 否 | 是否启用数据库迁移，默认 `true` |
+
+PowerShell：
+
+```powershell
+$env:MYSQL_USERNAME = "root"
+$env:MYSQL_PASSWORD = "你的MySQL密码"
+$env:REDIS_HOST = "localhost"
+$env:REDIS_PASSWORD = ""
+$env:JWT_SECRET = "change-this-jwt-secret"
+
+# 使用 AI 对话接口时配置
+$env:LLM_API_KEY = "你的LLM_API_KEY"
+$env:LLM_BASE_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1"
+$env:LLM_MODEL = "qwen-plus"
+```
+
+Linux/macOS：
+
+```bash
+export MYSQL_USERNAME=root
+export MYSQL_PASSWORD='你的MySQL密码'
+export REDIS_HOST=localhost
+export REDIS_PASSWORD=''
+export JWT_SECRET='change-this-jwt-secret'
+
+# 使用 AI 对话接口时配置
+export LLM_API_KEY='你的LLM_API_KEY'
+export LLM_BASE_URL='https://dashscope.aliyuncs.com/compatible-mode/v1'
+export LLM_MODEL='qwen-plus'
+```
+
+#### 4. 启动 Spring Boot
+
+```bash
+cd template/springboot
+mvn spring-boot:run -Dspring-boot.run.profiles=local
+```
+
+也可以先打包再运行：
+
+```bash
+cd template/springboot
+mvn clean package -DskipTests
+java -jar target/SpringBoot-1.0-SNAPSHOT.jar
+```
+
+启动时 Flyway 会执行 `src/main/resources/db/migration` 下的迁移，
+然后由 `DataInitializer` 初始化权限、菜单、语言、应用和编辑器数据。
+首次使用空数据库时会创建默认管理员：
+
+```text
+邮箱：admin@no-reply.com
+密码：admin
+```
+
+首次登录后请立即修改密码。已有数据的数据库不会因为重启而自动重新创建默认管理员。
+
+### Docker Compose 启动
+
+`template/springboot/docker-compose.yml` 会启动 Spring Boot、MySQL 8 和 Redis 7：
+
+```bash
+cd template/springboot
+docker compose up -d --build
+```
+
+查看日志：
+
+```bash
+docker compose logs -f app
+```
+
+停止服务：
+
+```bash
+docker compose down
+```
+
+默认配置：
+
+```text
+MySQL 地址：mysql:3306
+MySQL 数据库：tinypro_db
+MySQL 用户：root
+MySQL 密码：123456
+Redis 地址：redis:6379
+应用地址：http://localhost:3000
+```
+
+生产或共享环境不要直接使用默认密码。启动前应修改
+`template/springboot/docker-compose.yml` 中的数据库密码和 `JWT_SECRET`。
+使用 AI 对话接口时，还需要在 Compose 的 `app.environment` 中增加：
+
+```yaml
+LLM_API_KEY: your-llm-api-key
+LLM_BASE_URL: https://dashscope.aliyuncs.com/compatible-mode/v1
+LLM_MODEL: qwen-plus
+```
+
+### 验证后端是否启动成功
+
+默认健康检查：
+
+```bash
+curl http://localhost:3000/healthCheck
+```
+
+正常返回 `success`。Actuator 健康检查地址为：
+
+`http://localhost:3000/actuator/health`
+
+启用 Swagger：
+
+```powershell
+$env:ENABLE_SWAGGER = "true"
+```
+
+然后访问：
+
+```text
+http://localhost:3000/swagger-ui.html
+http://localhost:3000/v3/api-docs
+```
+
+登录接口默认是：
+
+```text
+POST http://localhost:3000/auth/login
+```
+
+如果配置 `GLOBAL_PREFIX=/api`，业务接口会变为
+`http://localhost:3000/api/auth/login`；健康检查仍为
+`http://localhost:3000/healthCheck`。
+
+### 与前端联调
+
+前端开发环境默认把 `/api` 请求代理到 `http://127.0.0.1:3000`，
+并在转发到 Spring Boot 时去掉 `/api` 前缀。因此本地联调时后端保持
+`GLOBAL_PREFIX=/` 即可。
+
+```bash
+# 终端 1：启动后端
+cd template/springboot
+mvn spring-boot:run -Dspring-boot.run.profiles=local
+
+# 终端 2：启动前端
+cd template/tinyvue
+pnpm install
+pnpm dev
+```
+
+### Flyway 注意事项
+
+- 新数据库可以直接启动，Flyway 会按版本顺序执行 `V1__...` 到最新迁移。
+- 已有非空数据库请先备份并核对表、字段、索引和约束，不要直接开启迁移。
+- 已执行的迁移文件不要修改；后续结构变化应新增更高版本的迁移文件。
+- `FLYWAY_BASELINE_ON_MIGRATE` 默认是 `false`。已有数据库需要 baseline
+  时，请先阅读 `template/springboot/FLYWAY.md`。
+- Hibernate 使用 `ddl-auto=validate`，只校验实体和数据库结构，不负责修改表结构。
+
+### 常见问题
+
+1. **JWT secret 为空或长度不足**
+
+   检查 `JWT_SECRET` 是否已设置，且长度至少为 8 个字符。
+
+2. **无法连接 MySQL**
+
+   检查 MySQL 是否启动、`tinypro_db` 是否已创建，以及
+   `MYSQL_USERNAME`、`MYSQL_PASSWORD` 是否正确。
+
+3. **无法连接 Redis**
+
+   检查 `REDIS_HOST`、端口 `6379` 和 `REDIS_PASSWORD` 是否正确。
+
+4. **AI 接口提示未配置 API Key**
+
+   配置 `LLM_API_KEY`。普通业务接口不依赖该配置，AI 对话接口依赖它。
+
+5. **前端请求 404**
+
+   本地联调时确认后端监听 `3000`，并保持默认 `GLOBAL_PREFIX=/`；
+   如果设置了 `GLOBAL_PREFIX=/api`，前端代理配置也需要同步调整。
